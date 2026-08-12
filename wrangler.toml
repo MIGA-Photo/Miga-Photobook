@@ -1,0 +1,42 @@
+name = "miga"
+main = "transform-worker.js"
+compatibility_date = "2026-08-01"
+
+# This targets your EXISTING "miga" Worker (already live at
+# https://miga.j7f8ywhn9y.workers.dev) and its real, already-in-use storage.
+# `wrangler deploy` updates that same Worker in place — its URL does not
+# change, so nothing in the frontend needs updating.
+
+[[kv_namespaces]]
+binding = "MEGA_KV"
+id = "5954627f90614f3abfd89a40ecef708f"   # mega_prompt_data — your real, existing KV
+
+[[d1_databases]]
+binding = "MEGA_DB"
+database_name = "mega_prompt_users_db"
+database_id = "12c64c63-f895-432e-87bd-ddb9c28e92fc"   # your real, existing D1 — already has 1 real user
+
+# Enable R2 in the dashboard first (Storage & Databases -> R2 -> enable),
+# then: wrangler r2 bucket create mega-images
+[[r2_buckets]]
+binding = "MEGA_IMAGES"
+bucket_name = "mega-images"
+
+# ---------------------------------------------------------------------------
+# Secrets (set with `wrangler secret put NAME` — never written to this file).
+# Most of these should already be set on "miga" since Paymob/Fawry/transform
+# already work there — this list is just for reference / filling any gaps.
+#
+#   ADMIN_PASSWORD                                    should already be set
+#   FAL_KEY                                            should already be set
+#   PAYMOB_SECRET_KEY, PAYMOB_PUBLIC_KEY,
+#     PAYMOB_INTEGRATION_ID, PAYMOB_HMAC_SECRET        should already be set
+#   FAWRY_MERCHANT_CODE, FAWRY_SECURITY_KEY            should already be set
+#
+#   ALLOWED_ORIGIN          NEW — e.g. https://megaaa2026.github.io
+#   SOFT_LAUNCH_MODE        NEW — "true" or "false", keep in sync with the
+#                             frontend's SOFT_LAUNCH constant
+#
+#   Only if/when you turn on social login (leave unset until then):
+#   GOOGLE_CLIENT_ID, APPLE_CLIENT_ID, FACEBOOK_APP_ID, FACEBOOK_APP_SECRET
+# ---------------------------------------------------------------------------
