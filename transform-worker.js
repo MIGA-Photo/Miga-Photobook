@@ -484,6 +484,12 @@ async function createOrder(env, request) {
     ref: ref ? String(ref).slice(0, 120) : "",
     status: "pending",
     createdAt: Date.now(),
+    // One-shot generation guard — see transformImage(). A paid order buys exactly
+    // one fal.ai call; once it succeeds this flips true and resultUrl is cached so
+    // a page reload or accidental retry replays the cached image instead of paying
+    // fal.ai again.
+    transformUsed: false,
+    resultUrl: null,
   };
   await env.MEGA_KV.put(`order:${code}`, JSON.stringify(order));
 
@@ -540,6 +546,8 @@ async function claimFreeOrder(env, request) {
     ref: "soft-launch-free-claim",
     status: "approved",
     createdAt: Date.now(),
+    transformUsed: false,
+    resultUrl: null,
   };
   await env.MEGA_KV.put(`order:${code}`, JSON.stringify(order));
   const indexRaw = await env.MEGA_KV.get("orders:index");
@@ -1495,11 +1503,35 @@ async function transformImage(env, request) {
   if (order.status !== "approved") return err("This order has not been approved yet", 403);
   if (order.productId !== productId) return err("This order code does not match this product", 403);
 
+  // ---- One-shot guard -------------------------------------------------
+  // Already generated once for this order: replay the cached result instead
+  // of calling fal.ai again. This is what makes retries/reloads free instead
+  // of a paid order being able to generate unlimited images.
+  if (order.transformUsed) {
+    if (order.resultUrl) return json({ imageUrl: order.resultUrl, cached: true });
+    return err("This order has already been used to generate an image", 409);
+  }
+
+  // Short-lived lock so a double-click (two requests in flight for the same
+  // order before either has finished) can't both slip past the check above
+  // and both hit fal.ai. Not a perfect atomic lock (KV has no compare-and-set),
+  // but it closes the window from "one full fal.ai round trip" down to a
+  // single fast KV read/write, which is enough for real double-clicks.
+  const lockKey = `transform-lock:${code}`;
+  if (await env.MEGA_KV.get(lockKey)) {
+    return err("A generation for this order is already in progress", 409);
+  }
+  await env.MEGA_KV.put(lockKey, "1", { expirationTtl: 90 });
+
   const productRaw = await env.MEGA_KV.get(`product:${productId}`);
-  if (!productRaw) return err("Product not found", 404);
+  if (!productRaw) {
+    await env.MEGA_KV.delete(lockKey);
+    return err("Product not found", 404);
+  }
   const product = JSON.parse(productRaw);
 
   if (!env.FAL_KEY) {
+    await env.MEGA_KV.delete(lockKey);
     return err("AI transform is not configured yet (missing FAL_KEY)", 501);
   }
 
@@ -1515,13 +1547,26 @@ async function transformImage(env, request) {
 
     if (!falRes.ok) {
       const detail = await falRes.text();
+      await env.MEGA_KV.delete(lockKey); // failed — don't burn the customer's one attempt
       return json({ error: "Image generation request failed", detail }, 502);
     }
     const data = await falRes.json();
     const outputUrl = data?.images?.[0]?.url;
-    if (!outputUrl) return json({ error: "No image returned from the generation service", detail: data }, 502);
+    if (!outputUrl) {
+      await env.MEGA_KV.delete(lockKey);
+      return json({ error: "No image returned from the generation service", detail: data }, 502);
+    }
+
+    // Success — consume the order's one attempt and cache the result.
+    order.transformUsed = true;
+    order.resultUrl = outputUrl;
+    order.transformedAt = Date.now();
+    await env.MEGA_KV.put(`order:${code}`, JSON.stringify(order));
+    await env.MEGA_KV.delete(lockKey);
+
     return json({ imageUrl: outputUrl });
   } catch (e) {
+    await env.MEGA_KV.delete(lockKey);
     return json({ error: "Unexpected server error", detail: String(e) }, 500);
   }
 }

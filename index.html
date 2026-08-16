@@ -2430,11 +2430,20 @@ document.getElementById('transformGenerateBtn').onclick = async ()=>{
   const p = products.find(x=>x.id===currentTransformId);
   const orderCode = orderCodes[currentTransformId];
   if(!orderCode){ showToast(t('toastGenerateFailed')); return; }
+  const genBtn = document.getElementById('transformGenerateBtn');
   const outCanvas = document.getElementById('transformOutCanvas');
   const ctx = outCanvas.getContext('2d');
   const w = outCanvas.width, h = outCanvas.height;
 
   if(TRANSFORM_API_ENDPOINT){
+    // Client-side guard only — the real limit is enforced server-side (an order
+    // can only ever produce one successful generation). This just avoids an
+    // extra round trip and gives the customer immediate feedback.
+    if(genBtn.dataset.used === '1'){
+      showToast(t('toastAlreadyGenerated') || 'This order has already been used to generate an image.');
+      return;
+    }
+    genBtn.disabled = true;
     showToast(t('toastGenerating'));
     try{
       const dataUri = document.getElementById('transformSrcCanvas').toDataURL('image/jpeg', 0.9);
@@ -2447,9 +2456,13 @@ document.getElementById('transformGenerateBtn').onclick = async ()=>{
       });
       const data = await res.json().catch(()=>null);
       if(!res.ok || !data || !data.imageUrl){
+        // 409 means the order was already consumed (possibly from another tab/device) —
+        // keep the button locked instead of letting the customer keep retrying.
+        if(res.status !== 409) genBtn.disabled = false;
         showToast(t('toastGenerateFailed'));
         return;
       }
+      genBtn.dataset.used = '1';
       const resultImg = new Image();
       resultImg.crossOrigin = 'anonymous';
       resultImg.onload = ()=>{
@@ -2461,6 +2474,7 @@ document.getElementById('transformGenerateBtn').onclick = async ()=>{
       resultImg.onerror = ()=> showToast(t('toastGenerateFailed'));
       resultImg.src = data.imageUrl;
     }catch(e){
+      genBtn.disabled = false;
       showToast(t('toastGenerateFailed'));
     }
     return;
