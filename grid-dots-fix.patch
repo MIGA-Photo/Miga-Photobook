@@ -1,0 +1,46 @@
+diff --git a/index.html b/index.html
+index cbada81..f9e43d0 100644
+--- a/index.html
++++ b/index.html
+@@ -362,9 +362,13 @@
+   html[dir="rtl"] .grid-arrow.prev svg{transform:scaleX(-1);}
+   html[dir="rtl"] .grid-arrow.next svg{transform:scaleX(-1);}
+   .grid-page-dots{display:flex; justify-content:center; gap:6px; margin-top:14px;}
+-  .grid-page-dots span{width:6px; height:6px; border-radius:50%; background:var(--line);}
++  .grid-page-dots span{width:6px; height:6px; border-radius:50%; background:var(--line); cursor:pointer;}
+   .grid-page-dots span.active{background:var(--brass);}
+-  @media(max-width:640px){ .grid-arrow{display:none;} }
++  @media(max-width:640px){
++    .grid-arrow{display:flex; position:static; margin:0 6px;}
++    .grid-page-dots{align-items:center;}
++    .grid-page-dots span{width:10px; height:10px;}
++  }
+   .empty-note{
+     color:var(--paper-dim); font-size:14.5px; border:1px dashed var(--line);
+     border-radius:10px; padding:26px; text-align:center;
+@@ -2115,7 +2119,7 @@ function renderGrids(){
+     if(nextBtn){ nextBtn.style.display = showNav ? '' : 'none'; nextBtn.disabled = page >= pageCount - 1; }
+     if(dotsEl){
+       dotsEl.innerHTML = showNav
+-        ? Array.from({length:pageCount}, (_,i) => `<span class="${i===page?'active':''}"></span>`).join('')
++        ? Array.from({length:pageCount}, (_,i) => `<span class="${i===page?'active':''}" onclick="goToGridPage('${cat}', ${i})" role="button" aria-label="page ${i+1}"></span>`).join('')
+         : '';
+     }
+ 
+@@ -2159,6 +2163,16 @@ function pageGrid(cat, direction){
+   document.getElementById(cat)?.scrollIntoView({behavior:'smooth', block:'start'});
+ }
+ 
++function goToGridPage(cat, pageIndex){
++  const items = products.filter(p=>p.category===cat);
++  const pageCount = Math.max(1, Math.ceil(items.length / GRID_PAGE_SIZE));
++  const next = Math.max(0, Math.min(pageCount - 1, pageIndex));
++  if(next === (gridPages[cat] || 0)) return;
++  gridPages[cat] = next;
++  renderGrids();
++  document.getElementById(cat)?.scrollIntoView({behavior:'smooth', block:'start'});
++}
++
+ function catLabel(c){
+   const map = { children:'optChildren', male:'optMale', female:'optFemale', business:'optBusiness', cinematic:'optCinematic', luxury:'optLuxury', artistic:'optArtistic', magazine:'optMagazine' };
+   return t(map[c] || 'optChildren');
