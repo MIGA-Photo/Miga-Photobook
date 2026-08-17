@@ -168,6 +168,49 @@
     color:var(--ink); background:var(--paper); border-color:var(--paper);
     box-shadow:0 3px 10px rgba(0,0,0,0.2);
   }
+
+  /* ===== Categories dropdown (replaces the row of pill buttons) ===== */
+  .cat-dropdown{position:relative;}
+  .cat-dropdown-btn{
+    display:flex; align-items:center; gap:10px;
+    background:transparent; color:var(--paper); border:1.5px solid var(--brass);
+    padding:10px 18px; border-radius:10px; font-size:15px; font-weight:600;
+    transition:.2s;
+  }
+  .cat-dropdown-btn:hover{background:rgba(255,201,77,0.08);}
+  .cat-dropdown-btn .cdi{font-size:19px; line-height:1;}
+  .cat-dropdown-btn .cdc{font-size:14px; transition:transform .18s; margin-inline-start:2px;}
+  .cat-dropdown.open .cat-dropdown-btn .cdc{transform:rotate(180deg);}
+  .cat-dropdown-menu{
+    display:none; position:absolute; top:calc(100% + 8px); inset-inline-end:0;
+    background:#17181f; border:1px solid var(--line); border-radius:12px;
+    padding:6px; min-width:200px; z-index:60; box-shadow:0 12px 30px rgba(0,0,0,0.35);
+  }
+  .cat-dropdown.open .cat-dropdown-menu{display:block;}
+  .cat-dropdown-menu button{
+    display:block; width:100%; text-align:inherit; background:transparent; color:var(--paper-dim);
+    padding:11px 14px; border-radius:8px; font-size:14.5px; border:none;
+  }
+  .cat-dropdown-menu button:hover, .cat-dropdown-menu button.active{
+    background:var(--paper); color:var(--ink);
+  }
+
+  /* ===== Collapsible sections (How it works / Testimonials / About / FAQ) ===== */
+  .cat-section.collapsible > .section-head{
+    cursor:pointer; user-select:none;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .cat-section.collapsible > .section-head .sh-left{display:flex; align-items:center; gap:12px;}
+  .cat-section.collapsible > .section-head .sh-icon{font-size:20px; color:var(--brass);}
+  .cat-section.collapsible > .section-head .sh-chevron{
+    font-size:15px; color:var(--brass); transition:transform .2s;
+  }
+  .cat-section.collapsible.open > .section-head .sh-chevron{transform:rotate(180deg);}
+  .cat-section.collapsible > .cs-body{
+    max-height:0; overflow:hidden; transition:max-height .25s ease;
+  }
+  .cat-section.collapsible.open > .cs-body{max-height:2400px;}
+  .cat-section.collapsible > .cs-body > *:first-child{margin-top:20px;}
   .admin-btn{
     background:transparent; border:1px solid var(--line); color:var(--paper-dim);
     padding:8px 14px; border-radius:8px; font-size:13px;
@@ -348,26 +391,35 @@
   @media(max-width:700px){ .grid{grid-template-columns:repeat(2, 1fr);} }
   @media(max-width:460px){ .grid{grid-template-columns:1fr;} }
   .grid-nav-wrap{position:relative;}
-  .grid-arrow{
-    position:absolute; top:50%; transform:translateY(-50%); z-index:2;
-    width:38px; height:38px; border-radius:50%; background:var(--ink-2);
-    border:1px solid var(--line); color:var(--brass); font-size:18px;
-    display:flex; align-items:center; justify-content:center; cursor:pointer;
-    box-shadow:0 4px 14px rgba(0,0,0,0.4);
+  /* Pagination bar: left arrow — page numbers — right arrow, replacing the
+     small dots. Kept in a fixed left-to-right order (arrow, numbers, arrow)
+     regardless of the page's RTL text direction, since page numbers read the
+     same way for everyone and this avoids ambiguity about which arrow means
+     "forward". */
+  .grid-page-dots{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin-top:18px; direction:ltr;
   }
-  .grid-arrow:hover{border-color:var(--brass);}
-  .grid-arrow:disabled{opacity:0.25; cursor:default;}
-  .grid-arrow.prev{inset-inline-start:-14px;}
-  .grid-arrow.next{inset-inline-end:-14px;}
-  html[dir="rtl"] .grid-arrow.prev svg{transform:scaleX(-1);}
-  html[dir="rtl"] .grid-arrow.next svg{transform:scaleX(-1);}
-  .grid-page-dots{display:flex; justify-content:center; gap:6px; margin-top:14px;}
-  .grid-page-dots span{width:6px; height:6px; border-radius:50%; background:var(--line); cursor:pointer;}
-  .grid-page-dots span.active{background:var(--brass);}
+  .grid-page-dots .gp-arrow{
+    display:flex; align-items:center; justify-content:center;
+    width:38px; height:38px; border-radius:10px;
+    background:var(--ink-2); border:1.5px solid var(--brass); color:var(--brass);
+    font-size:20px; font-weight:800; cursor:pointer; line-height:1;
+  }
+  .grid-page-dots .gp-arrow:hover{background:rgba(255,201,77,0.12);}
+  .grid-page-dots .gp-arrow:disabled{opacity:0.28; cursor:default; background:transparent;}
+  .grid-page-dots .gp-nums{display:flex; align-items:center; gap:6px;}
+  .grid-page-dots .gp-num{
+    min-width:34px; height:34px; padding:0 6px; border-radius:8px;
+    background:transparent; border:none; color:var(--paper-dim);
+    font-size:19px; font-weight:800; cursor:pointer;
+  }
+  .grid-page-dots .gp-num:hover{color:var(--paper);}
+  .grid-page-dots .gp-num.active{color:var(--brass); background:rgba(255,201,77,0.14);}
   @media(max-width:640px){
-    .grid-arrow{display:flex; position:static; margin:0 6px;}
-    .grid-page-dots{align-items:center;}
-    .grid-page-dots span{width:10px; height:10px;}
+    .grid-page-dots{gap:10px;}
+    .grid-page-dots .gp-arrow{width:42px; height:42px; font-size:22px;}
+    .grid-page-dots .gp-num{min-width:38px; height:38px; font-size:20px;}
   }
   .empty-note{
     color:var(--paper-dim); font-size:14.5px; border:1px dashed var(--line);
@@ -671,17 +723,24 @@
       </svg>
       <span>Miga<span class="logo-accent">-Photobook</span></span>
     </div>
-    <nav class="cats" id="catNav">
-      <button data-cat="all" class="active" data-i18n="navAll">الكل</button>
-      <button data-cat="children" data-i18n="navChildren">أطفال</button>
-      <button data-cat="male" data-i18n="navMale">رجالي</button>
-      <button data-cat="female" data-i18n="navFemale">نسائي</button>
-      <button data-cat="business" data-i18n="navBusiness">Business</button>
-      <button data-cat="cinematic" data-i18n="navCinematic">Cinematic</button>
-      <button data-cat="luxury" data-i18n="navLuxury">Luxury</button>
-      <button data-cat="artistic" data-i18n="navArtistic">Artistic</button>
-      <button data-cat="magazine" data-i18n="navMagazine">Magazine</button>
-    </nav>
+    <div class="cat-dropdown" id="catDropdown">
+      <button type="button" class="cat-dropdown-btn" id="catDropdownBtn" aria-haspopup="true" aria-expanded="false">
+        <span class="cdi" aria-hidden="true">&#9776;</span>
+        <span id="catDropdownLabel" data-i18n="categoriesLabel">الأقسام</span>
+        <span class="cdc" aria-hidden="true">&#9660;</span>
+      </button>
+      <div class="cat-dropdown-menu" id="catNav" role="menu">
+        <button data-cat="all" class="active" data-i18n="navAll" role="menuitem">الكل</button>
+        <button data-cat="children" data-i18n="navChildren" role="menuitem">أطفال</button>
+        <button data-cat="male" data-i18n="navMale" role="menuitem">رجالي</button>
+        <button data-cat="female" data-i18n="navFemale" role="menuitem">نسائي</button>
+        <button data-cat="business" data-i18n="navBusiness" role="menuitem">Business</button>
+        <button data-cat="cinematic" data-i18n="navCinematic" role="menuitem">Cinematic</button>
+        <button data-cat="luxury" data-i18n="navLuxury" role="menuitem">Luxury</button>
+        <button data-cat="artistic" data-i18n="navArtistic" role="menuitem">Artistic</button>
+        <button data-cat="magazine" data-i18n="navMagazine" role="menuitem">Magazine</button>
+      </div>
+    </div>
     <div class="header-controls">
       <div class="ctrl-group" id="langToggle">
         <button data-lang="ar" class="active">عربي</button>
@@ -752,10 +811,12 @@
   </div>
 </section>
 
-<section class="cat-section" id="howItWorks">
+<section class="cat-section collapsible open" id="howItWorks">
   <div class="section-head">
-    <h2 data-i18n="howItWorksTitle">كيف يعمل؟</h2>
+    <span class="sh-left"><span class="sh-icon" aria-hidden="true">&#10068;</span><h2 data-i18n="howItWorksTitle">كيف يعمل؟</h2></span>
+    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
   </div>
+  <div class="cs-body">
   <div class="how-grid">
     <div class="how-step">
       <div class="how-step-num">1</div>
@@ -780,6 +841,7 @@
       <h3 data-i18n="how4Title">احصل على النتيجة</h3>
       <p data-i18n="how4Desc">استلم صورتك الاحترافية الجديدة خلال ثوانٍ.</p>
     </div>
+  </div>
   </div>
 </section>
 
@@ -808,11 +870,15 @@
   </div>
 </section>
 
-<section class="cat-section" id="testimonials">
+<section class="cat-section collapsible" id="testimonials">
   <div class="section-head">
-    <h2 data-i18n="testimonialsTitle">آراء تهمنا</h2>
-    <button class="btn-ghost" id="writeReviewBtn" data-i18n="writeReviewBtn">اكتب تقييمك</button>
+    <span class="sh-left"><span class="sh-icon" aria-hidden="true">&#11088;</span><h2 data-i18n="testimonialsTitle">آراء تهمنا</h2></span>
+    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
   </div>
+  <div class="cs-body">
+    <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+      <button class="btn-ghost" id="writeReviewBtn" data-i18n="writeReviewBtn">اكتب تقييمك</button>
+    </div>
   <div class="testimonials-grid" id="testimonialsGrid">
     <div class="testimonial-card">
       <div class="stars">⭐⭐⭐⭐⭐</div>
@@ -824,6 +890,7 @@
     </div>
   </div>
   <p class="sub" style="margin-top:16px; opacity:0.7; font-size:12.5px;" id="testimonialsNoteEl" data-i18n="testimonialsNote">* سيتم تحديث هذا القسم بآراء العملاء الحقيقية أولاً بأول.</p>
+  </div>
 </section>
 
 <section class="cat-section" id="trustStrip">
@@ -835,17 +902,22 @@
   </div>
 </section>
 
-<section class="cat-section" id="aboutUs">
+<section class="cat-section collapsible" id="aboutUs">
   <div class="section-head">
-    <h2 data-i18n="aboutUsTitle">من نحن</h2>
+    <span class="sh-left"><span class="sh-icon" aria-hidden="true">&#128101;</span><h2 data-i18n="aboutUsTitle">من نحن</h2></span>
+    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
   </div>
+  <div class="cs-body">
   <p class="sub" style="max-width:680px; font-size:15px;" data-i18n="aboutUsText">متخصصون في تحويل الصور الشخصية تلقائيًا لتحف فنية عالية الجودة بالذكاء الاصطناعي — ارفع صورتك واختار الأسلوب، وإحنا نتولى الباقي بعناية عشان تضمن نتيجة تستحق اسمك.</p>
+  </div>
 </section>
 
-<section class="cat-section" id="faq">
+<section class="cat-section collapsible" id="faq">
   <div class="section-head">
-    <h2 data-i18n="faqTitle">أسئلة شائعة</h2>
+    <span class="sh-left"><span class="sh-icon" aria-hidden="true">&#10067;</span><h2 data-i18n="faqTitle">أسئلة شائعة</h2></span>
+    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
   </div>
+  <div class="cs-body">
   <div class="faq-list">
     <details class="faq-item">
       <summary data-i18n="faqQ1">إزاي تتم عملية التحويل؟</summary>
@@ -868,6 +940,7 @@
       <p data-i18n="faqA5">فور تأكيد الدفع، بترفع صورتك على الموقع وتستلم النتيجة المُحوّلة مباشرة، وتقدر تحمّلها في أي وقت.</p>
     </details>
   </div>
+  </div>
 </section>
 
 <section class="cat-section" id="children">
@@ -876,9 +949,7 @@
     <span class="tag tag-children">CHILDREN</span>
   </div>
   <div class="grid-nav-wrap">
-    <button class="grid-arrow prev" onclick="pageGrid('children', -1)" id="gridPrev-children" aria-label="prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
     <div class="grid" id="grid-children"></div>
-    <button class="grid-arrow next" onclick="pageGrid('children', 1)" id="gridNext-children" aria-label="next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
   </div>
   <div class="grid-page-dots" id="gridDots-children"></div>
 </section>
@@ -889,9 +960,7 @@
     <span class="tag tag-male">NATURAL MALE</span>
   </div>
   <div class="grid-nav-wrap">
-    <button class="grid-arrow prev" onclick="pageGrid('male', -1)" id="gridPrev-male" aria-label="prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
     <div class="grid" id="grid-male"></div>
-    <button class="grid-arrow next" onclick="pageGrid('male', 1)" id="gridNext-male" aria-label="next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
   </div>
   <div class="grid-page-dots" id="gridDots-male"></div>
 </section>
@@ -902,9 +971,7 @@
     <span class="tag tag-female">FEMALE</span>
   </div>
   <div class="grid-nav-wrap">
-    <button class="grid-arrow prev" onclick="pageGrid('female', -1)" id="gridPrev-female" aria-label="prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
     <div class="grid" id="grid-female"></div>
-    <button class="grid-arrow next" onclick="pageGrid('female', 1)" id="gridNext-female" aria-label="next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
   </div>
   <div class="grid-page-dots" id="gridDots-female"></div>
 </section>
@@ -915,9 +982,7 @@
     <span class="tag tag-business">BUSINESS</span>
   </div>
   <div class="grid-nav-wrap">
-    <button class="grid-arrow prev" onclick="pageGrid('business', -1)" id="gridPrev-business" aria-label="prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
     <div class="grid" id="grid-business"></div>
-    <button class="grid-arrow next" onclick="pageGrid('business', 1)" id="gridNext-business" aria-label="next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
   </div>
   <div class="grid-page-dots" id="gridDots-business"></div>
 </section>
@@ -928,9 +993,7 @@
     <span class="tag tag-cinematic">CINEMATIC</span>
   </div>
   <div class="grid-nav-wrap">
-    <button class="grid-arrow prev" onclick="pageGrid('cinematic', -1)" id="gridPrev-cinematic" aria-label="prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
     <div class="grid" id="grid-cinematic"></div>
-    <button class="grid-arrow next" onclick="pageGrid('cinematic', 1)" id="gridNext-cinematic" aria-label="next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
   </div>
   <div class="grid-page-dots" id="gridDots-cinematic"></div>
 </section>
@@ -941,9 +1004,7 @@
     <span class="tag tag-luxury">LUXURY</span>
   </div>
   <div class="grid-nav-wrap">
-    <button class="grid-arrow prev" onclick="pageGrid('luxury', -1)" id="gridPrev-luxury" aria-label="prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
     <div class="grid" id="grid-luxury"></div>
-    <button class="grid-arrow next" onclick="pageGrid('luxury', 1)" id="gridNext-luxury" aria-label="next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
   </div>
   <div class="grid-page-dots" id="gridDots-luxury"></div>
 </section>
@@ -954,9 +1015,7 @@
     <span class="tag tag-artistic">ARTISTIC</span>
   </div>
   <div class="grid-nav-wrap">
-    <button class="grid-arrow prev" onclick="pageGrid('artistic', -1)" id="gridPrev-artistic" aria-label="prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
     <div class="grid" id="grid-artistic"></div>
-    <button class="grid-arrow next" onclick="pageGrid('artistic', 1)" id="gridNext-artistic" aria-label="next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
   </div>
   <div class="grid-page-dots" id="gridDots-artistic"></div>
 </section>
@@ -967,9 +1026,7 @@
     <span class="tag tag-magazine">MAGAZINE</span>
   </div>
   <div class="grid-nav-wrap">
-    <button class="grid-arrow prev" onclick="pageGrid('magazine', -1)" id="gridPrev-magazine" aria-label="prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
     <div class="grid" id="grid-magazine"></div>
-    <button class="grid-arrow next" onclick="pageGrid('magazine', 1)" id="gridNext-magazine" aria-label="next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
   </div>
   <div class="grid-page-dots" id="gridDots-magazine"></div>
 </section>
@@ -1335,6 +1392,10 @@
           <input type="text" id="pTitle" placeholder="مثال: بورتريه إضاءة سينمائية" data-i18n-ph="pTitlePh">
         </div>
         <div class="field">
+          <label data-i18n="pTitleEnLabel">Product Title (English) — optional, shown to customers when they switch to English</label>
+          <input type="text" id="pTitleEn" placeholder="e.g. Cinematic Lighting Portrait" data-i18n-ph="pTitleEnPh">
+        </div>
+        <div class="field">
           <label data-i18n="pPriceLabel">السعر (جنيه)</label>
           <input type="number" id="pPrice" placeholder="9" min="0">
         </div>
@@ -1408,8 +1469,10 @@ const LAUNCH_PROMO_END = new Date('2026-08-15T23:59:59+02:00');
 // are set up (see transform-worker.js setup notes). Flip either to true once ready —
 // no other change needed, the payment tab will reappear automatically.
 const PAYMENT_METHODS_ENABLED = { card: false, fawry: false };
-const CURRENCY = 'جنيه';
-const HIDE_CHILDREN_FROM_CUSTOMERS = true; // children section isn't ready for customers yet; admin can still see it while logged in
+// Was hardcoded to Arabic, so every price ("25 جنيه") stayed Arabic even on the
+// English page. Now tracks the active language and is refreshed in applyLanguage().
+let CURRENCY = 'جنيه';
+const HIDE_CHILDREN_FROM_CUSTOMERS = false; // children section is now live for all visitors
 
 // Paste your deployed Cloudflare Worker URL here (see backend/transform-worker.js) to enable
 // real AI photo transformation. Leave empty ("") to keep the client-side style-preview fallback.
@@ -1442,6 +1505,7 @@ let currentBuyId = null;
 // ---------- i18n ----------
 const translations = {
   ar: {
+    categoriesLabel:'الأقسام',
     navAll:'الكل', navChildren:'أطفال', navMale:'رجالي', navFemale:'نسائي',
     navBusiness:'Business', navCinematic:'Cinematic', navLuxury:'Luxury', navArtistic:'Artistic', navMagazine:'Magazine',
     trackBtn:'تتبع طلبي', adminBtn:'لوحة الإدارة',
@@ -1534,6 +1598,7 @@ const translations = {
     pCatLabel:'القسم', optChildren:'أطفال', optMale:'رجالي', optFemale:'نسائي',
     optBusiness:'Business', optCinematic:'Cinematic', optLuxury:'Luxury', optArtistic:'Artistic', optMagazine:'Magazine / Poster',
     pTitleLabel:'عنوان المنتج', pTitlePh:'مثال: بورتريه إضاءة سينمائية',
+    pTitleEnLabel:'العنوان بالإنجليزي (اختياري — يظهر للعميل لما يبدّل للإنجليزي)', pTitleEnPh:'مثال: Cinematic Lighting Portrait',
     pPriceLabel:'السعر (جنيه)', pImageLabel:'صورة المنتج',
     pPromptLabel:'تعليمات التحويل بالذكاء الاصطناعي (للإدارة فقط — لا تظهر للعميل إطلاقًا)', pPromptPh:'اكتب تعليمات التحويل الدقيقة هنا...',
     pSaveBtn:'إضافة المنتج', adminLogoutBtn:'خروج',
@@ -1588,6 +1653,7 @@ const translations = {
     toastDownloadFailed:'تعذّر تحميل الصورة تلقائيًا'
   },
   en: {
+    categoriesLabel:'Categories',
     navAll:'All', navChildren:'Children', navMale:'Men', navFemale:'Women',
     navBusiness:'Business', navCinematic:'Cinematic', navLuxury:'Luxury', navArtistic:'Artistic', navMagazine:'Magazine',
     trackBtn:'Track Order', adminBtn:'Admin Panel',
@@ -1680,6 +1746,7 @@ const translations = {
     pCatLabel:'Category', optChildren:'Children', optMale:'Men', optFemale:'Women',
     optBusiness:'Business', optCinematic:'Cinematic', optLuxury:'Luxury', optArtistic:'Artistic', optMagazine:'Magazine / Poster',
     pTitleLabel:'Product Title', pTitlePh:'e.g. Cinematic Lighting Portrait',
+    pTitleEnLabel:'Product Title (English) — optional, shown to customers when they switch to English', pTitleEnPh:'e.g. Cinematic Lighting Portrait',
     pPriceLabel:'Price (EGP)', pImageLabel:'Product Image',
     pPromptLabel:'AI transformation instructions (admin only — never shown to the customer)', pPromptPh:'Write the exact transformation instructions here...',
     pSaveBtn:'Add Product', adminLogoutBtn:'Logout',
@@ -1739,6 +1806,13 @@ let currentLang = 'ar';
 function t(key){
   return (translations[currentLang] && translations[currentLang][key]) || (translations.ar[key] || key);
 }
+// Product titles are admin-entered free text, not part of the translations
+// dictionary — this uses the optional English title (titleEn) an admin can set
+// per product, falling back to the Arabic title if none was entered yet.
+function productTitle(p){
+  if(!p) return '';
+  return (currentLang === 'en' && p.titleEn) ? p.titleEn : p.title;
+}
 
 async function saveUiPrefs(){
   try{ localStorage.setItem('megaPromptUiPrefs', JSON.stringify({lang: currentLang, view: currentViewMode})); }
@@ -1755,6 +1829,7 @@ function applyLanguage(lang){
   currentLang = (lang === 'en') ? 'en' : 'ar';
   document.documentElement.lang = currentLang;
   document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+  CURRENCY = t('currencyLabel');
 
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     el.textContent = t(el.getAttribute('data-i18n'));
@@ -1765,6 +1840,15 @@ function applyLanguage(lang){
   document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
     el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
   });
+
+  // If a specific category (not "All") is selected, the dropdown button shows
+  // that category's name — the blanket data-i18n pass above just reset it to
+  // the generic "Categories" label, so re-sync it to the active button's
+  // freshly-translated text.
+  const activeCatBtn = document.querySelector('#catNav button.active');
+  if(activeCatBtn && activeCatBtn.dataset.cat !== 'all'){
+    document.getElementById('catDropdownLabel').textContent = activeCatBtn.textContent;
+  }
 
   document.querySelectorAll('#langToggle button').forEach(b=>{
     b.classList.toggle('active', b.dataset.lang === currentLang);
@@ -2012,7 +2096,7 @@ function updateCountdown(){
 
 function applyChildrenVisibility(){
   const visible = !HIDE_CHILDREN_FROM_CUSTOMERS || adminLoggedIn;
-  const navBtn = document.querySelector('nav.cats button[data-cat="children"]');
+  const navBtn = document.querySelector('#catNav button[data-cat="children"]');
   const section = document.getElementById('children');
   if(navBtn) navBtn.style.display = visible ? '' : 'none';
   if(section) section.style.display = visible ? '' : 'none';
@@ -2043,7 +2127,7 @@ function renderResultsAndComparison(){
     resultsEl.innerHTML = picks.map(p => `
       <div class="card">
         <div class="card-media">
-          <img src="${p.image}" alt="${escapeHtml(p.title)}" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
+          <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
         </div>
       </div>`).join('');
   }
@@ -2101,26 +2185,28 @@ function renderGrids(){
     gridPages[cat] = Math.min(gridPages[cat], pageCount - 1);
     const page = gridPages[cat];
 
-    const prevBtn = document.getElementById('gridPrev-'+cat);
-    const nextBtn = document.getElementById('gridNext-'+cat);
     const dotsEl = document.getElementById('gridDots-'+cat);
 
     if(!allItems.length){
       el.innerHTML = `<div class="empty-note">${t('emptyNoteCategory')}</div>`;
-      if(prevBtn) prevBtn.style.display = 'none';
-      if(nextBtn) nextBtn.style.display = 'none';
       if(dotsEl) dotsEl.innerHTML = '';
       return;
     }
 
     const items = allItems.slice(page * GRID_PAGE_SIZE, page * GRID_PAGE_SIZE + GRID_PAGE_SIZE);
     const showNav = allItems.length > GRID_PAGE_SIZE;
-    if(prevBtn){ prevBtn.style.display = showNav ? '' : 'none'; prevBtn.disabled = page === 0; }
-    if(nextBtn){ nextBtn.style.display = showNav ? '' : 'none'; nextBtn.disabled = page >= pageCount - 1; }
     if(dotsEl){
-      dotsEl.innerHTML = showNav
-        ? Array.from({length:pageCount}, (_,i) => `<span class="${i===page?'active':''}" onclick="goToGridPage('${cat}', ${i})" role="button" aria-label="page ${i+1}"></span>`).join('')
-        : '';
+      if(!showNav){
+        dotsEl.innerHTML = '';
+      }else{
+        const nums = Array.from({length:pageCount}, (_,i) =>
+          `<button type="button" class="gp-num${i===page?' active':''}" onclick="goToGridPage('${cat}', ${i})" aria-label="page ${i+1}" ${i===page?'aria-current="page"':''}>${i+1}</button>`
+        ).join('');
+        dotsEl.innerHTML =
+          `<button type="button" class="gp-arrow" onclick="pageGrid('${cat}', -1)" ${page===0?'disabled':''} aria-label="previous page">&#8249;</button>` +
+          `<span class="gp-nums">${nums}</span>` +
+          `<button type="button" class="gp-arrow" onclick="pageGrid('${cat}', 1)" ${page>=pageCount-1?'disabled':''} aria-label="next page">&#8250;</button>`;
+      }
     }
 
     el.innerHTML = items.map(p=>{
@@ -2128,11 +2214,11 @@ function renderGrids(){
       return `
       <div class="card">
         <div class="card-media">
-          <img src="${p.image}" alt="${escapeHtml(p.title)}" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
-          <span class="card-badge">${escapeHtml(p.title)}</span>
+          <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
+          <span class="card-badge">${escapeHtml(productTitle(p))}</span>
         </div>
         <div class="card-body">
-          <div class="card-title" onclick="openProductDetail('${p.id}')" style="cursor:pointer;">${escapeHtml(p.title)}</div>
+          <div class="card-title" onclick="openProductDetail('${p.id}')" style="cursor:pointer;">${escapeHtml(productTitle(p))}</div>
           ${owned ? `<span class="owned-pill">${t('ownedPill')}</span>` : ''}
           <div class="card-price">
             ${SOFT_LAUNCH ? t('freeLabel') : (LAUNCH_PROMO
@@ -2204,8 +2290,8 @@ function openProductDetail(id){
   if(!p) return;
   const owned = purchases.includes(p.id);
   document.getElementById('detailImg').src = p.image;
-  document.getElementById('detailImg').alt = p.title;
-  document.getElementById('detailTitle').textContent = p.title;
+  document.getElementById('detailImg').alt = productTitle(p);
+  document.getElementById('detailTitle').textContent = productTitle(p);
   document.getElementById('detailPrice').innerHTML = SOFT_LAUNCH ? t('freeLabel') : (LAUNCH_PROMO
     ? `<span class="price-old">${p.originalPrice || (p.price*2)} ${CURRENCY}</span> <span class="price-new">${p.price} ${CURRENCY}</span>`
     : (p.price + ' ' + CURRENCY));
@@ -2225,7 +2311,7 @@ function openBuyModal(id){
   const p = products.find(x=>x.id===id);
   document.getElementById('ipNumber').innerText = INSTAPAY_NUMBER;
   document.getElementById('buyModalText').innerText =
-    t('buyModalTextTemplate').replace('{title}', p.title).replace('{price}', p.price);
+    t('buyModalTextTemplate').replace('{title}', productTitle(p)).replace('{price}', p.price);
   document.getElementById('buyerPhone').value='';
   document.getElementById('buyerApp').value='';
   document.getElementById('buyerRef').value='';
@@ -2385,7 +2471,7 @@ function openTransformModal(id){
   currentTransformId = id;
   const p = products.find(x=>x.id===id);
   if(!p) return;
-  document.getElementById('transformModalText').innerText = p.title;
+  document.getElementById('transformModalText').innerText = productTitle(p);
   document.getElementById('transformFileInput').value = '';
   document.getElementById('transformConsent').checked = false;
   document.getElementById('transformPreviewWrap').style.display = 'none';
@@ -2546,12 +2632,45 @@ function getCategoryOf(productId){
 }
 
 
-// ---------- Category filter ----------
+// ---------- Collapsible sections (How it works / Testimonials / About / FAQ) ----------
+document.querySelectorAll('.cat-section.collapsible > .section-head').forEach(head=>{
+  head.addEventListener('click', ()=>{
+    head.parentElement.classList.toggle('open');
+  });
+});
+
+// ---------- Category dropdown (single button + menu, replaces the old pill row) ----------
+const catDropdown = document.getElementById('catDropdown');
+const catDropdownBtn = document.getElementById('catDropdownBtn');
+const catDropdownLabel = document.getElementById('catDropdownLabel');
+
+function closeCatDropdown(){
+  catDropdown.classList.remove('open');
+  catDropdownBtn.setAttribute('aria-expanded', 'false');
+}
+catDropdownBtn.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  const willOpen = !catDropdown.classList.contains('open');
+  catDropdown.classList.toggle('open', willOpen);
+  catDropdownBtn.setAttribute('aria-expanded', String(willOpen));
+});
+document.addEventListener('click', (e)=>{
+  if(!catDropdown.contains(e.target)) closeCatDropdown();
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape') closeCatDropdown();
+});
+
 document.getElementById('catNav').addEventListener('click', (e)=>{
   const btn = e.target.closest('button');
   if(!btn) return;
   [...document.querySelectorAll('#catNav button')].forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  // Selecting "All" restores the generic "Categories" label; picking a specific
+  // category shows that category's own name on the button, so it's clear at a
+  // glance which section you're currently browsing.
+  catDropdownLabel.textContent = btn.dataset.cat === 'all' ? t('categoriesLabel') : btn.textContent;
+  closeCatDropdown();
   const cat = btn.dataset.cat;
   if(cat==='all'){ document.getElementById('children').scrollIntoView({behavior:'smooth'}); }
   else{ document.getElementById(cat).scrollIntoView({behavior:'smooth'}); }
@@ -3146,6 +3265,7 @@ let editingProductId = null;
 document.getElementById('pSaveBtn').onclick = async ()=>{
   const cat = document.getElementById('pCat').value;
   const title = document.getElementById('pTitle').value.trim();
+  const titleEn = document.getElementById('pTitleEn').value.trim();
   const price = parseFloat(document.getElementById('pPrice').value || '0');
   const promptText = document.getElementById('pPrompt').value.trim();
   const fileInput = document.getElementById('pImage');
@@ -3167,7 +3287,7 @@ document.getElementById('pSaveBtn').onclick = async ()=>{
         showToast(t('toastImageUploadFailed'));
         return;
       }
-      existing.category = cat; existing.title = title; existing.price = price; existing.prompt = promptText;
+      existing.category = cat; existing.title = title; existing.titleEn = titleEn || undefined; existing.price = price; existing.prompt = promptText;
       if(imageUrl) existing.image = imageUrl;
       productToSave = existing;
       editingProductId = null;
@@ -3175,7 +3295,7 @@ document.getElementById('pSaveBtn').onclick = async ()=>{
     }else{
       productToSave = {
         id: 'p_' + Date.now(),
-        category: cat, title, price, image: imageUrl || PLACEHOLDER_IMG, prompt: promptText, order: Date.now()
+        category: cat, title, titleEn: titleEn || undefined, price, image: imageUrl || PLACEHOLDER_IMG, prompt: promptText, order: Date.now()
       };
       products.push(productToSave);
     }
@@ -3187,6 +3307,7 @@ document.getElementById('pSaveBtn').onclick = async ()=>{
     renderHeroStrip();
     renderAdminProductsList();
     document.getElementById('pTitle').value='';
+    document.getElementById('pTitleEn').value='';
     document.getElementById('pPrice').value='';
     document.getElementById('pPrompt').value='';
     fileInput.value='';
@@ -3236,6 +3357,7 @@ document.getElementById('pCancelEditBtn').onclick = ()=>{
   editingProductId = null;
   resetEditUI();
   document.getElementById('pTitle').value='';
+  document.getElementById('pTitleEn').value='';
   document.getElementById('pPrice').value='';
   document.getElementById('pPrompt').value='';
   document.getElementById('pImage').value='';
@@ -3247,6 +3369,7 @@ function editProduct(id){
   editingProductId = id;
   document.getElementById('pCat').value = p.category;
   document.getElementById('pTitle').value = p.title;
+  document.getElementById('pTitleEn').value = p.titleEn || '';
   document.getElementById('pPrice').value = p.price;
   document.getElementById('pPrompt').value = p.prompt;
   document.getElementById('pSaveBtn').textContent = t('pUpdateBtn');
