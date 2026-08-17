@@ -194,6 +194,13 @@
   .cat-dropdown-menu button:hover, .cat-dropdown-menu button.active{
     background:var(--paper); color:var(--ink);
   }
+  .admin-bell-btn{position:relative;}
+  .admin-bell-badge{
+    display:inline-flex; align-items:center; justify-content:center;
+    min-width:20px; height:20px; padding:0 5px; border-radius:10px;
+    background:#e0524a; color:#fff; font-size:12px; font-weight:800;
+    line-height:1; margin-inline-start:-2px;
+  }
 
   /* ===== Collapsible sections (How it works / Testimonials / About / FAQ) ===== */
   .cat-section.collapsible > .section-head{
@@ -391,6 +398,12 @@
   @media(max-width:700px){ .grid{grid-template-columns:repeat(2, 1fr);} }
   @media(max-width:460px){ .grid{grid-template-columns:1fr;} }
   .grid-nav-wrap{position:relative;}
+  .order-status-spinner{
+    width:34px; height:34px; margin:6px auto 0; border-radius:50%;
+    border:3px solid var(--line); border-top-color:var(--brass);
+    animation:mp-spin 0.8s linear infinite;
+  }
+  @keyframes mp-spin{ to{ transform:rotate(360deg); } }
   /* Pagination bar: left arrow — page numbers — right arrow, replacing the
      small dots. Kept in a fixed left-to-right order (arrow, numbers, arrow)
      regardless of the page's RTL text direction, since page numbers read the
@@ -722,6 +735,23 @@
         <circle cx="24" cy="25" r="1.6" fill="var(--brass)"/>
       </svg>
       <span>Miga<span class="logo-accent">-Photobook</span></span>
+    </div>
+    <div class="cat-dropdown" id="adminQuickAccess" style="display:none;">
+      <button type="button" class="cat-dropdown-btn admin-bell-btn" id="adminBellBtn" aria-haspopup="true" aria-expanded="false">
+        <span class="cdi" aria-hidden="true">&#128276;</span>
+        <span data-i18n="adminQuickLabel">لوحة التحكم</span>
+        <span class="admin-bell-badge" id="adminBellBadge" style="display:none;">0</span>
+        <span class="cdc" aria-hidden="true">&#9660;</span>
+      </button>
+      <div class="cat-dropdown-menu" id="adminQuickMenu" role="menu">
+        <button type="button" data-admin-tab="orders" role="menuitem">
+          <span data-i18n="tabOrders">الطلبات</span> <span id="adminQuickPendingLabel"></span>
+        </button>
+        <button type="button" data-admin-tab="products" data-i18n="tabProducts" role="menuitem">إضافة منتج</button>
+        <button type="button" data-admin-tab="reviews" data-i18n="tabReviews" role="menuitem">التقييمات</button>
+        <button type="button" data-admin-tab="visitors" data-i18n="tabVisitors" role="menuitem">الزوار</button>
+        <button type="button" id="adminQuickLogout" data-i18n="adminLogoutBtn" role="menuitem" style="color:#e07a7a;">خروج</button>
+      </div>
     </div>
     <div class="cat-dropdown" id="catDropdown">
       <button type="button" class="cat-dropdown-btn" id="catDropdownBtn" aria-haspopup="true" aria-expanded="false">
@@ -1145,22 +1175,25 @@
         <div class="ip-number" id="ipNumber">01202530308</div>
         <button class="ip-copy" id="ipCopyBtn" type="button" data-i18n="ipCopyBtn">نسخ الرقم</button>
       </div>
-      <div class="field">
-        <label data-i18n="buyerAppLabel">اسم التطبيق/البنك الذي حوّلت منه (اختياري)</label>
-        <input type="text" id="buyerApp" placeholder="مثال: إنستاباي، بنك مصر، CIB، فودافون كاش..." data-i18n-ph="buyerAppPh">
+      <div id="payFormFields">
+        <div class="field">
+          <label data-i18n="buyerPhoneLabel">رقم الموبايل الذي حوّلت منه</label>
+          <input type="tel" id="buyerPhone" placeholder="01xxxxxxxxx">
+        </div>
+        <p class="sub" style="margin-bottom:10px;" data-i18n="buyModalNote">هنراجع التحويل تلقائيًا — الصفحة هتفضل فاتحة قدامك وهتقولك أول ما يتأكد، من غير ما تدوّر على كود في مكان تاني.</p>
+        <div class="modal-actions">
+          <button class="btn-primary" id="buyConfirmBtn" data-i18n="buyConfirmBtn">تم الدفع</button>
+          <button class="btn-ghost" id="buyCancelBtn" data-i18n="cancelBtn">إلغاء</button>
+        </div>
       </div>
-      <div class="field">
-        <label data-i18n="buyerPhoneLabel">رقم الموبايل الذي حوّلت منه</label>
-        <input type="tel" id="buyerPhone" placeholder="01xxxxxxxxx">
-      </div>
-      <div class="field">
-        <label data-i18n="buyerRefLabel">رقم/مرجع عملية التحويل (إن وجد)</label>
-        <input type="text" id="buyerRef" placeholder="مثال: آخر 4 أرقام أو رقم العملية" data-i18n-ph="buyerRefPh">
-      </div>
-      <p class="sub" style="margin-bottom:10px;" data-i18n="buyModalNote">بعد إرسال الطلب سيظهر لك كود متابعة — بمجرد مراجعة التحويل من جانبنا وتفعيله، تُدخل الكود عشان نبدأ تحويل صورتك.</p>
-      <div class="modal-actions">
-        <button class="btn-primary" id="buyConfirmBtn" data-i18n="buyConfirmBtn">لقد حوّلت — إرسال الطلب</button>
-        <button class="btn-ghost" id="buyCancelBtn" data-i18n="cancelBtn">إلغاء</button>
+      <div id="payStatusPanel" style="display:none; text-align:center; padding:10px 0;">
+        <div class="order-status-spinner" aria-hidden="true"></div>
+        <p class="sub" id="payStatusText" style="font-size:15px; margin:14px 0 4px;" data-i18n="statusPendingText">بنراجع تحويلك... الصفحة هتتحدّث لوحدها أول ما نأكده.</p>
+        <p class="sub" style="font-size:12.5px; opacity:0.7;" data-i18n="statusCodeNote">كود طلبك (احتفظ بيه احتياطيًا):</p>
+        <div class="ip-number" id="payStatusCode" style="font-size:18px; margin:4px 0 16px;"></div>
+        <div class="modal-actions">
+          <button class="btn-ghost" id="payStatusCloseBtn" data-i18n="closeBtn">إغلاق</button>
+        </div>
       </div>
     </div>
 
@@ -1508,7 +1541,7 @@ const translations = {
     categoriesLabel:'الأقسام',
     navAll:'الكل', navChildren:'أطفال', navMale:'رجالي', navFemale:'نسائي',
     navBusiness:'Business', navCinematic:'Cinematic', navLuxury:'Luxury', navArtistic:'Artistic', navMagazine:'Magazine',
-    trackBtn:'تتبع طلبي', adminBtn:'لوحة الإدارة',
+    trackBtn:'تتبع طلبي', adminBtn:'لوحة الإدارة', adminQuickLabel:'لوحة التحكم',
     accountBtnGuest:'تسجيل الدخول', loginTab:'تسجيل الدخول', registerTab:'حساب جديد',
     continueGoogle:'المتابعة بحساب جوجل', continueApple:'المتابعة بحساب Apple', continueFacebook:'المتابعة بحساب فيسبوك',
     orDivider:'أو بالبريد الإلكتروني', toastSocialNotConfigured:'تسجيل الدخول بهذه الطريقة غير مُفعّل بعد',
@@ -1584,8 +1617,11 @@ const translations = {
     buyerAppLabel:'اسم التطبيق/البنك الذي حوّلت منه (اختياري)', buyerAppPh:'مثال: إنستاباي، بنك مصر، CIB، فودافون كاش...',
     buyerPhoneLabel:'رقم الموبايل الذي حوّلت منه',
     buyerRefLabel:'رقم/مرجع عملية التحويل (إن وجد)', buyerRefPh:'مثال: آخر 4 أرقام أو رقم العملية',
-    buyModalNote:'بعد إرسال الطلب سيظهر لك كود متابعة — بمجرد مراجعة التحويل من جانبنا وتفعيله، تُدخل الكود عشان نبدأ تحويل صورتك.',
-    buyConfirmBtn:'لقد حوّلت — إرسال الطلب', cancelBtn:'إلغاء',
+    statusPendingText:'بنراجع تحويلك... الصفحة هتتحدّث لوحدها أول ما نأكده.',
+    statusCodeNote:'كود طلبك (احتفظ بيه احتياطيًا):',
+    statusApprovedText:'تم تأكيد الدفع ✅ تقدر ترفع صورتك دلوقتي.',
+    buyModalNote:'هنراجع التحويل تلقائيًا — الصفحة هتفضل فاتحة قدامك وهتقولك أول ما يتأكد، من غير ما تدوّر على كود في مكان تاني.',
+    buyConfirmBtn:'تم الدفع', cancelBtn:'إلغاء',
     detailValue1:'✓ نحوّل صورتك تلقائيًا فور تأكيد الدفع', detailValue2:'✓ جودة استوديو احترافية مضمونة',
     detailValue3:'✓ النتيجة جاهزة للتحميل مباشرة', detailValue4:'✓ دعم فني مباشر لو احتجت مساعدة',
     detailBuyBtn:'احصل عليها الآن',
@@ -1656,7 +1692,7 @@ const translations = {
     categoriesLabel:'Categories',
     navAll:'All', navChildren:'Children', navMale:'Men', navFemale:'Women',
     navBusiness:'Business', navCinematic:'Cinematic', navLuxury:'Luxury', navArtistic:'Artistic', navMagazine:'Magazine',
-    trackBtn:'Track Order', adminBtn:'Admin Panel',
+    trackBtn:'Track Order', adminBtn:'Admin Panel', adminQuickLabel:'Dashboard',
     accountBtnGuest:'Log In', loginTab:'Log In', registerTab:'New Account',
     continueGoogle:'Continue with Google', continueApple:'Continue with Apple', continueFacebook:'Continue with Facebook',
     orDivider:'Or with email', toastSocialNotConfigured:'This sign-in method is not set up yet',
@@ -1732,8 +1768,11 @@ const translations = {
     buyerAppLabel:'App/bank you transferred from (optional)', buyerAppPh:'e.g. InstaPay, Banque Misr, CIB, Vodafone Cash...',
     buyerPhoneLabel:'Mobile number you transferred from',
     buyerRefLabel:'Transfer reference number (if any)', buyerRefPh:'e.g. last 4 digits or transaction number',
-    buyModalNote:"After sending your request, you'll get a tracking code — once we review and activate the transfer, enter the code to unlock the prompt.",
-    buyConfirmBtn:"I've Transferred — Send Request", cancelBtn:'Cancel',
+    statusPendingText:"We're reviewing your transfer... this page will update itself once it's confirmed.",
+    statusCodeNote:'Your order code (keep it just in case):',
+    statusApprovedText:'Payment confirmed ✅ You can upload your photo now.',
+    buyModalNote:"We'll review the transfer automatically — this page stays open and updates itself once confirmed, no separate code to look for.",
+    buyConfirmBtn:"I've Paid", cancelBtn:'Cancel',
     detailValue1:'✓ Your photo is transformed automatically right after payment', detailValue2:'✓ Guaranteed professional studio quality',
     detailValue3:'✓ Result ready to download instantly', detailValue4:'✓ Direct support if you need help',
     detailBuyBtn:'Get It Now',
@@ -2313,8 +2352,6 @@ function openBuyModal(id){
   document.getElementById('buyModalText').innerText =
     t('buyModalTextTemplate').replace('{title}', productTitle(p)).replace('{price}', p.price);
   document.getElementById('buyerPhone').value='';
-  document.getElementById('buyerApp').value='';
-  document.getElementById('buyerRef').value='';
   document.getElementById('payerName').value='';
   document.getElementById('payerPhone').value='';
   document.getElementById('payerEmail').value='';
@@ -2324,6 +2361,9 @@ function openBuyModal(id){
   document.querySelector('#paymentMethodTabs button[data-method="fawry"]').style.display =
     PAYMENT_METHODS_ENABLED.fawry ? '' : 'none';
   setPaymentMethod('instapay');
+  stopOrderStatusPolling();
+  document.getElementById('payFormFields').style.display = '';
+  document.getElementById('payStatusPanel').style.display = 'none';
   document.getElementById('buyModalBg').classList.add('show');
 }
 
@@ -2394,7 +2434,9 @@ document.getElementById('payCardFawryBtn').onclick = async ()=>{
       if(!res.ok || !data.referenceNumber){ showToast(t('toastOrderFailed')); return; }
       document.getElementById('fawryRefNumber').textContent = data.referenceNumber;
       document.getElementById('fawryRefResult').style.display = 'block';
-      showOrderCodeToast(orderData.code);
+      orderCodes[currentBuyId] = orderData.code;
+      await savePurchases();
+      showToast(t('toastOrderSentTemplate').replace('{code}', orderData.code));
     }
   }catch(e){
     showToast(t('toastOrderFailed'));
@@ -2410,8 +2452,6 @@ document.getElementById('buyConfirmBtn').onclick = async ()=>{
   const phone = document.getElementById('buyerPhone').value.trim();
   const activeTab = document.querySelector('#paymentMethodTabs button.active');
   const manualMethod = activeTab && activeTab.dataset.method === 'vodafone' ? 'Vodafone Cash' : 'InstaPay';
-  const appUsed = document.getElementById('buyerApp').value.trim() || manualMethod;
-  const ref = document.getElementById('buyerRef').value.trim();
   if(!phone){
     showToast(t('toastEnterPhone'));
     return;
@@ -2421,20 +2461,64 @@ document.getElementById('buyConfirmBtn').onclick = async ()=>{
   try{
     const res = await fetch(`${BACKEND_BASE}/orders/create`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: p.price, phone, appUsed, ref })
+      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: p.price, phone, appUsed: manualMethod, ref: '' })
     });
     const data = await res.json();
     if(!res.ok || !data.code){ showToast(t('toastOrderFailed')); return; }
-    document.getElementById('buyModalBg').classList.remove('show');
-    showOrderCodeToast(data.code);
+    orderCodes[currentBuyId] = data.code;
+    await savePurchases();
+    showOrderStatusPanel(currentBuyId, data.code);
   }catch(e){
     showToast(t('toastOrderFailed'));
   }
 };
 
-function showOrderCodeToast(code){
-  showToast(t('toastOrderSentTemplate').replace('{code}', code));
+// ---------- Live order status (replaces the old "close modal + remember a
+// code" flow) — the modal stays open and polls the backend on its own, so the
+// customer never has to go find the tracking modal and re-type the code
+// themselves; that manual entry is kept only as a fallback for a later visit.
+let orderStatusPollTimer = null;
+
+function stopOrderStatusPolling(){
+  if(orderStatusPollTimer){ clearInterval(orderStatusPollTimer); orderStatusPollTimer = null; }
 }
+
+function showOrderStatusPanel(productId, code){
+  document.getElementById('payFormFields').style.display = 'none';
+  document.getElementById('payStatusPanel').style.display = 'block';
+  document.getElementById('payStatusCode').textContent = code;
+  document.getElementById('payStatusText').textContent = t('statusPendingText');
+  document.querySelector('#payStatusPanel .order-status-spinner').style.display = '';
+
+  stopOrderStatusPolling();
+  const check = async ()=>{
+    if(!BACKEND_BASE) return;
+    try{
+      const res = await fetch(`${BACKEND_BASE}/orders/track?code=${encodeURIComponent(code)}`);
+      if(!res.ok) return;
+      const order = await res.json();
+      if(order.status === 'approved'){
+        stopOrderStatusPolling();
+        if(!purchases.includes(productId)) purchases.push(productId);
+        orderCodes[productId] = order.code || code;
+        await savePurchases();
+        renderGrids();
+        document.querySelector('#payStatusPanel .order-status-spinner').style.display = 'none';
+        document.getElementById('payStatusText').textContent = t('statusApprovedText');
+        showToast(t('toastReadyToTransform'));
+      }
+    }catch(e){ /* network hiccup — the next poll retries automatically */ }
+  };
+  check();
+  orderStatusPollTimer = setInterval(check, 6000);
+}
+
+document.getElementById('payStatusCloseBtn').onclick = ()=>{
+  stopOrderStatusPolling();
+  document.getElementById('buyModalBg').classList.remove('show');
+  const p = products.find(x=>x.id===currentBuyId);
+  if(p) document.getElementById(p.category)?.scrollIntoView({behavior:'smooth'});
+};
 
 // ---------- Photo transform (client-side style preview) ----------
 // NOTE FOR THE BUSINESS OWNER: this applies a category-based color/style preset
@@ -2675,6 +2759,74 @@ document.getElementById('catNav').addEventListener('click', (e)=>{
   if(cat==='all'){ document.getElementById('children').scrollIntoView({behavior:'smooth'}); }
   else{ document.getElementById(cat).scrollIntoView({behavior:'smooth'}); }
 });
+
+// ---------- Admin quick-access bell (top of page, before categories) ----------
+// Only ever shown once adminLoggedIn is true (see admin login/logout handlers
+// below) — customers who never authenticate never see this at all, same as
+// the old hidden "لوحة الإدارة" button.
+const adminQuickAccess = document.getElementById('adminQuickAccess');
+const adminBellBtn = document.getElementById('adminBellBtn');
+let adminBellPollTimer = null;
+
+function closeAdminQuickMenu(){
+  adminQuickAccess.classList.remove('open');
+  adminBellBtn.setAttribute('aria-expanded', 'false');
+}
+adminBellBtn.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  const willOpen = !adminQuickAccess.classList.contains('open');
+  adminQuickAccess.classList.toggle('open', willOpen);
+  adminBellBtn.setAttribute('aria-expanded', String(willOpen));
+});
+document.addEventListener('click', (e)=>{
+  if(!adminQuickAccess.contains(e.target)) closeAdminQuickMenu();
+});
+
+document.getElementById('adminQuickMenu').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button[data-admin-tab]');
+  if(!btn) return;
+  closeAdminQuickMenu();
+  const tab = btn.dataset.adminTab;
+  adminModalBg.classList.add('show');
+  document.getElementById('adminLoginView').style.display = 'none';
+  document.getElementById('adminFormView').style.display = 'block';
+  setAdminTab(tab);
+  if(tab === 'orders'){ loadOrders().then(renderOrdersList); }
+});
+document.getElementById('adminQuickLogout').addEventListener('click', ()=>{
+  closeAdminQuickMenu();
+  document.getElementById('adminLogoutBtn').click();
+});
+
+/** Refreshes just the pending-orders count for the bell badge, independent of
+ * whether the orders tab (or the admin modal at all) is currently open. */
+async function refreshAdminBellBadge(){
+  if(!adminLoggedIn || !BACKEND_BASE) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/orders/list?password=${encodeURIComponent(adminPasswordCache)}`);
+    if(!res.ok) return;
+    const data = await res.json();
+    const list = (data && data.value) ? JSON.parse(data.value) : [];
+    const pending = list.filter(o=>o.status==='pending').length;
+    const badge = document.getElementById('adminBellBadge');
+    const menuLabel = document.getElementById('adminQuickPendingLabel');
+    badge.style.display = pending ? '' : 'none';
+    badge.textContent = pending > 99 ? '99+' : String(pending);
+    menuLabel.textContent = pending ? `(${pending})` : '';
+  }catch(e){ /* next poll retries */ }
+}
+
+function showAdminQuickAccess(){
+  adminQuickAccess.style.display = '';
+  refreshAdminBellBadge();
+  if(adminBellPollTimer) clearInterval(adminBellPollTimer);
+  adminBellPollTimer = setInterval(refreshAdminBellBadge, 30000);
+}
+function hideAdminQuickAccess(){
+  adminQuickAccess.style.display = 'none';
+  closeAdminQuickMenu();
+  if(adminBellPollTimer){ clearInterval(adminBellPollTimer); adminBellPollTimer = null; }
+}
 
 // ---------- Customer accounts (real, D1-backed via the Worker) ----------
 let currentUser = null; // { name, email }
@@ -3201,6 +3353,7 @@ async function approveOrder(code){
     if(!res.ok){ showToast(t('toastWrongPassword')); return; }
     await loadOrders();
     renderOrdersList();
+    refreshAdminBellBadge();
     showToast(t('toastOrderApproved'));
   }catch(e){
     showToast(t('toastOrderFailed'));
@@ -3242,6 +3395,7 @@ document.getElementById('adminLoginBtn').onclick = async ()=>{
       await loadAdminProducts(); // full prompt text — only this authenticated session sees it
       applyChildrenVisibility();
       renderAdminProductsList();
+      showAdminQuickAccess();
     }else{
       showToast(t('toastWrongPassword'));
     }
@@ -3259,6 +3413,7 @@ document.getElementById('adminLogoutBtn').onclick = async ()=>{
   renderGrids();
   renderHeroStrip();
   applyChildrenVisibility();
+  hideAdminQuickAccess();
 };
 
 let editingProductId = null;
