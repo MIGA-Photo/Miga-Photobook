@@ -174,22 +174,22 @@
   .cat-dropdown-btn{
     display:flex; align-items:center; gap:10px;
     background:transparent; color:var(--paper); border:1.5px solid var(--brass);
-    padding:10px 18px; border-radius:10px; font-size:15px; font-weight:600;
+    padding:11px 20px; border-radius:10px; font-size:17px; font-weight:800;
     transition:.2s;
   }
   .cat-dropdown-btn:hover{background:rgba(255,201,77,0.08);}
-  .cat-dropdown-btn .cdi{font-size:19px; line-height:1;}
-  .cat-dropdown-btn .cdc{font-size:14px; transition:transform .18s; margin-inline-start:2px;}
+  .cat-dropdown-btn .cdi{font-size:21px; line-height:1;}
+  .cat-dropdown-btn .cdc{font-size:15px; transition:transform .18s; margin-inline-start:2px;}
   .cat-dropdown.open .cat-dropdown-btn .cdc{transform:rotate(180deg);}
   .cat-dropdown-menu{
     display:none; position:absolute; top:calc(100% + 8px); inset-inline-end:0;
     background:#17181f; border:1px solid var(--line); border-radius:12px;
-    padding:6px; min-width:200px; z-index:60; box-shadow:0 12px 30px rgba(0,0,0,0.35);
+    padding:6px; min-width:210px; z-index:60; box-shadow:0 12px 30px rgba(0,0,0,0.35);
   }
   .cat-dropdown.open .cat-dropdown-menu{display:block;}
   .cat-dropdown-menu button{
     display:block; width:100%; text-align:inherit; background:transparent; color:var(--paper-dim);
-    padding:11px 14px; border-radius:8px; font-size:14.5px; border:none;
+    padding:12px 15px; border-radius:8px; font-size:16px; font-weight:700; border:none;
   }
   .cat-dropdown-menu button:hover, .cat-dropdown-menu button.active{
     background:var(--paper); color:var(--ink);
@@ -218,6 +218,56 @@
   }
   .cat-section.collapsible.open > .cs-body{max-height:2400px;}
   .cat-section.collapsible > .cs-body > *:first-child{margin-top:20px;}
+
+  /* Quick-nav row: one row of bold, large tab buttons that jump to and open
+     each of the sections below (why-us / how it works / testimonials /
+     about / faq), so a visitor finds all of it at a glance instead of
+     scrolling past five separate stacked headers. */
+  .section-tabs{
+    display:flex; flex-wrap:wrap; gap:10px; margin:0 0 28px;
+  }
+  .section-tab-btn{
+    display:flex; align-items:center; gap:9px;
+    background:var(--ink-2); border:1.5px solid var(--line); color:var(--paper);
+    padding:13px 20px; border-radius:12px;
+    font-size:17px; font-weight:800; letter-spacing:0.2px;
+    transition:.2s;
+  }
+  .section-tab-btn span:first-child{font-size:19px;}
+  .section-tab-btn:hover{border-color:var(--brass-dim);}
+  .section-tab-btn.active{
+    background:var(--brass); color:var(--ink); border-color:var(--brass);
+  }
+  @media(max-width:700px){
+    .section-tab-btn{font-size:15.5px; padding:11px 16px;}
+  }
+
+  /* Admin orders: total/completed/pending counts, click to expand a live table */
+  .order-stats-bar{
+    display:flex; align-items:center; gap:22px; cursor:pointer; user-select:none;
+    background:var(--ink-2); border:1px solid var(--line); border-radius:12px;
+    padding:16px 20px; margin-bottom:16px;
+  }
+  .order-stat{display:flex; flex-direction:column; align-items:flex-start; gap:2px;}
+  .order-stat-num{font-size:26px; font-weight:800; color:var(--brass); line-height:1;}
+  .order-stat-label{font-size:12.5px; color:var(--paper-dim);}
+  .order-stats-chevron{margin-inline-start:auto; color:var(--brass); font-size:15px; transition:transform .2s;}
+  .order-stats-bar.open .order-stats-chevron{transform:rotate(180deg);}
+  #orderStatsTable{
+    background:var(--ink-2); border:1px solid var(--line); border-radius:12px;
+    padding:10px; margin-bottom:16px; font-size:13.5px;
+  }
+  #orderStatsTable table{width:100%; border-collapse:collapse;}
+  #orderStatsTable th, #orderStatsTable td{padding:8px 10px; text-align:inherit; border-bottom:1px solid var(--line);}
+  #orderStatsTable th{color:var(--paper-dim); font-weight:600; font-size:12px;}
+
+  .my-order-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--ink-2); border:1px solid var(--line); border-radius:10px;
+    padding:10px 14px; margin-bottom:8px; font-size:13px;
+  }
+  .my-order-row .mo-info{display:flex; flex-direction:column; gap:2px;}
+  .my-order-row .mo-date{color:var(--paper-dim); font-size:11.5px;}
   .admin-btn{
     background:transparent; border:1px solid var(--line); color:var(--paper-dim);
     padding:8px 14px; border-radius:8px; font-size:13px;
@@ -392,11 +442,20 @@
   .tag-artistic{background:rgba(47,230,176,0.16); color:var(--sage);}
   .tag-magazine{background:rgba(227,164,41,0.18); color:var(--brass-dim);}
 
-  .grid{display:grid; grid-template-columns:repeat(5, 1fr); gap:18px;}
+  .grid{display:grid; grid-template-columns:repeat(5, 1fr); gap:18px; align-items:stretch;}
   @media(max-width:1180px){ .grid{grid-template-columns:repeat(4, 1fr);} }
   @media(max-width:980px){ .grid{grid-template-columns:repeat(3, 1fr);} }
   @media(max-width:700px){ .grid{grid-template-columns:repeat(2, 1fr);} }
   @media(max-width:460px){ .grid{grid-template-columns:1fr;} }
+
+  /* Results showcase: smaller, denser thumbnails than the product grid — still
+     click-to-zoom (openLightbox), just meant to be skimmed quickly rather than
+     shopped from. */
+  .results-grid{display:grid; grid-template-columns:repeat(7, 1fr); gap:10px; align-items:stretch;}
+  .results-grid .card-media{aspect-ratio:1/1;}
+  @media(max-width:1180px){ .results-grid{grid-template-columns:repeat(5, 1fr);} }
+  @media(max-width:700px){ .results-grid{grid-template-columns:repeat(4, 1fr);} }
+  @media(max-width:460px){ .results-grid{grid-template-columns:repeat(3, 1fr); gap:8px;} }
   .grid-nav-wrap{position:relative;}
   .order-status-spinner{
     width:34px; height:34px; margin:6px auto 0; border-radius:50%;
@@ -816,16 +875,27 @@
 
 <section class="sprockets"></section>
 
-<section class="cat-section" id="whyUs">
+<div class="section-tabs" id="sectionTabsRow">
+  <button type="button" class="section-tab-btn" data-target="whyUs"><span aria-hidden="true">✅</span> <span data-i18n="whyUsTitle">لماذا Miga-Photobook؟</span></button>
+  <button type="button" class="section-tab-btn" data-target="howItWorks"><span aria-hidden="true">&#10068;</span> <span data-i18n="howItWorksTitle">كيف يعمل؟</span></button>
+  <button type="button" class="section-tab-btn" data-target="testimonials"><span aria-hidden="true">&#11088;</span> <span data-i18n="testimonialsTitle">آراء تهمنا</span></button>
+  <button type="button" class="section-tab-btn" data-target="aboutUs"><span aria-hidden="true">&#128101;</span> <span data-i18n="aboutUsTitle">من نحن</span></button>
+  <button type="button" class="section-tab-btn" data-target="faq"><span aria-hidden="true">&#10067;</span> <span data-i18n="faqTitle">أسئلة شائعة</span></button>
+</div>
+
+<section class="cat-section collapsible" id="whyUs">
   <div class="section-head">
-    <h2 data-i18n="whyUsTitle">لماذا Miga-Photobook؟</h2>
+    <span class="sh-left"><span class="sh-icon" aria-hidden="true">✅</span><h2 data-i18n="whyUsTitle">لماذا Miga-Photobook؟</h2></span>
+    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
   </div>
+  <div class="cs-body">
   <div class="why-us-grid">
     <div class="why-item">✅ <span data-i18n="whyUs1">نتائج احترافية</span></div>
     <div class="why-item">✅ <span data-i18n="whyUs2">تحويل تلقائي بالكامل</span></div>
     <div class="why-item">✅ <span data-i18n="whyUs3">جاهزة خلال ثوانٍ</span></div>
     <div class="why-item">✅ <span data-i18n="whyUs4">بدون أي خبرة تقنية</span></div>
     <div class="why-item">✅ <span data-i18n="whyUs5">جاهز للنسخ والاستخدام فورًا</span></div>
+  </div>
   </div>
 </section>
 
@@ -879,7 +949,7 @@
   <div class="section-head">
     <h2 data-i18n="resultsTitle">شاهد النتائج التي يمكنك الحصول عليها</h2>
   </div>
-  <div class="grid" id="resultsGrid"></div>
+  <div class="grid results-grid" id="resultsGrid"></div>
 </section>
 
 <section class="cat-section" id="beforeAfter">
@@ -887,14 +957,25 @@
     <h2 data-i18n="beforeAfterTitle">نفس الصورة... نتائج مختلفة تمامًا</h2>
   </div>
   <p class="sub" style="margin-bottom:24px; max-width:640px;" data-i18n="beforeAfterSub">مثال حي يوضح إمكانيات التحويل — نفس ملامح الوجه، بأساليب فنية مختلفة كليًا حسب الاختيار.</p>
-  <div class="before-after-wrap">
+  <div class="before-after-wrap" id="baWrapMale">
     <div class="ba-item">
-      <img id="baBeforeImg" src="" alt="قبل">
+      <img id="baBeforeImgMale" src="" alt="قبل">
       <span class="ba-label" data-i18n="beforeLabel">قبل</span>
     </div>
     <div class="ba-arrow">➜</div>
     <div class="ba-item">
-      <img id="baAfterImg" src="" alt="بعد">
+      <img id="baAfterImgMale" src="" alt="بعد">
+      <span class="ba-label" data-i18n="afterLabel">بعد</span>
+    </div>
+  </div>
+  <div class="before-after-wrap" id="baWrapFemale" style="margin-top:20px;">
+    <div class="ba-item">
+      <img id="baBeforeImgFemale" src="" alt="قبل">
+      <span class="ba-label" data-i18n="beforeLabel">قبل</span>
+    </div>
+    <div class="ba-arrow">➜</div>
+    <div class="ba-item">
+      <img id="baAfterImgFemale" src="" alt="بعد">
       <span class="ba-label" data-i18n="afterLabel">بعد</span>
     </div>
   </div>
@@ -1229,15 +1310,16 @@
     <h3 data-i18n="transformModalTitle">حوّل صورتك</h3>
     <p class="sub" id="transformModalText"></p>
 
-    <div class="field">
+    <div class="field" id="transformUploadField">
       <label data-i18n="uploadPhotoLabel">اختر صورتك</label>
       <input type="file" id="transformFileInput" accept="image/*">
     </div>
+    <p class="sub" id="transformAlreadyDoneNote" style="display:none;" data-i18n="transformAlreadyDoneNote">تم تحويل صورتك قبل كده باستخدام هذا الطلب — دي نتيجتك المحفوظة.</p>
 
 
     <div id="transformPreviewWrap" style="display:none; margin:14px 0;">
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-        <div>
+      <div id="transformPreviewGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div id="transformBeforeCol">
           <div class="sub" style="margin-bottom:6px;" data-i18n="beforeLabel">قبل</div>
           <canvas id="transformSrcCanvas" style="width:100%; border-radius:10px; border:1px solid var(--line);"></canvas>
         </div>
@@ -1248,13 +1330,15 @@
       </div>
     </div>
 
-    <label style="display:flex; align-items:flex-start; gap:8px; margin:12px 0; font-size:13px; color:var(--paper-dim); cursor:pointer;">
-      <input type="checkbox" id="transformConsent" style="margin-top:3px;">
-      <span data-i18n="consentLabel">أؤكد إني صاحب هذه الصورة أو الوصي الشرعي عليها، وأوافق على استخدامها لتوليد النتيجة الفنية المطلوبة.</span>
-    </label>
+    <div id="transformFreshFlowControls">
+      <label style="display:flex; align-items:flex-start; gap:8px; margin:12px 0; font-size:13px; color:var(--paper-dim); cursor:pointer;">
+        <input type="checkbox" id="transformConsent" style="margin-top:3px;">
+        <span data-i18n="consentLabel">أؤكد إني صاحب هذه الصورة أو الوصي الشرعي عليها، وأوافق على استخدامها لتوليد النتيجة الفنية المطلوبة.</span>
+      </label>
 
-    <p class="sub" style="margin-bottom:10px;" id="transformPrivacyNoteEl" data-i18n="transformPrivacyNote">تتم معالجة صورتك بالكامل داخل متصفحك — لا تُرفع لأي سيرفر ولا تُخزَّن في أي مكان.</p>
-    <p class="sub" style="margin-bottom:10px; opacity:0.75;" id="transformDemoNoteEl" data-i18n="transformDemoNote">هذه معاينة لأسلوب المعالجة اللوني المستوحى من هذا القسم — للتوليد الفني الكامل بالذكاء الاصطناعي، يلزم ربط خدمة توليد صور خارجية.</p>
+      <p class="sub" style="margin-bottom:10px;" id="transformPrivacyNoteEl" data-i18n="transformPrivacyNote">تتم معالجة صورتك بالكامل داخل متصفحك — لا تُرفع لأي سيرفر ولا تُخزَّن في أي مكان.</p>
+      <p class="sub" style="margin-bottom:10px; opacity:0.75;" id="transformDemoNoteEl" data-i18n="transformDemoNote">هذه معاينة لأسلوب المعالجة اللوني المستوحى من هذا القسم — للتوليد الفني الكامل بالذكاء الاصطناعي، يلزم ربط خدمة توليد صور خارجية.</p>
+    </div>
 
     <div class="modal-actions">
       <button class="btn-primary" id="transformGenerateBtn" data-i18n="generateBtn">حوّل الصورة</button>
@@ -1269,6 +1353,12 @@
   <div class="modal">
     <button class="close-x" id="trackModalClose">×</button>
     <h3 data-i18n="trackModalTitle">تتبع طلبك</h3>
+
+    <div id="myOrdersHistory" style="display:none; margin-bottom:18px;">
+      <div class="sub" style="margin-bottom:8px; font-weight:700;" data-i18n="myOrdersTitle">طلباتك السابقة</div>
+      <div id="myOrdersHistoryList"></div>
+    </div>
+
     <p class="sub" data-i18n="trackModalSub">أدخل كود المتابعة الذي حصلت عليه بعد إرسال طلب الشراء.</p>
     <div class="field">
       <label data-i18n="trackCodeLabel">كود المتابعة</label>
@@ -1452,6 +1542,13 @@
       </div>
 
       <div id="adminTabOrders" style="display:none;">
+        <div class="order-stats-bar" id="orderStatsBar" role="button" tabindex="0" aria-expanded="false">
+          <div class="order-stat"><span class="order-stat-num" id="statTotal">0</span><span class="order-stat-label" data-i18n="statTotalLabel">إجمالي الطلبات</span></div>
+          <div class="order-stat"><span class="order-stat-num" id="statApproved">0</span><span class="order-stat-label" data-i18n="statApprovedLabel">تم تنفيذها</span></div>
+          <div class="order-stat"><span class="order-stat-num" id="statPending">0</span><span class="order-stat-label" data-i18n="statPendingLabel">قيد المراجعة</span></div>
+          <span class="order-stats-chevron" aria-hidden="true">&#9660;</span>
+        </div>
+        <div id="orderStatsTable" style="display:none;"></div>
         <div id="ordersList"></div>
       </div>
 
@@ -1497,7 +1594,7 @@ const VODAFONE_CASH_NUMBER = "01017877978";
 const SOFT_LAUNCH = false; // when true: all prompts unlock free, no payment required. Flip to false to resume paid InstaPay flow.
 const LAUNCH_PROMO = true; // opening-offer mode: flat promo price, launch banner, bundles hidden
 // Change this date to extend/shorten the launch offer countdown shown in the banner.
-const LAUNCH_PROMO_END = new Date('2026-08-15T23:59:59+02:00');
+const LAUNCH_PROMO_END = new Date('2026-09-18T23:59:59+02:00');
 // Card (Paymob) and Fawry are hidden from customers until their merchant credentials
 // are set up (see transform-worker.js setup notes). Flip either to true once ready —
 // no other change needed, the payment tab will reappear automatically.
@@ -1626,6 +1723,7 @@ const translations = {
     detailValue3:'✓ النتيجة جاهزة للتحميل مباشرة', detailValue4:'✓ دعم فني مباشر لو احتجت مساعدة',
     detailBuyBtn:'احصل عليها الآن',
     trackModalTitle:'تتبع طلبك', trackModalSub:'أدخل كود المتابعة الذي حصلت عليه بعد إرسال طلب الشراء.',
+    myOrdersTitle:'طلباتك السابقة', loadingLabel:'جاري التحميل...',
     trackCodeLabel:'كود المتابعة', trackCheckBtn:'تحقّق من الحالة', closeBtn:'إغلاق',
     adminTitle:'دخول لوحة الإدارة',
     adminSub:'لوحة إدارة المنتجات والطلبات.',
@@ -1664,6 +1762,8 @@ const translations = {
     ordersEmptyNote:'لا توجد طلبات بعد.',
     orderLabelProduct:'المنتج', orderLabelPhone:'الموبايل', orderLabelPayApp:'وسيلة الدفع', orderLabelRef:'المرجع',
     orderLabelCode:'الكود', orderLabelStatus:'الحالة', orderStatusApproved:'تمت الموافقة', orderStatusPending:'قيد المراجعة',
+    statTotalLabel:'إجمالي الطلبات', statApprovedLabel:'تم تنفيذها', statPendingLabel:'قيد المراجعة',
+    statColCode:'الكود', statColProduct:'المنتج', statColStatus:'الحالة', statColTime:'الوقت',
     orderApproveBtn:'موافقة وتفعيل التحويل',
     softLaunchBanner:'🎉 إطلاق تجريبي — كل التحويلات متاحة مجانًا الآن لفترة محدودة',
     launchPromoBannerText:'🎉 عرض افتتاح الموقع — كل صورة بـ 25 جنيه فقط!',
@@ -1672,7 +1772,8 @@ const translations = {
     countdownEnded:'انتهى العرض',
     freeLabel:'مجانًا', claimFreeBtn:'احصل عليه مجانًا',
     toastFreeUnlocked:'تم الفتح مجانًا — جاهز تحوّل صورتك! (فترة الإطلاق التجريبي)',
-    transformBtn:'حوّل صورتك', transformModalTitle:'حوّل صورتك',
+    transformBtn:'حوّل صورتك', viewResultBtn:'شاهد نتيجتك ✅', transformModalTitle:'حوّل صورتك',
+    transformAlreadyDoneNote:'تم تحويل صورتك قبل كده باستخدام هذا الطلب — دي نتيجتك المحفوظة.',
     uploadPhotoLabel:'اختر صورتك', beforeLabel:'قبل', afterLabel:'بعد',
     consentLabel:'أؤكد إني صاحب هذه الصورة أو الوصي الشرعي عليها، وأوافق على استخدامها لتوليد النتيجة الفنية المطلوبة.',
     transformPrivacyNote:'تتم معالجة صورتك بالكامل داخل متصفحك — لا تُرفع لأي سيرفر ولا تُخزَّن في أي مكان.',
@@ -1777,6 +1878,7 @@ const translations = {
     detailValue3:'✓ Result ready to download instantly', detailValue4:'✓ Direct support if you need help',
     detailBuyBtn:'Get It Now',
     trackModalTitle:'Track Your Order', trackModalSub:'Enter the tracking code you received after sending a purchase request.',
+    myOrdersTitle:'Your Past Orders', loadingLabel:'Loading...',
     trackCodeLabel:'Tracking Code', trackCheckBtn:'Check Status', closeBtn:'Close',
     adminTitle:'Admin Login',
     adminSub:'Product and order management panel.',
@@ -1815,6 +1917,8 @@ const translations = {
     ordersEmptyNote:'No orders yet.',
     orderLabelProduct:'Product', orderLabelPhone:'Mobile', orderLabelPayApp:'Payment Method', orderLabelRef:'Reference',
     orderLabelCode:'Code', orderLabelStatus:'Status', orderStatusApproved:'Approved', orderStatusPending:'Under Review',
+    statTotalLabel:'Total Orders', statApprovedLabel:'Completed', statPendingLabel:'Under Review',
+    statColCode:'Code', statColProduct:'Product', statColStatus:'Status', statColTime:'Time',
     orderApproveBtn:'Approve & Enable Transform',
     softLaunchBanner:'🎉 Soft Launch — all transformations are free right now for a limited time',
     launchPromoBannerText:'🎉 Launch Offer — every photo for just 25 EGP!',
@@ -1823,7 +1927,8 @@ const translations = {
     countdownEnded:'Offer ended',
     freeLabel:'Free', claimFreeBtn:'Get It Free',
     toastFreeUnlocked:'Unlocked for free — ready to transform your photo! (soft launch period)',
-    transformBtn:'Transform Your Photo', transformModalTitle:'Transform Your Photo',
+    transformBtn:'Transform Your Photo', viewResultBtn:'View Your Result ✅', transformModalTitle:'Transform Your Photo',
+    transformAlreadyDoneNote:'Your photo was already transformed with this order — this is your saved result.',
     uploadPhotoLabel:'Choose your photo', beforeLabel:'Before', afterLabel:'After',
     consentLabel:"I confirm I own this photo or am its legal guardian, and consent to using it to generate the requested artistic result.",
     transformPrivacyNote:'Your photo is processed entirely in your browser — it is never uploaded to a server or stored anywhere.',
@@ -2036,6 +2141,8 @@ async function deleteProductRemote(id){
 // at any point, not even transiently: this site transforms the photo for the customer
 // automatically; the instructions that drive that are an admin-only detail.
 let orderCodes = {};
+let transformedResults = {}; // productId -> cached generated image URL, so a refreshed
+// page can show "شاهد النتيجة" instead of implying a fresh free attempt.
 async function loadPurchases(){
   try{
     const raw = localStorage.getItem('megaPromptPurchases');
@@ -2045,12 +2152,18 @@ async function loadPurchases(){
     const raw = localStorage.getItem('megaPromptOrderCodes');
     orderCodes = raw ? JSON.parse(raw) : {};
   }catch(e){ orderCodes = {}; }
+  try{
+    const raw = localStorage.getItem('megaPromptTransformedResults');
+    transformedResults = raw ? JSON.parse(raw) : {};
+  }catch(e){ transformedResults = {}; }
 }
 async function savePurchases(){
   try{ localStorage.setItem('megaPromptPurchases', JSON.stringify(purchases)); }
   catch(e){ console.error('save purchases failed', e); }
   try{ localStorage.setItem('megaPromptOrderCodes', JSON.stringify(orderCodes)); }
   catch(e){ console.error('save order codes failed', e); }
+  try{ localStorage.setItem('megaPromptTransformedResults', JSON.stringify(transformedResults)); }
+  catch(e){ console.error('save transformed results failed', e); }
 }
 
 // Orders: admin-only listing goes through the Worker (password-checked server-side);
@@ -2159,11 +2272,21 @@ function renderHeroStrip(){
 function renderResultsAndComparison(){
   const realPhotos = products.filter(p => p.image !== PLACEHOLDER_IMG);
 
-  // Results showcase: reuse real product photos (no fabricated images)
+  // Results showcase: reuse real product photos (no fabricated images), mixed
+  // round-robin across categories so it doesn't look like just one section's
+  // photos padded out — a genuine cross-section of the catalog.
   const resultsEl = document.getElementById('resultsGrid');
   if(resultsEl){
-    const picks = realPhotos.slice(0, 9);
-    resultsEl.innerHTML = picks.map(p => `
+    const byCat = {};
+    realPhotos.forEach(p=>{ (byCat[p.category] = byCat[p.category] || []).push(p); });
+    const cats = Object.keys(byCat);
+    const picks = [];
+    let round = 0;
+    while(picks.length < 12 && cats.some(c => byCat[c].length > round)){
+      cats.forEach(c=>{ if(byCat[c][round]) picks.push(byCat[c][round]); });
+      round++;
+    }
+    resultsEl.innerHTML = picks.slice(0, 12).map(p => `
       <div class="card">
         <div class="card-media">
           <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
@@ -2171,12 +2294,26 @@ function renderResultsAndComparison(){
       </div>`).join('');
   }
 
-  // Before/After: two real generated results of the same subject, shown side by side
-  // to demonstrate range — not a raw "unedited" photo, since we don't have one to show honestly.
-  const before = products.find(p => p.id === 'male_amber_studio');
-  const after = products.find(p => p.id === 'male_oil_painting_cosmic_tie');
-  if(before && document.getElementById('baBeforeImg')) document.getElementById('baBeforeImg').src = before.image;
-  if(after && document.getElementById('baAfterImg')) document.getElementById('baAfterImg').src = after.image;
+  // Before/After: two real product photos of the same category shown side by
+  // side to demonstrate range. Picked dynamically from whatever's actually in
+  // the live catalog (not hardcoded IDs, which silently break the moment
+  // products are added/removed/renamed from the admin panel) — one example
+  // from Men, one from Women.
+  const maleShots = products.filter(p => p.category === 'male' && p.image !== PLACEHOLDER_IMG);
+  const femaleShots = products.filter(p => p.category === 'female' && p.image !== PLACEHOLDER_IMG);
+  const setBa = (prefix, before, after)=>{
+    const wrap = document.getElementById('baWrap' + prefix);
+    if(!wrap) return;
+    if(before && after){
+      document.getElementById('baBeforeImg' + prefix).src = before.image;
+      document.getElementById('baAfterImg' + prefix).src = after.image;
+      wrap.style.display = '';
+    }else{
+      wrap.style.display = 'none'; // not enough photos in this category yet
+    }
+  };
+  setBa('Male', maleShots[0], maleShots[1]);
+  setBa('Female', femaleShots[0], femaleShots[1]);
 }
 
 // ---------- Living background watermark (site photos + wordmark, very low opacity) ----------
@@ -2250,6 +2387,7 @@ function renderGrids(){
 
     el.innerHTML = items.map(p=>{
       const owned = purchases.includes(p.id);
+      const alreadyTransformed = !!transformedResults[p.id];
       return `
       <div class="card">
         <div class="card-media">
@@ -2266,7 +2404,9 @@ function renderGrids(){
           </div>
           <div class="card-actions">
             ${owned
-              ? `<button class="buy-btn" onclick="openTransformModal('${p.id}')">${t('transformBtn')}</button>`
+              ? (alreadyTransformed
+                  ? `<button class="buy-btn" onclick="openTransformModal('${p.id}')">${t('viewResultBtn')}</button>`
+                  : `<button class="buy-btn" onclick="openTransformModal('${p.id}')">${t('transformBtn')}</button>`)
               : SOFT_LAUNCH
                 ? `<button class="buy-btn" onclick="claimFree('${p.id}')">${t('claimFreeBtn')}</button>`
                 : `<button class="buy-btn" onclick="openBuyModal('${p.id}')">${t('buyBtnPrefix')} — ${p.price} ${CURRENCY}</button>`}
@@ -2558,9 +2698,39 @@ function openTransformModal(id){
   document.getElementById('transformModalText').innerText = productTitle(p);
   document.getElementById('transformFileInput').value = '';
   document.getElementById('transformConsent').checked = false;
-  document.getElementById('transformPreviewWrap').style.display = 'none';
   document.getElementById('transformDownloadBtn').style.display = 'none';
+  document.getElementById('transformGenerateBtn').dataset.used = '';
   transformImg = null;
+
+  const cachedUrl = transformedResults[id];
+  if(cachedUrl){
+    // Already generated with this order — show the saved result straight away
+    // instead of the upload form, so refreshing the page (or coming back later)
+    // never looks like "another free attempt" is on offer.
+    document.getElementById('transformUploadField').style.display = 'none';
+    document.getElementById('transformAlreadyDoneNote').style.display = 'block';
+    document.getElementById('transformFreshFlowControls').style.display = 'none';
+    document.getElementById('transformBeforeCol').style.display = 'none';
+    document.getElementById('transformPreviewGrid').style.gridTemplateColumns = '1fr';
+    document.getElementById('transformPreviewWrap').style.display = 'block';
+    const outCanvas = document.getElementById('transformOutCanvas');
+    const ctx = outCanvas.getContext('2d');
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = ()=>{
+      outCanvas.width = img.naturalWidth; outCanvas.height = img.naturalHeight;
+      ctx.drawImage(img, 0, 0);
+      document.getElementById('transformDownloadBtn').style.display = 'inline-block';
+    };
+    img.src = cachedUrl;
+  }else{
+    document.getElementById('transformUploadField').style.display = '';
+    document.getElementById('transformAlreadyDoneNote').style.display = 'none';
+    document.getElementById('transformFreshFlowControls').style.display = '';
+    document.getElementById('transformBeforeCol').style.display = '';
+    document.getElementById('transformPreviewGrid').style.gridTemplateColumns = '1fr 1fr';
+    document.getElementById('transformPreviewWrap').style.display = 'none';
+  }
   transformModalBg.classList.add('show');
 }
 document.getElementById('transformModalClose').onclick = ()=> transformModalBg.classList.remove('show');
@@ -2643,6 +2813,9 @@ document.getElementById('transformGenerateBtn').onclick = async ()=>{
       };
       resultImg.onerror = ()=> showToast(t('toastGenerateFailed'));
       resultImg.src = data.imageUrl;
+      transformedResults[currentTransformId] = data.imageUrl;
+      savePurchases();
+      renderGrids();
     }catch(e){
       genBtn.disabled = false;
       showToast(t('toastGenerateFailed'));
@@ -2680,7 +2853,49 @@ document.getElementById('transformDownloadBtn').onclick = ()=>{
 
 // ---------- Order tracking ----------
 const trackModalBg = document.getElementById('trackModalBg');
-document.getElementById('trackOpenBtn').onclick = ()=> trackModalBg.classList.add('show');
+document.getElementById('trackOpenBtn').onclick = ()=>{
+  trackModalBg.classList.add('show');
+  renderMyOrdersHistory();
+};
+
+/** Every code the visitor has ever generated on this browser is already kept
+ * in orderCodes (localStorage) — this just re-checks each one's live status
+ * so "تتبع طلبي" shows a full history instead of a one-code-at-a-time lookup. */
+async function renderMyOrdersHistory(){
+  const wrap = document.getElementById('myOrdersHistory');
+  const listEl = document.getElementById('myOrdersHistoryList');
+  const entries = Object.entries(orderCodes || {});
+  if(!entries.length || !BACKEND_BASE){
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = 'block';
+  listEl.innerHTML = `<div class="empty-note">${t('loadingLabel') || '...'}</div>`;
+  const rows = await Promise.all(entries.map(async ([productId, code])=>{
+    const p = products.find(x=>x.id===productId);
+    try{
+      const res = await fetch(`${BACKEND_BASE}/orders/track?code=${encodeURIComponent(code)}`);
+      if(!res.ok) return null;
+      const order = await res.json();
+      return { p, code, status: order.status, createdAt: order.createdAt };
+    }catch(e){ return null; }
+  }));
+  const valid = rows.filter(Boolean).sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
+  if(!valid.length){
+    listEl.innerHTML = `<div class="empty-note">${t('ordersEmptyNote')}</div>`;
+    return;
+  }
+  listEl.innerHTML = valid.map(r => `
+    <div class="my-order-row">
+      <div class="mo-info">
+        <b>${r.p ? escapeHtml(productTitle(r.p)) : r.code}</b>
+        <span class="mo-date">${r.createdAt ? new Date(r.createdAt).toLocaleString(currentLang==='ar' ? 'ar-EG' : 'en-GB', {dateStyle:'medium', timeStyle:'short'}) : ''} — ${r.code}</span>
+      </div>
+      <span class="order-status ${r.status==='approved' ? 'status-approved' : 'status-pending'}">
+        ${r.status==='approved' ? t('orderStatusApproved') : t('orderStatusPending')}
+      </span>
+    </div>`).join('');
+}
 document.getElementById('trackModalClose').onclick = ()=> trackModalBg.classList.remove('show');
 document.getElementById('trackCancelBtn').onclick = ()=> trackModalBg.classList.remove('show');
 document.getElementById('trackCheckBtn').onclick = async ()=>{
@@ -2716,11 +2931,24 @@ function getCategoryOf(productId){
 }
 
 
-// ---------- Collapsible sections (How it works / Testimonials / About / FAQ) ----------
+// ---------- Collapsible sections (How it works / Testimonials / About / FAQ / Why us) ----------
 document.querySelectorAll('.cat-section.collapsible > .section-head').forEach(head=>{
   head.addEventListener('click', ()=>{
     head.parentElement.classList.toggle('open');
   });
+});
+
+// ---------- Quick-nav row (single row of tabs above the five sections above) ----------
+document.getElementById('sectionTabsRow').addEventListener('click', (e)=>{
+  const btn = e.target.closest('.section-tab-btn');
+  if(!btn) return;
+  document.querySelectorAll('.section-tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const targetId = btn.dataset.target;
+  document.querySelectorAll('#whyUs, #howItWorks, #testimonials, #aboutUs, #faq').forEach(sec=>{
+    sec.classList.toggle('open', sec.id === targetId);
+  });
+  document.getElementById(targetId)?.scrollIntoView({behavior:'smooth', block:'start'});
 });
 
 // ---------- Category dropdown (single button + menu, replaces the old pill row) ----------
@@ -2813,6 +3041,12 @@ async function refreshAdminBellBadge(){
     badge.style.display = pending ? '' : 'none';
     badge.textContent = pending > 99 ? '99+' : String(pending);
     menuLabel.textContent = pending ? `(${pending})` : '';
+    // If the orders tab happens to be open, keep its stats/table live too —
+    // same 30s cadence, no extra timer needed.
+    if(document.getElementById('adminTabOrders').style.display !== 'none'){
+      orders = list;
+      renderOrdersList();
+    }
   }catch(e){ /* next poll retries */ }
 }
 
@@ -3318,7 +3552,12 @@ function logVisitOnce(){
 function renderOrdersList(){
   const el = document.getElementById('ordersList');
   const pending = orders.filter(o=>o.status==='pending').length;
+  const approved = orders.filter(o=>o.status==='approved').length;
   document.getElementById('pendingCount').innerText = pending ? `(${pending})` : '';
+  document.getElementById('statTotal').textContent = orders.length;
+  document.getElementById('statApproved').textContent = approved;
+  document.getElementById('statPending').textContent = pending;
+  renderOrderStatsTable();
   if(!orders.length){
     el.innerHTML = `<div class="empty-note">${t('ordersEmptyNote')}</div>`;
     return;
@@ -3342,6 +3581,40 @@ function renderOrdersList(){
         </div>` : ''}
     </div>`).join('');
 }
+
+/** Compact recent-orders table shown when the stats bar is expanded — same
+ * `orders` array already loaded for the full list below, just condensed to
+ * the last 15 rows so the admin gets a live at-a-glance view without
+ * scrolling past the full detailed list. */
+function renderOrderStatsTable(){
+  const tableEl = document.getElementById('orderStatsTable');
+  if(!tableEl) return;
+  const sorted = [...orders].sort((a,b)=> b.createdAt - a.createdAt).slice(0, 15);
+  if(!sorted.length){
+    tableEl.innerHTML = `<div class="empty-note">${t('ordersEmptyNote')}</div>`;
+    return;
+  }
+  tableEl.innerHTML = `<table>
+    <thead><tr>
+      <th>${t('statColCode')}</th><th>${t('statColProduct')}</th><th>${t('statColStatus')}</th><th>${t('statColTime')}</th>
+    </tr></thead>
+    <tbody>
+      ${sorted.map(o=>`
+        <tr>
+          <td>${o.code}</td>
+          <td>${escapeHtml(o.productTitle)}</td>
+          <td><span class="order-status ${o.status==='approved' ? 'status-approved' : 'status-pending'}">${o.status==='approved' ? t('orderStatusApproved') : t('orderStatusPending')}</span></td>
+          <td>${new Date(o.createdAt).toLocaleString(currentLang==='ar' ? 'ar-EG' : 'en-GB', {dateStyle:'short', timeStyle:'short'})}</td>
+        </tr>`).join('')}
+    </tbody>
+  </table>`;
+}
+
+document.getElementById('orderStatsBar').addEventListener('click', function(){
+  const isOpen = this.classList.toggle('open');
+  this.setAttribute('aria-expanded', String(isOpen));
+  document.getElementById('orderStatsTable').style.display = isOpen ? 'block' : 'none';
+});
 
 async function approveOrder(code){
   if(!BACKEND_BASE) return;
@@ -3380,7 +3653,16 @@ async function loadAdminProducts(){
 
 document.getElementById('adminLoginBtn').onclick = async ()=>{
   const val = document.getElementById('adminPass').value;
-  if(!BACKEND_BASE){ showToast(t('toastWrongPassword')); return; }
+  const ok = await adminLoginWithPassword(val);
+  if(!ok) showToast(t('toastWrongPassword'));
+};
+
+/** Shared by the manual login button and by the silent auto-login on page load.
+ * Always re-verifies against the server rather than trusting a stored flag, so
+ * a changed/rotated admin password on the backend correctly logs the browser
+ * out instead of leaving a stale session. */
+async function adminLoginWithPassword(val){
+  if(!BACKEND_BASE || !val) return false;
   try{
     const res = await fetch(`${BACKEND_BASE}/admin/verify`, {
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -3396,19 +3678,24 @@ document.getElementById('adminLoginBtn').onclick = async ()=>{
       applyChildrenVisibility();
       renderAdminProductsList();
       showAdminQuickAccess();
-    }else{
-      showToast(t('toastWrongPassword'));
+      // Kept in localStorage so the admin stays logged in across page refreshes,
+      // the same way a customer account does. This is the site owner's own
+      // device/browser — if that ever changes, use "خروج" to clear it.
+      try{ localStorage.setItem('megaPromptAdminPass', val); }catch(e){}
+      return true;
     }
+    return false;
   }catch(e){
-    showToast(t('toastWrongPassword'));
+    return false;
   }
-};
+}
 document.getElementById('adminLogoutBtn').onclick = async ()=>{
   adminLoggedIn = false;
   adminPasswordCache = '';
   adminModalBg.classList.remove('show');
   editingProductId = null;
   resetEditUI();
+  try{ localStorage.removeItem('megaPromptAdminPass'); }catch(e){}
   await loadProducts(); // drop back to the prompt-free public list
   renderGrids();
   renderHeroStrip();
@@ -3667,6 +3954,15 @@ function showToast(msg){
   renderWatermarkBackground();
   await loadPurchases();
   await loadOrders();
+
+  // Persistent admin session: if this browser logged in before, silently
+  // re-verify and restore it — same behavior as a saved customer login,
+  // instead of asking for the password again on every refresh.
+  try{
+    const savedAdminPass = localStorage.getItem('megaPromptAdminPass');
+    if(savedAdminPass) await adminLoginWithPassword(savedAdminPass);
+  }catch(e){}
+
   applyLanguage(prefs?.lang || 'ar');
   applyViewMode(prefs?.view || 'desktop');
   await checkLoggedInUser();
