@@ -264,6 +264,12 @@
   #orderStatsTable th, #orderStatsTable td{padding:8px 10px; text-align:inherit; border-bottom:1px solid var(--line);}
   #orderStatsTable th{color:var(--paper-dim); font-weight:600; font-size:12px;}
 
+  .order-type-badge{
+    display:inline-block; font-size:11.5px; font-weight:800; padding:3px 10px; border-radius:100px;
+  }
+  .order-type-badge.type-transform{background:rgba(62,167,255,0.16); color:var(--steel);}
+  .order-type-badge.type-prompt{background:rgba(255,201,77,0.16); color:var(--brass);}
+
   .my-order-row{
     display:flex; align-items:center; justify-content:space-between; gap:10px;
     background:var(--ink-2); border:1px solid var(--line); border-radius:10px;
@@ -271,6 +277,15 @@
   }
   .my-order-row .mo-info{display:flex; flex-direction:column; gap:2px;}
   .my-order-row .mo-date{color:var(--paper-dim); font-size:11.5px;}
+
+  .purchased-prompt-box{
+    background:var(--ink); border:1px solid var(--line); border-radius:10px;
+    padding:12px; display:flex; flex-direction:column; gap:8px;
+  }
+  .purchased-prompt-box p{
+    font-size:13px; line-height:1.7; color:var(--paper-dim); margin:0;
+    white-space:pre-wrap;
+  }
 
   .popularity-badge{
     display:inline-flex; align-items:center; gap:4px; align-self:center;
@@ -1755,6 +1770,9 @@ const SOFT_LAUNCH = false; // when true: all prompts unlock free, no payment req
 const LAUNCH_PROMO = true; // opening-offer mode: flat promo price, launch banner, bundles hidden
 // Change this date to extend/shorten the launch offer countdown shown in the banner.
 const LAUNCH_PROMO_END = new Date('2026-09-18T23:59:59+02:00');
+// "Buy the prompt" service — same launch-promo pattern as photo prices.
+const PROMPT_PRICE = 10;
+const PROMPT_ORIGINAL_PRICE = 15;
 // Card (Paymob) and Fawry are hidden from customers until their merchant credentials
 // are set up (see transform-worker.js setup notes). Flip either to true once ready —
 // no other change needed, the payment tab will reappear automatically.
@@ -1791,6 +1809,7 @@ let products = [];
 let purchases = [];
 let orders = [];
 let currentBuyId = null;
+let currentBuyType = 'transform'; // 'transform' | 'prompt' — which of the two products the open buy modal is for
 
 // ---------- i18n ----------
 const translations = {
@@ -1911,6 +1930,14 @@ const translations = {
     lockOverlayText:'يتم تحويل صورتك بعد الشراء', ownedPill:'✓ تم الشراء',
     buyBtnPrefix:'🔷 احصل عليها الآن', emptyNoteCategory:'لا توجد منتجات في هذا القسم بعد — أضِف منتجات من لوحة الإدارة.',
     buyModalTextTemplate:'شراء "{title}" مقابل {price} جنيه.',
+    buyPromptModalTextTemplate:'شراء البرومبت الاحترافي لـ "{title}" مقابل {price} جنيه.',
+    buyPromptBtnPrefix:'احصل على البرومبت الاحترافي',
+    copyPromptBtn:'نسخ البرومبت', promptPendingBtn:'البرومبت قيد المراجعة',
+    orderTypeTransform:'تحويل صورة', orderTypePrompt:'شراء برومبت',
+    statusPromptApprovedText:'تم تأكيد الدفع ✅ البرومبت جاهز — هتلاقيه في "تتبع طلبي".',
+    toastPromptReady:'تم تأكيد الدفع — البرومبت جاهز الآن',
+    toastPromptCopied:'تم نسخ البرومبت',
+    toastPromptNotReady:'البرومبت لسه قيد المراجعة',
     toastCopiedNumber:'تم نسخ الرقم', toastEnterPhone:'يرجى إدخال رقم الموبايل الذي حوّلت منه',
     toastOrderSentTemplate:'تم إرسال طلبك — كود المتابعة: {code} (احتفظ به)',
     toastEnterCode:'أدخل كود المتابعة', toastOrderNotFound:'لم يتم العثور على طلب بهذا الكود',
@@ -1930,6 +1957,9 @@ const translations = {
     reviewColRating:'التقييم', reviewColComment:'التعليق',
     statColCode:'الكود', statColProduct:'المنتج', statColStatus:'الحالة', statColTime:'الوقت', statColBuyer:'الطالب',
     orderLabelBuyer:'اسم/إيميل الطالب', orderBuyerGuest:'زائر (بدون حساب)',
+    orderLabelType:'نوع الطلب', statColType:'النوع',
+    sendPromptWhatsAppBtn:'إرسال عبر واتساب',
+    whatsappPromptMessageTemplate:'مرحبًا 👋 تحويلك تم تأكيده — ده البرومبت الاحترافي الخاص بـ "{title}":\n\n{prompt}\n\nشكرًا لثقتك في Miga-Photobook 🙏',
     orderApproveBtn:'موافقة وتفعيل التحويل',
     softLaunchBanner:'🎉 إطلاق تجريبي — كل التحويلات متاحة مجانًا الآن لفترة محدودة',
     launchPromoBannerText:'🎉 عرض افتتاح الموقع — كل صورة بـ 25 جنيه فقط!',
@@ -2072,6 +2102,14 @@ const translations = {
     lockOverlayText:'Your photo gets transformed after purchase', ownedPill:'✓ Purchased',
     buyBtnPrefix:'🔷 Get It Now', emptyNoteCategory:'No products in this section yet — add products from the admin panel.',
     buyModalTextTemplate:'Buy "{title}" for {price} EGP.',
+    buyPromptModalTextTemplate:'Buy the professional prompt for "{title}" for {price} EGP.',
+    buyPromptBtnPrefix:'Get the Pro Prompt',
+    copyPromptBtn:'Copy Prompt', promptPendingBtn:'Prompt Under Review',
+    orderTypeTransform:'Photo Transform', orderTypePrompt:'Prompt Purchase',
+    statusPromptApprovedText:'Payment confirmed ✅ Your prompt is ready — find it under "Track Order".',
+    toastPromptReady:'Payment confirmed — your prompt is ready',
+    toastPromptCopied:'Prompt copied',
+    toastPromptNotReady:'This prompt is still under review',
     toastCopiedNumber:'Number copied', toastEnterPhone:'Please enter the mobile number you transferred from',
     toastOrderSentTemplate:'Your request has been sent — tracking code: {code} (keep it)',
     toastEnterCode:'Enter the tracking code', toastOrderNotFound:'No order found with this code',
@@ -2091,6 +2129,9 @@ const translations = {
     reviewColRating:'Rating', reviewColComment:'Comment',
     statColCode:'Code', statColProduct:'Product', statColStatus:'Status', statColTime:'Time', statColBuyer:'Buyer',
     orderLabelBuyer:'Buyer name/email', orderBuyerGuest:'Guest (no account)',
+    orderLabelType:'Order Type', statColType:'Type',
+    sendPromptWhatsAppBtn:'Send via WhatsApp',
+    whatsappPromptMessageTemplate:'Hi 👋 your payment is confirmed — here\\u2019s the professional prompt for "{title}":\\n\\n{prompt}\\n\\nThanks for choosing Miga-Photobook 🙏',
     orderApproveBtn:'Approve & Enable Transform',
     softLaunchBanner:'🎉 Soft Launch — all transformations are free right now for a limited time',
     launchPromoBannerText:'🎉 Launch Offer — every photo for just 25 EGP!',
@@ -2316,6 +2357,12 @@ let orderCodes = {};
 let transformedResults = {}; // productId -> cached generated image URL, so a refreshed
 // page can show "شاهد النتيجة" instead of implying a fresh free attempt.
 let productPopularity = {}; // productId -> approved-order count, from the public /products/popularity endpoint
+// Prompt-purchase state — kept entirely separate from the photo-transform
+// state above, since a customer can hold both kinds of order for the same
+// product at once (they're two different products being sold).
+let promptPurchases = [];
+let promptOrderCodes = {};
+let purchasedPromptTexts = {}; // productId -> prompt text, once its order is approved
 async function loadPurchases(){
   try{
     const raw = localStorage.getItem('megaPromptPurchases');
@@ -2329,6 +2376,18 @@ async function loadPurchases(){
     const raw = localStorage.getItem('megaPromptTransformedResults');
     transformedResults = raw ? JSON.parse(raw) : {};
   }catch(e){ transformedResults = {}; }
+  try{
+    const raw = localStorage.getItem('megaPromptPromptPurchases');
+    promptPurchases = raw ? JSON.parse(raw) : [];
+  }catch(e){ promptPurchases = []; }
+  try{
+    const raw = localStorage.getItem('megaPromptPromptOrderCodes');
+    promptOrderCodes = raw ? JSON.parse(raw) : {};
+  }catch(e){ promptOrderCodes = {}; }
+  try{
+    const raw = localStorage.getItem('megaPromptPurchasedPromptTexts');
+    purchasedPromptTexts = raw ? JSON.parse(raw) : {};
+  }catch(e){ purchasedPromptTexts = {}; }
 }
 async function savePurchases(){
   try{ localStorage.setItem('megaPromptPurchases', JSON.stringify(purchases)); }
@@ -2337,6 +2396,12 @@ async function savePurchases(){
   catch(e){ console.error('save order codes failed', e); }
   try{ localStorage.setItem('megaPromptTransformedResults', JSON.stringify(transformedResults)); }
   catch(e){ console.error('save transformed results failed', e); }
+  try{ localStorage.setItem('megaPromptPromptPurchases', JSON.stringify(promptPurchases)); }
+  catch(e){ console.error('save prompt purchases failed', e); }
+  try{ localStorage.setItem('megaPromptPromptOrderCodes', JSON.stringify(promptOrderCodes)); }
+  catch(e){ console.error('save prompt order codes failed', e); }
+  try{ localStorage.setItem('megaPromptPurchasedPromptTexts', JSON.stringify(purchasedPromptTexts)); }
+  catch(e){ console.error('save purchased prompt texts failed', e); }
 }
 
 // Orders: admin-only listing goes through the Worker (password-checked server-side);
@@ -2637,7 +2702,14 @@ function renderGrids(){
                   : `<button class="buy-btn" onclick="openTransformModal('${p.id}')">${t('transformBtn')}</button>`)
               : SOFT_LAUNCH
                 ? `<button class="buy-btn" onclick="claimFree('${p.id}')">${t('claimFreeBtn')}</button>`
-                : `<button class="buy-btn" onclick="openBuyModal('${p.id}')">${t('buyBtnPrefix')} — ${p.price} ${CURRENCY}</button>`}
+                : `<button class="buy-btn" onclick="openBuyModal('${p.id}', 'transform')">${t('buyBtnPrefix')} — ${p.price} ${CURRENCY}</button>`}
+            ${promptPurchases.includes(p.id)
+              ? (purchasedPromptTexts[p.id]
+                  ? `<button class="buy-btn prompt-btn" onclick="copyPurchasedPrompt('${p.id}')">${t('copyPromptBtn')}</button>`
+                  : `<button class="buy-btn prompt-btn" onclick="openTrackForPrompt('${p.id}')">${t('promptPendingBtn')}</button>`)
+              : `<button class="buy-btn prompt-btn" onclick="openBuyModal('${p.id}', 'prompt')">
+                   ${t('buyPromptBtnPrefix')} — <span class="price-old">${PROMPT_ORIGINAL_PRICE} ${CURRENCY}</span> <span class="price-new">${PROMPT_PRICE} ${CURRENCY}</span>
+                 </button>`}
           </div>
         </div>
       </div>`;
@@ -2706,19 +2778,22 @@ function openProductDetail(id){
   buyBtn.style.display = owned ? 'none' : '';
   buyBtn.onclick = ()=>{
     document.getElementById('detailModalBg').classList.remove('show');
-    if(SOFT_LAUNCH){ claimFree(id); } else { openBuyModal(id); }
+    if(SOFT_LAUNCH){ claimFree(id); } else { openBuyModal(id, 'transform'); }
   };
   document.getElementById('detailModalBg').classList.add('show');
 }
 document.getElementById('detailModalClose').onclick = ()=> document.getElementById('detailModalBg').classList.remove('show');
 document.getElementById('detailCancelBtn').onclick = ()=> document.getElementById('detailModalBg').classList.remove('show');
 
-function openBuyModal(id){
+function openBuyModal(id, type){
   currentBuyId = id;
+  currentBuyType = type === 'prompt' ? 'prompt' : 'transform';
   const p = products.find(x=>x.id===id);
+  const displayPrice = currentBuyType === 'prompt' ? PROMPT_PRICE : p.price;
   document.getElementById('ipNumber').innerText = INSTAPAY_NUMBER;
-  document.getElementById('buyModalText').innerText =
-    t('buyModalTextTemplate').replace('{title}', productTitle(p)).replace('{price}', p.price);
+  document.getElementById('buyModalText').innerText = currentBuyType === 'prompt'
+    ? t('buyPromptModalTextTemplate').replace('{title}', productTitle(p)).replace('{price}', displayPrice)
+    : t('buyModalTextTemplate').replace('{title}', productTitle(p)).replace('{price}', displayPrice);
   document.getElementById('buyerPhone').value='';
   document.getElementById('payerName').value='';
   document.getElementById('payerPhone').value='';
@@ -2774,13 +2849,14 @@ document.getElementById('payCardFawryBtn').onclick = async ()=>{
   const email = document.getElementById('payerEmail').value.trim();
   if(!name || !phone){ showToast(t('toastFillFields')); return; }
   const p = products.find(x=>x.id===currentBuyId);
+  const amount = currentBuyType === 'prompt' ? PROMPT_PRICE : p.price;
   if(!BACKEND_BASE){ showToast(t('toastOrderFailed')); return; }
 
   try{
     // Create the underlying order first (same order system as InstaPay), then hand off to the gateway.
     const orderRes = await fetch(`${BACKEND_BASE}/orders/create`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: p.price, phone, appUsed: method==='card' ? 'Paymob' : 'Fawry', ref:'', buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '' })
+      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: amount, phone, appUsed: method==='card' ? 'Paymob' : 'Fawry', ref:'', buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '', orderType: currentBuyType })
     });
     const orderData = await orderRes.json();
     if(!orderRes.ok || !orderData.code){ showToast(t('toastOrderFailed')); return; }
@@ -2788,7 +2864,7 @@ document.getElementById('payCardFawryBtn').onclick = async ()=>{
     if(method === 'card'){
       const res = await fetch(`${BACKEND_BASE}/payment/paymob/create`, {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ orderCode: orderData.code, amount: p.price, name, phone, email })
+        body: JSON.stringify({ orderCode: orderData.code, amount, name, phone, email })
       });
       const data = await res.json();
       if(!res.ok || !data.checkoutUrl){ showToast(t('toastOrderFailed')); return; }
@@ -2796,14 +2872,13 @@ document.getElementById('payCardFawryBtn').onclick = async ()=>{
     }else{
       const res = await fetch(`${BACKEND_BASE}/payment/fawry/create`, {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ orderCode: orderData.code, amount: p.price, name, phone, email })
+        body: JSON.stringify({ orderCode: orderData.code, amount, name, phone, email })
       });
       const data = await res.json();
       if(!res.ok || !data.referenceNumber){ showToast(t('toastOrderFailed')); return; }
       document.getElementById('fawryRefNumber').textContent = data.referenceNumber;
       document.getElementById('fawryRefResult').style.display = 'block';
-      orderCodes[currentBuyId] = orderData.code;
-      await savePurchases();
+      saveOrderReference(currentBuyId, currentBuyType, orderData.code);
       showToast(t('toastOrderSentTemplate').replace('{code}', orderData.code));
     }
   }catch(e){
@@ -2825,21 +2900,34 @@ document.getElementById('buyConfirmBtn').onclick = async ()=>{
     return;
   }
   const p = products.find(x=>x.id===currentBuyId);
+  const amount = currentBuyType === 'prompt' ? PROMPT_PRICE : p.price;
   if(!BACKEND_BASE){ showToast(t('toastOrderFailed')); return; }
   try{
     const res = await fetch(`${BACKEND_BASE}/orders/create`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: p.price, phone, appUsed: manualMethod, ref: '', buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '' })
+      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: amount, phone, appUsed: manualMethod, ref: '', buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '', orderType: currentBuyType })
     });
     const data = await res.json();
     if(!res.ok || !data.code){ showToast(t('toastOrderFailed')); return; }
-    orderCodes[currentBuyId] = data.code;
-    await savePurchases();
-    showOrderStatusPanel(currentBuyId, data.code);
+    saveOrderReference(currentBuyId, currentBuyType, data.code);
+    showOrderStatusPanel(currentBuyId, data.code, currentBuyType);
   }catch(e){
     showToast(t('toastOrderFailed'));
   }
 };
+
+/** Records a newly-created order's code against the right local bucket —
+ * separate from the photo-transform bucket, since a customer can hold both
+ * a 'transform' order and a 'prompt' order for the same product at once. */
+function saveOrderReference(productId, type, code){
+  if(type === 'prompt'){
+    promptOrderCodes[productId] = code;
+    if(!promptPurchases.includes(productId)) promptPurchases.push(productId);
+  }else{
+    orderCodes[productId] = code;
+  }
+  savePurchases();
+}
 
 // ---------- Live order status (replaces the old "close modal + remember a
 // code" flow) — the modal stays open and polls the backend on its own, so the
@@ -2851,7 +2939,8 @@ function stopOrderStatusPolling(){
   if(orderStatusPollTimer){ clearInterval(orderStatusPollTimer); orderStatusPollTimer = null; }
 }
 
-function showOrderStatusPanel(productId, code){
+function showOrderStatusPanel(productId, code, orderType){
+  orderType = orderType === 'prompt' ? 'prompt' : 'transform';
   document.getElementById('payFormFields').style.display = 'none';
   document.getElementById('payStatusPanel').style.display = 'block';
   document.getElementById('payStatusCode').textContent = code;
@@ -2867,13 +2956,19 @@ function showOrderStatusPanel(productId, code){
       const order = await res.json();
       if(order.status === 'approved'){
         stopOrderStatusPolling();
-        if(!purchases.includes(productId)) purchases.push(productId);
-        orderCodes[productId] = order.code || code;
+        if(orderType === 'prompt'){
+          if(!promptPurchases.includes(productId)) promptPurchases.push(productId);
+          promptOrderCodes[productId] = order.code || code;
+          if(order.promptText) purchasedPromptTexts[productId] = order.promptText;
+        }else{
+          if(!purchases.includes(productId)) purchases.push(productId);
+          orderCodes[productId] = order.code || code;
+        }
         await savePurchases();
         renderGrids();
         document.querySelector('#payStatusPanel .order-status-spinner').style.display = 'none';
-        document.getElementById('payStatusText').textContent = t('statusApprovedText');
-        showToast(t('toastReadyToTransform'));
+        document.getElementById('payStatusText').textContent = orderType === 'prompt' ? t('statusPromptApprovedText') : t('statusApprovedText');
+        showToast(orderType === 'prompt' ? t('toastPromptReady') : t('toastReadyToTransform'));
       }
     }catch(e){ /* network hiccup — the next poll retries automatically */ }
   };
@@ -2918,6 +3013,23 @@ function applyFilmGrain(ctx, w, h, intensity){
 let currentTransformId = null;
 let transformImg = null;
 const transformModalBg = document.getElementById('transformModalBg');
+
+/** Copies an already-approved prompt purchase straight to the clipboard —
+ * the fastest path once the customer already has it, no modal needed. */
+function copyPurchasedPrompt(id){
+  const text = purchasedPromptTexts[id];
+  if(!text){ showToast(t('toastPromptNotReady')); return; }
+  navigator.clipboard?.writeText(text).then(()=> showToast(t('toastPromptCopied'))).catch(()=>{
+    showToast(t('toastPromptCopied')); // clipboard permission denied — the track modal below still shows it
+  });
+}
+
+/** A prompt order that's still pending: send the customer to "تتبع طلبي"
+ * (My Orders) where its live status already refreshes automatically. */
+function openTrackForPrompt(id){
+  document.getElementById('trackModalBg').classList.add('show');
+  renderMyOrdersHistory();
+}
 
 function openTransformModal(id){
   currentTransformId = id;
@@ -3092,36 +3204,49 @@ document.getElementById('trackOpenBtn').onclick = ()=>{
 async function renderMyOrdersHistory(){
   const wrap = document.getElementById('myOrdersHistory');
   const listEl = document.getElementById('myOrdersHistoryList');
-  const entries = Object.entries(orderCodes || {});
+  const transformEntries = Object.entries(orderCodes || {}).map(([productId, code]) => ({productId, code, type:'transform'}));
+  const promptEntries = Object.entries(promptOrderCodes || {}).map(([productId, code]) => ({productId, code, type:'prompt'}));
+  const entries = [...transformEntries, ...promptEntries];
   if(!entries.length || !BACKEND_BASE){
     wrap.style.display = 'none';
     return;
   }
   wrap.style.display = 'block';
   listEl.innerHTML = `<div class="empty-note">${t('loadingLabel') || '...'}</div>`;
-  const rows = await Promise.all(entries.map(async ([productId, code])=>{
+  const rows = await Promise.all(entries.map(async ({productId, code, type})=>{
     const p = products.find(x=>x.id===productId);
     try{
       const res = await fetch(`${BACKEND_BASE}/orders/track?code=${encodeURIComponent(code)}`);
       if(!res.ok) return null;
       const order = await res.json();
-      return { p, code, status: order.status, createdAt: order.createdAt };
+      if(type === 'prompt' && order.status === 'approved' && order.promptText){
+        purchasedPromptTexts[productId] = order.promptText; // keep local cache in sync
+      }
+      return { p, code, type, status: order.status, createdAt: order.createdAt, promptText: order.promptText };
     }catch(e){ return null; }
   }));
+  savePurchases();
   const valid = rows.filter(Boolean).sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
   if(!valid.length){
     listEl.innerHTML = `<div class="empty-note">${t('ordersEmptyNote')}</div>`;
     return;
   }
   listEl.innerHTML = valid.map(r => `
-    <div class="my-order-row">
-      <div class="mo-info">
-        <b>${r.p ? escapeHtml(productTitle(r.p)) : r.code}</b>
-        <span class="mo-date">${r.createdAt ? new Date(r.createdAt).toLocaleString(currentLang==='ar' ? 'ar-EG' : 'en-GB', {dateStyle:'medium', timeStyle:'short'}) : ''} — ${r.code}</span>
+    <div class="my-order-row" style="flex-direction:column; align-items:stretch; gap:8px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <div class="mo-info">
+          <b>${r.p ? escapeHtml(productTitle(r.p)) : r.code} <span style="color:var(--brass); font-weight:600; font-size:11px;">— ${r.type==='prompt' ? t('orderTypePrompt') : t('orderTypeTransform')}</span></b>
+          <span class="mo-date">${r.createdAt ? new Date(r.createdAt).toLocaleString(currentLang==='ar' ? 'ar-EG' : 'en-GB', {dateStyle:'medium', timeStyle:'short'}) : ''} — ${r.code}</span>
+        </div>
+        <span class="order-status ${r.status==='approved' ? 'status-approved' : 'status-pending'}">
+          ${r.status==='approved' ? t('orderStatusApproved') : t('orderStatusPending')}
+        </span>
       </div>
-      <span class="order-status ${r.status==='approved' ? 'status-approved' : 'status-pending'}">
-        ${r.status==='approved' ? t('orderStatusApproved') : t('orderStatusPending')}
-      </span>
+      ${r.type==='prompt' && r.status==='approved' && r.promptText ? `
+        <div class="purchased-prompt-box">
+          <p>${escapeHtml(r.promptText)}</p>
+          <button class="btn-ghost" onclick="copyPurchasedPrompt('${r.p ? r.p.id : ''}')">${t('copyPromptBtn')}</button>
+        </div>` : ''}
     </div>`).join('');
 }
 document.getElementById('trackModalClose').onclick = ()=> trackModalBg.classList.remove('show');
@@ -4021,6 +4146,7 @@ function renderOrdersList(){
   const sorted = [...orders].sort((a,b)=> b.createdAt - a.createdAt);
   el.innerHTML = sorted.map(o=>`
     <div class="order-row">
+      <div class="oline"><span>${t('orderLabelType')}</span><b class="order-type-badge ${o.orderType==='prompt' ? 'type-prompt' : 'type-transform'}">${o.orderType==='prompt' ? t('orderTypePrompt') : t('orderTypeTransform')}</b></div>
       <div class="oline"><span>${t('orderLabelProduct')}</span><b>${escapeHtml(o.productTitle)} — ${o.price} ${CURRENCY}</b></div>
       <div class="oline"><span>${t('orderLabelPhone')}</span><b>${escapeHtml(o.phone)}</b></div>
       <div class="oline"><span>${t('orderLabelBuyer')}</span><b>${o.buyerName || o.buyerEmail ? escapeHtml(o.buyerName || '') + (o.buyerEmail ? ' — ' + escapeHtml(o.buyerEmail) : '') : t('orderBuyerGuest')}</b></div>
@@ -4032,10 +4158,10 @@ function renderOrdersList(){
           ${o.status==='approved' ? t('orderStatusApproved') : t('orderStatusPending')}
         </span>
       </div>
-      ${o.status==='pending' ? `
-        <div class="order-actions">
-          <button class="buy-btn" onclick="approveOrder('${o.code}')">${t('orderApproveBtn')}</button>
-        </div>` : ''}
+      <div class="order-actions">
+        ${o.status==='pending' ? `<button class="buy-btn" onclick="approveOrder('${o.code}')">${t('orderApproveBtn')}</button>` : ''}
+        ${o.orderType==='prompt' && o.status==='approved' && o.promptText ? `<button class="btn-ghost" onclick="sendPromptViaWhatsApp('${o.code}')">${t('sendPromptWhatsAppBtn')}</button>` : ''}
+      </div>
     </div>`).join('');
 }
 
@@ -4053,12 +4179,13 @@ function renderOrderStatsTable(){
   }
   tableEl.innerHTML = `<table>
     <thead><tr>
-      <th>${t('statColCode')}</th><th>${t('statColProduct')}</th><th>${t('statColStatus')}</th><th>${t('statColBuyer')}</th><th>${t('statColTime')}</th>
+      <th>${t('statColCode')}</th><th>${t('statColType')}</th><th>${t('statColProduct')}</th><th>${t('statColStatus')}</th><th>${t('statColBuyer')}</th><th>${t('statColTime')}</th>
     </tr></thead>
     <tbody>
       ${sorted.map(o=>`
         <tr>
           <td>${o.code}</td>
+          <td>${o.orderType==='prompt' ? t('orderTypePrompt') : t('orderTypeTransform')}</td>
           <td>${escapeHtml(o.productTitle)}</td>
           <td><span class="order-status ${o.status==='approved' ? 'status-approved' : 'status-pending'}">${o.status==='approved' ? t('orderStatusApproved') : t('orderStatusPending')}</span></td>
           <td>${escapeHtml(o.buyerName || o.buyerEmail || '—')}</td>
@@ -4091,6 +4218,25 @@ async function approveOrder(code){
   }catch(e){
     showToast(t('toastOrderFailed'));
   }
+}
+
+/** Opens WhatsApp (web or app) with the prompt text pre-filled, addressed to
+ * the phone number the customer paid from — a one-click manual send for the
+ * admin, since there's no WhatsApp Business API integration set up. Only
+ * ever shown for prompt orders that are already approved, so the text being
+ * sent is always exactly what the customer paid for and already has access
+ * to via "تتبع طلبي" on their end too. */
+function sendPromptViaWhatsApp(code){
+  const order = orders.find(o => o.code === code);
+  if(!order || !order.promptText){ showToast(t('toastPromptNotReady')); return; }
+  const digitsOnly = String(order.phone || '').replace(/\D/g, '');
+  // Egyptian local numbers start with 0 (e.g. 010...) — WhatsApp links need
+  // the international form (20...) with the leading 0 dropped.
+  const intlPhone = digitsOnly.startsWith('0') ? '20' + digitsOnly.slice(1) : digitsOnly;
+  const message = t('whatsappPromptMessageTemplate')
+    .replace('{title}', order.productTitle)
+    .replace('{prompt}', order.promptText);
+  window.open(`https://wa.me/${intlPhone}?text=${encodeURIComponent(message)}`, '_blank');
 }
 document.getElementById('adminModalClose').onclick = ()=>{
   adminModalBg.classList.remove('show');
