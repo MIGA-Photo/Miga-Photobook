@@ -708,10 +708,12 @@
 
   .contact-widget{position:fixed; bottom:26px; left:26px; z-index:200; display:flex; flex-direction:column; align-items:flex-start; gap:12px;}
 
-  /* Back to top + vertical scroll ruler — opposite corner from the contact
-     widget so the two never overlap. */
+  /* Back to top + vertical scroll ruler — pinned to the physical right edge
+     with a plain "right" (not the logical inset-inline-end), which in RTL
+     was flipping to the same left edge as the contact widget above and
+     landing right on top of it. */
   .back-to-top-fab{
-    position:fixed; bottom:26px; inset-inline-end:26px; z-index:200;
+    position:fixed; bottom:26px; right:26px; z-index:200;
     width:48px; height:48px; border-radius:50%;
     background:var(--brass); color:var(--ink);
     display:flex; align-items:center; justify-content:center;
@@ -721,21 +723,21 @@
   .back-to-top-fab:hover{transform:translateY(-3px);}
 
   .scroll-ruler{
-    position:fixed; top:50%; inset-inline-end:14px; transform:translateY(-50%); z-index:190;
-    display:flex; flex-direction:column; align-items:center; gap:6px;
+    position:fixed; top:50%; right:16px; transform:translateY(-50%); z-index:190;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
   }
   .scroll-ruler-arrow{
-    width:30px; height:26px; border-radius:8px;
-    background:var(--ink-2); border:1px solid var(--line); color:var(--brass); font-size:11px;
+    width:32px; height:28px; border-radius:8px;
+    background:var(--ink-2); border:1px solid var(--steel); color:var(--steel); font-size:12px;
   }
-  .scroll-ruler-arrow:hover{border-color:var(--brass);}
+  .scroll-ruler-arrow:hover{background:rgba(62,167,255,0.12);}
   .scroll-ruler-track{
-    position:relative; width:6px; height:160px; border-radius:4px;
+    position:relative; width:7px; height:280px; border-radius:5px;
     background:var(--line); cursor:pointer; overflow:hidden;
   }
   .scroll-ruler-thumb{
-    position:absolute; top:0; inset-inline-start:0; width:100%; height:40px;
-    background:var(--brass); border-radius:4px;
+    position:absolute; top:0; inset-inline-start:0; width:100%; height:50px;
+    background:var(--steel); border-radius:5px;
   }
   @media(max-width:860px){
     .scroll-ruler{display:none;} /* the floating back-to-top button already covers this on small screens */
