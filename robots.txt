@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://miga-photo.github.io/Miga-Photobook/sitemap.xml
