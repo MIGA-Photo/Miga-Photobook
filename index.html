@@ -124,7 +124,7 @@
     padding:7px 0; white-space:nowrap;
   }
   .promo-marquee-track{
-    display:inline-flex; gap:48px; animation:marqueeScroll 28s linear infinite;
+    display:inline-flex; gap:48px; animation:marqueeScroll 90s linear infinite;
     will-change:transform;
   }
   .promo-marquee-track span{
@@ -439,7 +439,7 @@
   .contact-sheet{overflow:hidden; border:1px solid var(--line); border-radius:4px; direction:ltr;}
   .strip-track{
     display:flex; gap:2px; width:max-content; direction:ltr;
-    animation:scrollStrip 28s linear infinite;
+    animation:scrollStrip 60s linear infinite;
   }
   .strip-track:hover{animation-play-state:paused;}
   @keyframes scrollStrip{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
@@ -556,6 +556,12 @@
   }
   .price-old{color:var(--paper-dim); font-weight:500; font-size:12.5px; text-decoration:line-through; opacity:0.7;}
   .price-new{color:var(--brass); font-weight:700; font-size:16px;}
+  /* Inside a .buy-btn (gold background), the default light-on-dark price
+     colors above are nearly invisible — override to dark-on-gold so the
+     prompt-purchase button's price reads exactly as clearly as the plain
+     price text in the transform button next to it. */
+  .buy-btn .price-old{color:rgba(20,15,5,0.55); opacity:1;}
+  .buy-btn .price-new{color:var(--ink); font-weight:800; font-size:13.5px;}
 
   .prompt-panel{
     border:1px solid var(--line); border-radius:8px; padding:12px; font-size:13px;
@@ -591,6 +597,8 @@
     padding:11px; border-radius:8px; font-size:13.5px; transition:.2s;
   }
   .copy-btn:hover{border-color:var(--brass); background:rgba(255,201,77,0.06);}
+  .reject-btn{border-color:rgba(224,122,122,0.4); color:#e07a7a;}
+  .reject-btn:hover{border-color:#e07a7a; background:rgba(224,122,122,0.08);}
   .owned-pill{
     font-size:11px; color:var(--sage); border:1px solid rgba(47,230,176,0.35);
     padding:3px 10px; border-radius:100px; align-self:flex-start; font-weight:600; letter-spacing:0.2px;
@@ -677,6 +685,7 @@
   .order-status{font-size:11.5px; padding:2px 8px; border-radius:100px; font-weight:600;}
   .status-pending{background:rgba(255,201,77,0.15); color:var(--brass);}
   .status-approved{background:rgba(47,230,176,0.15); color:var(--sage);}
+  .status-rejected{background:rgba(224,122,122,0.15); color:#e07a7a;}
   .order-actions{display:flex; gap:8px; margin-top:8px;}
   .order-actions button{flex:1; padding:7px; border-radius:6px; font-size:12.5px;}
 
@@ -1732,25 +1741,14 @@
       </div>
 
       <div id="adminTabVisitors" style="display:none;">
-        <div style="display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
-          <div style="flex:1; min-width:100px; background:var(--ink-2); border:1px solid var(--line); border-radius:10px; padding:14px; text-align:center;">
-            <div style="font-size:24px; font-weight:700; color:var(--brass);" id="visitorsTotalStat">—</div>
-            <div style="font-size:12px; color:var(--paper-dim);" data-i18n="visitorsTotalLabel">إجمالي الزيارات</div>
-          </div>
-          <div style="flex:1; min-width:100px; background:var(--ink-2); border:1px solid var(--line); border-radius:10px; padding:14px; text-align:center;">
-            <div style="font-size:24px; font-weight:700; color:var(--brass);" id="visitorsTodayStat">—</div>
-            <div style="font-size:12px; color:var(--paper-dim);" data-i18n="visitorsTodayLabel">زيارات اليوم</div>
-          </div>
-          <div style="flex:1; min-width:100px; background:var(--ink-2); border:1px solid var(--line); border-radius:10px; padding:14px; text-align:center;">
-            <div style="font-size:24px; font-weight:700; color:var(--brass);" id="visitorsUniqueTotalStat">—</div>
-            <div style="font-size:12px; color:var(--paper-dim);" data-i18n="visitorsUniqueTotalLabel">زوار فريدون</div>
-          </div>
-          <div style="flex:1; min-width:100px; background:var(--ink-2); border:1px solid var(--line); border-radius:10px; padding:14px; text-align:center;">
-            <div style="font-size:24px; font-weight:700; color:var(--brass);" id="visitorsUniqueTodayStat">—</div>
-            <div style="font-size:12px; color:var(--paper-dim);" data-i18n="visitorsUniqueTodayLabel">فريدون اليوم</div>
-          </div>
+        <div class="order-stats-bar" id="visitorStatsBar" role="button" tabindex="0" aria-expanded="false">
+          <div class="order-stat"><span class="order-stat-num" id="visitorsTotalStat">0</span><span class="order-stat-label" data-i18n="visitorsTotalLabel">إجمالي الزيارات</span></div>
+          <div class="order-stat"><span class="order-stat-num" id="visitorsTodayStat">0</span><span class="order-stat-label" data-i18n="visitorsTodayLabel">زيارات اليوم</span></div>
+          <div class="order-stat"><span class="order-stat-num" id="visitorsUniqueTotalStat">0</span><span class="order-stat-label" data-i18n="visitorsUniqueTotalLabel">زوار فريدون</span></div>
+          <div class="order-stat"><span class="order-stat-num" id="visitorsUniqueTodayStat">0</span><span class="order-stat-label" data-i18n="visitorsUniqueTodayLabel">فريدون اليوم</span></div>
+          <span class="order-stats-chevron" aria-hidden="true">&#9660;</span>
         </div>
-        <div id="visitorsLogList" style="max-height:360px; overflow-y:auto;"></div>
+        <div id="visitorsLogList" style="display:none; max-height:360px; overflow-y:auto;"></div>
       </div>
 
       <div class="modal-actions" style="margin-top:14px;">
@@ -1816,7 +1814,7 @@ const translations = {
   ar: {
     categoriesLabel:'الأقسام',
     searchPlaceholder:'ابحث في الموقع...', searchHistoryLabel:'بحثك السابق', searchNoHistory:'لا يوجد بحث سابق',
-    searchResultsLabel:'نتائج البحث', searchNoResults:'لا توجد نتائج',
+    searchResultsLabel:'نتائج البحث', searchNoResults:'لا توجد نتائج', searchSectionsLabel:'أقسام الموقع',
     navAll:'الكل', navChildren:'أطفال', navMale:'رجالي', navFemale:'نسائي',
     navBusiness:'Business', navCinematic:'Cinematic', navLuxury:'Luxury', navArtistic:'Artistic', navMagazine:'Magazine',
     trackBtn:'تتبع طلبي', adminBtn:'لوحة الإدارة', adminQuickLabel:'لوحة التحكم',
@@ -1835,6 +1833,7 @@ const translations = {
     tabVisitors:'الزوار', visitorsTotalLabel:'إجمالي الزيارات', visitorsTodayLabel:'زيارات اليوم',
     visitorsUniqueTotalLabel:'زوار فريدون', visitorsUniqueTodayLabel:'فريدون اليوم',
     visitorsColDate:'التاريخ والوقت', visitorsColPage:'الصفحة', visitorsColCountry:'الدولة',
+    visitorsColName:'الاسم', visitorsColEmail:'الإيميل',
     visitorsEmptyNote:'لا توجد زيارات مسجلة بعد.',
     toastAuthFailed:'حصل خطأ، تأكد من البيانات وحاول تاني',
     toastLoggedIn:'تم تسجيل الدخول بنجاح', toastRegistered:'تم إنشاء الحساب بنجاح',
@@ -1939,6 +1938,7 @@ const translations = {
     toastPromptCopied:'تم نسخ البرومبت',
     toastPromptNotReady:'البرومبت لسه قيد المراجعة',
     toastCopiedNumber:'تم نسخ الرقم', toastEnterPhone:'يرجى إدخال رقم الموبايل الذي حوّلت منه',
+    toastInvalidPhone:'من فضلك أدخل رقم موبايل مصري صحيح (01 متبوع بـ 9 أرقام)',
     toastOrderSentTemplate:'تم إرسال طلبك — كود المتابعة: {code} (احتفظ به)',
     toastEnterCode:'أدخل كود المتابعة', toastOrderNotFound:'لم يتم العثور على طلب بهذا الكود',
     toastReadyToTransform:'تم تأكيد طلبك — جاهز تحوّل صورتك دلوقتي', toastOrderPending:'الطلب لا يزال قيد المراجعة، حاول لاحقًا',
@@ -1951,6 +1951,10 @@ const translations = {
     ordersEmptyNote:'لا توجد طلبات بعد.',
     orderLabelProduct:'المنتج', orderLabelPhone:'الموبايل', orderLabelPayApp:'وسيلة الدفع', orderLabelRef:'المرجع',
     orderLabelCode:'الكود', orderLabelStatus:'الحالة', orderStatusApproved:'تمت الموافقة', orderStatusPending:'قيد المراجعة',
+    orderStatusRejected:'مرفوض', orderRejectBtn:'رفض الطلب', orderDeleteBtn:'حذف نهائي',
+    confirmRejectOrder:'هل أنت متأكد إنك عايز ترفض الطلب ده؟ مش هينفع توافق عليه بعد كده.',
+    confirmDeleteOrder:'هل أنت متأكد إنك عايز تحذف الطلب المرفوض ده نهائيًا؟',
+    toastOrderRejected:'تم رفض الطلب', toastOrderDeleted:'تم حذف الطلب',
     statTotalLabel:'إجمالي الطلبات', statApprovedLabel:'تم تنفيذها', statPendingLabel:'قيد المراجعة',
     statRevenueLabel:'إجمالي المبلغ المحصّل',
     reviewStatTotalLabel:'إجمالي التقييمات', reviewStatApprovedLabel:'منشورة', reviewStatPendingLabel:'قيد المراجعة',
@@ -1988,7 +1992,7 @@ const translations = {
   en: {
     categoriesLabel:'Categories',
     searchPlaceholder:'Search the site...', searchHistoryLabel:'Recent Searches', searchNoHistory:'No recent searches',
-    searchResultsLabel:'Results', searchNoResults:'No results found',
+    searchResultsLabel:'Results', searchNoResults:'No results found', searchSectionsLabel:'Site Sections',
     navAll:'All', navChildren:'Children', navMale:'Men', navFemale:'Women',
     navBusiness:'Business', navCinematic:'Cinematic', navLuxury:'Luxury', navArtistic:'Artistic', navMagazine:'Magazine',
     trackBtn:'Track Order', adminBtn:'Admin Panel', adminQuickLabel:'Dashboard',
@@ -2007,6 +2011,7 @@ const translations = {
     tabVisitors:'Visitors', visitorsTotalLabel:'Total Visits', visitorsTodayLabel:'Today',
     visitorsUniqueTotalLabel:'Unique Visitors', visitorsUniqueTodayLabel:'Unique Today',
     visitorsColDate:'Date & Time', visitorsColPage:'Page', visitorsColCountry:'Country',
+    visitorsColName:'Name', visitorsColEmail:'Email',
     visitorsEmptyNote:'No visits logged yet.',
     toastAuthFailed:'Something went wrong, please check your details and try again',
     toastLoggedIn:'Logged in successfully', toastRegistered:'Account created successfully',
@@ -2111,6 +2116,7 @@ const translations = {
     toastPromptCopied:'Prompt copied',
     toastPromptNotReady:'This prompt is still under review',
     toastCopiedNumber:'Number copied', toastEnterPhone:'Please enter the mobile number you transferred from',
+    toastInvalidPhone:'Please enter a valid Egyptian mobile number (01 followed by 9 digits)',
     toastOrderSentTemplate:'Your request has been sent — tracking code: {code} (keep it)',
     toastEnterCode:'Enter the tracking code', toastOrderNotFound:'No order found with this code',
     toastReadyToTransform:'Order confirmed — ready to transform your photo', toastOrderPending:'Order still under review, try again later',
@@ -2123,6 +2129,10 @@ const translations = {
     ordersEmptyNote:'No orders yet.',
     orderLabelProduct:'Product', orderLabelPhone:'Mobile', orderLabelPayApp:'Payment Method', orderLabelRef:'Reference',
     orderLabelCode:'Code', orderLabelStatus:'Status', orderStatusApproved:'Approved', orderStatusPending:'Under Review',
+    orderStatusRejected:'Rejected', orderRejectBtn:'Reject Order', orderDeleteBtn:'Delete Permanently',
+    confirmRejectOrder:"Are you sure you want to reject this order? It can't be approved afterwards.",
+    confirmDeleteOrder:'Are you sure you want to permanently delete this rejected order?',
+    toastOrderRejected:'Order rejected', toastOrderDeleted:'Order deleted',
     statTotalLabel:'Total Orders', statApprovedLabel:'Completed', statPendingLabel:'Under Review',
     statRevenueLabel:'Total Revenue Collected',
     reviewStatTotalLabel:'Total Reviews', reviewStatApprovedLabel:'Published', reviewStatPendingLabel:'Under Review',
@@ -2899,6 +2909,14 @@ document.getElementById('buyConfirmBtn').onclick = async ()=>{
     showToast(t('toastEnterPhone'));
     return;
   }
+  // Same Egyptian-mobile-number check the server enforces — this is just
+  // immediate feedback so a placeholder like "......" or "2222222" is caught
+  // before a network round trip; the server-side check is what actually
+  // prevents the order (this one alone could always be bypassed).
+  if(!/^01[0125][0-9]{8}$/.test(phone)){
+    showToast(t('toastInvalidPhone'));
+    return;
+  }
   const p = products.find(x=>x.id===currentBuyId);
   const amount = currentBuyType === 'prompt' ? PROMPT_PRICE : p.price;
   if(!BACKEND_BASE){ showToast(t('toastOrderFailed')); return; }
@@ -2908,7 +2926,10 @@ document.getElementById('buyConfirmBtn').onclick = async ()=>{
       body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: amount, phone, appUsed: manualMethod, ref: '', buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '', orderType: currentBuyType })
     });
     const data = await res.json();
-    if(!res.ok || !data.code){ showToast(t('toastOrderFailed')); return; }
+    if(!res.ok || !data.code){
+      showToast(res.status === 400 ? t('toastInvalidPhone') : t('toastOrderFailed'));
+      return;
+    }
     saveOrderReference(currentBuyId, currentBuyType, data.code);
     showOrderStatusPanel(currentBuyId, data.code, currentBuyType);
   }catch(e){
@@ -3238,9 +3259,7 @@ async function renderMyOrdersHistory(){
           <b>${r.p ? escapeHtml(productTitle(r.p)) : r.code} <span style="color:var(--brass); font-weight:600; font-size:11px;">— ${r.type==='prompt' ? t('orderTypePrompt') : t('orderTypeTransform')}</span></b>
           <span class="mo-date">${r.createdAt ? new Date(r.createdAt).toLocaleString(currentLang==='ar' ? 'ar-EG' : 'en-GB', {dateStyle:'medium', timeStyle:'short'}) : ''} — ${r.code}</span>
         </div>
-        <span class="order-status ${r.status==='approved' ? 'status-approved' : 'status-pending'}">
-          ${r.status==='approved' ? t('orderStatusApproved') : t('orderStatusPending')}
-        </span>
+        <span class="order-status ${orderStatusClass(r.status)}">${orderStatusLabel(r.status)}</span>
       </div>
       ${r.type==='prompt' && r.status==='approved' && r.promptText ? `
         <div class="purchased-prompt-box">
@@ -3396,6 +3415,36 @@ function scrollToProductCard(p){
   setTimeout(()=> openProductDetail(p.id), 450);
 }
 
+/** Static, always-searchable parts of the site (category sections, FAQ,
+ * testimonials, etc.) — combined with live product-title matches below so
+ * the search box covers the whole site, not just products. Rebuilt fresh on
+ * every call so labels follow the current language. */
+function getStaticSearchIndex(){
+  const cats = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
+  const items = cats.map(c => ({ id:c, label: catLabel(c), keywords:[catLabel(c).toLowerCase()], icon:'📁' }));
+  items.push(
+    { id:'howItWorks', label:t('howItWorksTitle'), keywords:[t('howItWorksTitle').toLowerCase()], icon:'❔' },
+    { id:'testimonials', label:t('testimonialsTitle'), keywords:[t('testimonialsTitle').toLowerCase(), 'تقييم', 'تقييمات', 'review', 'reviews', 'rating'], icon:'⭐' },
+    { id:'aboutUs', label:t('aboutUsTitle'), keywords:[t('aboutUsTitle').toLowerCase()], icon:'👥' },
+    { id:'faq', label:t('faqTitle'), keywords:[t('faqTitle').toLowerCase(), 'اسئلة', 'أسئلة', 'faq', 'questions'], icon:'❓' },
+    { id:'whyUs', label:t('whyUsTitle'), keywords:[t('whyUsTitle').toLowerCase()], icon:'✅' },
+    { id:'mostRequested', label:t('mostRequestedTitle'), keywords:[t('mostRequestedTitle').toLowerCase()], icon:'🔥' },
+    { id:'results', label:t('resultsTitle'), keywords:[t('resultsTitle').toLowerCase()], icon:'🖼️' },
+  );
+  return items;
+}
+
+function scrollToSiteSection(id){
+  searchBox.classList.remove('open');
+  const term = searchInput.value;
+  searchInput.value = '';
+  addSearchHistory(term);
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.add('open'); // opens it if it's one of the collapsible sections
+  el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
 function renderSearchDropdown(query){
   query = (query || '').trim().toLowerCase();
   if(!query){
@@ -3413,21 +3462,38 @@ function renderSearchDropdown(query){
         </div>`).join('');
     return;
   }
-  const matches = products.filter(p => productTitle(p).toLowerCase().includes(query) || p.title.toLowerCase().includes(query)).slice(0, 8);
-  if(!matches.length){
+  const sectionMatches = getStaticSearchIndex()
+    .filter(s => s.label.toLowerCase().includes(query) || s.keywords.some(k => k.includes(query)))
+    .slice(0, 6);
+  const productMatches = products
+    .filter(p => productTitle(p).toLowerCase().includes(query) || p.title.toLowerCase().includes(query))
+    .slice(0, 8);
+
+  if(!sectionMatches.length && !productMatches.length){
     searchDropdown.innerHTML = `<div class="sd-empty">${t('searchNoResults')}</div>`;
     return;
   }
-  searchDropdown.innerHTML =
-    `<div class="sd-section-label">${t('searchResultsLabel')}</div>` +
-    matches.map(p => `
-      <div class="sd-result" data-product="${p.id}">
-        <img src="${p.image}" alt="">
-        <div>
-          <div class="sd-title">${escapeHtml(productTitle(p))}</div>
-          <div class="sd-cat">${catLabel(p.category)}</div>
-        </div>
-      </div>`).join('');
+
+  let html = '';
+  if(sectionMatches.length){
+    html += `<div class="sd-section-label">${t('searchSectionsLabel')}</div>` +
+      sectionMatches.map(s => `
+        <div class="sd-history-item" data-section="${s.id}">
+          <span>${s.icon} ${escapeHtml(s.label)}</span>
+        </div>`).join('');
+  }
+  if(productMatches.length){
+    html += `<div class="sd-section-label">${t('searchResultsLabel')}</div>` +
+      productMatches.map(p => `
+        <div class="sd-result" data-product="${p.id}">
+          <img src="${p.image}" alt="">
+          <div>
+            <div class="sd-title">${escapeHtml(productTitle(p))}</div>
+            <div class="sd-cat">${catLabel(p.category)}</div>
+          </div>
+        </div>`).join('');
+  }
+  searchDropdown.innerHTML = html;
 }
 
 searchInput.addEventListener('focus', ()=>{
@@ -3452,7 +3518,12 @@ searchDropdown.addEventListener('click', (e)=>{
     removeSearchHistoryItem(removeBtn.dataset.remove);
     return;
   }
-  const historyItem = e.target.closest('.sd-history-item');
+  const sectionItem = e.target.closest('[data-section]');
+  if(sectionItem){
+    scrollToSiteSection(sectionItem.dataset.section);
+    return;
+  }
+  const historyItem = e.target.closest('.sd-history-item[data-term]');
   if(historyItem){
     searchInput.value = historyItem.dataset.term;
     renderSearchDropdown(historyItem.dataset.term);
@@ -4075,6 +4146,8 @@ async function loadVisitorStats(){
             <th style="padding:6px 4px; border-bottom:1px solid var(--line);">${t('visitorsColDate')}</th>
             <th style="padding:6px 4px; border-bottom:1px solid var(--line);">${t('visitorsColPage')}</th>
             <th style="padding:6px 4px; border-bottom:1px solid var(--line);">${t('visitorsColCountry')}</th>
+            <th style="padding:6px 4px; border-bottom:1px solid var(--line);">${t('visitorsColName')}</th>
+            <th style="padding:6px 4px; border-bottom:1px solid var(--line);">${t('visitorsColEmail')}</th>
           </tr>
         </thead>
         <tbody>
@@ -4083,6 +4156,8 @@ async function loadVisitorStats(){
               <td style="padding:6px 4px; border-bottom:1px solid var(--line);">${escapeHtml(new Date(v.visited_at).toLocaleString())}</td>
               <td style="padding:6px 4px; border-bottom:1px solid var(--line);">${escapeHtml(v.path || '/')}</td>
               <td style="padding:6px 4px; border-bottom:1px solid var(--line);">${escapeHtml(v.country || '—')}</td>
+              <td style="padding:6px 4px; border-bottom:1px solid var(--line);">${escapeHtml(v.user_name || '—')}</td>
+              <td style="padding:6px 4px; border-bottom:1px solid var(--line);">${escapeHtml(v.user_email || '—')}</td>
             </tr>`).join('')}
         </tbody>
       </table>`;
@@ -4090,6 +4165,12 @@ async function loadVisitorStats(){
     listEl.innerHTML = `<div class="empty-note">${t('visitorsEmptyNote')}</div>`;
   }
 }
+
+document.getElementById('visitorStatsBar').addEventListener('click', function(){
+  const isOpen = this.classList.toggle('open');
+  this.setAttribute('aria-expanded', String(isOpen));
+  document.getElementById('visitorsLogList').style.display = isOpen ? 'block' : 'none';
+});
 
 /** Long-lived anonymous ID (survives across sessions/tabs) — used only to count unique visitors, no PII. */
 function getOrCreateVisitorId(){
@@ -4128,6 +4209,18 @@ function logVisitAsLoggedInUser(){
   }).catch(()=>{});
 }
 
+/** Shared by every place that renders an order's status badge/label. */
+function orderStatusClass(status){
+  if(status==='approved') return 'status-approved';
+  if(status==='rejected') return 'status-rejected';
+  return 'status-pending';
+}
+function orderStatusLabel(status){
+  if(status==='approved') return t('orderStatusApproved');
+  if(status==='rejected') return t('orderStatusRejected');
+  return t('orderStatusPending');
+}
+
 function renderOrdersList(){
   const el = document.getElementById('ordersList');
   const pending = orders.filter(o=>o.status==='pending').length;
@@ -4154,12 +4247,13 @@ function renderOrdersList(){
       <div class="oline"><span>${t('orderLabelRef')}</span><b>${escapeHtml(o.ref || '—')}</b></div>
       <div class="oline"><span>${t('orderLabelCode')}</span><b>${o.code}</b></div>
       <div class="oline"><span>${t('orderLabelStatus')}</span>
-        <span class="order-status ${o.status==='approved' ? 'status-approved' : 'status-pending'}">
-          ${o.status==='approved' ? t('orderStatusApproved') : t('orderStatusPending')}
-        </span>
+        <span class="order-status ${orderStatusClass(o.status)}">${orderStatusLabel(o.status)}</span>
       </div>
       <div class="order-actions">
-        ${o.status==='pending' ? `<button class="buy-btn" onclick="approveOrder('${o.code}')">${t('orderApproveBtn')}</button>` : ''}
+        ${o.status==='pending' ? `
+          <button class="buy-btn" onclick="approveOrder('${o.code}')">${t('orderApproveBtn')}</button>
+          <button class="btn-ghost reject-btn" onclick="rejectOrderPrompt('${o.code}')">${t('orderRejectBtn')}</button>` : ''}
+        ${o.status==='rejected' ? `<button class="btn-ghost reject-btn" onclick="deleteOrderPrompt('${o.code}')">${t('orderDeleteBtn')}</button>` : ''}
         ${o.orderType==='prompt' && o.status==='approved' && o.promptText ? `<button class="btn-ghost" onclick="sendPromptViaWhatsApp('${o.code}')">${t('sendPromptWhatsAppBtn')}</button>` : ''}
       </div>
     </div>`).join('');
@@ -4187,7 +4281,7 @@ function renderOrderStatsTable(){
           <td>${o.code}</td>
           <td>${o.orderType==='prompt' ? t('orderTypePrompt') : t('orderTypeTransform')}</td>
           <td>${escapeHtml(o.productTitle)}</td>
-          <td><span class="order-status ${o.status==='approved' ? 'status-approved' : 'status-pending'}">${o.status==='approved' ? t('orderStatusApproved') : t('orderStatusPending')}</span></td>
+          <td><span class="order-status ${orderStatusClass(o.status)}">${orderStatusLabel(o.status)}</span></td>
           <td>${escapeHtml(o.buyerName || o.buyerEmail || '—')}</td>
           <td>${new Date(o.createdAt).toLocaleString(currentLang==='ar' ? 'ar-EG' : 'en-GB', {dateStyle:'short', timeStyle:'short'})}</td>
         </tr>`).join('')}
@@ -4200,6 +4294,45 @@ document.getElementById('orderStatsBar').addEventListener('click', function(){
   this.setAttribute('aria-expanded', String(isOpen));
   document.getElementById('orderStatsTable').style.display = isOpen ? 'block' : 'none';
 });
+
+/** Confirms, then rejects a pending order — for invalid/fake transfer claims
+ * (e.g. a made-up phone number, or the money never actually arriving). A
+ * rejected order can never be approved afterwards, and never unlocks a
+ * transform or a prompt. */
+async function rejectOrderPrompt(code){
+  if(!confirm(t('confirmRejectOrder'))) return;
+  if(!BACKEND_BASE) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/orders/reject`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ password: adminPasswordCache, code })
+    });
+    if(!res.ok){ showToast(t('toastOrderFailed')); return; }
+    await loadOrders();
+    renderOrdersList();
+    refreshAdminBellBadge();
+    showToast(t('toastOrderRejected'));
+  }catch(e){ showToast(t('toastOrderFailed')); }
+}
+
+/** Permanently removes an already-rejected order from the list, once the
+ * admin is done with it — pure cleanup, never available on a pending or
+ * approved order. */
+async function deleteOrderPrompt(code){
+  if(!confirm(t('confirmDeleteOrder'))) return;
+  if(!BACKEND_BASE) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/orders/delete`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ password: adminPasswordCache, code })
+    });
+    if(!res.ok){ showToast(t('toastOrderFailed')); return; }
+    await loadOrders();
+    renderOrdersList();
+    refreshAdminBellBadge();
+    showToast(t('toastOrderDeleted'));
+  }catch(e){ showToast(t('toastOrderFailed')); }
+}
 
 async function approveOrder(code){
   if(!BACKEND_BASE) return;
