@@ -287,6 +287,16 @@
     white-space:pre-wrap;
   }
 
+  /* ===== Image crop tool (admin uploads) ===== */
+  .crop-stage{
+    display:flex; justify-content:center; margin:14px 0; background:#0a0806;
+    border-radius:10px; overflow:hidden; border:1px solid var(--line);
+  }
+  #cropCanvas{cursor:grab; touch-action:none; display:block;}
+  #cropCanvas:active{cursor:grabbing;}
+  .crop-zoom-row{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+  .crop-zoom-row input[type="range"]{flex:1; accent-color:var(--brass);}
+
   .popularity-badge{
     display:inline-flex; align-items:center; gap:4px; align-self:center;
     background:rgba(255,201,77,0.14); color:var(--brass); font-weight:800; font-size:13px;
@@ -1525,6 +1535,25 @@
 </div>
 
 
+<div class="modal-bg" id="cropModalBg">
+  <div class="modal">
+    <button class="close-x" id="cropModalClose">×</button>
+    <h3 data-i18n="cropModalTitle">اضبط إطار الصورة</h3>
+    <p class="sub" data-i18n="cropModalSub">حرّك الصورة واستخدم شريط التكبير عشان تظبط الإطار — كل صور المنتجات هتخرج بنفس المقاس بالظبط بعد كده.</p>
+    <div class="crop-stage" id="cropStage">
+      <canvas id="cropCanvas" width="400" height="500"></canvas>
+    </div>
+    <div class="crop-zoom-row">
+      <span aria-hidden="true">🔍</span>
+      <input type="range" id="cropZoomSlider" min="1" max="3" step="0.01" value="1">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" id="cropConfirmBtn" data-i18n="cropConfirmBtn">تأكيد القص</button>
+      <button class="btn-ghost" id="cropCancelBtn" data-i18n="cancelBtn">إلغاء</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-bg" id="trackModalBg">
   <div class="modal">
     <button class="close-x" id="trackModalClose">×</button>
@@ -1902,6 +1931,8 @@ const translations = {
     detailValue1:'✓ نحوّل صورتك تلقائيًا فور تأكيد الدفع', detailValue2:'✓ جودة استوديو احترافية مضمونة',
     detailValue3:'✓ النتيجة جاهزة للتحميل مباشرة', detailValue4:'✓ دعم فني مباشر لو احتجت مساعدة',
     detailBuyBtn:'احصل عليها الآن',
+    cropModalTitle:'اضبط إطار الصورة', cropModalSub:'حرّك الصورة واستخدم شريط التكبير عشان تظبط الإطار — كل صور المنتجات هتخرج بنفس المقاس بالظبط بعد كده.',
+    cropConfirmBtn:'تأكيد القص',
     trackModalTitle:'تتبع طلبك', trackModalSub:'أدخل كود المتابعة الذي حصلت عليه بعد إرسال طلب الشراء.',
     myOrdersTitle:'طلباتك السابقة', loadingLabel:'جاري التحميل...',
     trackCodeLabel:'كود المتابعة', trackCheckBtn:'تحقّق من الحالة', closeBtn:'إغلاق',
@@ -2080,6 +2111,8 @@ const translations = {
     detailValue1:'✓ Your photo is transformed automatically right after payment', detailValue2:'✓ Guaranteed professional studio quality',
     detailValue3:'✓ Result ready to download instantly', detailValue4:'✓ Direct support if you need help',
     detailBuyBtn:'Get It Now',
+    cropModalTitle:'Adjust the Photo Frame', cropModalSub:'Drag the photo and use the zoom slider to fit it in the frame — every product photo will come out at exactly the same size after this.',
+    cropConfirmBtn:'Confirm Crop',
     trackModalTitle:'Track Your Order', trackModalSub:'Enter the tracking code you received after sending a purchase request.',
     myOrdersTitle:'Your Past Orders', loadingLabel:'Loading...',
     trackCodeLabel:'Tracking Code', trackCheckBtn:'Check Status', closeBtn:'Close',
@@ -3030,6 +3063,130 @@ function applyFilmGrain(ctx, w, h, intensity){
   }
   ctx.putImageData(imgData, 0, 0);
 }
+
+// ---------- Image crop tool (forces every admin-uploaded product photo to
+// the same output size, no matter how the source photo was framed) ----------
+const CROP_OUTPUT_W = 1000, CROP_OUTPUT_H = 1250; // matches the product card's 4:5 aspect ratio
+const cropModalBg = document.getElementById('cropModalBg');
+const cropCanvas = document.getElementById('cropCanvas');
+const cropCtx = cropCanvas.getContext('2d');
+const cropZoomSlider = document.getElementById('cropZoomSlider');
+let cropState = null; // { img, scale, offsetX, offsetY, resolve }
+
+function drawCrop(){
+  if(!cropState) return;
+  const { img, scale, offsetX, offsetY } = cropState;
+  const w = cropCanvas.width, h = cropCanvas.height;
+  cropCtx.clearRect(0,0,w,h);
+  cropCtx.save();
+  cropCtx.translate(w/2 + offsetX, h/2 + offsetY);
+  cropCtx.scale(scale, scale);
+  cropCtx.drawImage(img, -img.width/2, -img.height/2);
+  cropCtx.restore();
+}
+
+function clampCropOffset(){
+  const { img, scale } = cropState;
+  const w = cropCanvas.width, h = cropCanvas.height;
+  const drawnW = img.width * scale, drawnH = img.height * scale;
+  const maxX = Math.max(0, (drawnW - w) / 2);
+  const maxY = Math.max(0, (drawnH - h) / 2);
+  cropState.offsetX = Math.min(maxX, Math.max(-maxX, cropState.offsetX));
+  cropState.offsetY = Math.min(maxY, Math.max(-maxY, cropState.offsetY));
+}
+
+/** Opens the crop modal for `file`; resolves with a JPEG Blob at a fixed
+ * CROP_OUTPUT_W×CROP_OUTPUT_H once confirmed, or null if cancelled. A
+ * source photo's own framing (close-up vs full body vs a wide scene) can't
+ * be guessed reliably by any algorithm, so the admin repositions/zooms once
+ * — but the OUTPUT size is then always identical no matter what they upload. */
+function openCropModal(file){
+  return new Promise((resolve)=>{
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const w = cropCanvas.width, h = cropCanvas.height;
+        const baseScale = Math.max(w / img.width, h / img.height);
+        cropState = { img, scale: baseScale, offsetX: 0, offsetY: 0, resolve };
+        cropZoomSlider.value = '1';
+        drawCrop();
+        cropModalBg.classList.add('show');
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+cropZoomSlider.addEventListener('input', ()=>{
+  if(!cropState) return;
+  const w = cropCanvas.width, h = cropCanvas.height;
+  const baseScale = Math.max(w / cropState.img.width, h / cropState.img.height);
+  cropState.scale = baseScale * Number(cropZoomSlider.value);
+  clampCropOffset();
+  drawCrop();
+});
+
+let cropDragging = false, cropDragStart = null;
+function cropPointerDown(x, y){
+  cropDragging = true;
+  cropDragStart = { x, y, offsetX: cropState.offsetX, offsetY: cropState.offsetY };
+}
+function cropPointerMove(x, y){
+  if(!cropDragging || !cropState) return;
+  cropState.offsetX = cropDragStart.offsetX + (x - cropDragStart.x);
+  cropState.offsetY = cropDragStart.offsetY + (y - cropDragStart.y);
+  clampCropOffset();
+  drawCrop();
+}
+function cropPointerUp(){ cropDragging = false; }
+
+cropCanvas.addEventListener('mousedown', (e)=>{
+  const rect = cropCanvas.getBoundingClientRect();
+  cropPointerDown(e.clientX - rect.left, e.clientY - rect.top);
+});
+window.addEventListener('mousemove', (e)=>{
+  const rect = cropCanvas.getBoundingClientRect();
+  cropPointerMove(e.clientX - rect.left, e.clientY - rect.top);
+});
+window.addEventListener('mouseup', cropPointerUp);
+cropCanvas.addEventListener('touchstart', (e)=>{
+  const rect = cropCanvas.getBoundingClientRect();
+  const t = e.touches[0];
+  cropPointerDown(t.clientX - rect.left, t.clientY - rect.top);
+}, { passive:true });
+cropCanvas.addEventListener('touchmove', (e)=>{
+  const rect = cropCanvas.getBoundingClientRect();
+  const t = e.touches[0];
+  cropPointerMove(t.clientX - rect.left, t.clientY - rect.top);
+}, { passive:true });
+cropCanvas.addEventListener('touchend', cropPointerUp);
+
+function closeCropModal(result){
+  cropModalBg.classList.remove('show');
+  if(cropState){
+    const resolve = cropState.resolve;
+    cropState = null;
+    resolve(result);
+  }
+}
+
+document.getElementById('cropConfirmBtn').onclick = ()=>{
+  if(!cropState) return;
+  const out = document.createElement('canvas');
+  out.width = CROP_OUTPUT_W; out.height = CROP_OUTPUT_H;
+  const octx = out.getContext('2d');
+  const scaleUp = CROP_OUTPUT_W / cropCanvas.width; // display canvas size -> real output size
+  octx.save();
+  octx.translate(out.width/2 + cropState.offsetX * scaleUp, out.height/2 + cropState.offsetY * scaleUp);
+  octx.scale(cropState.scale * scaleUp, cropState.scale * scaleUp);
+  octx.drawImage(cropState.img, -cropState.img.width/2, -cropState.img.height/2);
+  octx.restore();
+  out.toBlob((blob)=> closeCropModal(blob), 'image/jpeg', 0.92);
+};
+document.getElementById('cropCancelBtn').onclick = ()=> closeCropModal(null);
+document.getElementById('cropModalClose').onclick = ()=> closeCropModal(null);
 
 let currentTransformId = null;
 let transformImg = null;
@@ -4443,6 +4600,22 @@ document.getElementById('adminLogoutBtn').onclick = async ()=>{
 };
 
 let editingProductId = null;
+// The raw file input still exists (for the OS file picker), but its file is
+// never uploaded directly — selecting one immediately opens the crop tool,
+// and only the resulting fixed-size Blob is ever sent to the server.
+let pendingCroppedBlob = null;
+document.getElementById('pImage').addEventListener('change', async (e)=>{
+  const file = e.target.files && e.target.files[0];
+  if(!file){ pendingCroppedBlob = null; return; }
+  const blob = await openCropModal(file);
+  if(!blob){
+    e.target.value = ''; // cancelled — never silently fall back to the uncropped original
+    pendingCroppedBlob = null;
+    return;
+  }
+  pendingCroppedBlob = blob;
+});
+
 document.getElementById('pSaveBtn').onclick = async ()=>{
   const cat = document.getElementById('pCat').value;
   const title = document.getElementById('pTitle').value.trim();
@@ -4493,6 +4666,7 @@ document.getElementById('pSaveBtn').onclick = async ()=>{
     document.getElementById('pPrice').value='';
     document.getElementById('pPrompt').value='';
     fileInput.value='';
+    pendingCroppedBlob = null;
     showToast(t('toastProductAdded'));
   };
 
@@ -4500,7 +4674,10 @@ document.getElementById('pSaveBtn').onclick = async ()=>{
   // URL — never embedded as base64 in the product record. This keeps the
   // products payload (and this page) small and lets browsers cache photos
   // normally instead of re-downloading them as text on every /products fetch.
-  if(fileInput.files && fileInput.files[0]){
+  // The Blob sent here always came out of the crop tool above, so every
+  // uploaded product photo is the same fixed pixel size regardless of what
+  // the original file looked like.
+  if(pendingCroppedBlob){
     if(!BACKEND_BASE){ showToast(t('toastOrderFailed')); return; }
     const saveBtn = document.getElementById('pSaveBtn');
     const originalLabel = saveBtn.textContent;
@@ -4508,7 +4685,7 @@ document.getElementById('pSaveBtn').onclick = async ()=>{
     saveBtn.disabled = true;
     try{
       const form = new FormData();
-      form.append('image', fileInput.files[0]);
+      form.append('image', pendingCroppedBlob, 'product.jpg');
       const res = await fetch(`${BACKEND_BASE}/admin/upload-image?password=${encodeURIComponent(adminPasswordCache)}`, {
         method:'POST', body: form
       });
@@ -4543,6 +4720,7 @@ document.getElementById('pCancelEditBtn').onclick = ()=>{
   document.getElementById('pPrice').value='';
   document.getElementById('pPrompt').value='';
   document.getElementById('pImage').value='';
+  pendingCroppedBlob = null;
 };
 
 function editProduct(id){
@@ -4554,6 +4732,8 @@ function editProduct(id){
   document.getElementById('pTitleEn').value = p.titleEn || '';
   document.getElementById('pPrice').value = p.price;
   document.getElementById('pPrompt').value = p.prompt;
+  document.getElementById('pImage').value = '';
+  pendingCroppedBlob = null;
   document.getElementById('pSaveBtn').textContent = t('pUpdateBtn');
   document.getElementById('pCancelEditBtn').style.display = '';
   document.getElementById('editingBanner').style.display = '';
@@ -4635,10 +4815,12 @@ document.getElementById('adminQuickImageInput').addEventListener('change', async
   if(!file || !id || !BACKEND_BASE) return;
   const p = products.find(x=>x.id===id);
   if(!p) return;
+  const blob = await openCropModal(file);
+  if(!blob) return; // cancelled
   showToast(t('uploadingImage'));
   try{
     const form = new FormData();
-    form.append('image', file);
+    form.append('image', blob, 'product.jpg');
     const res = await fetch(`${BACKEND_BASE}/admin/upload-image?password=${encodeURIComponent(adminPasswordCache)}`, {
       method:'POST', body: form
     });
