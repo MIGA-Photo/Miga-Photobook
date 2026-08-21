@@ -356,6 +356,14 @@
   .why-us-grid{
     display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:14px;
   }
+  .why-edge{
+    margin-top:18px; background:var(--ink-2); border:1px solid var(--brass-dim);
+    border-radius:12px; padding:18px 20px;
+  }
+  .why-edge h3{margin:0 0 10px; font-size:16.5px; color:var(--brass);}
+  .why-edge p{margin:0 0 10px; color:var(--paper); font-size:14.5px; line-height:1.85;}
+  .why-edge p:last-child{margin-bottom:0;}
+  .why-edge .lead{font-weight:600;}
   .why-item{
     background:var(--ink-2); border:1px solid var(--line); border-radius:10px;
     padding:16px; font-size:14.5px; color:var(--paper); display:flex; align-items:center; gap:8px;
@@ -1263,6 +1271,13 @@
     <div class="why-item">✅ <span data-i18n="whyUs4">بدون أي خبرة تقنية</span></div>
     <div class="why-item">✅ <span data-i18n="whyUs5">جاهز للنسخ والاستخدام فورًا</span></div>
   </div>
+  <div class="why-edge">
+    <h3 data-i18n="whyEdgeTitle">وأدوات الذكاء الاصطناعي المتاحة للكل؟</h3>
+    <p class="lead" data-i18n="whyEdgeP1">الأداة مش هي المشكلة — البرومبت هو المشكلة.</p>
+    <p data-i18n="whyEdgeP2">أي حد يقدر يفتح أداة ذكاء اصطناعي، لكن النتيجة بتعتمد على الوصف اللي بيكتبه: زاوية الإضاءة، نوع العدسة، درجة اللون، عمق المجال. من غير الكلام ده بتطلع صورة «مش وحشة» — مش صورة استوديو.</p>
+    <p data-i18n="whyEdgeP3">كل صورة في المعرض هنا نتيجة برومبت اتظبط وترجعنا فيه عشرات المرات لحد ما وصل للشكل ده. انت مش بتشتري «تحويل بالذكاء الاصطناعي» — انت بتشتري البرومبت المجرّب والنتيجة اللي شايفها قدامك بالظبط، من أول مرة وبدون تخمين.</p>
+    <p data-i18n="whyEdgeP4">وعشان إحنا واثقين في ده، بنبيعلك البرومبت نفسه بـ 10 جنيه لو حابب تشتغل بيه بنفسك.</p>
+  </div>
   </div>
 </section>
 
@@ -1905,6 +1920,11 @@ const translations = {
     promoVideoTitle:'شوف Miga-Photobook وهو شغال', promoVideoSub:'ثوانٍ معدودة، وصورتك العادية بتتحول لتحفة فنية احترافية.',
     trustCheck1:'✅ استلام فوري', trustCheck2:'✅ دفع آمن', trustCheck3:'✅ دعم فني مباشر', trustCheck4:'✅ تحديثات مستمرة',
     whyUsTitle:'لماذا Miga-Photobook؟',
+    whyEdgeTitle:'وأدوات الذكاء الاصطناعي المتاحة للكل؟',
+    whyEdgeP1:'الأداة مش هي المشكلة — البرومبت هو المشكلة.',
+    whyEdgeP2:'أي حد يقدر يفتح أداة ذكاء اصطناعي، لكن النتيجة بتعتمد على الوصف اللي بيكتبه: زاوية الإضاءة، نوع العدسة، درجة اللون، عمق المجال. من غير الكلام ده بتطلع صورة «مش وحشة» — مش صورة استوديو.',
+    whyEdgeP3:'كل صورة في المعرض هنا نتيجة برومبت اتظبط وترجعنا فيه عشرات المرات لحد ما وصل للشكل ده. انت مش بتشتري «تحويل بالذكاء الاصطناعي» — انت بتشتري البرومبت المجرّب والنتيجة اللي شايفها قدامك بالظبط، من أول مرة وبدون تخمين.',
+    whyEdgeP4:'وعشان إحنا واثقين في ده، بنبيعلك البرومبت نفسه بـ 10 جنيه لو حابب تشتغل بيه بنفسك.',
     whyUs1:'نتائج احترافية', whyUs2:'تحويل تلقائي بالكامل', whyUs3:'جاهزة خلال ثوانٍ', whyUs4:'بدون أي خبرة تقنية', whyUs5:'خصوصيتك محفوظة بالكامل',
     howItWorksTitle:'كيف يعمل؟',
     how1Title:'اختر التصميم', how1Desc:'تصفح المكتبة واختر الأسلوب اللي يعجبك من أي قسم.',
@@ -2083,6 +2103,11 @@ const translations = {
     promoVideoTitle:'See Miga-Photobook in action', promoVideoSub:'A few seconds, and your ordinary photo becomes a professional work of art.',
     trustCheck1:'✅ Instant delivery', trustCheck2:'✅ Secure payment', trustCheck3:'✅ Direct support', trustCheck4:'✅ Ongoing updates',
     whyUsTitle:'Why Miga-Photobook?',
+    whyEdgeTitle:'What about the AI tools everyone can use?',
+    whyEdgeP1:'The tool is not the hard part — the prompt is.',
+    whyEdgeP2:'Anyone can open an AI tool, but the result depends on the description behind it: the angle of the light, the lens, the colour grade, the depth of field. Without those you get a photo that is “not bad” — not a studio photo.',
+    whyEdgeP3:'Every image in this gallery is the result of a prompt we refined dozens of times until it looked like this. You are not buying “an AI transformation” — you are buying the proven prompt and exactly the result you can see, first time, with no guesswork.',
+    whyEdgeP4:'And because we stand behind that, we will sell you the prompt itself for 10 EGP if you would rather run it yourself.',
     whyUs1:'Professional results', whyUs2:'Fully automatic transformation', whyUs3:'Ready in seconds', whyUs4:'No technical experience needed', whyUs5:'Your privacy is fully protected',
     howItWorksTitle:'How does it work?',
     how1Title:'Pick a style', how1Desc:'Browse the library and pick the look you like from any section.',
