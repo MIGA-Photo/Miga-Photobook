@@ -310,7 +310,7 @@
     padding:5px 10px; border-radius:100px; white-space:nowrap;
   }
   .request-count-overlay{
-    position:absolute; top:8px; inset-inline-start:8px; z-index:2;
+    position:absolute; bottom:8px; inset-inline-start:8px; z-index:2;
     display:flex; align-items:center; gap:4px;
     background:rgba(10,8,4,0.75); color:var(--brass); font-weight:800; font-size:12px;
     padding:4px 9px; border-radius:100px; backdrop-filter:blur(2px);
@@ -1163,45 +1163,9 @@
 
 <section class="cat-section" id="mostRequested" style="display:none;">
   <div class="section-head">
-    <h2 data-i18n="mostRequestedTitle">الأكثر طلبًا</h2>
+    <h2 data-i18n="mostRequestedTitle">الأكثر طلبا</h2>
   </div>
-  <div class="grid results-grid" id="mostRequestedGrid"></div>
-</section>
-
-<section class="cat-section" id="results">
-  <div class="section-head">
-    <h2 data-i18n="resultsTitle">شاهد النتائج التي يمكنك الحصول عليها</h2>
-  </div>
-  <div class="grid results-grid" id="resultsGrid"></div>
-</section>
-
-<section class="cat-section" id="beforeAfter">
-  <div class="section-head">
-    <h2 data-i18n="beforeAfterTitle">نفس الصورة... نتائج مختلفة تمامًا</h2>
-  </div>
-  <p class="sub" style="margin-bottom:24px; max-width:640px;" data-i18n="beforeAfterSub">مثال حي يوضح إمكانيات التحويل — نفس ملامح الوجه، بأساليب فنية مختلفة كليًا حسب الاختيار.</p>
-  <div class="before-after-wrap" id="baWrapMale">
-    <div class="ba-item">
-      <img id="baBeforeImgMale" src="" alt="قبل">
-      <span class="ba-label" data-i18n="beforeLabel">قبل</span>
-    </div>
-    <div class="ba-arrow">➜</div>
-    <div class="ba-item">
-      <img id="baAfterImgMale" src="" alt="بعد">
-      <span class="ba-label" data-i18n="afterLabel">بعد</span>
-    </div>
-  </div>
-  <div class="before-after-wrap" id="baWrapFemale" style="margin-top:20px;">
-    <div class="ba-item">
-      <img id="baBeforeImgFemale" src="" alt="قبل">
-      <span class="ba-label" data-i18n="beforeLabel">قبل</span>
-    </div>
-    <div class="ba-arrow">➜</div>
-    <div class="ba-item">
-      <img id="baAfterImgFemale" src="" alt="بعد">
-      <span class="ba-label" data-i18n="afterLabel">بعد</span>
-    </div>
-  </div>
+  <div class="grid" id="mostRequestedGrid"></div>
 </section>
 
 <section class="cat-section collapsible" id="testimonials">
@@ -1953,9 +1917,7 @@ const translations = {
     how2Title:'ارفع صورتك', how2Desc:'ارفع صورتك الشخصية بجودة واضحة بعد الدفع.',
     how3Title:'نحوّلها تلقائيًا', how3Desc:'نطبّق الأسلوب اللي اخترته على صورتك بالذكاء الاصطناعي.',
     how4Title:'احصل على النتيجة', how4Desc:'استلم صورتك الاحترافية الجديدة خلال ثوانٍ.',
-    resultsTitle:'شاهد النتائج التي يمكنك الحصول عليها',
-    beforeAfterTitle:'نفس الصورة... نتائج مختلفة تمامًا',
-    beforeAfterSub:'مثال حي يوضح إمكانيات التحويل — نفس ملامح الوجه، بأساليب فنية مختلفة كليًا حسب الاختيار.',
+    mostRequestedTitle:'الأكثر طلبا',
     testimonialsTitle:'آراء تهمنا',
     testimonial1:'"أفضل تحويل صور جربته على الإطلاق"', testimonial2:'"حوّلت صوري إلى مستوى احترافي"',
     testimonialsNote:'* سيتم تحديث هذا القسم بآراء العملاء الحقيقية أولاً بأول.',
@@ -2022,7 +1984,7 @@ const translations = {
     pUpdateBtn:'تحديث المنتج', confirmDeleteProduct:'هل أنت متأكد من حذف هذا المنتج؟ لا يمكن التراجع.',
     pCancelEditBtn:'إلغاء التعديل / منتج جديد', editingBannerText:'وضع التعديل: أي حفظ الآن هيغيّر المنتج ده — مش هيضيف منتج جديد.',
     replaceImageTitle:'استبدال الصورة', removeImageTitle:'حذف الصورة', moveCategoryTitle:'نقل لقسم آخر',
-    moveUpTitle:'تحريك لأعلى (يظهر أولاً)', moveDownTitle:'تحريك لأسفل',
+    moveUpTitle:'تحريك لأعلى (يظهر أولاً)', moveDownTitle:'تحريك لأسفل', popularityCountTitle:'عدد مرات الطلب على هذا المنتج',
     confirmRemoveImage:'هل تريد حذف صورة هذا المنتج واستبدالها بصورة افتراضية؟',
     toastImageReplaced:'تم استبدال الصورة بنجاح', toastImageRemoved:'تم حذف الصورة',
     toastCategoryMoved:'تم نقل المنتج للقسم الجديد',
@@ -2133,9 +2095,7 @@ const translations = {
     how2Title:'Upload your photo', how2Desc:'Upload a clear photo of yourself after payment.',
     how3Title:'We transform it', how3Desc:'We apply the style you picked to your photo using AI.',
     how4Title:'Get your result', how4Desc:'Receive your new professional photo in seconds.',
-    resultsTitle:'See the results you can get',
-    beforeAfterTitle:'Same photo... completely different results',
-    beforeAfterSub:'A live example of what the transformation can do — same facial features, entirely different artistic styles depending on what you pick.',
+    mostRequestedTitle:'Most Ordered',
     testimonialsTitle:'What people are saying',
     testimonial1:'"Best photo transformation I have tried"', testimonial2:'"Turned my photos pro-level"',
     testimonialsNote:'* This section will be updated with real customer reviews as they come in.',
@@ -2202,7 +2162,7 @@ const translations = {
     pUpdateBtn:'Update Product', confirmDeleteProduct:'Are you sure you want to delete this product? This cannot be undone.',
     pCancelEditBtn:'Cancel edit / new product', editingBannerText:'Edit mode: saving now will change this product — not add a new one.',
     replaceImageTitle:'Replace image', removeImageTitle:'Remove image', moveCategoryTitle:'Move to another category',
-    moveUpTitle:'Move up (shows first)', moveDownTitle:'Move down',
+    moveUpTitle:'Move up (shows first)', moveDownTitle:'Move down', popularityCountTitle:'Number of times this product has been ordered',
     confirmRemoveImage:'Remove this product\'s image and replace it with the default placeholder?',
     toastImageReplaced:'Image replaced successfully', toastImageRemoved:'Image removed',
     toastCategoryMoved:'Product moved to the new category',
@@ -2341,7 +2301,7 @@ function applyLanguage(lang){
   // re-render dynamic, language-dependent content
   renderHeroStrip();
   renderGrids();
-  renderResultsAndComparison();
+  renderMostRequested();
   updateCountdown();
   if(adminLoggedIn && document.getElementById('adminTabOrders').style.display !== 'none'){
     renderOrdersList();
@@ -2615,16 +2575,21 @@ function applyChildrenVisibility(){
   const visible = !HIDE_CHILDREN_FROM_CUSTOMERS || adminLoggedIn;
   const navBtn = document.querySelector('#catNav button[data-cat="children"]');
   const section = document.getElementById('children');
+  const tile = document.querySelector('.cat-tile[data-cat="children"]');
   if(navBtn) navBtn.style.display = visible ? '' : 'none';
   if(section) section.style.display = visible ? '' : 'none';
+  if(tile) tile.style.display = visible ? '' : 'none';
   const heroCta1 = document.getElementById('heroCta1Link');
   if(heroCta1) heroCta1.setAttribute('href', visible ? '#children' : '#male');
 
   // Any OTHER category with zero products right now is hidden from regular
-  // visitors too — both its section and its entry in the categories dropdown
-  // — but stays fully visible to a logged-in admin so they can still add
-  // photos to it. It reappears for everyone automatically the moment it has
-  // at least one product, no manual "unhide" step needed.
+  // visitors too — its section, its tile in the "الأقسام" grid, and its
+  // entry in the categories dropdown — but stays fully visible to a
+  // logged-in admin so they can still add photos to it. It reappears for
+  // everyone automatically the moment it has at least one product, no
+  // manual "unhide" step needed. (renderCatTiles() also bakes this same
+  // check in directly, so a tile stays correctly hidden/shown even when it
+  // gets rebuilt from scratch without this function running again first.)
   const allCats = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
   allCats.forEach(cat=>{
     if(cat === 'children') return; // handled by HIDE_CHILDREN_FROM_CUSTOMERS above
@@ -2632,8 +2597,10 @@ function applyChildrenVisibility(){
     const catVisible = hasProducts || adminLoggedIn;
     const btn = document.querySelector('#catNav button[data-cat="'+cat+'"]');
     const sec = document.getElementById(cat);
+    const catTile = document.querySelector('.cat-tile[data-cat="'+cat+'"]');
     if(btn) btn.style.display = catVisible ? '' : 'none';
     if(sec) sec.style.display = catVisible ? '' : 'none';
+    if(catTile) catTile.style.display = catVisible ? '' : 'none';
   });
 }
 
@@ -2650,58 +2617,13 @@ function renderHeroStrip(){
     </div>`).join('');
 }
 
-function renderResultsAndComparison(){
-  const realPhotos = products.filter(p => p.image !== PLACEHOLDER_IMG);
-
-  // Results showcase: reuse real product photos (no fabricated images), mixed
-  // round-robin across categories so it doesn't look like just one section's
-  // photos padded out — a genuine cross-section of the catalog.
-  const resultsEl = document.getElementById('resultsGrid');
-  if(resultsEl){
-    const byCat = {};
-    realPhotos.forEach(p=>{ (byCat[p.category] = byCat[p.category] || []).push(p); });
-    const cats = Object.keys(byCat);
-    const picks = [];
-    let round = 0;
-    while(picks.length < 12 && cats.some(c => byCat[c].length > round)){
-      cats.forEach(c=>{ if(byCat[c][round]) picks.push(byCat[c][round]); });
-      round++;
-    }
-    resultsEl.innerHTML = picks.slice(0, 12).map(p => `
-      <div class="card">
-        <div class="card-media">
-          <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
-        </div>
-      </div>`).join('');
-  }
-
-  // Before/After: two real product photos of the same category shown side by
-  // side to demonstrate range. Picked dynamically from whatever's actually in
-  // the live catalog (not hardcoded IDs, which silently break the moment
-  // products are added/removed/renamed from the admin panel) — one example
-  // from Men, one from Women.
-  const maleShots = products.filter(p => p.category === 'male' && p.image !== PLACEHOLDER_IMG);
-  const femaleShots = products.filter(p => p.category === 'female' && p.image !== PLACEHOLDER_IMG);
-  const setBa = (prefix, before, after)=>{
-    const wrap = document.getElementById('baWrap' + prefix);
-    if(!wrap) return;
-    if(before && after){
-      document.getElementById('baBeforeImg' + prefix).src = before.image;
-      document.getElementById('baAfterImg' + prefix).src = after.image;
-      wrap.style.display = '';
-    }else{
-      wrap.style.display = 'none'; // not enough photos in this category yet
-    }
-  };
-  setBa('Male', maleShots[0], maleShots[1]);
-  setBa('Female', femaleShots[0], femaleShots[1]);
-  renderMostRequested();
-}
-
-/** "الأكثر طلبًا" — top products by confirmed order count, from the public
+/** "الأكثر طلبا" — top products by confirmed order count, from the public
  * /products/popularity endpoint (counts approved orders only). Hidden
  * entirely until at least one product has a confirmed order, so a brand-new
- * store doesn't show an awkward empty "most requested" section. */
+ * store doesn't show an awkward empty "most ordered" section. Cards are the
+ * exact same orderable product-card component used in every category grid
+ * (see renderProductCard) — same zoom-on-click photo, same title/price/buy
+ * button — so a visitor can act on it immediately, not just admire it. */
 function renderMostRequested(){
   const section = document.getElementById('mostRequested');
   const grid = document.getElementById('mostRequestedGrid');
@@ -2715,13 +2637,7 @@ function renderMostRequested(){
     return;
   }
   section.style.display = '';
-  grid.innerHTML = ranked.map(p => `
-    <div class="card">
-      <div class="card-media">
-        <span class="request-count-overlay">🔥 ${productPopularity[p.id]}</span>
-        <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
-      </div>
-    </div>`).join('');
+  grid.innerHTML = ranked.map(renderProductCard).join('');
 }
 
 // ---------- Living background watermark (site photos + wordmark, very low opacity) ----------
@@ -2793,44 +2709,54 @@ function renderGrids(){
       }
     }
 
-    el.innerHTML = items.map(p=>{
-      const owned = purchases.includes(p.id);
-      const alreadyTransformed = !!transformedResults[p.id];
-      return `
-      <div class="card">
-        <div class="card-media">
-          <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
-          <span class="card-badge">${escapeHtml(productTitle(p))}</span>
-        </div>
-        <div class="card-body">
-          <div class="card-title" onclick="openProductDetail('${p.id}')" style="cursor:pointer;">${escapeHtml(productTitle(p))}</div>
-          ${owned ? `<span class="owned-pill">${t('ownedPill')}</span>` : ''}
-          <div class="card-price">
-            ${SOFT_LAUNCH ? t('freeLabel') : (LAUNCH_PROMO
-              ? `<span class="price-old">${p.originalPrice || (p.price*2)} ${CURRENCY}</span> <span class="price-new">${p.price} ${CURRENCY}</span>`
-              : (p.price + ' ' + CURRENCY))}
-          </div>
-          <div class="card-actions">
-            ${owned
-              ? (alreadyTransformed
-                  ? `<button class="buy-btn" onclick="openTransformModal('${p.id}')">${t('viewResultBtn')}</button>`
-                  : `<button class="buy-btn" onclick="openTransformModal('${p.id}')">${t('transformBtn')}</button>`)
-              : SOFT_LAUNCH
-                ? `<button class="buy-btn" onclick="claimFree('${p.id}')">${t('claimFreeBtn')}</button>`
-                : `<button class="buy-btn" onclick="openBuyModal('${p.id}', 'transform')">${t('buyBtnPrefix')} — ${p.price} ${CURRENCY}</button>`}
-            ${promptPurchases.includes(p.id)
-              ? (purchasedPromptTexts[p.id]
-                  ? `<button class="buy-btn prompt-btn" onclick="copyPurchasedPrompt('${p.id}')">${t('copyPromptBtn')}</button>`
-                  : `<button class="buy-btn prompt-btn" onclick="openTrackForPrompt('${p.id}')">${t('promptPendingBtn')}</button>`)
-              : `<button class="buy-btn prompt-btn" onclick="openBuyModal('${p.id}', 'prompt')">
-                   ${t('buyPromptBtnPrefix')} — <span class="price-old">${PROMPT_ORIGINAL_PRICE} ${CURRENCY}</span> <span class="price-new">${PROMPT_PRICE} ${CURRENCY}</span>
-                 </button>`}
-          </div>
-        </div>
-      </div>`;
-    }).join('');
+    el.innerHTML = items.map(renderProductCard).join('');
   });
   renderCatTiles();
+}
+
+/** Single shared product-card template, used everywhere a product photo is
+ * shown as a full, orderable card: every category grid AND the "الأكثر طلبا"
+ * section — so "الأكثر طلبا" behaves exactly like a category (click the
+ * photo to zoom, same title/price/buttons to order right away), and so the
+ * 🔥 order-count badge (once a product has at least one confirmed order)
+ * shows consistently on every card site-wide, not just in one section. */
+function renderProductCard(p){
+  const owned = purchases.includes(p.id);
+  const alreadyTransformed = !!transformedResults[p.id];
+  const requestCount = productPopularity[p.id] || 0;
+  return `
+  <div class="card">
+    <div class="card-media">
+      <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
+      <span class="card-badge">${escapeHtml(productTitle(p))}</span>
+      ${requestCount > 0 ? `<span class="request-count-overlay" title="${t('popularityCountTitle')}">🔥 ${requestCount}</span>` : ''}
+    </div>
+    <div class="card-body">
+      <div class="card-title" onclick="openProductDetail('${p.id}')" style="cursor:pointer;">${escapeHtml(productTitle(p))}</div>
+      ${owned ? `<span class="owned-pill">${t('ownedPill')}</span>` : ''}
+      <div class="card-price">
+        ${SOFT_LAUNCH ? t('freeLabel') : (LAUNCH_PROMO
+          ? `<span class="price-old">${p.originalPrice || (p.price*2)} ${CURRENCY}</span> <span class="price-new">${p.price} ${CURRENCY}</span>`
+          : (p.price + ' ' + CURRENCY))}
+      </div>
+      <div class="card-actions">
+        ${owned
+          ? (alreadyTransformed
+              ? `<button class="buy-btn" onclick="openTransformModal('${p.id}')">${t('viewResultBtn')}</button>`
+              : `<button class="buy-btn" onclick="openTransformModal('${p.id}')">${t('transformBtn')}</button>`)
+          : SOFT_LAUNCH
+            ? `<button class="buy-btn" onclick="claimFree('${p.id}')">${t('claimFreeBtn')}</button>`
+            : `<button class="buy-btn" onclick="openBuyModal('${p.id}', 'transform')">${t('buyBtnPrefix')} — ${p.price} ${CURRENCY}</button>`}
+        ${promptPurchases.includes(p.id)
+          ? (purchasedPromptTexts[p.id]
+              ? `<button class="buy-btn prompt-btn" onclick="copyPurchasedPrompt('${p.id}')">${t('copyPromptBtn')}</button>`
+              : `<button class="buy-btn prompt-btn" onclick="openTrackForPrompt('${p.id}')">${t('promptPendingBtn')}</button>`)
+          : `<button class="buy-btn prompt-btn" onclick="openBuyModal('${p.id}', 'prompt')">
+               ${t('buyPromptBtnPrefix')} — <span class="price-old">${PROMPT_ORIGINAL_PRICE} ${CURRENCY}</span> <span class="price-new">${PROMPT_PRICE} ${CURRENCY}</span>
+             </button>`}
+      </div>
+    </div>
+  </div>`;
 }
 
 const CAT_IDS = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
@@ -2852,8 +2778,17 @@ function renderCatTiles(){
     const imgsHtml = source.length
       ? tiles.map(p=>`<img src="${p.image}" alt="" loading="lazy">`).join('')
       : `<div class="empty-note" style="grid-column:1/-1; grid-row:1/-1; display:flex; align-items:center; justify-content:center; font-size:12px;">${t('emptyNoteCategory')}</div>`;
+    // A category with zero products right now is hidden from regular
+    // visitors (same rule applyChildrenVisibility() applies to the section
+    // and nav-dropdown entry) but stays visible to a logged-in admin so they
+    // can still open it and add photos — baked in here directly so a freshly
+    // rebuilt tile is correct immediately, without depending on that other
+    // function having run first.
+    const catVisible = cat === 'children'
+      ? (!HIDE_CHILDREN_FROM_CUSTOMERS || adminLoggedIn)
+      : (items.length > 0 || adminLoggedIn);
     return `
-    <button type="button" class="cat-tile${isOpen ? ' open' : ''}" data-cat="${cat}" aria-expanded="${isOpen ? 'true' : 'false'}">
+    <button type="button" class="cat-tile${isOpen ? ' open' : ''}" data-cat="${cat}" aria-expanded="${isOpen ? 'true' : 'false'}" style="${catVisible ? '' : 'display:none;'}">
       <div class="cat-tile-collage">
         ${imgsHtml}
         ${items.length ? `<span class="ct-count">${items.length}</span>` : ''}
@@ -3719,7 +3654,6 @@ function getStaticSearchIndex(){
     { id:'faq', label:t('faqTitle'), keywords:[t('faqTitle').toLowerCase(), 'اسئلة', 'أسئلة', 'faq', 'questions'], icon:'❓' },
     { id:'whyUs', label:t('whyUsTitle'), keywords:[t('whyUsTitle').toLowerCase()], icon:'✅' },
     { id:'mostRequested', label:t('mostRequestedTitle'), keywords:[t('mostRequestedTitle').toLowerCase()], icon:'🔥' },
-    { id:'results', label:t('resultsTitle'), keywords:[t('resultsTitle').toLowerCase()], icon:'🖼️' },
   );
   return items;
 }
