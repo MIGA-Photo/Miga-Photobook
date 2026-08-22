@@ -131,11 +131,13 @@
     padding:7px 0; white-space:nowrap;
   }
   .promo-marquee-track{
-    display:inline-flex; gap:48px; animation:marqueeScroll 24s linear infinite;
+    display:inline-flex; gap:64px; animation:marqueeScroll 52s linear infinite;
     will-change:transform;
   }
   .promo-marquee-track span{
-    font-size:13.5px; font-weight:700; color:#1a1305; letter-spacing:0.2px; padding-inline-end:48px;
+    font-size:15px; font-weight:800; color:#1a1305; letter-spacing:0.4px; padding-inline-end:64px;
+    font-family:"Playfair Display", Georgia, "Times New Roman", serif;
+    text-shadow:0 1px 0 rgba(255,255,255,0.25);
   }
   @keyframes marqueeScroll{
     0%{ transform:translateX(0); }
@@ -468,7 +470,7 @@
   .contact-sheet{overflow:hidden; border:1px solid var(--line); border-radius:4px; direction:ltr;}
   .strip-track{
     display:flex; gap:2px; width:max-content; direction:ltr;
-    animation:scrollStrip 60s linear infinite;
+    animation:scrollStrip 110s linear infinite;
   }
   .strip-track:hover{animation-play-state:paused;}
   @keyframes scrollStrip{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
@@ -786,6 +788,51 @@
   .toast.show{transform:translateX(-50%) translateY(0);}
 
   .contact-widget{position:fixed; bottom:26px; left:26px; z-index:200; display:flex; flex-direction:column; align-items:flex-start; gap:12px;}
+
+  /* ===== Admin: floating launcher + collapsible panel =====
+     The admin panel is a working surface, not a one-shot dialog: it can be
+     folded away to a small floating badge while the storefront underneath is
+     checked, then unfolded again without losing what was typed. */
+  .admin-fab{
+    position:fixed; bottom:96px; left:26px; z-index:210;
+    display:none; align-items:center; gap:8px;
+    height:48px; padding:0 16px 0 14px; border-radius:26px;
+    background:var(--ink-2); border:2px solid var(--brass); color:var(--brass);
+    font-size:14px; font-weight:800; font-family:inherit; cursor:pointer;
+    box-shadow:0 8px 24px rgba(0,0,0,0.45);
+    transition:transform .18s ease, background .18s ease;
+  }
+  .admin-fab.show{display:inline-flex;}
+  .admin-fab:hover{transform:translateY(-3px); background:rgba(255,201,77,0.12);}
+  .admin-fab .af-icon{font-size:18px; line-height:1;}
+  .admin-fab .af-badge{
+    min-width:20px; height:20px; padding:0 6px; border-radius:10px;
+    background:var(--brass); color:var(--ink); font-size:12px; font-weight:800;
+    display:none; align-items:center; justify-content:center;
+  }
+  .admin-fab .af-badge.show{display:inline-flex;}
+
+  .admin-head{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+    margin-bottom:6px;
+  }
+  .admin-head-actions{display:flex; align-items:center; gap:6px; flex-shrink:0;}
+  .admin-icon-btn{
+    width:34px; height:34px; border-radius:9px; flex-shrink:0;
+    background:var(--ink); border:1px solid var(--line); color:var(--paper-dim);
+    font-size:17px; line-height:1; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:color .15s, border-color .15s;
+  }
+  .admin-icon-btn:hover{color:var(--brass); border-color:var(--brass-dim);}
+  /* Folded: header stays, everything below it is tucked away. */
+  .modal.admin-modal.collapsed #adminLoginView,
+  .modal.admin-modal.collapsed #adminFormView,
+  .modal.admin-modal.collapsed p.sub{display:none !important;}
+  .modal.admin-modal.collapsed{padding-bottom:18px;}
+  .modal.admin-modal{max-width:520px;}
+  .admin-tabs{flex-wrap:wrap;}
+  .admin-tabs button{flex:1 1 auto; min-width:104px;}
 
   /* Back to top + vertical scroll ruler — pinned to the physical right edge
      with a plain "right" (not the logical inset-inline-end), which in RTL
@@ -1750,10 +1797,21 @@
     </div>
   </div>
 </div>
+<button type="button" class="admin-fab" id="adminFab" aria-label="لوحة الإدارة">
+  <span class="af-icon" aria-hidden="true">&#9881;</span>
+  <span data-i18n="adminFabLabel">لوحة الإدارة</span>
+  <span class="af-badge" id="adminFabBadge"></span>
+</button>
+
 <div class="modal-bg" id="adminModalBg">
-  <div class="modal" style="max-width:480px;">
-    <button class="close-x" id="adminModalClose">×</button>
-    <h3 id="adminTitle" data-i18n="adminTitle">دخول لوحة الإدارة</h3>
+  <div class="modal admin-modal" id="adminModal">
+    <div class="admin-head">
+      <h3 id="adminTitle" data-i18n="adminTitle">دخول لوحة الإدارة</h3>
+      <div class="admin-head-actions">
+        <button type="button" class="admin-icon-btn" id="adminCollapseBtn" title="طي اللوحة" aria-label="طي اللوحة">&#8211;</button>
+        <button type="button" class="admin-icon-btn" id="adminModalClose" title="إغلاق" aria-label="إغلاق">&times;</button>
+      </div>
+    </div>
     <p class="sub" data-i18n="adminSub">لوحة إدارة المنتجات والطلبات.</p>
     <div id="adminLoginView">
       <div class="field">
@@ -1788,15 +1846,15 @@
         </div>
         <div class="field">
           <label data-i18n="pTitleLabel">عنوان المنتج</label>
-          <input type="text" id="pTitle" placeholder="مثال: بورتريه إضاءة سينمائية" data-i18n-ph="pTitlePh">
+          <input type="text" id="pTitle" value="Miga-photobook" placeholder="مثال: بورتريه إضاءة سينمائية" data-i18n-ph="pTitlePh">
         </div>
         <div class="field">
           <label data-i18n="pTitleEnLabel">Product Title (English) — optional, shown to customers when they switch to English</label>
-          <input type="text" id="pTitleEn" placeholder="e.g. Cinematic Lighting Portrait" data-i18n-ph="pTitleEnPh">
+          <input type="text" id="pTitleEn" value="Miga-photobook" placeholder="e.g. Cinematic Lighting Portrait" data-i18n-ph="pTitleEnPh">
         </div>
         <div class="field">
           <label data-i18n="pPriceLabel">السعر (جنيه)</label>
-          <input type="number" id="pPrice" placeholder="9" min="0">
+          <input type="number" id="pPrice" value="25" placeholder="25" min="0">
         </div>
         <div class="field">
           <label data-i18n="pImageLabel">صورة المنتج</label>
@@ -2011,7 +2069,7 @@ const translations = {
     trackModalTitle:'تتبع طلبك', trackModalSub:'أدخل كود المتابعة الذي حصلت عليه بعد إرسال طلب الشراء.',
     myOrdersTitle:'طلباتك السابقة', loadingLabel:'جاري التحميل...',
     trackCodeLabel:'كود المتابعة', trackCheckBtn:'تحقّق من الحالة', closeBtn:'إغلاق',
-    adminTitle:'دخول لوحة الإدارة',
+    adminTitle:'دخول لوحة الإدارة', adminFabLabel:'لوحة الإدارة',
     adminSub:'لوحة إدارة المنتجات والطلبات.',
     adminPassLabel:'كلمة المرور', adminLoginBtn:'دخول',
     tabProducts:'إضافة منتج', tabOrders:'الطلبات',
@@ -2195,7 +2253,7 @@ const translations = {
     trackModalTitle:'Track Your Order', trackModalSub:'Enter the tracking code you received after sending a purchase request.',
     myOrdersTitle:'Your Past Orders', loadingLabel:'Loading...',
     trackCodeLabel:'Tracking Code', trackCheckBtn:'Check Status', closeBtn:'Close',
-    adminTitle:'Admin Login',
+    adminTitle:'Admin Login', adminFabLabel:'Admin panel',
     adminSub:'Product and order management panel.',
     adminPassLabel:'Password', adminLoginBtn:'Login',
     tabProducts:'Add Product', tabOrders:'Orders',
@@ -2659,7 +2717,7 @@ function renderHeroStrip(){
   const doubled = [...list, ...list];
   track.innerHTML = doubled.map((p,i) => `
     <div class="frame">
-      <img src="${p.image}" alt="">
+      <img src="${p.image}" alt="" loading="lazy" decoding="async">
       <span class="fno">NO. ${String((i % list.length)+1).padStart(3,'0')}</span>
     </div>`).join('');
 }
@@ -2773,14 +2831,52 @@ function rowElements(key){
   return {rowEl, dotsEl};
 }
 
-/** Scrolls one product row forward or backward by a single visible width.
- * On a phone that width holds exactly one card, on a wide screen it holds the
- * full set of five — so the same call gives the right step on both. */
+/** How far a card's leading edge sits from the row's leading edge. Written in
+ * terms of on-screen rectangles so it is correct in both writing directions
+ * and does not depend on how a browser signs scrollLeft in RTL. */
+function rowEdgeOffset(rect, rowRect, rtl){
+  return rtl ? (rowRect.right - rect.right) : (rect.left - rowRect.left);
+}
+
+function rowCards(rowEl){
+  return Array.from(rowEl.querySelectorAll(':scope > .card'));
+}
+
+/** Index of the card currently sitting at the start of the visible area. */
+function currentRowIndex(rowEl, cards, rtl){
+  const rowRect = rowEl.getBoundingClientRect();
+  let index = 0, best = Infinity;
+  cards.forEach((c,i)=>{
+    const d = Math.abs(rowEdgeOffset(c.getBoundingClientRect(), rowRect, rtl));
+    if(d < best){ best = d; index = i; }
+  });
+  return index;
+}
+
+/** How many whole cards fit in one view: five on a wide screen, one on a phone. */
+function rowPerView(rowEl, cards){
+  const styles = getComputedStyle(rowEl);
+  const gap = parseFloat(styles.columnGap || styles.gap) || 0;
+  const pitch = cards[0].getBoundingClientRect().width + gap;
+  if(!pitch) return 1;
+  return Math.max(1, Math.round((rowEl.clientWidth + gap) / pitch));
+}
+
+/** Moves the row on by exactly one view's worth of cards. The target card is
+ * scrolled to by element rather than by adding a pixel offset each time, so
+ * the row can never drift half a card out of alignment however many times the
+ * arrows are pressed. */
 function scrollRow(key, direction){
   const {rowEl} = rowElements(key);
   if(!rowEl) return;
+  const cards = rowCards(rowEl);
+  if(!cards.length) return;
   const rtl = getComputedStyle(rowEl).direction === 'rtl';
-  rowEl.scrollBy({left: (rtl ? -1 : 1) * direction * rowEl.clientWidth, behavior:'smooth'});
+  const perView = rowPerView(rowEl, cards);
+  const current = currentRowIndex(rowEl, cards, rtl);
+  const maxIndex = Math.max(0, cards.length - perView);
+  const target = Math.max(0, Math.min(maxIndex, current + direction * perView));
+  cards[target].scrollIntoView({behavior:'smooth', inline:'start', block:'nearest'});
 }
 
 function updateRowArrows(key){
@@ -2789,10 +2885,15 @@ function updateRowArrows(key){
   const prev = dotsEl.querySelector('[data-row-prev]');
   const next = dotsEl.querySelector('[data-row-next]');
   if(!prev || !next) return;
-  const pos = Math.abs(rowEl.scrollLeft);
-  const max = rowEl.scrollWidth - rowEl.clientWidth;
-  prev.disabled = pos <= 4;
-  next.disabled = pos >= max - 4;
+  const cards = rowCards(rowEl);
+  if(!cards.length) return;
+  const rtl = getComputedStyle(rowEl).direction === 'rtl';
+  const rowRect = rowEl.getBoundingClientRect();
+  const firstOffset = rowEdgeOffset(cards[0].getBoundingClientRect(), rowRect, rtl);
+  const lastRect = cards[cards.length - 1].getBoundingClientRect();
+  const lastTrailing = rtl ? (lastRect.left - rowRect.left) : (rowRect.right - lastRect.right);
+  prev.disabled = firstOffset >= -4;
+  next.disabled = lastTrailing >= -4;
 }
 
 /** Single shared product-card template, used everywhere a product photo is
@@ -2808,7 +2909,7 @@ function renderProductCard(p){
   return `
   <div class="card">
     <div class="card-media">
-      <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
+      <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" loading="lazy" decoding="async" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
       <span class="card-badge">${escapeHtml(productTitle(p))}</span>
       ${requestCount > 0 ? `<span class="request-count-overlay" title="${t('popularityCountTitle')}">🔥 ${requestCount}</span>` : ''}
     </div>
@@ -3921,6 +4022,33 @@ async function refreshAdminBellBadge(){
   }catch(e){ /* next poll retries */ }
 }
 
+/** Folds the admin panel away without discarding anything typed into it: the
+ * modal is hidden and the floating launcher takes its place, so re-opening
+ * lands back on exactly the same tab with the same half-filled form. */
+function collapseAdminPanel(){
+  document.getElementById('adminModalBg').classList.remove('show');
+  document.getElementById('adminFab').classList.add('show');
+}
+
+function expandAdminPanel(){
+  document.getElementById('adminModalBg').classList.add('show');
+  document.getElementById('adminFab').classList.remove('show');
+}
+
+function syncAdminFabBadge(){
+  const badge = document.getElementById('adminFabBadge');
+  if(!badge) return;
+  const text = (document.getElementById('pendingCount')?.innerText || '').replace(/[()]/g,'').trim();
+  badge.textContent = text;
+  badge.classList.toggle('show', !!text);
+}
+
+document.getElementById('adminCollapseBtn').onclick = ()=>{
+  collapseAdminPanel();
+  syncAdminFabBadge();
+};
+document.getElementById('adminFab').onclick = expandAdminPanel;
+
 function showAdminQuickAccess(){
   adminQuickAccess.style.display = '';
   refreshAdminBellBadge();
@@ -4510,6 +4638,7 @@ function renderOrdersList(){
   const approved = orders.filter(o=>o.status==='approved').length;
   const revenue = orders.filter(o=>o.status==='approved').reduce((sum,o)=> sum + (Number(o.price)||0), 0);
   document.getElementById('pendingCount').innerText = pending ? `(${pending})` : '';
+  syncAdminFabBadge();
   document.getElementById('statTotal').textContent = orders.length;
   document.getElementById('statApproved').textContent = approved;
   document.getElementById('statPending').textContent = pending;
@@ -4656,6 +4785,7 @@ function sendPromptViaWhatsApp(code){
 }
 document.getElementById('adminModalClose').onclick = ()=>{
   adminModalBg.classList.remove('show');
+  document.getElementById('adminFab').classList.remove('show');
   editingProductId = null;
   resetEditUI();
 };
@@ -4717,6 +4847,7 @@ document.getElementById('adminLogoutBtn').onclick = async ()=>{
   adminModalBg.classList.remove('show');
   editingProductId = null;
   resetEditUI();
+  document.getElementById('adminFab').classList.remove('show');
   try{ localStorage.removeItem('megaPromptAdminPass'); }catch(e){}
   await loadProducts(); // drop back to the prompt-free public list
   renderGrids();
@@ -4724,6 +4855,21 @@ document.getElementById('adminLogoutBtn').onclick = async ()=>{
   applyChildrenVisibility();
   hideAdminQuickAccess();
 };
+
+const NEW_PRODUCT_DEFAULT_TITLE = 'Miga-photobook';
+const NEW_PRODUCT_DEFAULT_PRICE = 25;
+
+/** Puts the add-product form back to a clean state for the *next* product:
+ * the suggested name and price are filled in ready to be typed over, rather
+ * than leaving the admin with three empty boxes every single time. */
+function resetProductFormToDefaults(){
+  document.getElementById('pTitle').value = NEW_PRODUCT_DEFAULT_TITLE;
+  document.getElementById('pTitleEn').value = NEW_PRODUCT_DEFAULT_TITLE;
+  document.getElementById('pPrice').value = NEW_PRODUCT_DEFAULT_PRICE;
+  document.getElementById('pPrompt').value = '';
+  document.getElementById('pImage').value = '';
+  pendingCroppedBlob = null;
+}
 
 let editingProductId = null;
 // The raw file input still exists (for the OS file picker), but its file is
@@ -4787,12 +4933,7 @@ document.getElementById('pSaveBtn').onclick = async ()=>{
     renderHeroStrip();
     renderAdminProductsList();
     applyChildrenVisibility();
-    document.getElementById('pTitle').value='';
-    document.getElementById('pTitleEn').value='';
-    document.getElementById('pPrice').value='';
-    document.getElementById('pPrompt').value='';
-    fileInput.value='';
-    pendingCroppedBlob = null;
+    resetProductFormToDefaults();
     showToast(t('toastProductAdded'));
   };
 
@@ -4843,12 +4984,7 @@ function resetEditUI(){
 document.getElementById('pCancelEditBtn').onclick = ()=>{
   editingProductId = null;
   resetEditUI();
-  document.getElementById('pTitle').value='';
-  document.getElementById('pTitleEn').value='';
-  document.getElementById('pPrice').value='';
-  document.getElementById('pPrompt').value='';
-  document.getElementById('pImage').value='';
-  pendingCroppedBlob = null;
+  resetProductFormToDefaults();
 };
 
 function editProduct(id){
