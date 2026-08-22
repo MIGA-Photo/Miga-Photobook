@@ -523,7 +523,10 @@
     display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:2px;
     background:var(--ink-3);
   }
-  .cat-tile-collage img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .cat-tile-collage img, .cat-tile-collage .ct-blank{
+    width:100%; height:100%; aspect-ratio:1/1; object-fit:cover; display:block;
+  }
+  .cat-tile-collage .ct-blank{background:rgba(255,201,77,0.05);}
   .cat-tile-collage .ct-count{
     position:absolute; inset-inline-end:6px; inset-block-end:6px;
     background:rgba(12,12,16,0.72); color:var(--paper); font-size:11px; font-weight:700;
@@ -540,16 +543,34 @@
     .cat-tile-label .ct-name{font-size:13.5px;}
   }
 
-  .grid{display:grid; grid-template-columns:repeat(5, 1fr); gap:18px; align-items:stretch;}
-  @media(max-width:1180px){ .grid{grid-template-columns:repeat(4, 1fr);} }
-  @media(max-width:980px){ .grid{grid-template-columns:repeat(3, 1fr);} }
-  @media(max-width:700px){ .grid{grid-template-columns:repeat(2, 1fr);} }
-  @media(max-width:460px){ .grid{grid-template-columns:1fr;} }
+  /* Product row: one horizontal, snap-scrolling line instead of a wrapped
+     grid. The arrows under the row scroll by exactly one container width, so
+     on desktop that is one full set of 5 cards and on mobile it is exactly
+     one card — no page numbers needed. */
+  .grid{
+    display:flex; gap:18px; align-items:stretch;
+    overflow-x:auto; overflow-y:hidden;
+    scroll-snap-type:x mandatory; scroll-behavior:smooth;
+    scrollbar-width:none; -ms-overflow-style:none;
+    padding-bottom:4px;
+  }
+  .grid::-webkit-scrollbar{display:none;}
+  .grid > .card{
+    flex:0 0 calc((100% - 4*18px) / 5);
+    scroll-snap-align:start;
+  }
+  @media(max-width:1180px){ .grid > .card{flex-basis:calc((100% - 3*18px) / 4);} }
+  @media(max-width:980px){ .grid > .card{flex-basis:calc((100% - 2*18px) / 3);} }
+  @media(max-width:700px){ .grid{gap:14px;} .grid > .card{flex-basis:calc((100% - 14px) / 2);} }
+  @media(max-width:560px){ .grid > .card{flex-basis:100%;} }
+  .grid > .empty-note{flex:0 0 100%;}
 
   /* Results showcase: smaller, denser thumbnails than the product grid — still
      click-to-zoom (openLightbox), just meant to be skimmed quickly rather than
      shopped from. */
   .results-grid{display:grid; grid-template-columns:repeat(7, 1fr); gap:10px; align-items:stretch;}
+  .results-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:18px; overflow:visible;}
+  .results-grid > .card{flex:none;}
   .results-grid .card-media{aspect-ratio:1/1;}
   @media(max-width:1180px){ .results-grid{grid-template-columns:repeat(5, 1fr);} }
   @media(max-width:700px){ .results-grid{grid-template-columns:repeat(4, 1fr);} }
@@ -572,13 +593,14 @@
   }
   .grid-page-dots .gp-arrow{
     display:flex; align-items:center; justify-content:center;
-    width:38px; height:38px; border-radius:10px;
-    background:var(--ink-2); border:1.5px solid var(--brass); color:var(--brass);
-    font-size:20px; font-weight:800; cursor:pointer; line-height:1;
+    width:52px; height:46px; border-radius:12px;
+    background:var(--ink-2); border:2px solid var(--brass); color:var(--brass);
+    font-size:26px; font-weight:800; cursor:pointer; line-height:1;
+    box-shadow:0 2px 10px rgba(0,0,0,0.35);
   }
   .grid-page-dots .gp-arrow:hover{background:rgba(255,201,77,0.12);}
   .grid-page-dots .gp-arrow:disabled{opacity:0.28; cursor:default; background:transparent;}
-  .grid-page-dots .gp-nums{display:flex; align-items:center; gap:6px;}
+  .grid-page-dots .gp-nums{display:none;}
   .grid-page-dots .gp-num{
     min-width:34px; height:34px; padding:0 6px; border-radius:8px;
     background:transparent; border:none; color:var(--paper-dim);
@@ -587,9 +609,8 @@
   .grid-page-dots .gp-num:hover{color:var(--paper);}
   .grid-page-dots .gp-num.active{color:var(--brass); background:rgba(255,201,77,0.14);}
   @media(max-width:640px){
-    .grid-page-dots{gap:10px;}
-    .grid-page-dots .gp-arrow{width:42px; height:42px; font-size:22px;}
-    .grid-page-dots .gp-num{min-width:38px; height:38px; font-size:20px;}
+    .grid-page-dots{gap:22px; margin-top:14px;}
+    .grid-page-dots .gp-arrow{width:64px; height:50px; font-size:30px;}
   }
   .empty-note{
     color:var(--paper-dim); font-size:14.5px; border:1px dashed var(--line);
@@ -965,7 +986,7 @@
   body.view-mode-mobile .eyebrow{font-size:11px;}
   body.view-mode-mobile .cat-section{padding:36px 16px 10px;}
   body.view-mode-mobile .section-head h2{font-size:22px;}
-  body.view-mode-mobile .grid{grid-template-columns:1fr;}
+  body.view-mode-mobile .grid > .card{flex-basis:100%;}
   body.view-mode-mobile .cat-tiles-grid{grid-template-columns:repeat(2, 1fr); gap:14px;}
   body.view-mode-mobile .pricing{padding:40px 16px;}
   body.view-mode-mobile .pricing-grid{grid-template-columns:1fr;}
@@ -1336,6 +1357,7 @@
     <h2 data-i18n="mostRequestedTitle">الأكثر طلبا</h2>
   </div>
   <div class="grid" id="mostRequestedGrid"></div>
+  <div class="grid-page-dots" id="gridDots-mostRequested"></div>
 </section>
 
 <section class="cat-section collapsible" id="testimonials">
@@ -1924,6 +1946,7 @@ const translations = {
     promoVideoTitle:'شوف Miga-Photobook وهو شغال', promoVideoSub:'ثوانٍ معدودة، وصورتك العادية بتتحول لتحفة فنية احترافية.',
     trustCheck1:'✅ استلام فوري', trustCheck2:'✅ دفع آمن', trustCheck3:'✅ دعم فني مباشر', trustCheck4:'✅ تحديثات مستمرة',
     whyUsTitle:'لماذا Miga-Photobook؟',
+    rowPrevLabel:'الصور السابقة', rowNextLabel:'الصور التالية',
     whyEdgeTitle:'وأدوات الذكاء الاصطناعي المتاحة للكل؟',
     whyEdgeP1:'الأداة مش هي المشكلة — البرومبت هو المشكلة.',
     whyEdgeP2:'أي حد يقدر يفتح أداة ذكاء اصطناعي، لكن النتيجة بتعتمد على الوصف: زاوية الإضاءة، العدسة، درجة اللون. من غير ده بتطلع صورة «مش وحشة» — مش صورة استوديو.',
@@ -2107,6 +2130,7 @@ const translations = {
     promoVideoTitle:'See Miga-Photobook in action', promoVideoSub:'A few seconds, and your ordinary photo becomes a professional work of art.',
     trustCheck1:'✅ Instant delivery', trustCheck2:'✅ Secure payment', trustCheck3:'✅ Direct support', trustCheck4:'✅ Ongoing updates',
     whyUsTitle:'Why Miga-Photobook?',
+    rowPrevLabel:'Previous photos', rowNextLabel:'Next photos',
     whyEdgeTitle:'What about the AI tools everyone can use?',
     whyEdgeP1:'The tool is not the hard part — the prompt is.',
     whyEdgeP2:'Anyone can open an AI tool, but the result depends on the description: the angle of the light, the lens, the colour grade. Without those you get a photo that is “not bad” — not a studio photo.',
@@ -2657,10 +2681,13 @@ function renderMostRequested(){
     .slice(0, 12);
   if(!ranked.length){
     section.style.display = 'none';
+    const d = document.getElementById('gridDots-mostRequested');
+    if(d) d.innerHTML = '';
     return;
   }
   section.style.display = '';
   grid.innerHTML = ranked.map(renderProductCard).join('');
+  buildRowArrows('mostRequested', document.getElementById('gridDots-mostRequested'), grid);
 }
 
 // ---------- Living background watermark (site photos + wordmark, very low opacity) ----------
@@ -2695,19 +2722,12 @@ function renderWatermarkBackground(){
   }
 }
 
-const GRID_PAGE_SIZE = 15; // 5 columns x 3 rows
-const gridPages = {}; // current page index per category, e.g. gridPages.children = 0
-
 function renderGrids(){
-  ['children','male','female','business','cinematic','luxury','artistic','magazine'].forEach(cat=>{
+  CAT_IDS.forEach(cat=>{
     const el = document.getElementById('grid-'+cat);
+    if(!el) return;
     const allItems = products.filter(p=>p.category===cat)
       .sort((a,b) => (a.order ?? 9999) - (b.order ?? 9999));
-    const pageCount = Math.max(1, Math.ceil(allItems.length / GRID_PAGE_SIZE));
-    if(!(cat in gridPages)) gridPages[cat] = 0;
-    gridPages[cat] = Math.min(gridPages[cat], pageCount - 1);
-    const page = gridPages[cat];
-
     const dotsEl = document.getElementById('gridDots-'+cat);
 
     if(!allItems.length){
@@ -2716,25 +2736,63 @@ function renderGrids(){
       return;
     }
 
-    const items = allItems.slice(page * GRID_PAGE_SIZE, page * GRID_PAGE_SIZE + GRID_PAGE_SIZE);
-    const showNav = allItems.length > GRID_PAGE_SIZE;
-    if(dotsEl){
-      if(!showNav){
-        dotsEl.innerHTML = '';
-      }else{
-        const nums = Array.from({length:pageCount}, (_,i) =>
-          `<button type="button" class="gp-num${i===page?' active':''}" onclick="goToGridPage('${cat}', ${i})" aria-label="page ${i+1}" ${i===page?'aria-current="page"':''}>${i+1}</button>`
-        ).join('');
-        dotsEl.innerHTML =
-          `<button type="button" class="gp-arrow" onclick="pageGrid('${cat}', -1)" ${page===0?'disabled':''} aria-label="previous page">&#8249;</button>` +
-          `<span class="gp-nums">${nums}</span>` +
-          `<button type="button" class="gp-arrow" onclick="pageGrid('${cat}', 1)" ${page>=pageCount-1?'disabled':''} aria-label="next page">&#8250;</button>`;
-      }
-    }
-
-    el.innerHTML = items.map(renderProductCard).join('');
+    // Every product is rendered into one scrollable row; the arrows move the
+    // row by exactly one visible width rather than swapping a page of cards.
+    el.innerHTML = allItems.map(renderProductCard).join('');
+    buildRowArrows(cat, dotsEl, el);
   });
   renderCatTiles();
+}
+
+/** Draws the two arrows under a product row and keeps their enabled state in
+ * sync with how far the row has been scrolled. Used by every category row and
+ * by the "most requested" row, so all of them behave identically. */
+function buildRowArrows(key, dotsEl, rowEl){
+  if(!dotsEl || !rowEl) return;
+  if(rowEl.scrollWidth <= rowEl.clientWidth + 4){
+    dotsEl.innerHTML = '';
+    return;
+  }
+  dotsEl.innerHTML =
+    `<button type="button" class="gp-arrow" data-row-prev onclick="scrollRow('${key}', -1)" aria-label="${t('rowPrevLabel')}">&#8249;</button>` +
+    `<button type="button" class="gp-arrow" data-row-next onclick="scrollRow('${key}', 1)" aria-label="${t('rowNextLabel')}">&#8250;</button>`;
+  if(!rowEl.dataset.arrowsBound){
+    rowEl.addEventListener('scroll', ()=> updateRowArrows(key), {passive:true});
+    rowEl.dataset.arrowsBound = '1';
+  }
+  updateRowArrows(key);
+}
+
+function rowElements(key){
+  const rowEl = key === 'mostRequested'
+    ? document.getElementById('mostRequestedGrid')
+    : document.getElementById('grid-'+key);
+  const dotsEl = key === 'mostRequested'
+    ? document.getElementById('gridDots-mostRequested')
+    : document.getElementById('gridDots-'+key);
+  return {rowEl, dotsEl};
+}
+
+/** Scrolls one product row forward or backward by a single visible width.
+ * On a phone that width holds exactly one card, on a wide screen it holds the
+ * full set of five — so the same call gives the right step on both. */
+function scrollRow(key, direction){
+  const {rowEl} = rowElements(key);
+  if(!rowEl) return;
+  const rtl = getComputedStyle(rowEl).direction === 'rtl';
+  rowEl.scrollBy({left: (rtl ? -1 : 1) * direction * rowEl.clientWidth, behavior:'smooth'});
+}
+
+function updateRowArrows(key){
+  const {rowEl, dotsEl} = rowElements(key);
+  if(!rowEl || !dotsEl) return;
+  const prev = dotsEl.querySelector('[data-row-prev]');
+  const next = dotsEl.querySelector('[data-row-next]');
+  if(!prev || !next) return;
+  const pos = Math.abs(rowEl.scrollLeft);
+  const max = rowEl.scrollWidth - rowEl.clientWidth;
+  prev.disabled = pos <= 4;
+  next.disabled = pos >= max - 4;
 }
 
 /** Single shared product-card template, used everywhere a product photo is
@@ -2757,11 +2815,6 @@ function renderProductCard(p){
     <div class="card-body">
       <div class="card-title" onclick="openProductDetail('${p.id}')" style="cursor:pointer;">${escapeHtml(productTitle(p))}</div>
       ${owned ? `<span class="owned-pill">${t('ownedPill')}</span>` : ''}
-      <div class="card-price">
-        ${SOFT_LAUNCH ? t('freeLabel') : (LAUNCH_PROMO
-          ? `<span class="price-old">${p.originalPrice || (p.price*2)} ${CURRENCY}</span> <span class="price-new">${p.price} ${CURRENCY}</span>`
-          : (p.price + ' ' + CURRENCY))}
-      </div>
       <div class="card-actions">
         ${owned
           ? (alreadyTransformed
@@ -2796,10 +2849,12 @@ function renderCatTiles(){
     const items = products.filter(p=>p.category===cat).sort((a,b) => (a.order ?? 9999) - (b.order ?? 9999));
     const realPhotos = items.filter(p=>p.image !== PLACEHOLDER_IMG);
     const source = (realPhotos.length ? realPhotos : items).slice(0, 4);
-    const tiles = Array.from({length:4}, (_,i)=> source[i % (source.length || 1)]);
     const isOpen = document.getElementById(cat)?.classList.contains('open');
+    // Exactly four equal cells: the real photos first, then quiet empty cells
+    // rather than repeating the same photo to pad the collage out.
     const imgsHtml = source.length
-      ? tiles.map(p=>`<img src="${p.image}" alt="" loading="lazy">`).join('')
+      ? source.map(p=>`<img src="${p.image}" alt="" loading="lazy">`).join('')
+        + Array.from({length: Math.max(0, 4 - source.length)}, ()=>'<span class="ct-blank" aria-hidden="true"></span>').join('')
       : `<div class="empty-note" style="grid-column:1/-1; grid-row:1/-1; display:flex; align-items:center; justify-content:center; font-size:12px;">${t('emptyNoteCategory')}</div>`;
     // A category with zero products right now is hidden from regular
     // visitors (same rule applyChildrenVisibility() applies to the section
@@ -2849,27 +2904,6 @@ function openCatSection(id){
   const tile = document.querySelector(`.cat-tile[data-cat="${id}"]`);
   if(tile){ tile.classList.add('open'); tile.setAttribute('aria-expanded', 'true'); }
   return sec;
-}
-
-function pageGrid(cat, direction){
-  const items = products.filter(p=>p.category===cat);
-  const pageCount = Math.max(1, Math.ceil(items.length / GRID_PAGE_SIZE));
-  const current = gridPages[cat] || 0;
-  const next = Math.max(0, Math.min(pageCount - 1, current + direction));
-  if(next === current) return;
-  gridPages[cat] = next;
-  renderGrids();
-  document.getElementById(cat)?.scrollIntoView({behavior:'smooth', block:'start'});
-}
-
-function goToGridPage(cat, pageIndex){
-  const items = products.filter(p=>p.category===cat);
-  const pageCount = Math.max(1, Math.ceil(items.length / GRID_PAGE_SIZE));
-  const next = Math.max(0, Math.min(pageCount - 1, pageIndex));
-  if(next === (gridPages[cat] || 0)) return;
-  gridPages[cat] = next;
-  renderGrids();
-  document.getElementById(cat)?.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 function catLabel(c){
