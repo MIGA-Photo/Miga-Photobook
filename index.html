@@ -793,6 +793,46 @@
      The admin panel is a working surface, not a one-shot dialog: it can be
      folded away to a small floating badge while the storefront underneath is
      checked, then unfolded again without losing what was typed. */
+  /* A single, quiet nudge for a visitor who has browsed but not ordered.
+     Shows once per visit, sits at the bottom out of the way of the content,
+     and is dismissible — deliberately not a modal that blocks the page. */
+  /* Purchase confirmation: a deliberate second action before an order is
+     created, so "I've paid" cannot be tapped on reflex before transferring. */
+  .pay-confirm-row{
+    display:flex; align-items:flex-start; gap:10px; cursor:pointer;
+    background:var(--ink); border:1px solid var(--line); border-radius:9px;
+    padding:11px 13px; margin-bottom:10px; font-size:13.5px; line-height:1.6;
+  }
+  .pay-confirm-row input{
+    width:19px; height:19px; margin:2px 0 0; accent-color:var(--brass); flex-shrink:0;
+  }
+  .pay-warning{
+    background:rgba(220,80,60,0.10); border:1px solid rgba(220,80,60,0.45);
+    border-radius:9px; padding:10px 13px; margin-bottom:12px;
+    font-size:12.8px; line-height:1.65; color:#f0b9ae;
+  }
+  #buyConfirmBtn[disabled]{opacity:0.45; cursor:not-allowed;}
+
+  .stay-nudge{
+    position:fixed; bottom:-200px; inset-inline-start:50%; transform:translateX(-50%);
+    z-index:205; width:min(440px, calc(100vw - 32px));
+    background:var(--ink-2); border:2px solid var(--brass); border-radius:16px;
+    padding:18px 20px 16px; box-shadow:0 18px 50px rgba(0,0,0,0.55);
+    transition:bottom .45s cubic-bezier(.22,1,.36,1);
+  }
+  .stay-nudge.show{bottom:26px;}
+  .stay-nudge h4{font-size:16.5px; color:var(--brass); margin:0 0 6px; padding-inline-end:26px;}
+  .stay-nudge p{font-size:14px; color:var(--paper); line-height:1.7; margin:0 0 14px;}
+  .stay-nudge-actions{display:flex; gap:10px; flex-wrap:wrap;}
+  .stay-nudge-actions .btn-primary,
+  .stay-nudge-actions .btn-ghost{flex:1 1 auto; padding:11px 16px; font-size:14px; text-align:center;}
+  .stay-nudge-close{
+    position:absolute; top:10px; inset-inline-end:12px;
+    background:none; border:none; color:var(--paper-dim); font-size:22px; line-height:1; cursor:pointer;
+  }
+  .stay-nudge-close:hover{color:var(--paper);}
+  @media(max-width:560px){ .stay-nudge.show{bottom:92px;} }
+
   .admin-fab{
     position:fixed; bottom:96px; left:26px; z-index:210;
     display:none; align-items:center; gap:8px;
@@ -1179,6 +1219,14 @@
   <div class="cat-tiles-grid" id="categoryTilesGrid"></div>
 </section>
 
+<section class="cat-section" id="mostRequested" style="display:none;">
+  <div class="section-head">
+    <h2 data-i18n="mostRequestedTitle">الأكثر طلبا</h2>
+  </div>
+  <div class="grid" id="mostRequestedGrid"></div>
+  <div class="grid-page-dots" id="gridDots-mostRequested"></div>
+</section>
+
 <section class="cat-section collapsible" id="children">
   <div class="section-head">
     <span class="sh-left"><span class="sh-icon" aria-hidden="true">📁</span><h2 data-i18n="secChildrenTitle">قسم الأطفال</h2><span class="tag tag-children">CHILDREN</span></span>
@@ -1399,14 +1447,6 @@
   </div>
 </section>
 
-<section class="cat-section" id="mostRequested" style="display:none;">
-  <div class="section-head">
-    <h2 data-i18n="mostRequestedTitle">الأكثر طلبا</h2>
-  </div>
-  <div class="grid" id="mostRequestedGrid"></div>
-  <div class="grid-page-dots" id="gridDots-mostRequested"></div>
-</section>
-
 <section class="cat-section collapsible" id="testimonials">
   <div class="section-head">
     <span class="sh-left"><span class="sh-icon" aria-hidden="true">&#11088;</span><h2 data-i18n="testimonialsTitle">آراء تهمنا</h2></span>
@@ -1565,9 +1605,18 @@
           <label data-i18n="buyerPhoneLabel">رقم الموبايل الذي حوّلت منه</label>
           <input type="tel" id="buyerPhone" placeholder="01xxxxxxxxx">
         </div>
+        <div class="field">
+          <label data-i18n="payerRefLabel">رقم عملية التحويل (من رسالة أو إشعار التحويل)</label>
+          <input type="text" id="payerRef" inputmode="latin" data-i18n-ph="payerRefPh" placeholder="مثال: 4821960573">
+        </div>
+        <div class="pay-warning" data-i18n="payWarning">تنبيه: الطلبات اللي من غير تحويل فعلي بتترفض، وبنمنع الرقم من الطلب تاني لو اتكرر.</div>
+        <label class="pay-confirm-row" for="payConfirmChk">
+          <input type="checkbox" id="payConfirmChk">
+          <span data-i18n="payConfirmLabel">أؤكد إني حوّلت المبلغ فعلًا، وإن رقم العملية المكتوب فوق صحيح.</span>
+        </label>
         <p class="sub" style="margin-bottom:10px;" data-i18n="buyModalNote">هنراجع التحويل تلقائيًا — الصفحة هتفضل فاتحة قدامك وهتقولك أول ما يتأكد، من غير ما تدوّر على كود في مكان تاني.</p>
         <div class="modal-actions">
-          <button class="btn-primary" id="buyConfirmBtn" data-i18n="buyConfirmBtn">تم الدفع</button>
+          <button class="btn-primary" id="buyConfirmBtn" disabled data-i18n="buyConfirmBtn">تم الدفع</button>
           <button class="btn-ghost" id="buyCancelBtn" data-i18n="cancelBtn">إلغاء</button>
         </div>
       </div>
@@ -1647,6 +1696,7 @@
     <div class="modal-actions">
       <button class="btn-primary" id="transformGenerateBtn" data-i18n="generateBtn">حوّل الصورة</button>
       <button class="btn-ghost" id="transformDownloadBtn" style="display:none;" data-i18n="downloadResultBtn">تحميل النتيجة</button>
+      <button class="btn-ghost" id="transformShareBtn" style="display:none;" data-i18n="shareResultBtn">شارك النتيجة</button>
       <button class="btn-ghost" id="transformCancelBtn" data-i18n="cancelBtn">إلغاء</button>
     </div>
   </div>
@@ -1797,6 +1847,16 @@
     </div>
   </div>
 </div>
+<div class="stay-nudge" id="stayNudge" role="dialog" aria-live="polite">
+  <button type="button" class="stay-nudge-close" id="stayNudgeClose" aria-label="إغلاق">&times;</button>
+  <h4 data-i18n="nudgeTitle">لسه مستني إيه؟</h4>
+  <p data-i18n="nudgeBody">عرض الافتتاح لسه شغال — صورتك بـ 25 جنيه بدل 50. لو محتار في الاختيار، ابعتلنا واتساب ونساعدك تختار الأنسب لك.</p>
+  <div class="stay-nudge-actions">
+    <a class="btn-primary" href="#children" id="nudgeBrowseBtn" data-i18n="nudgeBrowseBtn">تصفّح الصور</a>
+    <a class="btn-ghost" href="https://wa.me/201202530308?text=%D9%85%D8%AD%D8%AA%D8%A7%D8%B1%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D8%AE%D8%AA%D9%8A%D8%A7%D8%B1%D8%8C%20%D9%85%D9%85%D9%83%D9%86%20%D9%85%D8%B3%D8%A7%D8%B9%D8%AF%D8%A9%D8%9F" target="_blank" rel="noopener" data-i18n="nudgeAskBtn">اسألنا واتساب</a>
+  </div>
+</div>
+
 <button type="button" class="admin-fab" id="adminFab" aria-label="لوحة الإدارة">
   <span class="af-icon" aria-hidden="true">&#9881;</span>
   <span data-i18n="adminFabLabel">لوحة الإدارة</span>
@@ -1808,6 +1868,7 @@
     <div class="admin-head">
       <h3 id="adminTitle" data-i18n="adminTitle">دخول لوحة الإدارة</h3>
       <div class="admin-head-actions">
+        <button type="button" class="admin-icon-btn" id="adminAlertsBtn" title="تنبيهات الطلبات" aria-label="تنبيهات الطلبات">&#128276;</button>
         <button type="button" class="admin-icon-btn" id="adminCollapseBtn" title="طي اللوحة" aria-label="طي اللوحة">&#8211;</button>
         <button type="button" class="admin-icon-btn" id="adminModalClose" title="إغلاق" aria-label="إغلاق">&times;</button>
       </div>
@@ -1855,6 +1916,20 @@
         <div class="field">
           <label data-i18n="pPriceLabel">السعر (جنيه)</label>
           <input type="number" id="pPrice" value="25" placeholder="25" min="0">
+        </div>
+        <div class="field" id="pShareLinkField" style="display:none;">
+          <label data-i18n="pShareLinkLabel">رابط المنتج (للإعلانات) — انسخه وضعه في منشور المنصة</label>
+          <div style="display:flex; gap:8px; align-items:stretch;">
+            <input type="text" id="pShareLink" readonly onclick="this.select()" style="flex:1; direction:ltr; text-align:left;">
+            <button type="button" class="admin-icon-btn" id="pShareLinkCopy" title="نسخ الرابط" aria-label="نسخ الرابط">&#128203;</button>
+          </div>
+        </div>
+        <div class="field" id="pImageLinkField" style="display:none;">
+          <label data-i18n="pImageLinkLabel">رابط الصورة الأصلية — لرفعها في الإعلان</label>
+          <div style="display:flex; gap:8px; align-items:stretch;">
+            <input type="text" id="pImageLink" readonly onclick="this.select()" style="flex:1; direction:ltr; text-align:left;">
+            <button type="button" class="admin-icon-btn" id="pImageLinkCopy" title="نسخ رابط الصورة" aria-label="نسخ رابط الصورة">&#128203;</button>
+          </div>
         </div>
         <div class="field">
           <label data-i18n="pImageLabel">صورة المنتج</label>
@@ -2070,6 +2145,28 @@ const translations = {
     myOrdersTitle:'طلباتك السابقة', loadingLabel:'جاري التحميل...',
     trackCodeLabel:'كود المتابعة', trackCheckBtn:'تحقّق من الحالة', closeBtn:'إغلاق',
     adminTitle:'دخول لوحة الإدارة', adminFabLabel:'لوحة الإدارة',
+    alertsOnTitle:'تنبيهات الطلبات مفعّلة', alertsOffTitle:'فعّل تنبيهات الطلبات',
+    toastAlertsOn:'تم تفعيل تنبيهات الطلبات ✅', toastAlertsBlocked:'المتصفح رفض التنبيهات — فعّلها من إعدادات الموقع.',
+    toastAlertsUnsupported:'المتصفح ده مش بيدعم التنبيهات.',
+    toastNewOrder:'وصل {n} طلب جديد 🔔',
+    newOrderNotifTitle:'طلب جديد — Miga-Photobook',
+    newOrderNotifBody:'{n} طلب جديد. إجمالي المعلّق: {total}.',
+    shareResultBtn:'شارك النتيجة', shareResultText:'شوف صورتي من Miga-Photobook 🔥',
+    toastShareCopied:'تم نسخ الرابط — الصقه في أي مكان ✅',
+    nudgeTitle:'لسه مستني إيه؟',
+    nudgeBody:'عرض الافتتاح لسه شغال — صورتك بـ 25 جنيه بدل 50. لو محتار في الاختيار، ابعتلنا واتساب ونساعدك تختار الأنسب لك.',
+    nudgeBrowseBtn:'تصفّح الصور', nudgeAskBtn:'اسألنا واتساب',
+    payerRefLabel:'رقم عملية التحويل (من رسالة أو إشعار التحويل)',
+    payerRefPh:'مثال: 4821960573',
+    payWarning:'تنبيه: الطلبات اللي من غير تحويل فعلي بتترفض، وبنمنع الرقم من الطلب تاني لو اتكرر.',
+    payConfirmLabel:'أؤكد إني حوّلت المبلغ فعلًا، وإن رقم العملية المكتوب فوق صحيح.',
+    toastEnterRef:'اكتب رقم عملية التحويل الصحيح من إشعار التحويل.',
+    toastConfirmPaymentFirst:'علّم على خانة التأكيد إنك حوّلت المبلغ فعلًا.',
+    pShareLinkLabel:'رابط المنتج (للإعلانات) — انسخه وضعه في منشور المنصة',
+    pImageLinkLabel:'رابط الصورة الأصلية — لرفعها في الإعلان',
+    copyLinkTitle:'نسخ رابط المنتج', copyImageLinkTitle:'نسخ رابط الصورة',
+    toastLinkCopied:'تم نسخ رابط المنتج ✅', toastImageLinkCopied:'تم نسخ رابط الصورة ✅',
+    toastNoImageYet:'المنتج ده لسه مفيهوش صورة.',
     adminSub:'لوحة إدارة المنتجات والطلبات.',
     adminPassLabel:'كلمة المرور', adminLoginBtn:'دخول',
     tabProducts:'إضافة منتج', tabOrders:'الطلبات',
@@ -2254,6 +2351,28 @@ const translations = {
     myOrdersTitle:'Your Past Orders', loadingLabel:'Loading...',
     trackCodeLabel:'Tracking Code', trackCheckBtn:'Check Status', closeBtn:'Close',
     adminTitle:'Admin Login', adminFabLabel:'Admin panel',
+    alertsOnTitle:'Order alerts are on', alertsOffTitle:'Turn on order alerts',
+    toastAlertsOn:'Order alerts enabled ✅', toastAlertsBlocked:'The browser blocked notifications — enable them in site settings.',
+    toastAlertsUnsupported:'This browser does not support notifications.',
+    toastNewOrder:'{n} new order(s) just arrived 🔔',
+    newOrderNotifTitle:'New order — Miga-Photobook',
+    newOrderNotifBody:'{n} new order(s). Pending in total: {total}.',
+    shareResultBtn:'Share result', shareResultText:'Check out my photo from Miga-Photobook 🔥',
+    toastShareCopied:'Link copied — paste it anywhere ✅',
+    nudgeTitle:'Still deciding?',
+    nudgeBody:'The launch offer is still on — your photo for 25 EGP instead of 50. Not sure which style suits you? Message us on WhatsApp and we will help you pick.',
+    nudgeBrowseBtn:'Browse photos', nudgeAskBtn:'Ask us on WhatsApp',
+    payerRefLabel:'Transfer reference number (from your transfer receipt)',
+    payerRefPh:'e.g. 4821960573',
+    payWarning:'Note: orders without a real transfer are rejected, and repeat attempts block the number from ordering again.',
+    payConfirmLabel:'I confirm I have actually transferred the amount, and the reference above is correct.',
+    toastEnterRef:'Enter the correct transfer reference from your receipt.',
+    toastConfirmPaymentFirst:'Please tick the box confirming you have transferred the amount.',
+    pShareLinkLabel:'Product link (for ads) — copy it into your platform post',
+    pImageLinkLabel:'Original image link — to upload with your ad',
+    copyLinkTitle:'Copy product link', copyImageLinkTitle:'Copy image link',
+    toastLinkCopied:'Product link copied ✅', toastImageLinkCopied:'Image link copied ✅',
+    toastNoImageYet:'This product has no image yet.',
     adminSub:'Product and order management panel.',
     adminPassLabel:'Password', adminLoginBtn:'Login',
     tabProducts:'Add Product', tabOrders:'Orders',
@@ -3054,6 +3173,98 @@ function openProductDetail(id){
 document.getElementById('detailModalClose').onclick = ()=> document.getElementById('detailModalBg').classList.remove('show');
 document.getElementById('detailCancelBtn').onclick = ()=> document.getElementById('detailModalBg').classList.remove('show');
 
+/** Public, shareable address for one product. Used for ads: the link drops a
+ * visitor straight onto this photo instead of the top of the storefront.
+ * Built from the live page address so it stays correct if the site ever moves. */
+function productShareLink(id){
+  const base = window.location.origin + window.location.pathname;
+  return `${base}#product=${encodeURIComponent(id)}`;
+}
+
+function copyToClipboard(text, toastKey){
+  if(!text) return;
+  const done = ()=> showToast(t(toastKey));
+  if(navigator.clipboard?.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=> fallbackCopy(text, done));
+  }else{
+    fallbackCopy(text, done);
+  }
+}
+
+function fallbackCopy(text, done){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.setAttribute('readonly','');
+  ta.style.cssText = 'position:fixed; top:-1000px; opacity:0;';
+  document.body.appendChild(ta);
+  ta.select();
+  try{ document.execCommand('copy'); done(); }catch(e){}
+  document.body.removeChild(ta);
+}
+
+function copyProductLink(id){ copyToClipboard(productShareLink(id), 'toastLinkCopied'); }
+
+function copyProductImageUrl(id){
+  const p = products.find(x=>x.id===id);
+  if(!p || !p.image || p.image === PLACEHOLDER_IMG){ showToast(t('toastNoImageYet')); return; }
+  copyToClipboard(p.image, 'toastImageLinkCopied');
+}
+
+/** Opens the product named in the address bar, e.g. #product=p_123. Retried
+ * once shortly after load because the catalogue arrives over the network and
+ * may not be in memory yet on the first pass. */
+function openProductFromHash(){
+  const m = /[#&]product=([^&]+)/.exec(window.location.hash || '');
+  if(!m) return;
+  const id = decodeURIComponent(m[1]);
+  const open = ()=>{
+    if(!products.find(x=>x.id===id)) return false;
+    openProductDetail(id);
+    return true;
+  };
+  if(open()) return;
+  let tries = 0;
+  const timer = setInterval(()=>{
+    if(open() || ++tries > 20) clearInterval(timer);
+  }, 300);
+}
+window.addEventListener('hashchange', openProductFromHash);
+
+/** Shows one gentle reminder to a visitor who has looked around for a while
+ * without ordering. Deliberately conservative: never for someone who has
+ * already bought, never for the admin, never twice in the same visit, and
+ * never before they have actually engaged with the page. */
+function armStayNudge(){
+  const nudge = document.getElementById('stayNudge');
+  if(!nudge) return;
+  let dismissed = false;
+  try{ dismissed = sessionStorage.getItem('migaNudgeSeen') === '1'; }catch(e){}
+  if(dismissed || adminLoggedIn || purchases.length) return;
+
+  let scrolledEnough = false;
+  const onScroll = ()=>{
+    if(window.scrollY > window.innerHeight * 0.9) scrolledEnough = true;
+  };
+  window.addEventListener('scroll', onScroll, {passive:true});
+
+  const hide = ()=>{
+    nudge.classList.remove('show');
+    try{ sessionStorage.setItem('migaNudgeSeen','1'); }catch(e){}
+  };
+  document.getElementById('stayNudgeClose').onclick = hide;
+  document.getElementById('nudgeBrowseBtn').onclick = hide;
+
+  setTimeout(()=>{
+    // Re-check at the last moment: they may have bought, logged in as admin,
+    // or already have a modal open in the meantime.
+    if(!scrolledEnough || adminLoggedIn || purchases.length) return;
+    if(document.querySelector('.modal-bg.show')) return;
+    nudge.classList.add('show');
+    try{ sessionStorage.setItem('migaNudgeSeen','1'); }catch(e){}
+    setTimeout(()=> nudge.classList.remove('show'), 20000);
+  }, 45000);
+}
+
 function openBuyModal(id, type){
   currentBuyId = id;
   currentBuyType = type === 'prompt' ? 'prompt' : 'transform';
@@ -3064,6 +3275,9 @@ function openBuyModal(id, type){
     ? t('buyPromptModalTextTemplate').replace('{title}', productTitle(p)).replace('{price}', displayPrice)
     : t('buyModalTextTemplate').replace('{title}', productTitle(p)).replace('{price}', displayPrice);
   document.getElementById('buyerPhone').value='';
+  document.getElementById('payerRef').value='';
+  document.getElementById('payConfirmChk').checked = false;
+  syncBuyConfirmBtn();
   document.getElementById('payerName').value='';
   document.getElementById('payerPhone').value='';
   document.getElementById('payerEmail').value='';
@@ -3078,6 +3292,17 @@ function openBuyModal(id, type){
   document.getElementById('payStatusPanel').style.display = 'none';
   document.getElementById('buyModalBg').classList.add('show');
 }
+
+/** The order button stays inert until the customer has actively ticked the
+ * confirmation. A deliberate second action is what stops "I've paid" being
+ * tapped on reflex before the transfer has actually been made. */
+function syncBuyConfirmBtn(){
+  const chk = document.getElementById('payConfirmChk');
+  const btn = document.getElementById('buyConfirmBtn');
+  if(!chk || !btn) return;
+  btn.disabled = !chk.checked;
+}
+document.getElementById('payConfirmChk').addEventListener('change', syncBuyConfirmBtn);
 
 function setPaymentMethod(method){
   document.querySelectorAll('#paymentMethodTabs button').forEach(b=>{
@@ -3176,13 +3401,24 @@ document.getElementById('buyConfirmBtn').onclick = async ()=>{
     showToast(t('toastInvalidPhone'));
     return;
   }
+  if(!document.getElementById('payConfirmChk').checked){
+    showToast(t('toastConfirmPaymentFirst'));
+    return;
+  }
+  // The transfer reference is the one thing a visitor who has not actually
+  // paid cannot produce, so it is required rather than optional.
+  const ref = document.getElementById('payerRef').value.trim();
+  if(ref.length < 4 || !/[0-9]/.test(ref)){
+    showToast(t('toastEnterRef'));
+    return;
+  }
   const p = products.find(x=>x.id===currentBuyId);
   const amount = currentBuyType === 'prompt' ? PROMPT_PRICE : p.price;
   if(!BACKEND_BASE){ showToast(t('toastOrderFailed')); return; }
   try{
     const res = await fetch(`${BACKEND_BASE}/orders/create`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: amount, phone, appUsed: manualMethod, ref: '', buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '', orderType: currentBuyType })
+      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: amount, phone, appUsed: manualMethod, ref, buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '', orderType: currentBuyType })
     });
     const data = await res.json();
     if(!res.ok || !data.code){
@@ -3443,6 +3679,7 @@ function openTransformModal(id){
   document.getElementById('transformFileInput').value = '';
   document.getElementById('transformConsent').checked = false;
   document.getElementById('transformDownloadBtn').style.display = 'none';
+  document.getElementById('transformShareBtn').style.display = 'none';
   document.getElementById('transformGenerateBtn').dataset.used = '';
   transformImg = null;
 
@@ -3465,6 +3702,7 @@ function openTransformModal(id){
       outCanvas.width = img.naturalWidth; outCanvas.height = img.naturalHeight;
       ctx.drawImage(img, 0, 0);
       document.getElementById('transformDownloadBtn').style.display = 'inline-block';
+      document.getElementById('transformShareBtn').style.display = 'inline-block';
     };
     img.src = cachedUrl;
   }else{
@@ -3502,6 +3740,7 @@ document.getElementById('transformFileInput').addEventListener('change', (e)=>{
       outCanvas.getContext('2d').clearRect(0,0,w,h);
       document.getElementById('transformPreviewWrap').style.display = 'block';
       document.getElementById('transformDownloadBtn').style.display = 'none';
+      document.getElementById('transformShareBtn').style.display = 'none';
     };
     img.src = ev.target.result;
   };
@@ -3553,6 +3792,7 @@ document.getElementById('transformGenerateBtn').onclick = async ()=>{
         ctx.clearRect(0,0,w,h);
         ctx.drawImage(resultImg, 0, 0, w, h);
         document.getElementById('transformDownloadBtn').style.display = 'inline-block';
+        document.getElementById('transformShareBtn').style.display = 'inline-block';
         showToast(t('toastTransformDone'));
       };
       resultImg.onerror = ()=> showToast(t('toastGenerateFailed'));
@@ -3580,7 +3820,34 @@ document.getElementById('transformGenerateBtn').onclick = async ()=>{
   ctx.fillRect(0,0,w,h);
   applyFilmGrain(ctx, w, h, preset.grain);
   document.getElementById('transformDownloadBtn').style.display = 'inline-block';
+  document.getElementById('transformShareBtn').style.display = 'inline-block';
   showToast(t('toastTransformDone'));
+};
+
+/** Lets a happy customer pass the result on. Uses the phone's native share
+ * sheet with the actual image where the browser allows it, and falls back to
+ * sharing (or copying) the storefront link everywhere else. */
+document.getElementById('transformShareBtn').onclick = async ()=>{
+  const outCanvas = document.getElementById('transformOutCanvas');
+  const shareText = t('shareResultText');
+  const shareUrl = window.location.origin + window.location.pathname;
+  try{
+    const blob = outCanvas ? await new Promise(r=> outCanvas.toBlob(r, 'image/jpeg', 0.92)) : null;
+    if(blob && navigator.canShare){
+      const file = new File([blob], 'miga-photobook.jpg', {type:'image/jpeg'});
+      if(navigator.canShare({files:[file]})){
+        await navigator.share({files:[file], text: `${shareText} ${shareUrl}`});
+        return;
+      }
+    }
+    if(navigator.share){
+      await navigator.share({title:'Miga-Photobook', text: shareText, url: shareUrl});
+      return;
+    }
+  }catch(e){
+    if(e && e.name === 'AbortError') return;   // customer closed the share sheet
+  }
+  copyToClipboard(`${shareText} ${shareUrl}`, 'toastShareCopied');
 };
 
 document.getElementById('transformDownloadBtn').onclick = ()=>{
@@ -3997,6 +4264,71 @@ document.getElementById('adminQuickLogout').addEventListener('click', ()=>{
 
 /** Refreshes just the pending-orders count for the bell badge, independent of
  * whether the orders tab (or the admin modal at all) is currently open. */
+let lastSeenPendingCount = null;   // null = first poll, nothing to compare against yet
+let adminAlertSound = null;
+
+/** Asks once for permission to raise a system notification. Only ever called
+ * from a real click (browsers reject the request otherwise). */
+function enableAdminAlerts(){
+  if(!('Notification' in window)) { showToast(t('toastAlertsUnsupported')); return; }
+  Notification.requestPermission().then(perm=>{
+    showToast(t(perm === 'granted' ? 'toastAlertsOn' : 'toastAlertsBlocked'));
+    updateAdminAlertBtn();
+  }).catch(()=>{});
+}
+
+function updateAdminAlertBtn(){
+  const btn = document.getElementById('adminAlertsBtn');
+  if(!btn) return;
+  const granted = ('Notification' in window) && Notification.permission === 'granted';
+  btn.textContent = granted ? '🔔' : '🔕';
+  btn.title = t(granted ? 'alertsOnTitle' : 'alertsOffTitle');
+}
+
+/** Short chime built with the Web Audio API — no audio file to ship, and it
+ * only ever plays in response to a new order, never on page load. */
+function playAdminChime(){
+  try{
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if(!Ctx) return;
+    adminAlertSound = adminAlertSound || new Ctx();
+    if(adminAlertSound.state === 'suspended') adminAlertSound.resume();
+    [880, 1320].forEach((freq, i)=>{
+      const osc = adminAlertSound.createOscillator();
+      const gain = adminAlertSound.createGain();
+      osc.frequency.value = freq;
+      osc.type = 'sine';
+      gain.gain.setValueAtTime(0.0001, adminAlertSound.currentTime + i*0.18);
+      gain.gain.exponentialRampToValueAtTime(0.25, adminAlertSound.currentTime + i*0.18 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, adminAlertSound.currentTime + i*0.18 + 0.35);
+      osc.connect(gain).connect(adminAlertSound.destination);
+      osc.start(adminAlertSound.currentTime + i*0.18);
+      osc.stop(adminAlertSound.currentTime + i*0.18 + 0.36);
+    });
+  }catch(e){ /* sound is a nicety, never block on it */ }
+}
+
+/** Fires when the pending-order count goes UP, so an order that arrives while
+ * the storefront is sitting in a background tab still gets noticed. */
+function announceNewOrders(pending){
+  if(lastSeenPendingCount === null){ lastSeenPendingCount = pending; return; }
+  const added = pending - lastSeenPendingCount;
+  lastSeenPendingCount = pending;
+  if(added <= 0) return;
+  playAdminChime();
+  showToast(t('toastNewOrder').replace('{n}', added));
+  document.title = `(${pending}) ` + document.title.replace(/^\(\d+\)\s*/, '');
+  if(('Notification' in window) && Notification.permission === 'granted'){
+    try{
+      const n = new Notification(t('newOrderNotifTitle'), {
+        body: t('newOrderNotifBody').replace('{n}', added).replace('{total}', pending),
+        tag: 'miga-new-order'
+      });
+      n.onclick = ()=>{ window.focus(); expandAdminPanel(); n.close(); };
+    }catch(e){}
+  }
+}
+
 async function refreshAdminBellBadge(){
   if(!adminLoggedIn || !BACKEND_BASE) return;
   try{
@@ -4005,6 +4337,7 @@ async function refreshAdminBellBadge(){
     const data = await res.json();
     const list = (data && data.value) ? JSON.parse(data.value) : [];
     const pending = list.filter(o=>o.status==='pending').length;
+    announceNewOrders(pending);
     const badge = document.getElementById('adminBellBadge');
     const menuLabel = document.getElementById('adminQuickPendingLabel');
     badge.style.display = pending ? '' : 'none';
@@ -4048,14 +4381,22 @@ document.getElementById('adminCollapseBtn').onclick = ()=>{
   syncAdminFabBadge();
 };
 document.getElementById('adminFab').onclick = expandAdminPanel;
+document.getElementById('adminAlertsBtn').onclick = enableAdminAlerts;
+updateAdminAlertBtn();
+document.getElementById('pShareLinkCopy').onclick = ()=>
+  copyToClipboard(document.getElementById('pShareLink').value, 'toastLinkCopied');
+document.getElementById('pImageLinkCopy').onclick = ()=>
+  copyToClipboard(document.getElementById('pImageLink').value, 'toastImageLinkCopied');
 
 function showAdminQuickAccess(){
   adminQuickAccess.style.display = '';
   refreshAdminBellBadge();
   if(adminBellPollTimer) clearInterval(adminBellPollTimer);
-  adminBellPollTimer = setInterval(refreshAdminBellBadge, 30000);
+  adminBellPollTimer = setInterval(refreshAdminBellBadge, 10000);
 }
 function hideAdminQuickAccess(){
+  lastSeenPendingCount = null;
+  document.title = document.title.replace(/^\(\d+\)\s*/, '');
   adminQuickAccess.style.display = 'none';
   closeAdminQuickMenu();
   if(adminBellPollTimer){ clearInterval(adminBellPollTimer); adminBellPollTimer = null; }
@@ -4862,7 +5203,28 @@ const NEW_PRODUCT_DEFAULT_PRICE = 25;
 /** Puts the add-product form back to a clean state for the *next* product:
  * the suggested name and price are filled in ready to be typed over, rather
  * than leaving the admin with three empty boxes every single time. */
+/** The link boxes only mean anything for a product that already exists, so
+ * they are shown while editing one and hidden while a new one is being typed. */
+function setProductLinkFields(p){
+  const linkField = document.getElementById('pShareLinkField');
+  const imgField = document.getElementById('pImageLinkField');
+  if(!linkField || !imgField) return;
+  if(!p){
+    linkField.style.display = 'none';
+    imgField.style.display = 'none';
+    document.getElementById('pShareLink').value = '';
+    document.getElementById('pImageLink').value = '';
+    return;
+  }
+  linkField.style.display = '';
+  document.getElementById('pShareLink').value = productShareLink(p.id);
+  const hasImage = p.image && p.image !== PLACEHOLDER_IMG;
+  imgField.style.display = hasImage ? '' : 'none';
+  document.getElementById('pImageLink').value = hasImage ? p.image : '';
+}
+
 function resetProductFormToDefaults(){
+  setProductLinkFields(null);
   document.getElementById('pTitle').value = NEW_PRODUCT_DEFAULT_TITLE;
   document.getElementById('pTitleEn').value = NEW_PRODUCT_DEFAULT_TITLE;
   document.getElementById('pPrice').value = NEW_PRODUCT_DEFAULT_PRICE;
@@ -4997,6 +5359,7 @@ function editProduct(id){
   document.getElementById('pPrice').value = p.price;
   document.getElementById('pPrompt').value = p.prompt;
   document.getElementById('pImage').value = '';
+  setProductLinkFields(p);
   pendingCroppedBlob = null;
   document.getElementById('pSaveBtn').textContent = t('pUpdateBtn');
   document.getElementById('pCancelEditBtn').style.display = '';
@@ -5041,6 +5404,8 @@ function renderAdminProductsList(){
         <div class="admin-product-actions">
           <button onclick="moveProductOrder('${p.id}', -1)" ${idx===0?'disabled':''} title="${t('moveUpTitle')}">▲</button>
           <button onclick="moveProductOrder('${p.id}', 1)" ${idx===items.length-1?'disabled':''} title="${t('moveDownTitle')}">▼</button>
+          <button onclick="copyProductLink('${p.id}')" title="${t('copyLinkTitle')}">🔗</button>
+          <button onclick="copyProductImageUrl('${p.id}')" title="${t('copyImageLinkTitle')}">📷</button>
           <button onclick="editProduct('${p.id}')" title="تعديل">✏️</button>
           <button onclick="triggerReplaceImage('${p.id}')" title="${t('replaceImageTitle')}">🖼️</button>
           <button onclick="removeProductImage('${p.id}')" title="${t('removeImageTitle')}">🚫</button>
@@ -5175,6 +5540,8 @@ function showToast(msg){
   if(window.location.hash === '#mega-admin-9k2x'){
     adminModalBg.classList.add('show');
   }
+  openProductFromHash();
+  armStayNudge();
 })();
 </script>
 </body>
