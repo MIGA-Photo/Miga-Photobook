@@ -816,6 +816,13 @@
   /* Shown once the customer's photo is actually ready. Thanks them at the one
      moment they are most pleased, and puts sharing and reviewing right there
      — the two things that grow the shop and cost the customer nothing. */
+  /* Already thanked: kept visible rather than hidden so the admin can tell
+     "done" apart from "not offered", but clearly inert. */
+  .thanked-btn, .thanked-btn:hover{
+    opacity:0.45; cursor:default; pointer-events:none;
+    border-color:var(--line); color:var(--paper-dim); background:transparent;
+  }
+
   .thanks-panel{
     display:none; margin-top:16px; padding:16px 18px;
     background:rgba(255,201,77,0.07); border:1.5px solid var(--brass-dim);
@@ -2181,7 +2188,7 @@ const translations = {
     thanksTitle:'شكراً إنك جربتنا 🙏',
     thanksBody:'لو الصورة عجبتك، مشاركتها مع صحابك أو تقييم سريع بيساعدنا كتير.',
     thanksShareBtn:'شارك صورتك', thanksReviewBtn:'اكتب تقييمك',
-    thankCustomerBtn:'شكر عبر واتساب',
+    thankCustomerBtn:'شكر عبر واتساب', thankCustomerDoneBtn:'✓ تم إرسال رسالة الشكر',
     whatsappThanksTemplate:'أهلاً 👋\nشكراً إنك جربت Miga-Photobook وطلبت "{title}".\nلو الصورة عجبتك، مشاركتها مع صحابك هتبقى دعم كبير لينا 🙏\nولو حبيت صورة تانية، ابعتلنا في أي وقت.',
     payerRefLabel:'رقم عملية التحويل (من رسالة أو إشعار التحويل)',
     payerRefPh:'مثال: 4821960573',
@@ -2392,7 +2399,7 @@ const translations = {
     thanksTitle:'Thank you for trying us 🙏',
     thanksBody:'If you like your photo, sharing it with friends or leaving a quick review helps us a lot.',
     thanksShareBtn:'Share your photo', thanksReviewBtn:'Write a review',
-    thankCustomerBtn:'Thank via WhatsApp',
+    thankCustomerBtn:'Thank via WhatsApp', thankCustomerDoneBtn:'✓ Thank-you message sent',
     whatsappThanksTemplate:'Hi 👋\nThank you for trying Miga-Photobook and ordering "{title}".\nIf you like your photo, sharing it with friends would mean a lot to us 🙏\nAnd if you would like another one, just message us any time.',
     payerRefLabel:'Transfer reference number (from your transfer receipt)',
     payerRefPh:'e.g. 4821960573',
@@ -5052,7 +5059,9 @@ function renderOrdersList(){
           <button class="btn-ghost reject-btn" onclick="rejectOrderPrompt('${o.code}')">${t('orderRejectBtn')}</button>` : ''}
         ${o.status==='rejected' ? `<button class="btn-ghost reject-btn" onclick="deleteOrderPrompt('${o.code}')">${t('orderDeleteBtn')}</button>` : ''}
         ${o.orderType==='prompt' && o.status==='approved' && o.promptText ? `<button class="btn-ghost" onclick="sendPromptViaWhatsApp('${o.code}')">${t('sendPromptWhatsAppBtn')}</button>` : ''}
-        ${o.status==='approved' ? `<button class="btn-ghost" onclick="thankCustomerViaWhatsApp('${o.code}')">${t('thankCustomerBtn')}</button>` : ''}
+        ${o.status==='approved' ? (thankedOrders.includes(o.code)
+          ? `<button class="btn-ghost thanked-btn" disabled>${t('thankCustomerDoneBtn')}</button>`
+          : `<button class="btn-ghost" onclick="thankCustomerViaWhatsApp('${o.code}')">${t('thankCustomerBtn')}</button>`) : ''}
       </div>
     </div>`).join('');
 }
@@ -5167,11 +5176,31 @@ function toWhatsAppNumber(phone){
 /** Opens WhatsApp on the customer's number with a thank-you already written,
  * so following up after delivery costs one tap instead of retyping the same
  * message for every order. Sending stays a deliberate human action. */
+/** Order codes already thanked, so the button cannot be pressed twice and the
+ * admin can see at a glance who is still owed a follow-up. Stored locally: it
+ * is a note-to-self about what was sent by hand, not order data the server
+ * needs — which also means it is per-device. */
+let thankedOrders = [];
+try{
+  const raw = localStorage.getItem('migaThankedOrders');
+  if(raw) thankedOrders = JSON.parse(raw) || [];
+}catch(e){ thankedOrders = []; }
+
+function markOrderThanked(code){
+  if(thankedOrders.includes(code)) return;
+  thankedOrders.push(code);
+  try{ localStorage.setItem('migaThankedOrders', JSON.stringify(thankedOrders)); }catch(e){}
+}
+
 function thankCustomerViaWhatsApp(code){
   const order = orders.find(o => o.code === code);
   if(!order) return;
   const message = t('whatsappThanksTemplate').replace('{title}', order.productTitle);
   window.open(`https://wa.me/${toWhatsAppNumber(order.phone)}?text=${encodeURIComponent(message)}`, '_blank');
+  // Marked as soon as WhatsApp opens: the message is composed and handed over,
+  // and there is no way for the page to learn whether "send" was tapped.
+  markOrderThanked(code);
+  renderOrdersList();
 }
 
 function sendPromptViaWhatsApp(code){
