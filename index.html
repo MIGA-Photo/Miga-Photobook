@@ -287,7 +287,7 @@
   <div class="pricing-grid">
     <div class="plan">
       <h3 data-i18n="plan1Title">الباقة الفردية</h3>
-      <div class="price" data-i18n="plan1Price">حسب المنتج</div>
+      <div class="price" data-i18n="plan1Price">من 25 جنيه</div>
       <ul>
         <li data-i18n="plan1Li1">تحويل صورة واحدة بالسعر المعروض</li>
         <li data-i18n="plan1Li2">فتح فوري بعد الدفع</li>
@@ -405,7 +405,7 @@
       <button class="btn-ghost" id="writeReviewBtn" data-i18n="writeReviewBtn">اكتب تقييمك</button>
     </div>
   <div class="testimonials-grid" id="testimonialsGrid">
-    <div class="empty-note" style="grid-column:1/-1;" data-i18n="testimonialsEmpty">لسه مفيش تقييمات منشورة. لو جرّبت الخدمة، كن أول من يشارك تجربته.</div>
+    <div class="empty-note" style="grid-column:1/-1;" data-i18n="testimonialsEmpty">جرّب الخدمة وكن أول من يشارك تجربته هنا 🙌</div>
   </div>
   <p class="sub" style="margin-top:16px; opacity:0.7; font-size:12.5px;" id="testimonialsNoteEl" data-i18n="testimonialsNote">* سيتم تحديث هذا القسم بآراء العملاء الحقيقية أولاً بأول.</p>
   </div>
@@ -426,7 +426,7 @@
     <span class="sh-chevron" aria-hidden="true">&#9660;</span>
   </div>
   <div class="cs-body">
-  <p class="sub" style="max-width:680px; font-size:15px;" data-i18n="aboutUsText">متخصصون في تحويل الصور الشخصية تلقائيًا لتحف فنية عالية الجودة بالذكاء الاصطناعي — ارفع صورتك واختار الأسلوب، وإحنا نتولى الباقي بعناية عشان تضمن نتيجة تستحق اسمك.</p>
+  <p class="sub" style="max-width:680px; font-size:15px;" data-i18n="aboutUsText">Miga-Photobook مشروع مصري بدأ بفكرة بسيطة: خلي جلسة التصوير الاحترافية متاحة لأي حد وبسعر معقول. بنحوّل صورتك الشخصية لتحفة فنية بجودة استوديو باستخدام الذكاء الاصطناعي — ارفع صورتك واختار الأسلوب، وإحنا نتولى الباقي بعناية عشان تضمن نتيجة تستحق اسمك.</p>
   </div>
 </section>
 
@@ -557,7 +557,7 @@
           <label data-i18n="payerRefLabel">رقم عملية التحويل (من رسالة أو إشعار التحويل)</label>
           <input type="text" id="payerRef" inputmode="latin" data-i18n-ph="payerRefPh" placeholder="مثال: 4821960573">
         </div>
-        <div class="pay-warning" data-i18n="payWarning">تنبيه: الطلبات اللي من غير تحويل فعلي بتترفض، وبنمنع الرقم من الطلب تاني لو اتكرر.</div>
+        <div class="pay-warning" data-i18n="payWarning">🔐 لضمان سرعة تنفيذ طلبك، تأكد من إدخال رقم عملية التحويل الصحيح.</div>
         <label class="pay-confirm-row" for="payConfirmChk">
           <input type="checkbox" id="payConfirmChk">
           <span data-i18n="payConfirmLabel">أؤكد إني حوّلت المبلغ فعلًا، وإن رقم العملية المكتوب فوق صحيح.</span>
@@ -573,6 +573,7 @@
         <p class="sub" id="payStatusText" style="font-size:15px; margin:14px 0 4px;" data-i18n="statusPendingText">بنراجع تحويلك... الصفحة هتتحدّث لوحدها أول ما نأكده.</p>
         <p class="sub" style="font-size:12.5px; opacity:0.7;" data-i18n="statusCodeNote">كود طلبك (احتفظ بيه احتياطيًا):</p>
         <div class="ip-number" id="payStatusCode" style="font-size:18px; margin:4px 0 16px;"></div>
+        <p class="sub" style="font-size:12.5px; opacity:0.8;" data-i18n="statusSafeCloseNote">تقدر تقفل الصفحة دلوقتي براحتك — هنراجع طلبك ونبعتلك تحديث بمجرد ما يتأكد.</p>
         <div class="modal-actions">
           <button class="btn-ghost" id="payStatusCloseBtn" data-i18n="closeBtn">إغلاق</button>
         </div>
@@ -637,8 +638,8 @@
         <span data-i18n="consentLabel">أؤكد إني صاحب هذه الصورة أو الوصي الشرعي عليها، وأوافق على استخدامها لتوليد النتيجة الفنية المطلوبة.</span>
       </label>
 
-      <p class="sub" style="margin-bottom:10px;" id="transformPrivacyNoteEl" data-i18n="transformPrivacyNote">تتم معالجة صورتك بالكامل داخل متصفحك — لا تُرفع لأي سيرفر ولا تُخزَّن في أي مكان.</p>
-      <p class="sub" style="margin-bottom:10px; opacity:0.75;" id="transformDemoNoteEl" data-i18n="transformDemoNote">هذه معاينة لأسلوب المعالجة اللوني المستوحى من هذا القسم — للتوليد الفني الكامل بالذكاء الاصطناعي، يلزم ربط خدمة توليد صور خارجية.</p>
+      <p class="sub" style="margin-bottom:10px;" id="transformPrivacyNoteEl" data-i18n="transformPrivacyNote">صورتك بتُستخدم فقط لتنفيذ طلبك، ومتُشاركش مع أي جهة تانية.</p>
+      <p class="sub" style="margin-bottom:10px; opacity:0.85;" id="transformLikenessNoteEl" data-i18n="transformLikenessNote">بنحافظ على ملامحك الأساسية قدر الإمكان، لكن جودة النتيجة بتعتمد على وضوح الصورة الأصلية.</p>
     </div>
 
     <div class="modal-actions">
@@ -1050,11 +1051,11 @@ const translations = {
     mostRequestedTitle:'الأكثر طلبا',
     testimonialsTitle:'آراء تهمنا',
     testimonial1:'"أفضل تحويل صور جربته على الإطلاق"', testimonial2:'"حوّلت صوري إلى مستوى احترافي"',
-    testimonialsNote:'* كل تقييم هنا من عميل حقيقي، بعد مراجعته.', testimonialsEmpty:'لسه مفيش تقييمات منشورة. لو جرّبت الخدمة، كن أول من يشارك تجربته.',
+    testimonialsNote:'* كل تقييم هنا من عميل حقيقي، بعد مراجعته.', testimonialsEmpty:'جرّب الخدمة وكن أول من يشارك تجربته هنا 🙌',
     trustBadge1:'جودة احترافية في كل صورة', trustBadge2:'تحديث مستمر للأساليب الفنية المتاحة',
     trustBadge3:'دعم فني سريع ومباشر', trustBadge4:'أمان وخصوصية في كل عملية',
     aboutUsTitle:'من نحن',
-    aboutUsText:'متخصصون في تحويل الصور الشخصية تلقائيًا لتحف فنية عالية الجودة بالذكاء الاصطناعي — ارفع صورتك واختار الأسلوب، وإحنا نتولى الباقي بعناية عشان تضمن نتيجة تستحق اسمك.',
+    aboutUsText:'Miga-Photobook مشروع مصري بدأ بفكرة بسيطة: خلي جلسة التصوير الاحترافية متاحة لأي حد وبسعر معقول. بنحوّل صورتك الشخصية لتحفة فنية بجودة استوديو باستخدام الذكاء الاصطناعي — ارفع صورتك واختار الأسلوب، وإحنا نتولى الباقي بعناية عشان تضمن نتيجة تستحق اسمك.',
     faqTitle:'أسئلة شائعة',
     faqQ1:'إزاي تتم عملية التحويل؟', faqA1:'بعد الدفع، بترفع صورتك، وإحنا نحوّلها تلقائيًا بالأسلوب اللي اخترته، وتستلم النتيجة جاهزة على الموقع مباشرة.',
     faqQ2:'قد إيه بتاخد وقت؟', faqA2:'في خطوتين: تأكيد التحويل البنكي بياخد عادةً دقائق (بنراجعه بنفسنا)، وبعد التأكيد التحويل بالذكاء الاصطناعي نفسه بياخد ثوانٍ لدقايق وهتشوف النتيجة على نفس الصفحة.',
@@ -1069,7 +1070,7 @@ const translations = {
     secArtisticTitle:'قسم Artistic', secMagazineTitle:'قسم Magazine / Poster',
     pricingTitle:'الأسعار والعروض',
     pricingSub:'اطلب تحويل صورك منفردة، أو وفّر أكثر مع الباقات. كل باقة تُطبّق كخصم عند طلب العدد المطابق من الصور ضمن أي قسم.',
-    plan1Title:'الباقة الفردية', plan1Price:'حسب المنتج', currencyLabel:'جنيه',
+    plan1Title:'الباقة الفردية', plan1Price:'من 25 جنيه', currencyLabel:'جنيه',
     plan1Li1:'تحويل صورة واحدة بالسعر المعروض', plan1Li2:'تنفيذ فوري بعد الدفع', plan1Li3:'مناسبة للتجربة', plan1Cta:'تصفح الآن',
     plan2Title:'باقة الاحترافي', plan2Unit:'/ 10 صور',
     plan2Li1:'وفّر حتى 40% عن السعر الفردي', plan2Li2:'اختيار حر من أي قسم', plan2Li3:'دعم فني بالأولوية',
@@ -1089,6 +1090,7 @@ const translations = {
     buyerRefLabel:'رقم/مرجع عملية التحويل (إن وجد)', buyerRefPh:'مثال: آخر 4 أرقام أو رقم العملية',
     statusPendingText:'بنراجع تحويلك... الصفحة هتتحدّث لوحدها أول ما نأكده.',
     statusCodeNote:'كود طلبك (احتفظ بيه احتياطيًا):',
+    statusSafeCloseNote:'تقدر تقفل الصفحة دلوقتي براحتك — هنراجع طلبك ونبعتلك تحديث بمجرد ما يتأكد.',
     statusApprovedText:'تم تأكيد الدفع ✅ تقدر ترفع صورتك دلوقتي.',
     buyModalNote:'هنراجع التحويل تلقائيًا — الصفحة هتفضل فاتحة قدامك وهتقولك أول ما يتأكد، من غير ما تدوّر على كود في مكان تاني.',
     buyConfirmBtn:'تم الدفع', cancelBtn:'إلغاء',
@@ -1120,7 +1122,7 @@ const translations = {
     whatsappThanksTemplate:'أهلاً 👋\nشكراً إنك جربت Miga-Photobook وطلبت "{title}".\nلو الصورة عجبتك، مشاركتها مع صحابك هتبقى دعم كبير لينا 🙏\nولو حبيت صورة تانية، ابعتلنا في أي وقت.',
     payerRefLabel:'رقم عملية التحويل (من رسالة أو إشعار التحويل)',
     payerRefPh:'مثال: 4821960573',
-    payWarning:'تنبيه: الطلبات اللي من غير تحويل فعلي بتترفض، وبنمنع الرقم من الطلب تاني لو اتكرر.',
+    payWarning:'🔐 لضمان سرعة تنفيذ طلبك، تأكد من إدخال رقم عملية التحويل الصحيح.',
     payConfirmLabel:'أؤكد إني حوّلت المبلغ فعلًا، وإن رقم العملية المكتوب فوق صحيح.',
     toastEnterRef:'اكتب رقم عملية التحويل الصحيح من إشعار التحويل.',
     toastConfirmPaymentFirst:'علّم على خانة التأكيد إنك حوّلت المبلغ فعلًا.',
@@ -1202,9 +1204,9 @@ const translations = {
     transformAlreadyDoneNote:'تم تحويل صورتك قبل كده باستخدام هذا الطلب — دي نتيجتك المحفوظة.',
     uploadPhotoLabel:'اختر صورتك', beforeLabel:'قبل', afterLabel:'بعد',
     consentLabel:'أؤكد إني صاحب هذه الصورة أو الوصي الشرعي عليها، وأوافق على استخدامها لتوليد النتيجة الفنية المطلوبة.',
-    transformPrivacyNote:'تتم معالجة صورتك بالكامل داخل متصفحك — لا تُرفع لأي سيرفر ولا تُخزَّن في أي مكان.',
+    transformPrivacyNote:'صورتك بتُستخدم فقط لتنفيذ طلبك، ومتُشاركش مع أي جهة تانية.',
     transformPrivacyNoteReal:'صورتك تُرسَل بشكل آمن إلى خدمة معالجة الصور لإنشاء النتيجة، ولا تُخزَّن بشكل دائم على خوادمنا.',
-    transformDemoNote:'هذه معاينة لأسلوب المعالجة اللوني المستوحى من هذا القسم — للتوليد الفني الكامل بالذكاء الاصطناعي، يلزم ربط خدمة توليد صور خارجية.',
+    transformLikenessNote:'بنحافظ على ملامحك الأساسية قدر الإمكان، لكن جودة النتيجة بتعتمد على وضوح الصورة الأصلية.',
     generateBtn:'حوّل الصورة', downloadResultBtn:'تحميل النتيجة',
     toastInvalidImage:'من فضلك اختر ملف صورة صالح',
     toastSelectPhoto:'من فضلك اختر صورة أولاً',
@@ -1265,11 +1267,11 @@ const translations = {
     mostRequestedTitle:'Most Ordered',
     testimonialsTitle:'What people are saying',
     testimonial1:'"Best photo transformation I have tried"', testimonial2:'"Turned my photos pro-level"',
-    testimonialsNote:'* Every review here is from a real customer, after moderation.', testimonialsEmpty:'No published reviews yet. If you have tried the service, be the first to share your experience.',
+    testimonialsNote:'* Every review here is from a real customer, after moderation.', testimonialsEmpty:'Try the service and be the first to share your experience here 🙌',
     trustBadge1:'Professional quality in every photo', trustBadge2:'Constantly growing prompt library',
     trustBadge3:'Fast, direct support', trustBadge4:'Security and privacy on every order',
     aboutUsTitle:'About Us',
-    aboutUsText:'We specialize in transforming personal photos into high-quality art automatically using AI — upload your photo and pick a style, and we handle the rest carefully so the result is worthy of your name.',
+    aboutUsText:"Miga-Photobook is an Egyptian project that started with a simple idea: make a professional photoshoot affordable and accessible to everyone. We turn your personal photo into a studio-quality piece of art using AI — upload your photo and pick a style, and we handle the rest carefully so the result is worthy of your name.",
     faqTitle:'Frequently Asked Questions',
     faqQ1:'How does the transformation work?', faqA1:'After payment, you upload your photo, and we transform it automatically in the style you picked — the result appears right on the site.',
     faqQ2:'How long does it take?', faqA2:'Two steps: confirming your bank transfer usually takes minutes (we review it ourselves), and once confirmed the AI transformation itself takes seconds to a few minutes, shown on the same page.',
@@ -1284,7 +1286,7 @@ const translations = {
     secArtisticTitle:'Artistic Section', secMagazineTitle:'Magazine / Poster Section',
     pricingTitle:'Pricing & Offers',
     pricingSub:'Order photo transformations individually, or save more with bundles. Each bundle applies as a discount for the matching number of photos from any section.',
-    plan1Title:'Single Transformation', plan1Price:'Per product', currencyLabel:'EGP',
+    plan1Title:'Single Transformation', plan1Price:'From 25 EGP', currencyLabel:'EGP',
     plan1Li1:'One photo transformation at its listed price', plan1Li2:'Instant processing after payment', plan1Li3:'Good for trying it out', plan1Cta:'Browse Now',
     plan2Title:'Pro Bundle', plan2Unit:'/ 10 photos',
     plan2Li1:'Save up to 40% off individual price', plan2Li2:'Free choice from any section', plan2Li3:'Priority support',
@@ -1304,6 +1306,7 @@ const translations = {
     buyerRefLabel:'Transfer reference number (if any)', buyerRefPh:'e.g. last 4 digits or transaction number',
     statusPendingText:"We're reviewing your transfer... this page will update itself once it's confirmed.",
     statusCodeNote:'Your order code (keep it just in case):',
+    statusSafeCloseNote:"You can close this page now — we'll review your order and update you as soon as it's confirmed.",
     statusApprovedText:'Payment confirmed ✅ You can upload your photo now.',
     buyModalNote:"We'll review the transfer automatically — this page stays open and updates itself once confirmed, no separate code to look for.",
     buyConfirmBtn:"I've Paid", cancelBtn:'Cancel',
@@ -1335,7 +1338,7 @@ const translations = {
     whatsappThanksTemplate:'Hi 👋\nThank you for trying Miga-Photobook and ordering "{title}".\nIf you like your photo, sharing it with friends would mean a lot to us 🙏\nAnd if you would like another one, just message us any time.',
     payerRefLabel:'Transfer reference number (from your transfer receipt)',
     payerRefPh:'e.g. 4821960573',
-    payWarning:'Note: orders without a real transfer are rejected, and repeat attempts block the number from ordering again.',
+    payWarning:'🔐 To make sure your order is processed quickly, double-check the transfer reference number.',
     payConfirmLabel:'I confirm I have actually transferred the amount, and the reference above is correct.',
     toastEnterRef:'Enter the correct transfer reference from your receipt.',
     toastConfirmPaymentFirst:'Please tick the box confirming you have transferred the amount.',
@@ -1417,9 +1420,9 @@ const translations = {
     transformAlreadyDoneNote:'Your photo was already transformed with this order — this is your saved result.',
     uploadPhotoLabel:'Choose your photo', beforeLabel:'Before', afterLabel:'After',
     consentLabel:"I confirm I own this photo or am its legal guardian, and consent to using it to generate the requested artistic result.",
-    transformPrivacyNote:'Your photo is processed entirely in your browser — it is never uploaded to a server or stored anywhere.',
+    transformPrivacyNote:'Your photo is used only to fulfill your order and is never shared with anyone else.',
     transformPrivacyNoteReal:'Your photo is sent securely to an image-processing service to create the result, and is not permanently stored on our servers.',
-    transformDemoNote:"This is a style/color-grading preview inspired by this section — full AI generation matching the exact prompt requires connecting an external image-generation service.",
+    transformLikenessNote:"We keep your core facial features as close to the original as possible, but the result's quality depends on how clear the original photo is.",
     generateBtn:'Transform Photo', downloadResultBtn:'Download Result',
     toastInvalidImage:'Please choose a valid image file',
     toastSelectPhoto:'Please choose a photo first',
@@ -1484,16 +1487,13 @@ function applyLanguage(lang){
     b.classList.toggle('active', b.dataset.lang === currentLang);
   });
 
-  // The privacy/demo notes in the transform modal depend on whether a real
+  // The privacy note in the transform modal depends on whether a real
   // image-generation backend is configured (BACKEND_BASE) — override the
   // generic i18n text so customers always see an accurate description.
+  // (The facial-likeness note below it is static and always shown as-is.)
   const privacyNoteEl = document.getElementById('transformPrivacyNoteEl');
-  const demoNoteEl = document.getElementById('transformDemoNoteEl');
   if(BACKEND_BASE){
     if(privacyNoteEl) privacyNoteEl.textContent = t('transformPrivacyNoteReal');
-    if(demoNoteEl) demoNoteEl.style.display = 'none';
-  }else{
-    if(demoNoteEl) demoNoteEl.style.display = '';
   }
 
   // re-render dynamic, language-dependent content
