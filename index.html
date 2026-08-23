@@ -813,6 +813,20 @@
   }
   #buyConfirmBtn[disabled]{opacity:0.45; cursor:not-allowed;}
 
+  /* Shown once the customer's photo is actually ready. Thanks them at the one
+     moment they are most pleased, and puts sharing and reviewing right there
+     — the two things that grow the shop and cost the customer nothing. */
+  .thanks-panel{
+    display:none; margin-top:16px; padding:16px 18px;
+    background:rgba(255,201,77,0.07); border:1.5px solid var(--brass-dim);
+    border-radius:12px; text-align:center;
+  }
+  .thanks-panel.show{display:block;}
+  .thanks-panel h4{margin:0 0 6px; font-size:16px; color:var(--brass);}
+  .thanks-panel p{margin:0 0 12px; font-size:13.5px; line-height:1.7; color:var(--paper);}
+  .thanks-actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:center;}
+  .thanks-actions button{flex:1 1 150px; padding:11px 14px; font-size:13.5px;}
+
   .stay-nudge{
     position:fixed; bottom:-200px; inset-inline-start:50%; transform:translateX(-50%);
     z-index:205; width:min(440px, calc(100vw - 32px));
@@ -1697,6 +1711,14 @@
       <button class="btn-primary" id="transformGenerateBtn" data-i18n="generateBtn">حوّل الصورة</button>
       <button class="btn-ghost" id="transformDownloadBtn" style="display:none;" data-i18n="downloadResultBtn">تحميل النتيجة</button>
       <button class="btn-ghost" id="transformShareBtn" style="display:none;" data-i18n="shareResultBtn">شارك النتيجة</button>
+      <div class="thanks-panel" id="thanksPanel">
+        <h4 data-i18n="thanksTitle">شكراً إنك جربتنا 🙏</h4>
+        <p data-i18n="thanksBody">لو الصورة عجبتك، مشاركتها مع صحابك أو تقييم سريع بيساعدنا كتير.</p>
+        <div class="thanks-actions">
+          <button class="btn-primary" id="thanksShareBtn" data-i18n="thanksShareBtn">شارك صورتك</button>
+          <button class="btn-ghost" id="thanksReviewBtn" data-i18n="thanksReviewBtn">اكتب تقييمك</button>
+        </div>
+      </div>
       <button class="btn-ghost" id="transformCancelBtn" data-i18n="cancelBtn">إلغاء</button>
     </div>
   </div>
@@ -2156,6 +2178,11 @@ const translations = {
     nudgeTitle:'لسه مستني إيه؟',
     nudgeBody:'عرض الافتتاح لسه شغال — صورتك بـ 25 جنيه بدل 50. لو محتار في الاختيار، ابعتلنا واتساب ونساعدك تختار الأنسب لك.',
     nudgeBrowseBtn:'تصفّح الصور', nudgeAskBtn:'اسألنا واتساب',
+    thanksTitle:'شكراً إنك جربتنا 🙏',
+    thanksBody:'لو الصورة عجبتك، مشاركتها مع صحابك أو تقييم سريع بيساعدنا كتير.',
+    thanksShareBtn:'شارك صورتك', thanksReviewBtn:'اكتب تقييمك',
+    thankCustomerBtn:'شكر عبر واتساب',
+    whatsappThanksTemplate:'أهلاً 👋\nشكراً إنك جربت Miga-Photobook وطلبت "{title}".\nلو الصورة عجبتك، مشاركتها مع صحابك هتبقى دعم كبير لينا 🙏\nولو حبيت صورة تانية، ابعتلنا في أي وقت.',
     payerRefLabel:'رقم عملية التحويل (من رسالة أو إشعار التحويل)',
     payerRefPh:'مثال: 4821960573',
     payWarning:'تنبيه: الطلبات اللي من غير تحويل فعلي بتترفض، وبنمنع الرقم من الطلب تاني لو اتكرر.',
@@ -2362,6 +2389,11 @@ const translations = {
     nudgeTitle:'Still deciding?',
     nudgeBody:'The launch offer is still on — your photo for 25 EGP instead of 50. Not sure which style suits you? Message us on WhatsApp and we will help you pick.',
     nudgeBrowseBtn:'Browse photos', nudgeAskBtn:'Ask us on WhatsApp',
+    thanksTitle:'Thank you for trying us 🙏',
+    thanksBody:'If you like your photo, sharing it with friends or leaving a quick review helps us a lot.',
+    thanksShareBtn:'Share your photo', thanksReviewBtn:'Write a review',
+    thankCustomerBtn:'Thank via WhatsApp',
+    whatsappThanksTemplate:'Hi 👋\nThank you for trying Miga-Photobook and ordering "{title}".\nIf you like your photo, sharing it with friends would mean a lot to us 🙏\nAnd if you would like another one, just message us any time.',
     payerRefLabel:'Transfer reference number (from your transfer receipt)',
     payerRefPh:'e.g. 4821960573',
     payWarning:'Note: orders without a real transfer are rejected, and repeat attempts block the number from ordering again.',
@@ -3680,6 +3712,7 @@ function openTransformModal(id){
   document.getElementById('transformConsent').checked = false;
   document.getElementById('transformDownloadBtn').style.display = 'none';
   document.getElementById('transformShareBtn').style.display = 'none';
+  document.getElementById('thanksPanel').classList.remove('show');
   document.getElementById('transformGenerateBtn').dataset.used = '';
   transformImg = null;
 
@@ -3703,6 +3736,7 @@ function openTransformModal(id){
       ctx.drawImage(img, 0, 0);
       document.getElementById('transformDownloadBtn').style.display = 'inline-block';
       document.getElementById('transformShareBtn').style.display = 'inline-block';
+      document.getElementById('thanksPanel').classList.add('show');
     };
     img.src = cachedUrl;
   }else{
@@ -3741,6 +3775,7 @@ document.getElementById('transformFileInput').addEventListener('change', (e)=>{
       document.getElementById('transformPreviewWrap').style.display = 'block';
       document.getElementById('transformDownloadBtn').style.display = 'none';
       document.getElementById('transformShareBtn').style.display = 'none';
+      document.getElementById('thanksPanel').classList.remove('show');
     };
     img.src = ev.target.result;
   };
@@ -3793,6 +3828,7 @@ document.getElementById('transformGenerateBtn').onclick = async ()=>{
         ctx.drawImage(resultImg, 0, 0, w, h);
         document.getElementById('transformDownloadBtn').style.display = 'inline-block';
         document.getElementById('transformShareBtn').style.display = 'inline-block';
+        document.getElementById('thanksPanel').classList.add('show');
         showToast(t('toastTransformDone'));
       };
       resultImg.onerror = ()=> showToast(t('toastGenerateFailed'));
@@ -3821,6 +3857,7 @@ document.getElementById('transformGenerateBtn').onclick = async ()=>{
   applyFilmGrain(ctx, w, h, preset.grain);
   document.getElementById('transformDownloadBtn').style.display = 'inline-block';
   document.getElementById('transformShareBtn').style.display = 'inline-block';
+  document.getElementById('thanksPanel').classList.add('show');
   showToast(t('toastTransformDone'));
 };
 
@@ -4703,6 +4740,13 @@ document.getElementById('registerBiometricBtn').onclick = async ()=>{
 
 // ---------- Reviews ----------
 const reviewModalBg = document.getElementById('reviewModalBg');
+// The thank-you panel reuses the buttons that already exist, so there is one
+// share implementation and one review flow rather than parallel copies.
+document.getElementById('thanksShareBtn').onclick = ()=>
+  document.getElementById('transformShareBtn').click();
+document.getElementById('thanksReviewBtn').onclick = ()=>
+  document.getElementById('writeReviewBtn').click();
+
 document.getElementById('writeReviewBtn').onclick = ()=>{
   if(!currentUser){
     showToast(t('toastLoginRequired'));
@@ -5008,6 +5052,7 @@ function renderOrdersList(){
           <button class="btn-ghost reject-btn" onclick="rejectOrderPrompt('${o.code}')">${t('orderRejectBtn')}</button>` : ''}
         ${o.status==='rejected' ? `<button class="btn-ghost reject-btn" onclick="deleteOrderPrompt('${o.code}')">${t('orderDeleteBtn')}</button>` : ''}
         ${o.orderType==='prompt' && o.status==='approved' && o.promptText ? `<button class="btn-ghost" onclick="sendPromptViaWhatsApp('${o.code}')">${t('sendPromptWhatsAppBtn')}</button>` : ''}
+        ${o.status==='approved' ? `<button class="btn-ghost" onclick="thankCustomerViaWhatsApp('${o.code}')">${t('thankCustomerBtn')}</button>` : ''}
       </div>
     </div>`).join('');
 }
@@ -5112,6 +5157,23 @@ async function approveOrder(code){
  * ever shown for prompt orders that are already approved, so the text being
  * sent is always exactly what the customer paid for and already has access
  * to via "تتبع طلبي" on their end too. */
+/** Egyptian local numbers start with 0 (e.g. 010...) — WhatsApp links need
+ * the international form (20...) with the leading zero dropped. */
+function toWhatsAppNumber(phone){
+  const digitsOnly = String(phone || '').replace(/\D/g, '');
+  return digitsOnly.startsWith('0') ? '20' + digitsOnly.slice(1) : digitsOnly;
+}
+
+/** Opens WhatsApp on the customer's number with a thank-you already written,
+ * so following up after delivery costs one tap instead of retyping the same
+ * message for every order. Sending stays a deliberate human action. */
+function thankCustomerViaWhatsApp(code){
+  const order = orders.find(o => o.code === code);
+  if(!order) return;
+  const message = t('whatsappThanksTemplate').replace('{title}', order.productTitle);
+  window.open(`https://wa.me/${toWhatsAppNumber(order.phone)}?text=${encodeURIComponent(message)}`, '_blank');
+}
+
 function sendPromptViaWhatsApp(code){
   const order = orders.find(o => o.code === code);
   if(!order || !order.promptText){ showToast(t('toastPromptNotReady')); return; }
