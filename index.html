@@ -2189,6 +2189,7 @@ const translations = {
     thanksBody:'لو الصورة عجبتك، مشاركتها مع صحابك أو تقييم سريع بيساعدنا كتير.',
     thanksShareBtn:'شارك صورتك', thanksReviewBtn:'اكتب تقييمك',
     thankCustomerBtn:'شكر عبر واتساب', thankCustomerDoneBtn:'✓ تم إرسال رسالة الشكر',
+    toastThankSaveFailed:'الرسالة اتفتحت، بس تسجيلها فشل — جرّب تحدّث الصفحة.',
     whatsappThanksTemplate:'أهلاً 👋\nشكراً إنك جربت Miga-Photobook وطلبت "{title}".\nلو الصورة عجبتك، مشاركتها مع صحابك هتبقى دعم كبير لينا 🙏\nولو حبيت صورة تانية، ابعتلنا في أي وقت.',
     payerRefLabel:'رقم عملية التحويل (من رسالة أو إشعار التحويل)',
     payerRefPh:'مثال: 4821960573',
@@ -2400,6 +2401,7 @@ const translations = {
     thanksBody:'If you like your photo, sharing it with friends or leaving a quick review helps us a lot.',
     thanksShareBtn:'Share your photo', thanksReviewBtn:'Write a review',
     thankCustomerBtn:'Thank via WhatsApp', thankCustomerDoneBtn:'✓ Thank-you message sent',
+    toastThankSaveFailed:'The message opened, but saving the note failed — try refreshing.',
     whatsappThanksTemplate:'Hi 👋\nThank you for trying Miga-Photobook and ordering "{title}".\nIf you like your photo, sharing it with friends would mean a lot to us 🙏\nAnd if you would like another one, just message us any time.',
     payerRefLabel:'Transfer reference number (from your transfer receipt)',
     payerRefPh:'e.g. 4821960573',
@@ -5059,7 +5061,7 @@ function renderOrdersList(){
           <button class="btn-ghost reject-btn" onclick="rejectOrderPrompt('${o.code}')">${t('orderRejectBtn')}</button>` : ''}
         ${o.status==='rejected' ? `<button class="btn-ghost reject-btn" onclick="deleteOrderPrompt('${o.code}')">${t('orderDeleteBtn')}</button>` : ''}
         ${o.orderType==='prompt' && o.status==='approved' && o.promptText ? `<button class="btn-ghost" onclick="sendPromptViaWhatsApp('${o.code}')">${t('sendPromptWhatsAppBtn')}</button>` : ''}
-        ${o.status==='approved' ? (thankedOrders.includes(o.code)
+        ${o.status==='approved' ? (isOrderThanked(o)
           ? `<button class="btn-ghost thanked-btn" disabled>${t('thankCustomerDoneBtn')}</button>`
           : `<button class="btn-ghost" onclick="thankCustomerViaWhatsApp('${o.code}')">${t('thankCustomerBtn')}</button>`) : ''}
       </div>
@@ -5176,20 +5178,11 @@ function toWhatsAppNumber(phone){
 /** Opens WhatsApp on the customer's number with a thank-you already written,
  * so following up after delivery costs one tap instead of retyping the same
  * message for every order. Sending stays a deliberate human action. */
-/** Order codes already thanked, so the button cannot be pressed twice and the
- * admin can see at a glance who is still owed a follow-up. Stored locally: it
- * is a note-to-self about what was sent by hand, not order data the server
- * needs — which also means it is per-device. */
-let thankedOrders = [];
-try{
-  const raw = localStorage.getItem('migaThankedOrders');
-  if(raw) thankedOrders = JSON.parse(raw) || [];
-}catch(e){ thankedOrders = []; }
-
-function markOrderThanked(code){
-  if(thankedOrders.includes(code)) return;
-  thankedOrders.push(code);
-  try{ localStorage.setItem('migaThankedOrders', JSON.stringify(thankedOrders)); }catch(e){}
+/** Whether this order has already had a thank-you sent. Read straight off the
+ * order record, so the state is the same on every device the admin uses
+ * instead of resetting each time a different browser opens the panel. */
+function isOrderThanked(order){
+  return !!(order && order.thankedAt);
 }
 
 function thankCustomerViaWhatsApp(code){
@@ -5197,10 +5190,24 @@ function thankCustomerViaWhatsApp(code){
   if(!order) return;
   const message = t('whatsappThanksTemplate').replace('{title}', order.productTitle);
   window.open(`https://wa.me/${toWhatsAppNumber(order.phone)}?text=${encodeURIComponent(message)}`, '_blank');
-  // Marked as soon as WhatsApp opens: the message is composed and handed over,
-  // and there is no way for the page to learn whether "send" was tapped.
-  markOrderThanked(code);
+
+  // Update the button immediately so it cannot be pressed twice while the
+  // request is in flight, then persist. Marked as soon as WhatsApp opens: the
+  // message has been composed and handed over, and the page has no way to
+  // learn whether "send" was actually tapped.
+  order.thankedAt = Date.now();
   renderOrdersList();
+
+  if(!BACKEND_BASE) return;
+  fetch(`${BACKEND_BASE}/orders/mark-thanked`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ code, password: adminPasswordCache })
+  }).catch(()=>{
+    // Saving the note failed; the message itself was still handed to WhatsApp.
+    // Say so plainly rather than leaving a tick that will vanish on reload.
+    showToast(t('toastThankSaveFailed'));
+  });
 }
 
 function sendPromptViaWhatsApp(code){
