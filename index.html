@@ -162,12 +162,12 @@
   .baf-title{ font-size:clamp(20px,4.5vw,28px); margin:0 0 6px; }
   .baf-sub{ color:var(--paper-dim); max-width:520px; margin:0 auto 28px; font-size:14.5px; }
   .baf-wrap{ position:relative; width:min(94vw,560px); aspect-ratio:1/1; margin:0 auto; }
-  .baf-center{ position:absolute; top:50%; left:50%; width:clamp(120px,32vw,190px); height:clamp(120px,32vw,190px); transform:translate(-50%,-50%); border-radius:50%; overflow:hidden; border:3px solid var(--brass); box-shadow:0 0 0 6px var(--ink), 0 8px 24px rgba(0,0,0,0.4); z-index:5; }
-  .baf-center img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .baf-center{ position:absolute; top:50%; left:50%; width:clamp(120px,32vw,190px); height:clamp(120px,32vw,190px); transform:translate(-50%,-50%); border-radius:50%; overflow:hidden; border:3px solid var(--brass); box-shadow:0 0 0 6px var(--ink), 0 0 22px rgba(227,164,41,0.45), 0 8px 24px rgba(0,0,0,0.4); z-index:5; }
+  .baf-center img{ width:100%; height:100%; object-fit:cover; object-position:center 18%; display:block; }
   .baf-center-label{ position:absolute; bottom:-14px; left:50%; transform:translateX(-50%); background:var(--brass); color:var(--ink); font-size:11px; font-weight:700; padding:3px 12px; border-radius:20px; white-space:nowrap; z-index:6; }
   .baf-item{ --radius:clamp(120px,36vw,225px); position:absolute; top:50%; left:50%; width:clamp(58px,17vw,92px); height:clamp(58px,17vw,92px); margin-top:calc(clamp(58px,17vw,92px) / -2); margin-left:calc(clamp(58px,17vw,92px) / -2); transform:rotate(var(--angle)) translate(0, calc(-1 * var(--radius))) rotate(calc(-1 * var(--angle))); border-radius:50%; overflow:hidden; border:2px solid var(--line); box-shadow:0 4px 14px rgba(0,0,0,0.35); transition:transform 0.25s ease, border-color 0.25s ease; }
   .baf-item:active, .baf-item:hover{ border-color:var(--brass); }
-  .baf-item img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .baf-item img{ width:100%; height:100%; object-fit:cover; object-position:center 15%; display:block; }
   .baf-connector{ position:absolute; top:50%; left:50%; width:1px; height:1px; z-index:1; }
   .baf-connector::before{ content:''; position:absolute; top:0; left:0; width:2px; background:var(--line); opacity:0.35; height:var(--radius); transform-origin:top center; transform:rotate(var(--angle)); }
 </style>
