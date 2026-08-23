@@ -1127,7 +1127,7 @@ const translations = {
     pShareLinkLabel:'رابط المنتج (للإعلانات) — انسخه وضعه في منشور المنصة',
     pImageLinkLabel:'رابط الصورة الأصلية — لرفعها في الإعلان',
     copyLinkTitle:'نسخ رابط المنتج', copyImageLinkTitle:'نسخ رابط الصورة',
-    setCoverTitle:'اجعلها واجهة القسم',
+    setCoverTitle:'اجعلها واجهة القسم', cycleCoverTitle:'صورة أخرى من القسم',
     toastCoverSet:'تم تعيينها واجهة للقسم ⭐',
     toastCoverSaveFailed:'اتغيّرت على الشاشة، بس الحفظ فشل — جرّب تاني.',
     toastLinkCopied:'تم نسخ رابط المنتج ✅', toastImageLinkCopied:'تم نسخ رابط الصورة ✅',
@@ -1342,7 +1342,7 @@ const translations = {
     pShareLinkLabel:'Product link (for ads) — copy it into your platform post',
     pImageLinkLabel:'Original image link — to upload with your ad',
     copyLinkTitle:'Copy product link', copyImageLinkTitle:'Copy image link',
-    setCoverTitle:'Make this the category cover',
+    setCoverTitle:'Make this the category cover', cycleCoverTitle:'Show another photo',
     toastCoverSet:'Set as the category cover ⭐',
     toastCoverSaveFailed:'Changed on screen, but saving failed — please try again.',
     toastLinkCopied:'Product link copied ✅', toastImageLinkCopied:'Image link copied ✅',
@@ -2091,17 +2091,14 @@ function renderCatTiles(){
     const items = products.filter(p=>p.category===cat).sort((a,b) => (a.order ?? 9999) - (b.order ?? 9999));
     const cover = categoryCover(items);
     const isOpen = document.getElementById(cat)?.classList.contains('open');
-    // The runners-up are stacked behind the cover and revealed on hover or
-    // touch. Changing on a deliberate gesture is discovery; changing on its
-    // own while being read is a distraction, so nothing moves unprompted.
-    const peek = categoryTopPhotos(items, COVER_POOL_SIZE)
-      .filter(p => cover && p.id !== cover.id);
+    // One photo, swapped only when the small ⟳ control is pressed. The tile's
+    // own job is to open the category, so nothing else about it moves.
+    const pool = categoryTopPhotos(items, COVER_POOL_SIZE);
     const coverHtml = cover
-      ? `<img class="ct-main" src="${cover.image}" alt="" loading="lazy" decoding="async">`
-        + peek.map((p,i)=>`<img class="ct-peek" data-peek="${i+1}" src="${p.image}" alt="" loading="lazy" decoding="async">`).join('')
-        + (peek.length ? `<span class="ct-dots" aria-hidden="true">${
-            Array.from({length: peek.length + 1}, (_,i)=>`<i${i===0?' class="on"':''}></i>`).join('')
-          }</span>` : '')
+      ? `<img src="${cover.image}" alt="" loading="lazy" decoding="async">`
+        + (pool.length > 1
+            ? `<span class="ct-cycle" role="button" tabindex="0" data-cycle="${cat}" title="${t('cycleCoverTitle')}" aria-label="${t('cycleCoverTitle')}">&#8635;</span>`
+            : '')
       : `<span class="ct-empty">${t('emptyNoteCategory')}</span>`;
     // A category with zero products right now is hidden from regular
     // visitors (same rule applyChildrenVisibility() applies to the section
@@ -2114,7 +2111,7 @@ function renderCatTiles(){
       : (items.length > 0 || adminLoggedIn);
     return `
     <button type="button" class="cat-tile${isOpen ? ' open' : ''}" data-cat="${cat}" aria-expanded="${isOpen ? 'true' : 'false'}" style="${catVisible ? '' : 'display:none;'}">
-      <div class="cat-tile-cover${peek.length ? ' has-peek' : ''}">
+      <div class="cat-tile-cover">
         ${coverHtml}
         ${items.length ? `<span class="ct-count">${items.length}</span>` : ''}
         <div class="cat-tile-label">
@@ -2127,24 +2124,35 @@ function renderCatTiles(){
   }).join('');
 }
 
-// A phone has no hover, so the same reveal is driven by touch: it starts when
-// a finger lands on a tile and stops when it lifts. Passive listeners, so
-// holding a tile never blocks the page from scrolling.
-(function bindCoverPeekOnTouch(){
-  const grid = document.getElementById('categoryTilesGrid');
-  if(!grid) return;
-  const start = (e)=>{
-    const cover = e.target.closest('.cat-tile')?.querySelector('.cat-tile-cover.has-peek');
-    if(cover) cover.classList.add('peeking');
-  };
-  const stop = ()=> grid.querySelectorAll('.cat-tile-cover.peeking')
-    .forEach(el => el.classList.remove('peeking'));
-  grid.addEventListener('touchstart', start, {passive:true});
-  grid.addEventListener('touchend', stop, {passive:true});
-  grid.addEventListener('touchcancel', stop, {passive:true});
-})();
+/** Steps a tile to the next of its top photos. Bound to its own small control
+ * rather than the tile itself: the tile is a button whose job is to open the
+ * category, and a tap that sometimes opened and sometimes swapped the picture
+ * would make it unpredictable. */
+function cycleCategoryCover(cat){
+  const items = products.filter(p => p.category === cat);
+  const pool = categoryTopPhotos(items, COVER_POOL_SIZE);
+  if(pool.length < 2) return;
+  sessionCoverPick[cat] = ((sessionCoverPick[cat] ?? 0) + 1) % pool.length;
+
+  const tile = document.querySelector(`.cat-tile[data-cat="${cat}"] .cat-tile-cover img`);
+  if(!tile) return;
+  // Fade through the swap so it reads as a change, not a flicker.
+  tile.classList.add('swapping');
+  setTimeout(()=>{
+    tile.src = pool[sessionCoverPick[cat]].image;
+    tile.classList.remove('swapping');
+  }, 180);
+}
 
 document.getElementById('categoryTilesGrid')?.addEventListener('click', (e)=>{
+  const cycle = e.target.closest('[data-cycle]');
+  if(cycle){
+    // Swallow the click so the tile underneath does not also open.
+    e.preventDefault();
+    e.stopPropagation();
+    cycleCategoryCover(cycle.getAttribute('data-cycle'));
+    return;
+  }
   const tile = e.target.closest('.cat-tile');
   if(!tile) return;
   const sec = document.getElementById(tile.dataset.cat);

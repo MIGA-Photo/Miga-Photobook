@@ -502,42 +502,28 @@
   }
   .cat-tile:hover .cat-tile-cover img{transform:scale(1.05);}
 
-  /* Runner-up photos sit stacked behind the cover, invisible until asked for.
-     They fade in one at a time while the tile is held or hovered, so a visitor
-     can preview what else is inside without the tile ever changing on its own. */
-  .cat-tile-cover .ct-peek{
-    position:absolute; inset:0; opacity:0;
-    transition:opacity .5s ease;
+  /* A small, deliberate control for stepping through the category's best
+     photos. Kept separate from the tile itself so a tap on the tile always
+     does the one thing it promises: open the category. */
+  .cat-tile-cover .ct-cycle{
+    position:absolute; inset-inline-start:8px; inset-block-start:8px; z-index:3;
+    width:30px; height:30px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(12,12,16,0.72); border:1px solid rgba(255,255,255,0.16);
+    color:var(--paper); font-size:15px; line-height:1; cursor:pointer;
+    transition:background .15s ease, transform .25s ease, color .15s ease;
   }
-  .cat-tile-cover.has-peek:hover .ct-peek,
-  .cat-tile-cover.has-peek.peeking .ct-peek{
-    animation:coverPeek 4.2s ease-in-out infinite;
+  .cat-tile-cover .ct-cycle:hover{
+    background:rgba(255,201,77,0.9); color:var(--ink); transform:rotate(180deg);
   }
-  .cat-tile-cover.has-peek:hover .ct-peek[data-peek="2"],
-  .cat-tile-cover.has-peek.peeking .ct-peek[data-peek="2"]{
-    animation-delay:1.4s;
-  }
-  @keyframes coverPeek{
-    0%, 8%    {opacity:0;}
-    18%, 30%  {opacity:1;}
-    40%, 100% {opacity:0;}
-  }
-
-  /* Small dots hinting there is more than one photo behind the tile. */
-  .cat-tile-cover .ct-dots{
-    position:absolute; inset-inline-start:8px; inset-block-start:10px; z-index:2;
-    display:flex; gap:4px;
-  }
-  .cat-tile-cover .ct-dots i{
-    width:5px; height:5px; border-radius:50%;
-    background:rgba(255,255,255,0.38);
-  }
-  .cat-tile-cover .ct-dots i.on{background:var(--brass);}
+  .cat-tile-cover .ct-cycle:focus-visible{outline:2px solid var(--brass); outline-offset:2px;}
+  /* Brief fade while the photo is exchanged, so the swap reads as intentional. */
+  .cat-tile-cover img.swapping{opacity:0;}
 
   @media (prefers-reduced-motion: reduce){
-    .cat-tile-cover.has-peek:hover .ct-peek,
-    .cat-tile-cover.has-peek.peeking .ct-peek{animation:none;}
     .cat-tile:hover .cat-tile-cover img{transform:none;}
+    .cat-tile-cover .ct-cycle:hover{transform:none;}
+    .cat-tile-cover img{transition:none;}
   }
   /* Dark wash under the text so the label stays readable over any photo. */
   .cat-tile-cover::after{
