@@ -891,6 +891,7 @@
         <button data-tab="orders" id="tabBtnOrders"><span data-i18n="tabOrders">الطلبات</span> <span id="pendingCount"></span></button>
         <button data-tab="reviews" id="tabBtnReviews"><span data-i18n="tabReviews">التقييمات</span> <span id="pendingReviewCount"></span></button>
         <button data-tab="visitors" id="tabBtnVisitors" data-i18n="tabVisitors">الزوار</button>
+        <button data-tab="showcase" id="tabBtnShowcase" data-i18n="tabShowcase">الدائرة</button>
       </div>
 
       <div id="adminTabProducts">
@@ -986,6 +987,58 @@
         <div id="visitorsLogList" style="display:none; max-height:360px; overflow-y:auto;"></div>
       </div>
 
+      <div id="adminTabShowcase" style="display:none;">
+        <p class="sub" style="margin-bottom:14px;" data-i18n="scIntro">ارفع الصورة الأصلية اللي هتظهر في نص الدائرة في الصفحة الرئيسية، والنتايج الثمانية اللي هتلف حواليها.</p>
+        <div class="field">
+          <label data-i18n="scCenterLabel">الصورة الأصلية (المنتصف)</label>
+          <img id="scPreview-center" style="display:none; width:90px; height:90px; object-fit:cover; border-radius:50%; border:2px solid #3b8ef0; margin-bottom:8px;">
+          <input type="file" id="scInput-center" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="scItemLabel1">نتيجة 1</label>
+          <img id="scPreview-1" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="scInput-1" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="scItemLabel2">نتيجة 2</label>
+          <img id="scPreview-2" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="scInput-2" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="scItemLabel3">نتيجة 3</label>
+          <img id="scPreview-3" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="scInput-3" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="scItemLabel4">نتيجة 4</label>
+          <img id="scPreview-4" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="scInput-4" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="scItemLabel5">نتيجة 5</label>
+          <img id="scPreview-5" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="scInput-5" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="scItemLabel6">نتيجة 6</label>
+          <img id="scPreview-6" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="scInput-6" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="scItemLabel7">نتيجة 7</label>
+          <img id="scPreview-7" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="scInput-7" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="scItemLabel8">نتيجة 8</label>
+          <img id="scPreview-8" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="scInput-8" accept="image/*">
+        </div>
+        <div class="modal-actions" style="margin-top:14px;">
+          <button class="btn-primary" id="scSaveBtn" data-i18n="scSaveBtn">حفظ صور الدائرة</button>
+        </div>
+      </div>
+
       <div class="modal-actions" style="margin-top:14px;">
         <button class="btn-ghost" id="adminLogoutBtn" data-i18n="adminLogoutBtn">خروج</button>
       </div>
@@ -1066,6 +1119,15 @@ const translations = {
     reviewModerationNote:'سيظهر تقييمك بعد مراجعته من فريقنا.',
     tabReviews:'التقييمات', noPendingReviews:'لا توجد تقييمات جديدة للمراجعة.',
     tabVisitors:'الزوار', visitorsTotalLabel:'إجمالي الزيارات', visitorsTodayLabel:'زيارات اليوم',
+    tabShowcase:'الدائرة',
+    scIntro:'ارفع الصورة الأصلية اللي هتظهر في نص الدائرة في الصفحة الرئيسية، والنتايج الثمانية اللي هتلف حواليها.',
+    scCenterLabel:'الصورة الأصلية (المنتصف)',
+    scItemLabel1:'نتيجة 1', scItemLabel2:'نتيجة 2', scItemLabel3:'نتيجة 3', scItemLabel4:'نتيجة 4',
+    scItemLabel5:'نتيجة 5', scItemLabel6:'نتيجة 6', scItemLabel7:'نتيجة 7', scItemLabel8:'نتيجة 8',
+    scSaveBtn:'حفظ صور الدائرة',
+    toastImageUploaded:'تم رفع الصورة',
+    toastShowcaseIncomplete:'لازم ترفع كل الـ9 صور الأول',
+    toastShowcaseSaved:'تم حفظ صور الدائرة',
     visitorsUniqueTotalLabel:'زوار فريدون', visitorsUniqueTodayLabel:'فريدون اليوم',
     visitorsColDate:'التاريخ والوقت', visitorsColPage:'الصفحة', visitorsColCountry:'الدولة',
     visitorsColName:'الاسم', visitorsColEmail:'الإيميل',
@@ -1286,6 +1348,15 @@ const translations = {
     reviewModerationNote:'Your review will appear after our team reviews it.',
     tabReviews:'Reviews', noPendingReviews:'No new reviews to moderate.',
     tabVisitors:'Visitors', visitorsTotalLabel:'Total Visits', visitorsTodayLabel:'Today',
+    tabShowcase:'Showcase',
+    scIntro:'Upload the original photo shown in the center of the homepage circle, and the 8 results that orbit around it.',
+    scCenterLabel:'Original Photo (Center)',
+    scItemLabel1:'Result 1', scItemLabel2:'Result 2', scItemLabel3:'Result 3', scItemLabel4:'Result 4',
+    scItemLabel5:'Result 5', scItemLabel6:'Result 6', scItemLabel7:'Result 7', scItemLabel8:'Result 8',
+    scSaveBtn:'Save Showcase Images',
+    toastImageUploaded:'Image uploaded',
+    toastShowcaseIncomplete:'Upload all 9 images first',
+    toastShowcaseSaved:'Showcase images saved',
     visitorsUniqueTotalLabel:'Unique Visitors', visitorsUniqueTodayLabel:'Unique Today',
     visitorsColDate:'Date & Time', visitorsColPage:'Page', visitorsColCountry:'Country',
     visitorsColName:'Name', visitorsColEmail:'Email',
@@ -3992,10 +4063,12 @@ function setAdminTab(tab){
   document.getElementById('tabBtnOrders').classList.toggle('active', tab==='orders');
   document.getElementById('tabBtnReviews').classList.toggle('active', tab==='reviews');
   document.getElementById('tabBtnVisitors').classList.toggle('active', tab==='visitors');
+  document.getElementById('tabBtnShowcase').classList.toggle('active', tab==='showcase');
   document.getElementById('adminTabProducts').style.display = tab==='products' ? 'block' : 'none';
   document.getElementById('adminTabOrders').style.display = tab==='orders' ? 'block' : 'none';
   document.getElementById('adminTabReviews').style.display = tab==='reviews' ? 'block' : 'none';
   document.getElementById('adminTabVisitors').style.display = tab==='visitors' ? 'block' : 'none';
+  document.getElementById('adminTabShowcase').style.display = tab==='showcase' ? 'block' : 'none';
 }
 document.getElementById('tabBtnProducts').onclick = ()=> setAdminTab('products');
 document.getElementById('tabBtnOrders').onclick = async ()=>{
@@ -4011,6 +4084,112 @@ document.getElementById('tabBtnVisitors').onclick = async ()=>{
   setAdminTab('visitors');
   await loadVisitorStats();
 };
+document.getElementById('tabBtnShowcase').onclick = async ()=>{
+  setAdminTab('showcase');
+  await loadShowcaseIntoAdmin();
+};
+
+// ---------- Before/After circle showcase (homepage hero section) ----------
+// The 9 slots (center + 8 satellites) are stored server-side as plain image
+// URLs under one config object, so Magdy can swap them from the admin panel
+// without ever touching code. If the backend has nothing saved yet, the
+// hardcoded default images already in the HTML markup are left untouched.
+const SHOWCASE_SLOTS = ['center','1','2','3','4','5','6','7','8'];
+let showcaseState = {}; // slot -> uploaded URL (only populated once loaded/changed)
+
+async function loadShowcaseIntoAdmin(){
+  if(!BACKEND_BASE) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/showcase`);
+    const data = await res.json().catch(()=>null);
+    if(!data) return;
+    SHOWCASE_SLOTS.forEach(slot=>{
+      const url = slot==='center' ? data.center : (data.items || [])[parseInt(slot,10)-1];
+      if(url){
+        showcaseState[slot] = url;
+        const img = document.getElementById(`scPreview-${slot}`);
+        if(img){ img.src = url; img.style.display = 'inline-block'; }
+      }
+    });
+  }catch(e){ /* silent — admin can still upload fresh images regardless */ }
+}
+
+SHOWCASE_SLOTS.forEach(slot=>{
+  const input = document.getElementById(`scInput-${slot}`);
+  if(!input) return;
+  input.addEventListener('change', async (e)=>{
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    if(!BACKEND_BASE){ showToast(t('toastOrderFailed')); return; }
+    try{
+      const form = new FormData();
+      form.append('image', file);
+      const res = await fetch(`${BACKEND_BASE}/admin/upload-image?password=${encodeURIComponent(adminPasswordCache)}`, {
+        method:'POST', body: form
+      });
+      const data = await res.json().catch(()=>null);
+      if(!res.ok || !data || !data.url){
+        showToast(data && data.error ? data.error : t('toastImageUploadFailed'));
+        return;
+      }
+      showcaseState[slot] = data.url;
+      const img = document.getElementById(`scPreview-${slot}`);
+      if(img){ img.src = data.url; img.style.display = 'inline-block'; }
+      showToast(t('toastImageUploaded') || 'تم رفع الصورة');
+    }catch(err){
+      showToast(t('toastImageUploadFailed'));
+    }
+  });
+});
+
+document.getElementById('scSaveBtn').onclick = async ()=>{
+  if(!BACKEND_BASE){ showToast(t('toastOrderFailed')); return; }
+  const missing = SHOWCASE_SLOTS.filter(s=>!showcaseState[s]);
+  if(missing.length){ showToast(t('toastShowcaseIncomplete') || 'لازم ترفع كل الـ9 صور الأول'); return; }
+  const btn = document.getElementById('scSaveBtn');
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = t('uploadingImage');
+  try{
+    const payload = {
+      center: showcaseState['center'],
+      items: [1,2,3,4,5,6,7,8].map(n=>showcaseState[String(n)])
+    };
+    const res = await fetch(`${BACKEND_BASE}/admin/showcase?password=${encodeURIComponent(adminPasswordCache)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(()=>null);
+    btn.disabled = false;
+    btn.textContent = original;
+    if(!res.ok){
+      showToast(data && data.error ? data.error : t('toastOrderFailed'));
+      return;
+    }
+    showToast(t('toastShowcaseSaved') || 'تم حفظ صور الدائرة');
+  }catch(e){
+    btn.disabled = false;
+    btn.textContent = original;
+    showToast(t('toastOrderFailed'));
+  }
+};
+
+/** Loads the saved showcase images (if any) into the homepage circle. If the
+ * backend has nothing configured yet, the default images already baked into
+ * the HTML (before-after/before-after/*.jpg) stay exactly as they are — this
+ * only overrides them once real choices exist. */
+async function loadShowcaseOnHomepage(){
+  if(!BACKEND_BASE) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/showcase`);
+    const data = await res.json().catch(()=>null);
+    if(!data || !data.center || !Array.isArray(data.items) || data.items.length < 8) return;
+    const centerImg = document.querySelector('.baf-center img');
+    if(centerImg) centerImg.src = data.center;
+    const itemImgs = document.querySelectorAll('.baf-item img');
+    itemImgs.forEach((img,i)=>{ if(data.items[i]) img.src = data.items[i]; });
+  }catch(e){ /* keep default images on any failure */ }
+}
+loadShowcaseOnHomepage();
 
 async function loadVisitorStats(){
   const listEl = document.getElementById('visitorsLogList');
