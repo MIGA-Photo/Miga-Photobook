@@ -1127,6 +1127,9 @@ const translations = {
     pShareLinkLabel:'رابط المنتج (للإعلانات) — انسخه وضعه في منشور المنصة',
     pImageLinkLabel:'رابط الصورة الأصلية — لرفعها في الإعلان',
     copyLinkTitle:'نسخ رابط المنتج', copyImageLinkTitle:'نسخ رابط الصورة',
+    setCoverTitle:'اجعلها واجهة القسم',
+    toastCoverSet:'تم تعيينها واجهة للقسم ⭐',
+    toastCoverSaveFailed:'اتغيّرت على الشاشة، بس الحفظ فشل — جرّب تاني.',
     toastLinkCopied:'تم نسخ رابط المنتج ✅', toastImageLinkCopied:'تم نسخ رابط الصورة ✅',
     toastNoImageYet:'المنتج ده لسه مفيهوش صورة.',
     adminSub:'لوحة إدارة المنتجات والطلبات.',
@@ -1339,6 +1342,9 @@ const translations = {
     pShareLinkLabel:'Product link (for ads) — copy it into your platform post',
     pImageLinkLabel:'Original image link — to upload with your ad',
     copyLinkTitle:'Copy product link', copyImageLinkTitle:'Copy image link',
+    setCoverTitle:'Make this the category cover',
+    toastCoverSet:'Set as the category cover ⭐',
+    toastCoverSaveFailed:'Changed on screen, but saving failed — please try again.',
     toastLinkCopied:'Product link copied ✅', toastImageLinkCopied:'Image link copied ✅',
     toastNoImageYet:'This product has no image yet.',
     adminSub:'Product and order management panel.',
@@ -2030,20 +2036,73 @@ const CAT_TAG_LABEL = { children:'CHILDREN', male:'NATURAL MALE', female:'FEMALE
  * category's own real product photos (falls back to the placeholder art
  * only if it has none yet), plus its name and item count. Tiles stay in
  * sync with the catalog because this runs at the end of every renderGrids(). */
+/** Picks the one photo that fronts a category.
+ *
+ * Preference order:
+ *   1. a photo the admin has explicitly flagged as the cover
+ *   2. the most-ordered photo in that category — customers voting with their
+ *      money is a better judge of "most appealing" than any fixed rule
+ *   3. the first photo that actually has an image
+ */
+/** The category's strongest photos, best first — ranked by how many people
+ * actually ordered them, which is a truer measure of appeal than any fixed
+ * rule. Placeholders never qualify. */
+function categoryTopPhotos(items, limit){
+  return items
+    .filter(p => p.image && p.image !== PLACEHOLDER_IMG)
+    .sort((a,b) => (productPopularity[b.id] || 0) - (productPopularity[a.id] || 0))
+    .slice(0, limit || 3);
+}
+
+/** How many photos a tile may rotate between. Kept small on purpose: showing
+ * the 5th-best photo to some visitors means deliberately showing a weaker
+ * image, so the pool stops at the genuine top few. */
+const COVER_POOL_SIZE = 3;
+
+/** Chosen once per page load, never on a timer. A tile that changed while it
+ * was being looked at would read as a glitch, and a visitor who remembers
+ * "the black-and-white one" should still find it where they left it. Picking
+ * fresh on each visit keeps the storefront from looking static without ever
+ * moving under anyone's eyes. */
+const sessionCoverPick = {};
+
+function categoryCover(items){
+  const withPhoto = items.filter(p => p.image && p.image !== PLACEHOLDER_IMG);
+  if(!withPhoto.length) return null;
+
+  // An explicit admin choice always wins — it is a decision, not a default.
+  const chosen = withPhoto.find(p => p.isCover);
+  if(chosen) return chosen;
+
+  const cat = withPhoto[0].category;
+  const pool = categoryTopPhotos(withPhoto, COVER_POOL_SIZE);
+  if(pool.length === 1) return pool[0];
+
+  if(!(cat in sessionCoverPick)){
+    sessionCoverPick[cat] = Math.floor(Math.random() * pool.length);
+  }
+  return pool[Math.min(sessionCoverPick[cat], pool.length - 1)] || pool[0];
+}
+
 function renderCatTiles(){
   const wrap = document.getElementById('categoryTilesGrid');
   if(!wrap) return;
   wrap.innerHTML = CAT_IDS.map(cat=>{
     const items = products.filter(p=>p.category===cat).sort((a,b) => (a.order ?? 9999) - (b.order ?? 9999));
-    const realPhotos = items.filter(p=>p.image !== PLACEHOLDER_IMG);
-    const source = (realPhotos.length ? realPhotos : items).slice(0, 4);
+    const cover = categoryCover(items);
     const isOpen = document.getElementById(cat)?.classList.contains('open');
-    // Exactly four equal cells: the real photos first, then quiet empty cells
-    // rather than repeating the same photo to pad the collage out.
-    const imgsHtml = source.length
-      ? source.map(p=>`<img src="${p.image}" alt="" loading="lazy">`).join('')
-        + Array.from({length: Math.max(0, 4 - source.length)}, ()=>'<span class="ct-blank" aria-hidden="true"></span>').join('')
-      : `<div class="empty-note" style="grid-column:1/-1; grid-row:1/-1; display:flex; align-items:center; justify-content:center; font-size:12px;">${t('emptyNoteCategory')}</div>`;
+    // The runners-up are stacked behind the cover and revealed on hover or
+    // touch. Changing on a deliberate gesture is discovery; changing on its
+    // own while being read is a distraction, so nothing moves unprompted.
+    const peek = categoryTopPhotos(items, COVER_POOL_SIZE)
+      .filter(p => cover && p.id !== cover.id);
+    const coverHtml = cover
+      ? `<img class="ct-main" src="${cover.image}" alt="" loading="lazy" decoding="async">`
+        + peek.map((p,i)=>`<img class="ct-peek" data-peek="${i+1}" src="${p.image}" alt="" loading="lazy" decoding="async">`).join('')
+        + (peek.length ? `<span class="ct-dots" aria-hidden="true">${
+            Array.from({length: peek.length + 1}, (_,i)=>`<i${i===0?' class="on"':''}></i>`).join('')
+          }</span>` : '')
+      : `<span class="ct-empty">${t('emptyNoteCategory')}</span>`;
     // A category with zero products right now is hidden from regular
     // visitors (same rule applyChildrenVisibility() applies to the section
     // and nav-dropdown entry) but stays visible to a logged-in admin so they
@@ -2055,18 +2114,35 @@ function renderCatTiles(){
       : (items.length > 0 || adminLoggedIn);
     return `
     <button type="button" class="cat-tile${isOpen ? ' open' : ''}" data-cat="${cat}" aria-expanded="${isOpen ? 'true' : 'false'}" style="${catVisible ? '' : 'display:none;'}">
-      <div class="cat-tile-collage">
-        ${imgsHtml}
+      <div class="cat-tile-cover${peek.length ? ' has-peek' : ''}">
+        ${coverHtml}
         ${items.length ? `<span class="ct-count">${items.length}</span>` : ''}
-      </div>
-      <div class="cat-tile-label">
-        <span class="ct-name">${escapeHtml(catLabel(cat))}</span>
-        <span class="tag tag-${cat}">${CAT_TAG_LABEL[cat]}</span>
+        <div class="cat-tile-label">
+          <span class="ct-name">${escapeHtml(catLabel(cat))}</span>
+          <span class="tag tag-${cat}">${CAT_TAG_LABEL[cat]}</span>
+        </div>
       </div>
       <span class="sh-chevron" aria-hidden="true">&#9660;</span>
     </button>`;
   }).join('');
 }
+
+// A phone has no hover, so the same reveal is driven by touch: it starts when
+// a finger lands on a tile and stops when it lifts. Passive listeners, so
+// holding a tile never blocks the page from scrolling.
+(function bindCoverPeekOnTouch(){
+  const grid = document.getElementById('categoryTilesGrid');
+  if(!grid) return;
+  const start = (e)=>{
+    const cover = e.target.closest('.cat-tile')?.querySelector('.cat-tile-cover.has-peek');
+    if(cover) cover.classList.add('peeking');
+  };
+  const stop = ()=> grid.querySelectorAll('.cat-tile-cover.peeking')
+    .forEach(el => el.classList.remove('peeking'));
+  grid.addEventListener('touchstart', start, {passive:true});
+  grid.addEventListener('touchend', stop, {passive:true});
+  grid.addEventListener('touchcancel', stop, {passive:true});
+})();
 
 document.getElementById('categoryTilesGrid')?.addEventListener('click', (e)=>{
   const tile = e.target.closest('.cat-tile');
@@ -2171,6 +2247,25 @@ function fallbackCopy(text, done){
 }
 
 function copyProductLink(id){ copyToClipboard(productShareLink(id), 'toastLinkCopied'); }
+
+/** Makes this photo the face of its category. Exactly one cover per category,
+ * so choosing a new one clears the previous choice rather than leaving two
+ * flagged and letting the order of the list decide. */
+async function setCategoryCover(id){
+  const chosen = products.find(p => p.id === id);
+  if(!chosen) return;
+  if(!chosen.image || chosen.image === PLACEHOLDER_IMG){ showToast(t('toastNoImageYet')); return; }
+
+  const previous = products.filter(p => p.category === chosen.category && p.isCover && p.id !== id);
+  previous.forEach(p => { delete p.isCover; });
+  chosen.isCover = true;
+
+  renderCatTiles();
+  renderAdminProductsList();
+
+  const saved = await Promise.all([chosen, ...previous].map(upsertProductRemote));
+  showToast(t(saved.every(Boolean) ? 'toastCoverSet' : 'toastCoverSaveFailed'));
+}
 
 function copyProductImageUrl(id){
   const p = products.find(x=>x.id===id);
@@ -4429,6 +4524,7 @@ function renderAdminProductsList(){
         <div class="admin-product-actions">
           <button onclick="moveProductOrder('${p.id}', -1)" ${idx===0?'disabled':''} title="${t('moveUpTitle')}">▲</button>
           <button onclick="moveProductOrder('${p.id}', 1)" ${idx===items.length-1?'disabled':''} title="${t('moveDownTitle')}">▼</button>
+          <button onclick="setCategoryCover('${p.id}')" title="${t('setCoverTitle')}">${p.isCover ? '⭐' : '☆'}</button>
           <button onclick="copyProductLink('${p.id}')" title="${t('copyLinkTitle')}">🔗</button>
           <button onclick="copyProductImageUrl('${p.id}')" title="${t('copyImageLinkTitle')}">📷</button>
           <button onclick="editProduct('${p.id}')" title="تعديل">✏️</button>
