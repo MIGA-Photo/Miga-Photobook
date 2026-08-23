@@ -257,6 +257,31 @@ function isValidEmail(email) {
 // Very small best-effort per-IP rate limiter using KV with a short TTL.
 // Not a substitute for Cloudflare's own Rate Limiting Rules (recommended
 // in addition, configured in the dashboard) — this just blunts casual abuse.
+/** Normalises a transfer reference so trivial variations ("48219-60573",
+ * " 4821960573 ") cannot be used to file the same receipt twice. */
+function normaliseRef(ref) {
+  return String(ref || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
+
+/** A reference is only plausible if it is reasonably long and contains at
+ * least one digit — every InstaPay / Vodafone Cash receipt number does. This
+ * is the server-side twin of the check in the storefront, and it is this one
+ * that actually counts, since a browser-side check can always be bypassed. */
+function isPlausibleRef(ref) {
+  const cleaned = normaliseRef(ref);
+  return cleaned.length >= 4 && cleaned.length <= 60 && /[0-9]/.test(cleaned);
+}
+
+/** How many orders from this phone number the admin has already rejected.
+ * Kept as its own counter so the check costs one KV read rather than a scan
+ * of every order ever placed. */
+async function rejectedCountForPhone(env, phone) {
+  const raw = await env.MEGA_KV.get(`rejects:${phone}`);
+  return parseInt(raw || "0", 10) || 0;
+}
+
+const MAX_REJECTS_BEFORE_BLOCK = 3;
+
 async function rateLimit(env, request, key, limit, windowSeconds) {
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
   const k = `ratelimit:${key}:${ip}`;
@@ -492,6 +517,26 @@ async function createOrder(env, request) {
     return err("Please enter a valid Egyptian mobile number (e.g. 01xxxxxxxxx)", 400);
   }
 
+  // A visitor who never transferred has no receipt number to give, so this is
+  // the single most effective filter against "I've paid" being clicked
+  // speculatively. Enforced here, not only in the page.
+  if (!isPlausibleRef(ref)) {
+    return err("Please enter the transfer reference number from your payment receipt", 400);
+  }
+
+  // The same receipt can only ever back one order. Without this, one genuine
+  // transfer could be replayed to claim several products.
+  const refKey = `orderref:${normaliseRef(ref)}`;
+  if (await env.MEGA_KV.get(refKey)) {
+    return err("This transfer reference has already been used for another order", 409);
+  }
+
+  // Repeat offenders: once the admin has rejected several orders from a
+  // number, that number stops being able to file new ones.
+  if ((await rejectedCountForPhone(env, cleanedPhone)) >= MAX_REJECTS_BEFORE_BLOCK) {
+    return err("Ordering from this number has been suspended after repeated unpaid orders. Please contact support.", 403);
+  }
+
   const code = randomCode(8);
   const order = {
     code,
@@ -522,6 +567,8 @@ async function createOrder(env, request) {
     promptText: null,
   };
   await env.MEGA_KV.put(`order:${code}`, JSON.stringify(order));
+  // Claim this receipt number so it cannot back a second order.
+  await env.MEGA_KV.put(refKey, code);
 
   const indexRaw = await env.MEGA_KV.get("orders:index");
   const index = indexRaw ? JSON.parse(indexRaw) : [];
@@ -672,8 +719,21 @@ async function rejectOrder(env, request) {
   if (!raw) return err("Order not found", 404);
   const order = JSON.parse(raw);
   if (order.status === "approved") return err("This order was already approved and can't be rejected", 409);
+  const alreadyRejected = order.status === "rejected";
   order.status = "rejected";
   await env.MEGA_KV.put(`order:${code}`, JSON.stringify(order));
+
+  if (!alreadyRejected) {
+    // Count it against the phone number, so a number that keeps filing unpaid
+    // orders eventually stops being able to.
+    const phone = String(order.phone || "").trim();
+    if (phone) {
+      await env.MEGA_KV.put(`rejects:${phone}`, String((await rejectedCountForPhone(env, phone)) + 1));
+    }
+    // Release the reference: if a genuine receipt was mistyped onto the wrong
+    // order, the customer must be able to use it on the correct one.
+    if (order.ref) await env.MEGA_KV.delete(`orderref:${normaliseRef(order.ref)}`);
+  }
   return json({ ok: true });
 }
 
