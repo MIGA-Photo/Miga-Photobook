@@ -20,6 +20,7 @@
  *   GET  /admin/products (full text, admin only)
  *   POST     /orders/create        GET /orders/track      GET /orders/list
  *   POST     /orders/approve       POST /orders/claim-free
+ *   POST     /orders/mark-thanked  (admin only)
  *   POST     /reviews/submit       GET /reviews/list      GET /reviews/pending
  *   POST     /reviews/approve
  *   POST     /visits/log (public)  GET  /visits/stats (admin only)
@@ -694,6 +695,34 @@ async function claimFreeOrder(env, request) {
   await env.MEGA_KV.put("orders:index", JSON.stringify(index));
 
   return json({ code });
+}
+
+/**
+ * Records that the owner has sent the customer a thank-you message for this
+ * order. Stored on the order itself rather than in the admin's browser so the
+ * "already thanked" state follows the order across phone, laptop and any
+ * future device — a note kept in localStorage would silently reset on each
+ * new browser and lead to customers being messaged twice.
+ */
+async function markOrderThanked(env, request) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return err("Invalid JSON body");
+  }
+  if (!(await verifyAdmin(env, body.password))) return err("Wrong password", 401);
+  const code = (body.code || "").toUpperCase().trim();
+  const raw = await env.MEGA_KV.get(`order:${code}`);
+  if (!raw) return err("Order not found", 404);
+  const order = JSON.parse(raw);
+  // Idempotent: pressing twice keeps the original timestamp rather than
+  // overwriting it, so the record stays truthful about when it was sent.
+  if (!order.thankedAt) {
+    order.thankedAt = Date.now();
+    await env.MEGA_KV.put(`order:${code}`, JSON.stringify(order));
+  }
+  return json({ ok: true, thankedAt: order.thankedAt });
 }
 
 async function listOrders(env, request) {
@@ -1858,6 +1887,7 @@ export default {
       else if (pathname === "/orders/approve" && request.method === "POST") response = await approveOrder(env, request);
       else if (pathname === "/orders/reject" && request.method === "POST") response = await rejectOrder(env, request);
       else if (pathname === "/orders/delete" && request.method === "POST") response = await deleteOrder(env, request);
+      else if (pathname === "/orders/mark-thanked" && request.method === "POST") response = await markOrderThanked(env, request);
       else if (pathname === "/reviews/submit" && request.method === "POST") response = await submitReview(env, request);
       else if (pathname === "/reviews/list" && request.method === "GET") response = await listApprovedReviews(env);
       else if (pathname === "/reviews/pending" && request.method === "GET") response = await listPendingReviews(env, request);
