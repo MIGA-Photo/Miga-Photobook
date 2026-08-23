@@ -314,6 +314,7 @@
   }
   .hero h1{font-size:52px; line-height:1.25; color:var(--paper); margin-bottom:20px;}
   .hero h1 em{font-style:normal; color:var(--brass);}
+  .hero h1 .brand-mark{font-style:normal; color:var(--brass); font-family:'Georgia','Times New Roman',serif; letter-spacing:0.3px; text-shadow:0 0 14px rgba(227,164,41,0.35);}
   .hero p{color:var(--paper-dim); font-size:16.5px; max-width:480px; margin-bottom:28px;}
   .hero-ctas{display:flex; gap:12px;}
   .trust-checks{
