@@ -282,6 +282,55 @@ async function rejectedCountForPhone(env, phone) {
 
 const MAX_REJECTS_BEFORE_BLOCK = 3;
 
+/**
+ * Pushes a new-order alert to Telegram.
+ *
+ * This is the only alert channel that reaches the owner when the storefront
+ * is not open in a browser tab. iOS Safari will not raise web notifications
+ * for a website, so the in-page bell can never be relied on for a phone that
+ * is locked or asleep — this can.
+ *
+ * Deliberately best-effort: a Telegram outage, a revoked token, or missing
+ * configuration must never stop a paying customer's order from being saved.
+ * Every failure path is swallowed and the order still goes through.
+ */
+async function notifyOwnerOfOrder(env, order) {
+  const token = env.TELEGRAM_BOT_TOKEN;
+  const chatId = env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return;           // not configured — silently skip
+
+  const mono = (v) => "`" + String(v || "—") + "`";
+  const lines = [
+    "🔔 *طلب جديد*",
+    "",
+    "*المنتج:* " + order.productTitle,
+    "*السعر:* " + order.price + " EGP",
+    "*النوع:* " + (order.orderType === "prompt" ? "برومبت" : "تحويل صورة"),
+    "*الموبايل:* " + order.phone,
+    "*وسيلة الدفع:* " + (order.appUsed || "—"),
+    "*رقم العملية:* " + mono(order.ref),
+    "*كود الطلب:* " + mono(order.code),
+  ];
+  if (order.buyerName || order.buyerEmail) {
+    lines.push(("*العميل:* " + (order.buyerName || "") + " " + (order.buyerEmail || "")).trim());
+  }
+
+  try {
+    await fetch("https://api.telegram.org/bot" + token + "/sendMessage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: lines.join("\n"),
+        parse_mode: "Markdown",
+        disable_web_page_preview: true,
+      }),
+    });
+  } catch (e) {
+    // Alerting is a convenience, never a condition of taking an order.
+  }
+}
+
 async function rateLimit(env, request, key, limit, windowSeconds) {
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
   const k = `ratelimit:${key}:${ip}`;
@@ -574,6 +623,10 @@ async function createOrder(env, request) {
   const index = indexRaw ? JSON.parse(indexRaw) : [];
   index.push(code);
   await env.MEGA_KV.put("orders:index", JSON.stringify(index));
+
+  // Only after the order is safely stored, so an alert can never be sent for
+  // an order that failed to save.
+  await notifyOwnerOfOrder(env, order);
 
   return json({ code });
 }
