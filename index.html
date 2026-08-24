@@ -897,6 +897,7 @@
         <button data-tab="reviews" id="tabBtnReviews"><span data-i18n="tabReviews">التقييمات</span> <span id="pendingReviewCount"></span></button>
         <button data-tab="visitors" id="tabBtnVisitors" data-i18n="tabVisitors">الزوار</button>
         <button data-tab="showcase" id="tabBtnShowcase" data-i18n="tabShowcase">الدائرة</button>
+        <button data-tab="promoimages" id="tabBtnPromoImages" data-i18n="tabPromoImages">صور العرض</button>
       </div>
 
       <div id="adminTabProducts">
@@ -1044,6 +1045,113 @@
         </div>
       </div>
 
+      <div id="adminTabPromoImages" style="display:none;">
+        <p class="sub" style="margin-bottom:14px;" data-i18n="piIntro">ارفع لحد 20 صورة نتيجة، وهتظهر بدل الفيديو كعرض متحرك بنفس شكل وإطار قسم "شوف Miga-Photobook وهو شغال".</p>
+        <div class="field">
+          <label data-i18n="piItemLabel1">صورة 1</label>
+          <img id="piPreview-1" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-1" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel2">صورة 2</label>
+          <img id="piPreview-2" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-2" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel3">صورة 3</label>
+          <img id="piPreview-3" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-3" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel4">صورة 4</label>
+          <img id="piPreview-4" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-4" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel5">صورة 5</label>
+          <img id="piPreview-5" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-5" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel6">صورة 6</label>
+          <img id="piPreview-6" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-6" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel7">صورة 7</label>
+          <img id="piPreview-7" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-7" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel8">صورة 8</label>
+          <img id="piPreview-8" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-8" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel9">صورة 9</label>
+          <img id="piPreview-9" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-9" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel10">صورة 10</label>
+          <img id="piPreview-10" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-10" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel11">صورة 11</label>
+          <img id="piPreview-11" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-11" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel12">صورة 12</label>
+          <img id="piPreview-12" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-12" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel13">صورة 13</label>
+          <img id="piPreview-13" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-13" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel14">صورة 14</label>
+          <img id="piPreview-14" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-14" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel15">صورة 15</label>
+          <img id="piPreview-15" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-15" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel16">صورة 16</label>
+          <img id="piPreview-16" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-16" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel17">صورة 17</label>
+          <img id="piPreview-17" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-17" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel18">صورة 18</label>
+          <img id="piPreview-18" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-18" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel19">صورة 19</label>
+          <img id="piPreview-19" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-19" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel20">صورة 20</label>
+          <img id="piPreview-20" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="piInput-20" accept="image/*">
+        </div>
+        <div class="modal-actions" style="margin-top:14px;">
+          <button class="btn-primary" id="piSaveBtn" data-i18n="piSaveBtn">حفظ صور العرض</button>
+        </div>
+      </div>
+
       <div class="modal-actions" style="margin-top:14px;">
         <button class="btn-ghost" id="adminLogoutBtn" data-i18n="adminLogoutBtn">خروج</button>
       </div>
@@ -1125,6 +1233,31 @@ const translations = {
     tabReviews:'التقييمات', noPendingReviews:'لا توجد تقييمات جديدة للمراجعة.',
     tabVisitors:'الزوار', visitorsTotalLabel:'إجمالي الزيارات', visitorsTodayLabel:'زيارات اليوم',
     tabShowcase:'الدائرة',
+    tabPromoImages:'صور العرض',
+    piIntro:'ارفع لحد 20 صورة نتيجة، وهتظهر بدل الفيديو كعرض متحرك بنفس شكل وإطار قسم "شوف Miga-Photobook وهو شغال".',
+    piItemLabel1:'صورة 1',
+    piItemLabel2:'صورة 2',
+    piItemLabel3:'صورة 3',
+    piItemLabel4:'صورة 4',
+    piItemLabel5:'صورة 5',
+    piItemLabel6:'صورة 6',
+    piItemLabel7:'صورة 7',
+    piItemLabel8:'صورة 8',
+    piItemLabel9:'صورة 9',
+    piItemLabel10:'صورة 10',
+    piItemLabel11:'صورة 11',
+    piItemLabel12:'صورة 12',
+    piItemLabel13:'صورة 13',
+    piItemLabel14:'صورة 14',
+    piItemLabel15:'صورة 15',
+    piItemLabel16:'صورة 16',
+    piItemLabel17:'صورة 17',
+    piItemLabel18:'صورة 18',
+    piItemLabel19:'صورة 19',
+    piItemLabel20:'صورة 20',
+    piSaveBtn:'حفظ صور العرض',
+    toastPromoImagesIncomplete:'لازم ترفع 3 صور على الأقل',
+    toastPromoImagesSaved:'تم حفظ صور العرض',
     scIntro:'ارفع الصورة الأصلية اللي هتظهر في نص الدائرة في الصفحة الرئيسية، والنتايج الثمانية اللي هتلف حواليها.',
     scCenterLabel:'الصورة الأصلية (المنتصف)',
     scItemLabel1:'نتيجة 1', scItemLabel2:'نتيجة 2', scItemLabel3:'نتيجة 3', scItemLabel4:'نتيجة 4',
@@ -1355,6 +1488,31 @@ const translations = {
     tabReviews:'Reviews', noPendingReviews:'No new reviews to moderate.',
     tabVisitors:'Visitors', visitorsTotalLabel:'Total Visits', visitorsTodayLabel:'Today',
     tabShowcase:'Showcase',
+    tabPromoImages:'Display Images',
+    piIntro:'Upload up to 20 result images to replace the video with a rotating display using the same frame as the "See Miga-Photobook in action" section.',
+    piItemLabel1:'Image 1',
+    piItemLabel2:'Image 2',
+    piItemLabel3:'Image 3',
+    piItemLabel4:'Image 4',
+    piItemLabel5:'Image 5',
+    piItemLabel6:'Image 6',
+    piItemLabel7:'Image 7',
+    piItemLabel8:'Image 8',
+    piItemLabel9:'Image 9',
+    piItemLabel10:'Image 10',
+    piItemLabel11:'Image 11',
+    piItemLabel12:'Image 12',
+    piItemLabel13:'Image 13',
+    piItemLabel14:'Image 14',
+    piItemLabel15:'Image 15',
+    piItemLabel16:'Image 16',
+    piItemLabel17:'Image 17',
+    piItemLabel18:'Image 18',
+    piItemLabel19:'Image 19',
+    piItemLabel20:'Image 20',
+    piSaveBtn:'Save Display Images',
+    toastPromoImagesIncomplete:'Upload at least 3 images first',
+    toastPromoImagesSaved:'Display images saved',
     scIntro:'Upload the original photo shown in the center of the homepage circle, and the 8 results that orbit around it.',
     scCenterLabel:'Original Photo (Center)',
     scItemLabel1:'Result 1', scItemLabel2:'Result 2', scItemLabel3:'Result 3', scItemLabel4:'Result 4',
@@ -4071,11 +4229,13 @@ function setAdminTab(tab){
   document.getElementById('tabBtnReviews').classList.toggle('active', tab==='reviews');
   document.getElementById('tabBtnVisitors').classList.toggle('active', tab==='visitors');
   document.getElementById('tabBtnShowcase').classList.toggle('active', tab==='showcase');
+  document.getElementById('tabBtnPromoImages').classList.toggle('active', tab==='promoimages');
   document.getElementById('adminTabProducts').style.display = tab==='products' ? 'block' : 'none';
   document.getElementById('adminTabOrders').style.display = tab==='orders' ? 'block' : 'none';
   document.getElementById('adminTabReviews').style.display = tab==='reviews' ? 'block' : 'none';
   document.getElementById('adminTabVisitors').style.display = tab==='visitors' ? 'block' : 'none';
   document.getElementById('adminTabShowcase').style.display = tab==='showcase' ? 'block' : 'none';
+  document.getElementById('adminTabPromoImages').style.display = tab==='promoimages' ? 'block' : 'none';
 }
 document.getElementById('tabBtnProducts').onclick = ()=> setAdminTab('products');
 document.getElementById('tabBtnOrders').onclick = async ()=>{
@@ -4094,6 +4254,10 @@ document.getElementById('tabBtnVisitors').onclick = async ()=>{
 document.getElementById('tabBtnShowcase').onclick = async ()=>{
   setAdminTab('showcase');
   await loadShowcaseIntoAdmin();
+};
+document.getElementById('tabBtnPromoImages').onclick = async ()=>{
+  setAdminTab('promoimages');
+  await loadPromoImagesIntoAdmin();
 };
 
 // ---------- Before/After circle showcase (homepage hero section) ----------
@@ -4197,6 +4361,124 @@ async function loadShowcaseOnHomepage(){
   }catch(e){ /* keep default images on any failure */ }
 }
 loadShowcaseOnHomepage();
+
+// ---------- Promo images (rotating 3-panel display, replaces the video if configured) ----------
+const PROMO_IMAGE_SLOTS = Array.from({length:20}, (_,i)=>String(i+1));
+let promoImagesState = {}; // slot -> uploaded URL
+
+async function loadPromoImagesIntoAdmin(){
+  if(!BACKEND_BASE) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/promo-images`);
+    const data = await res.json().catch(()=>null);
+    if(!data || !Array.isArray(data.items)) return;
+    PROMO_IMAGE_SLOTS.forEach((slot,i)=>{
+      const url = data.items[i];
+      if(url){
+        promoImagesState[slot] = url;
+        const img = document.getElementById(`piPreview-${slot}`);
+        if(img){ img.src = url; img.style.display = 'inline-block'; }
+      }
+    });
+  }catch(e){ /* silent — admin can still upload fresh images regardless */ }
+}
+
+PROMO_IMAGE_SLOTS.forEach(slot=>{
+  const input = document.getElementById(`piInput-${slot}`);
+  if(!input) return;
+  input.addEventListener('change', async (e)=>{
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    if(!BACKEND_BASE){ showToast(t('toastOrderFailed')); return; }
+    try{
+      const form = new FormData();
+      form.append('image', file);
+      const res = await fetch(`${BACKEND_BASE}/admin/upload-image?password=${encodeURIComponent(adminPasswordCache)}`, {
+        method:'POST', body: form
+      });
+      const data = await res.json().catch(()=>null);
+      if(!res.ok || !data || !data.url){
+        showToast(data && data.error ? data.error : t('toastImageUploadFailed'));
+        return;
+      }
+      promoImagesState[slot] = data.url;
+      const img = document.getElementById(`piPreview-${slot}`);
+      if(img){ img.src = data.url; img.style.display = 'inline-block'; }
+      showToast(t('toastImageUploaded') || 'تم رفع الصورة');
+    }catch(err){
+      showToast(t('toastImageUploadFailed'));
+    }
+  });
+});
+
+document.getElementById('piSaveBtn').onclick = async ()=>{
+  if(!BACKEND_BASE){ showToast(t('toastOrderFailed')); return; }
+  const items = PROMO_IMAGE_SLOTS.map(s=>promoImagesState[s]).filter(Boolean);
+  if(items.length < 3){ showToast(t('toastPromoImagesIncomplete') || 'لازم ترفع 3 صور على الأقل'); return; }
+  const btn = document.getElementById('piSaveBtn');
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = t('uploadingImage');
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/promo-images?password=${encodeURIComponent(adminPasswordCache)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ items })
+    });
+    const data = await res.json().catch(()=>null);
+    btn.disabled = false;
+    btn.textContent = original;
+    if(!res.ok){
+      showToast(data && data.error ? data.error : t('toastOrderFailed'));
+      return;
+    }
+    showToast(t('toastPromoImagesSaved') || 'تم حفظ صور العرض');
+  }catch(e){
+    btn.disabled = false;
+    btn.textContent = original;
+    showToast(t('toastOrderFailed'));
+  }
+};
+
+/** On the homepage, if the admin has saved 3+ promo images, replace the <video>
+ * with a rotating 3-panel image display using the exact same frame/border CSS
+ * (.promo-video-frame / .promo-video) so it looks identical to the video
+ * version. If nothing is configured yet, the original video stays untouched. */
+async function loadPromoImagesOnHomepage(){
+  if(!BACKEND_BASE) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/promo-images`);
+    const data = await res.json().catch(()=>null);
+    if(!data || !Array.isArray(data.items) || data.items.length < 3) return;
+    const items = data.items.filter(Boolean);
+    const frame = document.querySelector('.promo-video-frame');
+    const video = document.querySelector('.promo-video');
+    if(!frame || !video) return;
+    video.style.display = 'none';
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'width:100%; height:100%; display:flex; gap:0; border-radius:12px; overflow:hidden;';
+    const n = 3;
+    const imgs = [];
+    for(let i=0;i<n;i++){
+      const im = document.createElement('img');
+      im.style.cssText = 'flex:1 1 0; width:100%; height:100%; object-fit:cover; transition:opacity 0.5s ease;';
+      im.src = items[i % items.length];
+      wrap.appendChild(im);
+      imgs.push(im);
+    }
+    frame.appendChild(wrap);
+    let offset = 0;
+    setInterval(()=>{
+      offset = (offset + 1) % items.length;
+      imgs.forEach((im,i)=>{
+        im.style.opacity = '0';
+        setTimeout(()=>{
+          im.src = items[(offset + i*Math.floor(items.length/n)) % items.length];
+          im.style.opacity = '1';
+        }, 400);
+      });
+    }, 3200);
+  }catch(e){ /* keep the default video on any failure */ }
+}
+loadPromoImagesOnHomepage();
 
 async function loadVisitorStats(){
   const listEl = document.getElementById('visitorsLogList');
