@@ -4458,8 +4458,11 @@ async function loadPromoImagesOnHomepage(){
     if(!frame || !video) return;
     if(frame.dataset.carouselInit === '1') return; // guard against double-init
     frame.dataset.carouselInit = '1';
-    video.pause();
+    // Keep the video playing (muted, hidden) in the background rather than
+    // pausing it — this way its narration audio is ready the instant the
+    // person taps the sound button, with no restart/reload delay.
     video.style.display = 'none';
+    video.play().catch(()=>{});
     frame.style.overflow = 'hidden';
 
     // Shuffle once per page load (Fisher–Yates) so repeat visits — and repeat
@@ -4477,7 +4480,7 @@ async function loadPromoImagesOnHomepage(){
       const holder = document.createElement('div');
       holder.style.cssText = 'flex:1 1 0; height:100%; overflow:hidden; position:relative;';
       const im = document.createElement('img');
-      im.style.cssText = 'width:100%; height:100%; object-fit:cover; display:block; transition:opacity 0.5s ease, transform 3.4s ease-out; transform:scale(1); background:#111;';
+      im.style.cssText = 'width:100%; height:100%; object-fit:cover; display:block; transition:opacity 0.5s ease; background:#111;';
       im.src = items[i % items.length];
       holder.appendChild(im);
       wrap.appendChild(holder);
@@ -4494,6 +4497,21 @@ async function loadPromoImagesOnHomepage(){
       return d;
     });
     wrap.appendChild(dots);
+
+    // Sound button — the images have no audio of their own, so this unmutes
+    // the original video's narration playing quietly behind the scenes.
+    const soundBtn = document.createElement('button');
+    soundBtn.type = 'button';
+    soundBtn.setAttribute('aria-label', 'تشغيل الصوت');
+    soundBtn.style.cssText = 'position:absolute; top:10px; left:10px; z-index:3; width:36px; height:36px; border-radius:50%; border:1.5px solid var(--brass); background:rgba(20,16,8,0.55); color:var(--brass); font-size:16px; display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter:blur(2px);';
+    soundBtn.textContent = '🔇';
+    soundBtn.addEventListener('click', (e)=>{
+      e.stopPropagation(); // don't trigger the left/right image navigation
+      video.muted = !video.muted;
+      if(!video.muted) video.play().catch(()=>{});
+      soundBtn.textContent = video.muted ? '🔇' : '🔊';
+    });
+    wrap.appendChild(soundBtn);
     frame.appendChild(wrap);
 
     let offset = 0;
@@ -4531,8 +4549,6 @@ async function loadPromoImagesOnHomepage(){
         setTimeout(()=>{
           im.src = nextSrcs[i];
           im.style.opacity = '1';
-          im.style.transform = 'scale(1)';
-          requestAnimationFrame(()=>{ im.style.transform = 'scale(1.08)'; });
         }, 350);
       });
       updateDots();
