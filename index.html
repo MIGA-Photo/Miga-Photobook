@@ -83,6 +83,8 @@
         <button type="button" data-admin-tab="products" data-i18n="tabProducts" role="menuitem">إضافة منتج</button>
         <button type="button" data-admin-tab="reviews" data-i18n="tabReviews" role="menuitem">التقييمات</button>
         <button type="button" data-admin-tab="visitors" data-i18n="tabVisitors" role="menuitem">الزوار</button>
+        <button type="button" data-admin-tab="showcase" data-i18n="tabShowcase" role="menuitem">الدائرة</button>
+        <button type="button" data-admin-tab="promoimages" data-i18n="tabPromoImages" role="menuitem">صور العرض</button>
         <button type="button" id="adminQuickLogout" data-i18n="adminLogoutBtn" role="menuitem" style="color:#e07a7a;">خروج</button>
       </div>
     </div>
@@ -3621,6 +3623,8 @@ document.getElementById('adminQuickMenu').addEventListener('click', (e)=>{
   document.getElementById('adminFormView').style.display = 'block';
   setAdminTab(tab);
   if(tab === 'orders'){ loadOrders().then(renderOrdersList); }
+  if(tab === 'showcase'){ loadShowcaseIntoAdmin(); }
+  if(tab === 'promoimages'){ loadPromoImagesIntoAdmin(); }
 });
 document.getElementById('adminQuickLogout').addEventListener('click', ()=>{
   closeAdminQuickMenu();
