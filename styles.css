@@ -390,12 +390,15 @@
   }
   .promo-video-frame{
     position:relative; flex:2 1 640px; max-width:900px; aspect-ratio:1440/854;
-    border-radius:16px; padding:5px; overflow:hidden;
-    background:linear-gradient(145deg, var(--brass), var(--brass-dim));
-    box-shadow:0 0 50px rgba(255,201,77,0.3), 0 20px 60px rgba(0,0,0,0.55);
+    border-radius:16px; border:4px solid var(--brass); overflow:hidden; box-sizing:border-box;
+    box-shadow:0 0 50px rgba(255,201,77,0.3), 0 20px 60px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.15);
   }
   .promo-video{
     width:100%; height:100%; object-fit:cover; border-radius:12px; display:block; background:#000;
+  }
+  @keyframes promoWaveScroll{
+    0%{background-position-y:0;}
+    100%{background-position-y:48px;}
   }
   @media(max-width:640px){
     .promo-video-frame{max-width:100%; flex-basis:100%;}

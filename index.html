@@ -4461,7 +4461,7 @@ async function loadPromoImagesOnHomepage(){
     // Keep the video playing (muted, hidden) in the background rather than
     // pausing it — this way its narration audio is ready the instant the
     // person taps the sound button, with no restart/reload delay.
-    video.style.display = 'none';
+    video.style.cssText = 'position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; overflow:hidden;';
     video.play().catch(()=>{});
     frame.style.overflow = 'hidden';
 
@@ -4512,6 +4512,16 @@ async function loadPromoImagesOnHomepage(){
       soundBtn.textContent = video.muted ? '🔇' : '🔊';
     });
     wrap.appendChild(soundBtn);
+
+    // Wavy, moving zigzag seams between the 3 panels instead of a hard
+    // straight edge — a thin jagged strip laid over each boundary, its
+    // background scrolling continuously to feel alive, like water.
+    const waveSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='48' viewBox='0 0 24 48'%3E%3Cpath d='M0 0 L24 6 L0 12 L24 18 L0 24 L24 30 L0 36 L24 42 L0 48' fill='none' stroke='%23e3a429' stroke-width='2.5' opacity='0.55'/%3E%3C/svg%3E";
+    [1,2].forEach(pos=>{
+      const d = document.createElement('div');
+      d.style.cssText = `position:absolute; top:0; bottom:0; left:${(100/3)*pos}%; width:26px; margin-left:-13px; z-index:2; background-image:url("${waveSvg}"); background-repeat:repeat-y; background-size:24px 48px; animation:promoWaveScroll 2.6s linear infinite; pointer-events:none; mix-blend-mode:overlay;`;
+      wrap.appendChild(d);
+    });
     frame.appendChild(wrap);
 
     let offset = 0;
