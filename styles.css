@@ -399,7 +399,9 @@
   }
   @media(max-width:640px){
     .promo-video-frame{max-width:100%; flex-basis:100%;}
-    .promo-video-outer{padding:14px;}
+    .promo-video-outer{
+      padding:0; border:none; background:none; box-shadow:none; border-radius:0;
+    }
     .promo-video-copy{padding:18px;}
   }
 
