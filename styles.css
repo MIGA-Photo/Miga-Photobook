@@ -361,10 +361,22 @@
   html[dir="rtl"] .how-arrow{transform:scaleX(-1);}
 
   /* ===== Promo video ===== */
-  .promo-video-wrap{
-    display:flex; align-items:center; gap:36px; flex-wrap:wrap; justify-content:flex-start;
+  .promo-video-outer{
+    display:flex; align-items:stretch; gap:0; flex-wrap:wrap; justify-content:center;
+    border:2px solid var(--brass); border-radius:20px; padding:22px;
+    background:rgba(255,201,77,0.03);
+    box-shadow:0 0 60px rgba(255,201,77,0.12), inset 0 0 40px rgba(255,201,77,0.04);
   }
-  .promo-video-copy{flex:1 1 280px; max-width:380px;}
+  .promo-video-wrap{
+    display:flex; align-items:center; gap:28px; flex-wrap:wrap; justify-content:center; width:100%;
+  }
+  .promo-video-copy{
+    flex:1 1 280px; max-width:400px; align-self:stretch;
+    display:flex; flex-direction:column; justify-content:center;
+    border:1.5px solid var(--brass); border-radius:16px; padding:22px 24px;
+    background:linear-gradient(180deg, rgba(255,201,77,0.08), rgba(255,201,77,0.02));
+    box-shadow:0 0 24px rgba(255,201,77,0.14);
+  }
   .promo-video-copy h2{
     margin-bottom:10px; font-family:'Georgia','Times New Roman',serif; font-weight:700;
     background:linear-gradient(90deg, var(--brass) 0%, #fff8e1 45%, var(--brass) 90%);
@@ -385,7 +397,11 @@
   .promo-video{
     width:100%; height:100%; object-fit:cover; border-radius:12px; display:block; background:#000;
   }
-  @media(max-width:640px){ .promo-video-frame{max-width:100%; flex-basis:100%;} }
+  @media(max-width:640px){
+    .promo-video-frame{max-width:100%; flex-basis:100%;}
+    .promo-video-outer{padding:14px;}
+    .promo-video-copy{padding:18px;}
+  }
 
   .before-after-wrap{display:flex; align-items:center; gap:24px; flex-wrap:wrap;}
   .ba-item{position:relative; width:260px;}
