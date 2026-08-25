@@ -164,6 +164,11 @@
   .baf-title{ font-size:clamp(20px,4.5vw,28px); margin:0 0 6px; }
   .baf-sub{ color:var(--paper-dim); max-width:520px; margin:0 auto 28px; font-size:14.5px; }
   .baf-wrap{ position:relative; width:min(94vw,560px); aspect-ratio:1/1; margin:0 auto; }
+  .baf-orbit{ position:absolute; inset:0; animation:bafOrbitSpin 48s linear infinite; }
+  @keyframes bafOrbitSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+  .baf-item-spin{ width:100%; height:100%; animation:bafOrbitCounterSpin 48s linear infinite; }
+  @keyframes bafOrbitCounterSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(-360deg); } }
+  @media(prefers-reduced-motion:reduce){ .baf-orbit, .baf-item-spin{ animation:none; } }
   .baf-center{ position:absolute; top:50%; left:50%; width:clamp(120px,32vw,190px); height:clamp(120px,32vw,190px); transform:translate(-50%,-50%); border-radius:50%; overflow:hidden; border:2px solid #3b8ef0; box-shadow:0 0 0 6px var(--ink), 0 0 18px rgba(59,142,240,0.4), 0 8px 24px rgba(0,0,0,0.4); z-index:5; }
   .baf-center img{ width:100%; height:100%; object-fit:cover; object-position:center 18%; display:block; }
   .baf-center-label{ position:absolute; bottom:-14px; left:50%; transform:translateX(-50%); background:var(--brass); color:var(--ink); font-size:11px; font-weight:700; padding:3px 12px; border-radius:20px; white-space:nowrap; z-index:6; }
@@ -178,22 +183,24 @@
   <h2 class="baf-title" data-i18n="bafTitle">صورة واحدة منك... نحولها لأجمل صورة من اختيارك من عندنا</h2>
   <p class="baf-sub" data-i18n="bafSub">دي نفس الصورة، بعد ما Miga-Photobook حوّلها لأكتر من ستايل. اختار اللي يعجبك وجرّبه على صورتك.</p>
   <div class="baf-wrap">
-    <div class="baf-connector" style="--angle:0deg; --radius:clamp(120px,36vw,225px);"></div>
-    <div class="baf-connector" style="--angle:45deg; --radius:clamp(120px,36vw,225px);"></div>
-    <div class="baf-connector" style="--angle:90deg; --radius:clamp(120px,36vw,225px);"></div>
-    <div class="baf-connector" style="--angle:135deg; --radius:clamp(120px,36vw,225px);"></div>
-    <div class="baf-connector" style="--angle:180deg; --radius:clamp(120px,36vw,225px);"></div>
-    <div class="baf-connector" style="--angle:225deg; --radius:clamp(120px,36vw,225px);"></div>
-    <div class="baf-connector" style="--angle:270deg; --radius:clamp(120px,36vw,225px);"></div>
-    <div class="baf-connector" style="--angle:315deg; --radius:clamp(120px,36vw,225px);"></div>
-    <div class="baf-item" style="--angle:0deg;"><img src="before-after/before-after/after-1.jpg" alt="نتيجة 1" loading="lazy"></div>
-    <div class="baf-item" style="--angle:45deg;"><img src="before-after/before-after/after-2.jpg" alt="نتيجة 2" loading="lazy"></div>
-    <div class="baf-item" style="--angle:90deg;"><img src="before-after/before-after/after-3.jpg" alt="نتيجة 3" loading="lazy"></div>
-    <div class="baf-item" style="--angle:135deg;"><img src="before-after/before-after/after-4.jpg" alt="نتيجة 4" loading="lazy"></div>
-    <div class="baf-item" style="--angle:180deg;"><img src="before-after/before-after/after-5.jpg" alt="نتيجة 5" loading="lazy"></div>
-    <div class="baf-item" style="--angle:225deg;"><img src="before-after/before-after/after-6.jpg" alt="نتيجة 6" loading="lazy"></div>
-    <div class="baf-item" style="--angle:270deg;"><img src="before-after/before-after/after-7.jpg" alt="نتيجة 7" loading="lazy"></div>
-    <div class="baf-item" style="--angle:315deg;"><img src="before-after/before-after/after-8.jpg" alt="نتيجة 8" loading="lazy"></div>
+    <div class="baf-orbit">
+      <div class="baf-connector" style="--angle:0deg; --radius:clamp(120px,36vw,225px);"></div>
+      <div class="baf-connector" style="--angle:45deg; --radius:clamp(120px,36vw,225px);"></div>
+      <div class="baf-connector" style="--angle:90deg; --radius:clamp(120px,36vw,225px);"></div>
+      <div class="baf-connector" style="--angle:135deg; --radius:clamp(120px,36vw,225px);"></div>
+      <div class="baf-connector" style="--angle:180deg; --radius:clamp(120px,36vw,225px);"></div>
+      <div class="baf-connector" style="--angle:225deg; --radius:clamp(120px,36vw,225px);"></div>
+      <div class="baf-connector" style="--angle:270deg; --radius:clamp(120px,36vw,225px);"></div>
+      <div class="baf-connector" style="--angle:315deg; --radius:clamp(120px,36vw,225px);"></div>
+      <div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-1.jpg" alt="نتيجة 1" loading="lazy"></div></div>
+      <div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-2.jpg" alt="نتيجة 2" loading="lazy"></div></div>
+      <div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-3.jpg" alt="نتيجة 3" loading="lazy"></div></div>
+      <div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-4.jpg" alt="نتيجة 4" loading="lazy"></div></div>
+      <div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-5.jpg" alt="نتيجة 5" loading="lazy"></div></div>
+      <div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-6.jpg" alt="نتيجة 6" loading="lazy"></div></div>
+      <div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-7.jpg" alt="نتيجة 7" loading="lazy"></div></div>
+      <div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-8.jpg" alt="نتيجة 8" loading="lazy"></div></div>
+    </div>
     <div class="baf-center">
       <img src="before-after/before-after/before.jpg" alt="الصورة الأصلية">
       <span class="baf-center-label" data-i18n="bafCenterLabel">صورتك الأصلية</span>
