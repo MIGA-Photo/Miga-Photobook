@@ -4452,34 +4452,139 @@ async function loadPromoImagesOnHomepage(){
     const res = await fetch(`${BACKEND_BASE}/promo-images`);
     const data = await res.json().catch(()=>null);
     if(!data || !Array.isArray(data.items) || data.items.length < 3) return;
-    const items = data.items.filter(Boolean);
+    let items = data.items.filter(Boolean);
     const frame = document.querySelector('.promo-video-frame');
     const video = document.querySelector('.promo-video');
     if(!frame || !video) return;
-    video.style.display = 'none';
+    if(frame.dataset.carouselInit === '1') return; // guard against double-init
+    frame.dataset.carouselInit = '1';
+    // Keep the video playing (muted, hidden) in the background rather than
+    // pausing it — this way its narration audio is ready the instant the
+    // person taps the sound button, with no restart/reload delay.
+    video.style.cssText = 'position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; overflow:hidden;';
+    video.play().catch(()=>{});
+    frame.style.overflow = 'hidden';
+
+    // Shuffle once per page load (Fisher–Yates) so repeat visits — and repeat
+    // watches in the same visit — show a different sequence each time.
+    for(let i=items.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [items[i],items[j]] = [items[j],items[i]];
+    }
+
     const wrap = document.createElement('div');
-    wrap.style.cssText = 'width:100%; height:100%; display:flex; gap:0; border-radius:12px; overflow:hidden;';
+    wrap.style.cssText = 'position:relative; width:100%; height:100%; display:flex; gap:0; border-radius:12px; overflow:hidden; cursor:pointer; user-select:none;';
     const n = 3;
     const imgs = [];
     for(let i=0;i<n;i++){
+      const holder = document.createElement('div');
+      holder.style.cssText = 'flex:1 1 0; height:100%; overflow:hidden; position:relative;';
       const im = document.createElement('img');
-      im.style.cssText = 'flex:1 1 0; width:100%; height:100%; object-fit:cover; transition:opacity 0.5s ease;';
+      im.style.cssText = 'width:100%; height:100%; object-fit:cover; display:block; transition:opacity 0.5s ease; background:#111;';
       im.src = items[i % items.length];
-      wrap.appendChild(im);
+      holder.appendChild(im);
+      wrap.appendChild(holder);
       imgs.push(im);
     }
+    // Progress dots — one per image, lightly indicating position and inviting
+    // curiosity ("what's next?") which is what keeps people watching.
+    const dots = document.createElement('div');
+    dots.style.cssText = 'position:absolute; bottom:10px; left:0; right:0; display:flex; justify-content:center; gap:5px; z-index:2;';
+    const dotEls = items.slice(0, Math.min(items.length, 10)).map(()=>{
+      const d = document.createElement('span');
+      d.style.cssText = 'width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.35); transition:background 0.3s, transform 0.3s;';
+      dots.appendChild(d);
+      return d;
+    });
+    wrap.appendChild(dots);
+
+    // Sound button — the images have no audio of their own, so this unmutes
+    // the original video's narration playing quietly behind the scenes.
+    const soundBtn = document.createElement('button');
+    soundBtn.type = 'button';
+    soundBtn.setAttribute('aria-label', 'تشغيل الصوت');
+    soundBtn.style.cssText = 'position:absolute; top:10px; left:10px; z-index:3; width:36px; height:36px; border-radius:50%; border:1.5px solid var(--brass); background:rgba(20,16,8,0.55); color:var(--brass); font-size:16px; display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter:blur(2px);';
+    soundBtn.textContent = '🔇';
+    soundBtn.addEventListener('click', (e)=>{
+      e.stopPropagation(); // don't trigger the left/right image navigation
+      video.muted = !video.muted;
+      if(!video.muted) video.play().catch(()=>{});
+      soundBtn.textContent = video.muted ? '🔇' : '🔊';
+    });
+    wrap.appendChild(soundBtn);
+
+    // Wavy, moving zigzag seams between the 3 panels instead of a hard
+    // straight edge — a thin jagged strip laid over each boundary, its
+    // background scrolling continuously to feel alive, like water.
+    const waveSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='48' viewBox='0 0 24 48'%3E%3Cpath d='M0 0 L24 6 L0 12 L24 18 L0 24 L24 30 L0 36 L24 42 L0 48' fill='none' stroke='%23e3a429' stroke-width='2.5' opacity='0.55'/%3E%3C/svg%3E";
+    [1,2].forEach(pos=>{
+      const d = document.createElement('div');
+      d.style.cssText = `position:absolute; top:0; bottom:0; left:${(100/3)*pos}%; width:26px; margin-left:-13px; z-index:2; background-image:url("${waveSvg}"); background-repeat:repeat-y; background-size:24px 48px; animation:promoWaveScroll 2.6s linear infinite; pointer-events:none; mix-blend-mode:overlay;`;
+      wrap.appendChild(d);
+    });
     frame.appendChild(wrap);
+
     let offset = 0;
-    setInterval(()=>{
-      offset = (offset + 1) % items.length;
+    let paused = false;
+    let resumeTimer = null;
+
+    function preload(src){
+      return new Promise((resolve)=>{
+        const p = new Image();
+        p.onload = ()=>resolve(true);
+        p.onerror = ()=>resolve(false);
+        p.src = src;
+      });
+    }
+    // Warm the whole library in the background right away so every future
+    // transition is instant — this is what makes it feel buttery, not just
+    // the next couple of frames.
+    items.forEach(src=> preload(src));
+
+    function updateDots(){
+      const active = offset % dotEls.length;
+      dotEls.forEach((d,i)=>{
+        d.style.background = i===active ? 'var(--brass)' : 'rgba(255,255,255,0.35)';
+        d.style.transform = i===active ? 'scale(1.3)' : 'scale(1)';
+      });
+    }
+    updateDots();
+
+    async function render(){
+      const nextSrcs = imgs.map((im,i)=> items[((offset + i*Math.floor(items.length/n)) % items.length + items.length) % items.length]);
+      await Promise.all(nextSrcs.map(preload));
+      if(paused) { /* still show — preload doesn't hurt */ }
       imgs.forEach((im,i)=>{
         im.style.opacity = '0';
         setTimeout(()=>{
-          im.src = items[(offset + i*Math.floor(items.length/n)) % items.length];
+          im.src = nextSrcs[i];
           im.style.opacity = '1';
-        }, 400);
+        }, 350);
       });
-    }, 3200);
+      updateDots();
+    }
+
+    function goTo(step){
+      offset = ((offset + step) % items.length + items.length) % items.length;
+      const renderPromise = render();
+      // Manual navigation counts as engagement — give the auto-rotation a
+      // breather so it doesn't fight the person's own browsing.
+      if(resumeTimer) clearTimeout(resumeTimer);
+      paused = true;
+      resumeTimer = setTimeout(()=>{ paused = false; }, 5000);
+      return renderPromise;
+    }
+
+    setInterval(()=>{ if(!paused) goTo(1); }, 3400);
+
+    // Tap the right half to go forward, left half to go back — simple,
+    // intuitive, and gives visitors a reason to keep interacting instead of
+    // just watching passively.
+    wrap.addEventListener('click', (e)=>{
+      const rect = wrap.getBoundingClientRect();
+      const tappedRight = (e.clientX - rect.left) > rect.width / 2;
+      return goTo(tappedRight ? 1 : -1);
+    });
   }catch(e){ /* keep the default video on any failure */ }
 }
 loadPromoImagesOnHomepage();
