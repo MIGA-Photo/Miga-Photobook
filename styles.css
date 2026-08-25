@@ -363,6 +363,7 @@
   /* ===== Promo video ===== */
   .promo-video-outer{
     display:flex; align-items:stretch; gap:0; flex-wrap:wrap; justify-content:center;
+    width:fit-content; max-width:100%; margin:0 auto;
     border:2px solid var(--brass); border-radius:20px; padding:22px;
     background:rgba(255,201,77,0.03);
     box-shadow:0 0 60px rgba(255,201,77,0.12), inset 0 0 40px rgba(255,201,77,0.04);
