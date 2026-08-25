@@ -762,7 +762,7 @@
   }
   .plan.featured{border-color:var(--brass); position:relative; background:linear-gradient(180deg, rgba(255,201,77,0.12), transparent 60%);}
   .plan.featured::before{
-    content:"الأكثر طلبًا"; position:absolute; top:-13px; right:24px; background:var(--brass);
+    content:"🔥 الأكثر طلبًا"; position:absolute; top:-13px; right:24px; background:var(--brass);
     color:var(--ink); font-size:11.5px; font-weight:700; padding:4px 12px; border-radius:100px;
   }
   .plan h3{font-size:20px; color:var(--paper);}
