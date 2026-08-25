@@ -988,7 +988,7 @@ function renderMostRequested(){
   const grid = document.getElementById('mostRequestedGrid');
   if(!section || !grid) return;
   const ranked = products
-    .filter(p => (productPopularity[p.id] || 0) > 0)
+    .filter(p => p.image && p.image !== PLACEHOLDER_IMG && (productPopularity[p.id] || 0) > 0)
     .sort((a,b) => (productPopularity[b.id]||0) - (productPopularity[a.id]||0))
     .slice(0, 12);
   if(!ranked.length){
@@ -1038,7 +1038,16 @@ function renderGrids(){
   CAT_IDS.forEach(cat=>{
     const el = document.getElementById('grid-'+cat);
     if(!el) return;
-    const allItems = products.filter(p=>p.category===cat)
+    // Products the admin has written up (title, prompt, price) but hasn't
+    // attached a real photo to yet still carry PLACEHOLDER_IMG — a mostly
+    // empty dark rectangle with small centered text. Left unfiltered here,
+    // every one of those showed up as a large, blank-looking card in the
+    // live customer grid alongside the real photos. The category tiles
+    // already exclude these from their own cover photo (see categoryCover);
+    // this brings the actual product grid in line with that same rule, so a
+    // draft with no photo yet stays a backstage admin concern instead of a
+    // customer-facing empty tile.
+    const allItems = products.filter(p=>p.category===cat && p.image && p.image !== PLACEHOLDER_IMG)
       .sort((a,b) => (a.order ?? 9999) - (b.order ?? 9999));
     const dotsEl = document.getElementById('gridDots-'+cat);
 
@@ -2210,17 +2219,36 @@ function getCategoryOf(productId){
 
 
 // ---------- Quick-nav row (single row of tabs above the five sections above) ----------
-document.getElementById('sectionTabsRow').addEventListener('click', (e)=>{
-  const btn = e.target.closest('.section-tab-btn');
-  if(!btn) return;
-  document.querySelectorAll('.section-tab-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  const targetId = btn.dataset.target;
+// Accordion behaviour: tapping a tab expands its content directly beneath
+// the row and hides the other four tabs, so the open one and its content
+// read as a single expanded block. Tapping the same (now-lone) tab again
+// collapses it and brings the other four back. Only ever one section open
+// at a time, matching how the sections themselves already worked — this
+// just makes the tab row follow the same rule instead of staying a fixed
+// row of five above whichever section happens to be open.
+function setActiveSectionTab(targetId, {scroll} = {scroll: true}){
+  const row = document.getElementById('sectionTabsRow');
+  document.querySelectorAll('.section-tab-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.target === targetId);
+  });
   document.querySelectorAll('#whyUs, #howItWorks, #testimonials, #aboutUs, #faq').forEach(sec=>{
     sec.classList.toggle('open', sec.id === targetId);
   });
-  document.getElementById(targetId)?.scrollIntoView({behavior:'smooth', block:'start'});
+  row.classList.toggle('has-active', !!targetId);
+  if(targetId && scroll){
+    document.getElementById(targetId)?.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+}
+document.getElementById('sectionTabsRow').addEventListener('click', (e)=>{
+  const btn = e.target.closest('.section-tab-btn');
+  if(!btn) return;
+  const alreadyActive = btn.classList.contains('active');
+  setActiveSectionTab(alreadyActive ? null : btn.dataset.target, {scroll: !alreadyActive});
 });
+// howItWorks starts open by default (see its markup), so the row starts in
+// the same collapsed-to-one-tab state a click would produce, instead of
+// showing all five tabs above a section that's already expanded.
+setActiveSectionTab('howItWorks', {scroll: false});
 
 // ---------- Back to top + vertical scroll ruler ----------
 const backToTopBtn = document.getElementById('backToTopBtn');
@@ -2346,7 +2374,11 @@ function scrollToSiteSection(id){
   addSearchHistory(term);
   const el = document.getElementById(id);
   if(!el) return;
-  el.classList.add('open'); // opens it if it's one of the collapsible sections
+  if(['whyUs','howItWorks','testimonials','aboutUs','faq'].includes(id)){
+    setActiveSectionTab(id, {scroll: false}); // keeps the tab row's hide/show in sync
+  } else {
+    el.classList.add('open'); // opens it if it's one of the collapsible category sections
+  }
   document.querySelector(`.cat-tile[data-cat="${id}"]`)?.classList.add('open');
   document.querySelector(`.cat-tile[data-cat="${id}"]`)?.setAttribute('aria-expanded', 'true');
   el.scrollIntoView({behavior:'smooth', block:'start'});

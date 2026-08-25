@@ -216,13 +216,16 @@
      about / faq), so a visitor finds all of it at a glance instead of
      scrolling past five separate stacked headers. */
   .section-tabs{
-    display:flex; flex-wrap:wrap; gap:10px; margin:0 0 28px;
+    display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; margin:0 0 28px;
   }
+  @media(min-width:640px){ .section-tabs{grid-template-columns:repeat(3, 1fr);} }
+  @media(min-width:980px){ .section-tabs{grid-template-columns:repeat(5, 1fr);} }
   .section-tab-btn{
-    display:flex; align-items:center; gap:10px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    width:100%; height:56px; box-sizing:border-box; text-align:center;
     background:var(--ink-2); border:1.5px solid var(--brass); color:var(--paper);
-    padding:12px 20px; border-radius:12px;
-    font-size:16px; font-weight:800; letter-spacing:0.2px; font-family:inherit;
+    padding:0 14px; border-radius:12px;
+    font-size:15px; font-weight:800; letter-spacing:0.2px; font-family:inherit;
     transition:.2s;
   }
   .section-tab-btn:hover{background:rgba(255,201,77,0.08);}
@@ -230,8 +233,14 @@
     background:var(--brass); color:var(--ink); border-color:var(--brass);
   }
   .section-tab-btn.active .icon-badge{border-color:var(--ink); color:var(--ink);}
+  /* Accordion mode: once a tab is active, the other four are hidden and the
+     active one stretches across the row, so it sits directly above its own
+     content instead of floating alone in a mostly-empty grid. Re-clicking it
+     (still the only visible button) is what brings the other four back. */
+  .section-tabs.has-active .section-tab-btn{display:none;}
+  .section-tabs.has-active .section-tab-btn.active{display:flex; grid-column:1/-1;}
   @media(max-width:700px){
-    .section-tab-btn{font-size:14.5px; padding:10px 15px;}
+    .section-tab-btn{font-size:13.5px; height:52px; padding:0 10px;}
   }
 
   /* Admin orders: total/completed/pending counts, click to expand a live table */
@@ -298,11 +307,11 @@
     padding:4px 9px; border-radius:100px; backdrop-filter:blur(2px);
   }
   .admin-btn{
-    display:inline-flex; align-items:center; gap:8px;
-    background:transparent; border:1px solid var(--line); color:var(--paper-dim);
-    padding:8px 14px; border-radius:8px; font-size:13px;
+    display:inline-flex; align-items:center; gap:8px; height:44px; box-sizing:border-box;
+    background:transparent; border:1.5px solid var(--brass); color:var(--paper-dim);
+    padding:0 16px; border-radius:10px; font-size:13px;
   }
-  .admin-btn:hover{border-color:var(--brass); color:var(--brass);}
+  .admin-btn:hover{background:rgba(255,201,77,0.08); color:var(--brass);}
 
   /* ===== Hero ===== */
   .hero{
@@ -1177,11 +1186,17 @@
     .hero h1{font-size:36px;}
   }
 
-  /* ===== Header controls (lang / view toggles) ===== */
-  .ctrl-group{display:flex; gap:4px; background:var(--ink-2); border:1px solid var(--line); border-radius:8px; padding:3px;}
+  /* ===== Header controls (lang / view toggles) — same height, weight of
+     border, and radius as the other header controls (theme switch, account,
+     track order) so the whole row reads as one deliberate family instead of
+     five differently-sized pieces. ===== */
+  .ctrl-group{
+    display:flex; align-items:center; gap:4px; height:44px; box-sizing:border-box;
+    background:var(--ink-2); border:1.5px solid var(--brass); border-radius:10px; padding:0 4px;
+  }
   .ctrl-group button{
-    display:inline-flex; align-items:center; gap:6px;
-    background:transparent; color:var(--paper-dim); padding:6px 10px; border-radius:6px; font-size:12.5px;
+    display:inline-flex; align-items:center; gap:6px; height:36px; box-sizing:border-box;
+    background:transparent; color:var(--paper-dim); padding:0 12px; border-radius:7px; font-size:12.5px;
   }
   .ctrl-group button.active{background:var(--brass); color:var(--ink); font-weight:700;}
   .ctrl-group button.active .icon-badge{border-color:var(--ink); color:var(--ink);}
@@ -1194,26 +1209,29 @@
      them. */
   .icon-badge{
     display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
-    width:24px; height:24px; border-radius:50%;
+    width:28px; height:28px; border-radius:50%;
     border:1.5px solid var(--brass); color:var(--brass);
   }
-  .icon-badge svg{width:15px; height:15px; display:block;}
+  .icon-badge svg{width:17px; height:17px; display:block;}
   @media(max-width:460px){
-    .icon-badge{width:21px; height:21px;}
-    .icon-badge svg{width:13px; height:13px;}
+    .icon-badge{width:24px; height:24px;}
+    .icon-badge svg{width:15px; height:15px;}
   }
 
   /* ===== Day/night switch — one rectangle whose sky changes with the mode:
      a lit sun on a pale blue/gold sky for day, a crescent in a dark starry
      sky for night. The knob carries whichever icon is active and slides to
      that side; inset-inline-start (not left) so it slides the right way in
-     both Arabic (RTL) and English (LTR). Reused as-is in the admin panel. */
+     both Arabic (RTL) and English (LTR). Same height and gold border-weight
+     as the other four header controls (view/lang toggles, account, track
+     order) so the row reads as one family instead of five different sizes.
+     Reused as-is (at a smaller scale) in the admin panel. */
   .theme-toggle{
-    position:relative; width:58px; height:30px; border-radius:100px; flex-shrink:0;
-    border:1px solid rgba(0,0,0,0.15); padding:0; cursor:pointer; overflow:hidden;
+    position:relative; width:84px; height:44px; border-radius:100px; flex-shrink:0; box-sizing:border-box;
+    border:1.5px solid var(--brass); padding:0; cursor:pointer; overflow:hidden;
     background:linear-gradient(90deg,#bfe3ff,#ffe8a3); transition:background .35s ease;
   }
-  .theme-toggle.is-night{ background:linear-gradient(90deg,#0c1233,#1c2760); border-color:rgba(255,255,255,0.14); }
+  .theme-toggle.is-night{ background:linear-gradient(90deg,#0c1233,#1c2760); }
   .theme-toggle:focus-visible{outline:2px solid var(--brass); outline-offset:2px;}
   .theme-toggle .tt-stars{ position:absolute; inset:0; opacity:0; transition:opacity .3s ease; }
   .theme-toggle.is-night .tt-stars{ opacity:1; }
@@ -1225,32 +1243,32 @@
      even at the same box size). */
   .theme-toggle .tt-icon{
     position:absolute; top:50%; transform:translateY(-50%); z-index:1;
-    width:16px; height:16px; border-radius:50%;
+    width:22px; height:22px; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
     border:1.3px solid rgba(255,201,77,0.65);
   }
-  .theme-toggle .tt-icon svg{width:10px; height:10px; display:block;}
-  .theme-toggle .tt-sun{ inset-inline-start:5px; color:#c98a12; }
-  .theme-toggle .tt-moon{ inset-inline-end:5px; color:#c7c4ff; }
+  .theme-toggle .tt-icon svg{width:14px; height:14px; display:block;}
+  .theme-toggle .tt-sun{ inset-inline-start:7px; color:#c98a12; }
+  .theme-toggle .tt-moon{ inset-inline-end:7px; color:#c7c4ff; }
   .theme-toggle .tt-knob{
-    position:absolute; top:3px; inset-inline-start:3px; width:24px; height:24px; border-radius:50%;
+    position:absolute; top:3px; inset-inline-start:3px; width:38px; height:38px; border-radius:50%;
     background:#fff8ec; color:#c98a12; display:flex; align-items:center; justify-content:center;
     border:1.5px solid var(--brass);
     box-shadow:0 1px 5px rgba(0,0,0,0.35); transition:inset-inline-start .35s cubic-bezier(.4,1.5,.6,1), background .35s ease, color .35s ease;
   }
-  .theme-toggle.is-night .tt-knob{ inset-inline-start:31px; background:#171b35; color:#f2efff; }
-  .theme-toggle .tt-knob svg{width:15px; height:15px; display:block;}
-  .theme-toggle .tt-knob-sun,.theme-toggle .tt-knob-moon{display:flex; width:15px; height:15px;}
+  .theme-toggle.is-night .tt-knob{ inset-inline-start:43px; background:#171b35; color:#f2efff; }
+  .theme-toggle .tt-knob svg{width:23px; height:23px; display:block;}
+  .theme-toggle .tt-knob-sun,.theme-toggle .tt-knob-moon{display:flex; width:23px; height:23px;}
   .theme-toggle .tt-knob-moon{display:none;}
   .theme-toggle.is-night .tt-knob-sun{display:none;}
   .theme-toggle.is-night .tt-knob-moon{display:flex;}
-  .theme-toggle.theme-toggle-sm{width:50px; height:26px;}
-  .theme-toggle.theme-toggle-sm .tt-icon{width:14px; height:14px;}
-  .theme-toggle.theme-toggle-sm .tt-icon svg{width:8px; height:8px;}
-  .theme-toggle.theme-toggle-sm .tt-knob{width:20px; height:20px;}
-  .theme-toggle.theme-toggle-sm .tt-knob svg{width:12px; height:12px;}
-  .theme-toggle.theme-toggle-sm .tt-knob-sun,.theme-toggle.theme-toggle-sm .tt-knob-moon{width:12px; height:12px;}
-  .theme-toggle.theme-toggle-sm.is-night .tt-knob{inset-inline-start:27px;}
+  .theme-toggle.theme-toggle-sm{width:60px; height:32px;}
+  .theme-toggle.theme-toggle-sm .tt-icon{width:16px; height:16px;}
+  .theme-toggle.theme-toggle-sm .tt-icon svg{width:10px; height:10px;}
+  .theme-toggle.theme-toggle-sm .tt-knob{width:27px; height:27px;}
+  .theme-toggle.theme-toggle-sm .tt-knob svg{width:16px; height:16px;}
+  .theme-toggle.theme-toggle-sm .tt-knob-sun,.theme-toggle.theme-toggle-sm .tt-knob-moon{width:16px; height:16px;}
+  .theme-toggle.theme-toggle-sm.is-night .tt-knob{inset-inline-start:30px;}
   @media (prefers-reduced-motion: reduce){
     .theme-toggle, .theme-toggle .tt-knob, .theme-toggle .tt-stars{transition:none;}
   }
