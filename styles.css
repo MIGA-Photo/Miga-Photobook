@@ -676,7 +676,7 @@
     border-color:var(--brass-dim);
     box-shadow:0 14px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,201,77,0.15);
   }
-  .card-media{position:relative; aspect-ratio:4/5; background:#150c26;}
+  .card-media{position:relative; aspect-ratio:4/5; background:#150c26; overflow:hidden;}
   .card-media img{width:100%; height:100%; object-fit:cover;}
   .card-badge{
     position:absolute; top:10px; right:10px; left:10px; font-size:10.5px; letter-spacing:0.3px;
