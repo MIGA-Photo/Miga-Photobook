@@ -325,13 +325,21 @@
     display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:14px;
   }
   .why-edge{
-    margin-top:18px; background:var(--ink-2); border:1px solid var(--brass-dim);
-    border-radius:12px; padding:18px 20px;
+    margin-top:18px; position:relative;
+    background:linear-gradient(180deg, rgba(255,201,77,0.11), rgba(255,201,77,0.02) 55%, transparent);
+    border:2px solid var(--brass); border-radius:18px; padding:28px 24px 24px;
+    box-shadow:0 0 44px rgba(255,201,77,0.18), inset 0 0 30px rgba(255,201,77,0.05);
   }
+  .why-edge::before{
+    content:"💡 السر"; position:absolute; top:-14px; right:24px; background:var(--brass);
+    color:var(--ink); font-size:11.5px; font-weight:700; padding:4px 14px; border-radius:100px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.35);
+  }
+  html[dir="rtl"] .why-edge::before{ right:24px; left:auto; }
   .why-edge h3{margin:0 0 10px; font-size:16.5px; color:var(--brass);}
   .why-edge p{margin:0 0 10px; color:var(--paper); font-size:14.5px; line-height:1.85;}
   .why-edge p:last-child{margin-bottom:0;}
-  .why-edge .lead{font-weight:600;}
+  .why-edge .lead{font-weight:700; font-size:17px; color:#fff8e1;}
   .why-edge-link{
     display:inline-block; margin-top:4px; color:var(--brass); font-weight:600;
     text-decoration:underline; text-underline-offset:3px;
