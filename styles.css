@@ -440,6 +440,14 @@
   html[dir="rtl"] .ba-arrow{display:inline-block; transform:scaleX(-1);}
 
   .testimonials-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:16px;}
+  .proof-results-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(130px,1fr)); gap:12px;
+  }
+  .proof-tile{
+    aspect-ratio:4/5; border-radius:12px; overflow:hidden; border:1.5px solid var(--brass-dim);
+    box-shadow:0 6px 18px rgba(0,0,0,0.3);
+  }
+  .proof-tile img{width:100%; height:100%; object-fit:cover; display:block;}
   .testimonial-card{
     background:var(--ink-2); border:1px solid var(--line); border-radius:12px; padding:20px;
   }
@@ -770,7 +778,7 @@
   }
   .plan.featured{border-color:var(--brass); position:relative; background:linear-gradient(180deg, rgba(255,201,77,0.12), transparent 60%);}
   .plan.featured::before{
-    content:"🔥 الأكثر طلبًا"; position:absolute; top:-13px; right:24px; background:var(--brass);
+    content:"⭐ الأكثر طلبًا"; position:absolute; top:-13px; right:24px; background:var(--brass);
     color:var(--ink); font-size:11.5px; font-weight:700; padding:4px 12px; border-radius:100px;
   }
   .plan h3{font-size:20px; color:var(--paper);}
