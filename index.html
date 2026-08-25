@@ -1051,102 +1051,162 @@
         <p class="sub" style="margin-bottom:14px;" data-i18n="piIntro">ارفع لحد 20 صورة نتيجة، وهتظهر بدل الفيديو كعرض متحرك بنفس شكل وإطار قسم "شوف Miga-Photobook وهو شغال".</p>
         <div class="field">
           <label data-i18n="piItemLabel1">صورة 1</label>
-          <img id="piPreview-1" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-1" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-1" data-slot="1" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-1" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel2">صورة 2</label>
-          <img id="piPreview-2" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-2" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-2" data-slot="2" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-2" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel3">صورة 3</label>
-          <img id="piPreview-3" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-3" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-3" data-slot="3" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-3" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel4">صورة 4</label>
-          <img id="piPreview-4" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-4" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-4" data-slot="4" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-4" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel5">صورة 5</label>
-          <img id="piPreview-5" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-5" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-5" data-slot="5" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-5" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel6">صورة 6</label>
-          <img id="piPreview-6" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-6" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-6" data-slot="6" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-6" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel7">صورة 7</label>
-          <img id="piPreview-7" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-7" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-7" data-slot="7" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-7" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel8">صورة 8</label>
-          <img id="piPreview-8" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-8" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-8" data-slot="8" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-8" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel9">صورة 9</label>
-          <img id="piPreview-9" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-9" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-9" data-slot="9" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-9" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel10">صورة 10</label>
-          <img id="piPreview-10" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-10" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-10" data-slot="10" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-10" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel11">صورة 11</label>
-          <img id="piPreview-11" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-11" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-11" data-slot="11" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-11" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel12">صورة 12</label>
-          <img id="piPreview-12" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-12" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-12" data-slot="12" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-12" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel13">صورة 13</label>
-          <img id="piPreview-13" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-13" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-13" data-slot="13" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-13" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel14">صورة 14</label>
-          <img id="piPreview-14" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-14" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-14" data-slot="14" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-14" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel15">صورة 15</label>
-          <img id="piPreview-15" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-15" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-15" data-slot="15" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-15" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel16">صورة 16</label>
-          <img id="piPreview-16" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-16" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-16" data-slot="16" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-16" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel17">صورة 17</label>
-          <img id="piPreview-17" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-17" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-17" data-slot="17" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-17" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel18">صورة 18</label>
-          <img id="piPreview-18" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-18" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-18" data-slot="18" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-18" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel19">صورة 19</label>
-          <img id="piPreview-19" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-19" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-19" data-slot="19" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-19" accept="image/*">
         </div>
         <div class="field">
           <label data-i18n="piItemLabel20">صورة 20</label>
-          <img id="piPreview-20" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-20" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-20" data-slot="20" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
           <input type="file" id="piInput-20" accept="image/*">
         </div>
         <div class="modal-actions" style="margin-top:14px;">
@@ -1258,8 +1318,9 @@ const translations = {
     piItemLabel19:'صورة 19',
     piItemLabel20:'صورة 20',
     piSaveBtn:'حفظ صور العرض',
-    toastPromoImagesIncomplete:'لازم ترفع 3 صور على الأقل',
+    toastPromoImagesIncomplete:'لازم ترفع 3 صور على الأقل، أو تمسحهم كلهم',
     toastPromoImagesSaved:'تم حفظ صور العرض',
+    toastPromoImageRemoved:'اضغط "حفظ صور العرض" لتثبيت الحذف',
     scIntro:'ارفع الصورة الأصلية اللي هتظهر في نص الدائرة في الصفحة الرئيسية، والنتايج الثمانية اللي هتلف حواليها.',
     scCenterLabel:'الصورة الأصلية (المنتصف)',
     scItemLabel1:'نتيجة 1', scItemLabel2:'نتيجة 2', scItemLabel3:'نتيجة 3', scItemLabel4:'نتيجة 4',
@@ -1513,8 +1574,9 @@ const translations = {
     piItemLabel19:'Image 19',
     piItemLabel20:'Image 20',
     piSaveBtn:'Save Display Images',
-    toastPromoImagesIncomplete:'Upload at least 3 images first',
+    toastPromoImagesIncomplete:'Upload at least 3 images, or remove them all',
     toastPromoImagesSaved:'Display images saved',
+    toastPromoImageRemoved:'Click "Save display images" to confirm the removal',
     scIntro:'Upload the original photo shown in the center of the homepage circle, and the 8 results that orbit around it.',
     scCenterLabel:'Original Photo (Center)',
     scItemLabel1:'Result 1', scItemLabel2:'Result 2', scItemLabel3:'Result 3', scItemLabel4:'Result 4',
@@ -4382,6 +4444,8 @@ async function loadPromoImagesIntoAdmin(){
         promoImagesState[slot] = url;
         const img = document.getElementById(`piPreview-${slot}`);
         if(img){ img.src = url; img.style.display = 'inline-block'; }
+        const removeBtn = document.getElementById(`piRemove-${slot}`);
+        if(removeBtn){ removeBtn.style.display = 'flex'; removeBtn.style.alignItems = 'center'; removeBtn.style.justifyContent = 'center'; }
       }
     });
   }catch(e){ /* silent — admin can still upload fresh images regardless */ }
@@ -4408,6 +4472,8 @@ PROMO_IMAGE_SLOTS.forEach(slot=>{
       promoImagesState[slot] = data.url;
       const img = document.getElementById(`piPreview-${slot}`);
       if(img){ img.src = data.url; img.style.display = 'inline-block'; }
+      const removeBtn = document.getElementById(`piRemove-${slot}`);
+      if(removeBtn){ removeBtn.style.display = 'flex'; removeBtn.style.alignItems = 'center'; removeBtn.style.justifyContent = 'center'; }
       showToast(t('toastImageUploaded') || 'تم رفع الصورة');
     }catch(err){
       showToast(t('toastImageUploadFailed'));
@@ -4415,10 +4481,27 @@ PROMO_IMAGE_SLOTS.forEach(slot=>{
   });
 });
 
+PROMO_IMAGE_SLOTS.forEach(slot=>{
+  const removeBtn = document.getElementById(`piRemove-${slot}`);
+  if(!removeBtn) return;
+  removeBtn.addEventListener('click', ()=>{
+    delete promoImagesState[slot];
+    const img = document.getElementById(`piPreview-${slot}`);
+    if(img){ img.src = ''; img.style.display = 'none'; }
+    const input = document.getElementById(`piInput-${slot}`);
+    if(input) input.value = '';
+    removeBtn.style.display = 'none';
+    showToast(t('toastPromoImageRemoved') || 'اضغط "حفظ صور العرض" لتثبيت الحذف');
+  });
+});
+
 document.getElementById('piSaveBtn').onclick = async ()=>{
   if(!BACKEND_BASE){ showToast(t('toastOrderFailed')); return; }
   const items = PROMO_IMAGE_SLOTS.map(s=>promoImagesState[s]).filter(Boolean);
-  if(items.length < 3){ showToast(t('toastPromoImagesIncomplete') || 'لازم ترفع 3 صور على الأقل'); return; }
+  // Either a full, meaningful gallery (3+) or a fully cleared one (0) — a
+  // half-filled 1-2 state can't drive the 3-panel display anyway, so it's
+  // blocked the same way it always was; a full clear is now explicitly allowed.
+  if(items.length > 0 && items.length < 3){ showToast(t('toastPromoImagesIncomplete') || 'لازم ترفع 3 صور على الأقل، أو تمسحهم كلهم'); return; }
   const btn = document.getElementById('piSaveBtn');
   const original = btn.textContent;
   btn.disabled = true;
@@ -4587,7 +4670,11 @@ async function loadPromoImagesOnHomepage(){
     });
   }catch(e){ /* keep the default video on any failure */ }
 }
-loadPromoImagesOnHomepage();
+// Disabled on purpose (Magdy's request): the homepage should always show the
+// promo video, never the 3-image carousel fallback, even though images are
+// still saved in the admin panel's "صور العرض" tab. Nothing was deleted —
+// just uncomment the line below to bring the image carousel back on.
+// loadPromoImagesOnHomepage();
 
 async function loadVisitorStats(){
   const listEl = document.getElementById('visitorsLogList');
