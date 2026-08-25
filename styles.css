@@ -175,7 +175,8 @@
     transition:.2s;
   }
   .cat-dropdown-btn:hover{background:rgba(255,201,77,0.08);}
-  .cat-dropdown-btn .cdi{font-size:21px; line-height:1;}
+  .cat-dropdown-btn .cdi{display:flex; align-items:center; font-size:20px; line-height:1;}
+  .cat-dropdown-btn .cdi svg{width:1em; height:1em; display:block;}
   .cat-dropdown-btn .cdc{font-size:15px; transition:transform .18s; margin-inline-start:2px;}
   .cat-dropdown.open .cat-dropdown-btn .cdc{transform:rotate(180deg);}
   .cat-dropdown-menu{
@@ -199,18 +200,11 @@
     line-height:1; margin-inline-start:-2px;
   }
 
-  /* ===== Collapsible sections (How it works / Testimonials / About / FAQ) ===== */
-  .cat-section.collapsible > .section-head{
-    cursor:pointer; user-select:none;
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
-  }
-  .cat-section.collapsible > .section-head .sh-left{display:flex; align-items:center; gap:12px;}
-  .cat-section.collapsible > .section-head .sh-icon{display:flex; align-items:center; font-size:20px; color:var(--brass);}
-  .cat-section.collapsible > .section-head .sh-icon svg{width:1em; height:1em; display:block;}
-  .cat-section.collapsible > .section-head .sh-chevron{
-    font-size:15px; color:var(--brass); transition:transform .2s;
-  }
-  .cat-section.collapsible.open > .section-head .sh-chevron{transform:rotate(180deg);}
+  /* ===== Collapsible sections (How it works / Testimonials / About / FAQ) —
+     opened and closed entirely by their tile/tab trigger elsewhere on the
+     page (the category tiles grid, or the section-tabs row), which already
+     display that section's name and icon; no separate header is rendered
+     inside the section itself, so nothing repeats it. ===== */
   .cat-section.collapsible > .cs-body{
     max-height:0; overflow:hidden; transition:max-height .25s ease;
   }
@@ -225,19 +219,19 @@
     display:flex; flex-wrap:wrap; gap:10px; margin:0 0 28px;
   }
   .section-tab-btn{
-    display:flex; align-items:center; gap:9px;
-    background:var(--ink-2); border:1.5px solid var(--line); color:var(--paper);
-    padding:13px 20px; border-radius:12px;
-    font-size:17px; font-weight:800; letter-spacing:0.2px;
+    display:flex; align-items:center; gap:10px;
+    background:var(--ink-2); border:1.5px solid var(--brass); color:var(--paper);
+    padding:12px 20px; border-radius:12px;
+    font-size:16px; font-weight:800; letter-spacing:0.2px; font-family:inherit;
     transition:.2s;
   }
-  .section-tab-btn span:first-child{font-size:19px;}
-  .section-tab-btn:hover{border-color:var(--brass-dim);}
+  .section-tab-btn:hover{background:rgba(255,201,77,0.08);}
   .section-tab-btn.active{
     background:var(--brass); color:var(--ink); border-color:var(--brass);
   }
+  .section-tab-btn.active .icon-badge{border-color:var(--ink); color:var(--ink);}
   @media(max-width:700px){
-    .section-tab-btn{font-size:15.5px; padding:11px 16px;}
+    .section-tab-btn{font-size:14.5px; padding:10px 15px;}
   }
 
   /* Admin orders: total/completed/pending counts, click to expand a live table */
@@ -304,6 +298,7 @@
     padding:4px 9px; border-radius:100px; backdrop-filter:blur(2px);
   }
   .admin-btn{
+    display:inline-flex; align-items:center; gap:8px;
     background:transparent; border:1px solid var(--line); color:var(--paper-dim);
     padding:8px 14px; border-radius:8px; font-size:13px;
   }
@@ -1053,16 +1048,16 @@
   /* ===== Search (with per-visitor search history) ===== */
   .search-box{position:relative; display:flex; align-items:center;}
   .search-box .search-icon-btn{
-    position:absolute; inset-inline-start:10px; color:var(--paper-dim);
+    position:absolute; inset-inline-start:10px; color:var(--brass);
     background:transparent; border:none; display:flex; align-items:center; pointer-events:none;
   }
   .search-box input{
-    width:220px; background:var(--ink-2); border:1px solid var(--line); color:var(--paper);
-    border-radius:10px; padding:10px 14px 10px 36px; font-size:14px;
+    width:220px; background:var(--ink-2); border:1.5px solid var(--brass); color:var(--paper);
+    border-radius:10px; padding:10px 14px 10px 36px; font-size:14px; transition:box-shadow .2s ease;
   }
   html[dir="rtl"] .search-box input{padding:10px 36px 10px 14px;}
   html[dir="rtl"] .search-box .search-icon-btn{inset-inline-start:auto; inset-inline-end:10px;}
-  .search-box input:focus{outline:none; border-color:var(--brass);}
+  .search-box input:focus{outline:none; border-color:var(--brass); box-shadow:0 0 0 3px rgba(255,201,77,0.18);}
   .search-dropdown{
     display:none; position:absolute; top:calc(100% + 8px); inset-inline-start:0; width:100%;
     min-width:280px; background:var(--ink-2); border:1px solid var(--line); border-radius:12px;
@@ -1185,9 +1180,28 @@
   /* ===== Header controls (lang / view toggles) ===== */
   .ctrl-group{display:flex; gap:4px; background:var(--ink-2); border:1px solid var(--line); border-radius:8px; padding:3px;}
   .ctrl-group button{
+    display:inline-flex; align-items:center; gap:6px;
     background:transparent; color:var(--paper-dim); padding:6px 10px; border-radius:6px; font-size:12.5px;
   }
   .ctrl-group button.active{background:var(--brass); color:var(--ink); font-weight:700;}
+  .ctrl-group button.active .icon-badge{border-color:var(--ink); color:var(--ink);}
+
+  /* ===== Icon badge — a small ring in the site's signature gold, used to
+     frame a standalone icon (view toggle, account) the same way the
+     categories/admin dropdown buttons already frame themselves, so every
+     icon in the header reads as one consistent, deliberately-sized family
+     instead of mismatched emoji at whatever size the system font gives
+     them. */
+  .icon-badge{
+    display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
+    width:24px; height:24px; border-radius:50%;
+    border:1.5px solid var(--brass); color:var(--brass);
+  }
+  .icon-badge svg{width:15px; height:15px; display:block;}
+  @media(max-width:460px){
+    .icon-badge{width:21px; height:21px;}
+    .icon-badge svg{width:13px; height:13px;}
+  }
 
   /* ===== Day/night switch — one rectangle whose sky changes with the mode:
      a lit sun on a pale blue/gold sky for day, a crescent in a dark starry
@@ -1195,7 +1209,7 @@
      that side; inset-inline-start (not left) so it slides the right way in
      both Arabic (RTL) and English (LTR). Reused as-is in the admin panel. */
   .theme-toggle{
-    position:relative; width:54px; height:28px; border-radius:100px; flex-shrink:0;
+    position:relative; width:58px; height:30px; border-radius:100px; flex-shrink:0;
     border:1px solid rgba(0,0,0,0.15); padding:0; cursor:pointer; overflow:hidden;
     background:linear-gradient(90deg,#bfe3ff,#ffe8a3); transition:background .35s ease;
   }
@@ -1204,26 +1218,39 @@
   .theme-toggle .tt-stars{ position:absolute; inset:0; opacity:0; transition:opacity .3s ease; }
   .theme-toggle.is-night .tt-stars{ opacity:1; }
   .theme-toggle .tt-star{ position:absolute; width:2px; height:2px; border-radius:50%; background:#fff; opacity:0.85; }
+  /* Static end icons ringed in the site's signature gold, same framing
+     language as the categories/admin dropdown buttons, so the sun and moon
+     read as one equally-sized pair rather than two differently-weighted
+     glyphs (a filled moon vs. an outline sun previously looked mismatched
+     even at the same box size). */
   .theme-toggle .tt-icon{
-    position:absolute; top:50%; transform:translateY(-50%); width:13px; height:13px; z-index:1;
+    position:absolute; top:50%; transform:translateY(-50%); z-index:1;
+    width:16px; height:16px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    border:1.3px solid rgba(255,201,77,0.65);
   }
-  .theme-toggle .tt-icon svg{width:100%; height:100%; display:block;}
-  .theme-toggle .tt-sun{ inset-inline-start:6px; color:#c98a12; }
-  .theme-toggle .tt-moon{ inset-inline-end:6px; color:#c7c4ff; opacity:0.9; }
+  .theme-toggle .tt-icon svg{width:10px; height:10px; display:block;}
+  .theme-toggle .tt-sun{ inset-inline-start:5px; color:#c98a12; }
+  .theme-toggle .tt-moon{ inset-inline-end:5px; color:#c7c4ff; }
   .theme-toggle .tt-knob{
-    position:absolute; top:3px; inset-inline-start:3px; width:22px; height:22px; border-radius:50%;
+    position:absolute; top:3px; inset-inline-start:3px; width:24px; height:24px; border-radius:50%;
     background:#fff8ec; color:#c98a12; display:flex; align-items:center; justify-content:center;
+    border:1.5px solid var(--brass);
     box-shadow:0 1px 5px rgba(0,0,0,0.35); transition:inset-inline-start .35s cubic-bezier(.4,1.5,.6,1), background .35s ease, color .35s ease;
   }
-  .theme-toggle.is-night .tt-knob{ inset-inline-start:29px; background:#171b35; color:#f2efff; }
-  .theme-toggle .tt-knob svg{width:13px; height:13px; display:block;}
-  .theme-toggle .tt-knob-sun,.theme-toggle .tt-knob-moon{display:flex; width:13px; height:13px;}
+  .theme-toggle.is-night .tt-knob{ inset-inline-start:31px; background:#171b35; color:#f2efff; }
+  .theme-toggle .tt-knob svg{width:15px; height:15px; display:block;}
+  .theme-toggle .tt-knob-sun,.theme-toggle .tt-knob-moon{display:flex; width:15px; height:15px;}
   .theme-toggle .tt-knob-moon{display:none;}
   .theme-toggle.is-night .tt-knob-sun{display:none;}
   .theme-toggle.is-night .tt-knob-moon{display:flex;}
-  .theme-toggle.theme-toggle-sm{width:46px; height:24px;}
-  .theme-toggle.theme-toggle-sm .tt-knob{width:18px; height:18px;}
-  .theme-toggle.theme-toggle-sm.is-night .tt-knob{inset-inline-start:25px;}
+  .theme-toggle.theme-toggle-sm{width:50px; height:26px;}
+  .theme-toggle.theme-toggle-sm .tt-icon{width:14px; height:14px;}
+  .theme-toggle.theme-toggle-sm .tt-icon svg{width:8px; height:8px;}
+  .theme-toggle.theme-toggle-sm .tt-knob{width:20px; height:20px;}
+  .theme-toggle.theme-toggle-sm .tt-knob svg{width:12px; height:12px;}
+  .theme-toggle.theme-toggle-sm .tt-knob-sun,.theme-toggle.theme-toggle-sm .tt-knob-moon{width:12px; height:12px;}
+  .theme-toggle.theme-toggle-sm.is-night .tt-knob{inset-inline-start:27px;}
   @media (prefers-reduced-motion: reduce){
     .theme-toggle, .theme-toggle .tt-knob, .theme-toggle .tt-stars{transition:none;}
   }

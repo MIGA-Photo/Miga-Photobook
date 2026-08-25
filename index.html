@@ -81,7 +81,7 @@
     </div>
     <div class="cat-dropdown" id="adminQuickAccess" style="display:none;">
       <button type="button" class="cat-dropdown-btn admin-bell-btn" id="adminBellBtn" aria-haspopup="true" aria-expanded="false">
-        <span class="cdi" aria-hidden="true">&#128276;</span>
+        <span class="cdi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9.5a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 13.5 6 9.5z"/><path d="M10.3 18.5a1.9 1.9 0 0 0 3.4 0"/></svg></span>
         <span data-i18n="adminQuickLabel">لوحة التحكم</span>
         <span class="admin-bell-badge" id="adminBellBadge" style="display:none;">0</span>
         <span class="cdc" aria-hidden="true">&#9660;</span>
@@ -100,7 +100,7 @@
     </div>
     <div class="cat-dropdown" id="catDropdown">
       <button type="button" class="cat-dropdown-btn" id="catDropdownBtn" aria-haspopup="true" aria-expanded="false">
-        <span class="cdi" aria-hidden="true">&#9776;</span>
+        <span class="cdi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg></span>
         <span id="catDropdownLabel" data-i18n="categoriesLabel">الأقسام</span>
         <span class="cdc" aria-hidden="true">&#9660;</span>
       </button>
@@ -119,7 +119,7 @@
 
     <div class="search-box" id="searchBox">
       <button type="button" class="search-icon-btn" id="searchIconBtn" aria-label="بحث" title="بحث">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><circle cx="10.3" cy="10.3" r="6.6" stroke-width="2.1"/><path d="M8 6.6a4 4 0 0 0-2.7 3.9" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/><line x1="15.2" y1="15.2" x2="21" y2="21" stroke-width="2.6" stroke-linecap="round"/></svg>
       </button>
       <input type="text" id="searchInput" data-i18n-ph="searchPlaceholder" placeholder="ابحث في الموقع...">
       <div class="search-dropdown" id="searchDropdown"></div>
@@ -144,10 +144,16 @@
         </span>
       </button>
       <div class="ctrl-group" id="viewToggle">
-        <button data-view="desktop" class="active" id="viewBtnDesktop">💻 <span data-i18n="viewDesktopLabel">كمبيوتر</span></button>
-        <button data-view="mobile" id="viewBtnMobile">📱 <span data-i18n="viewMobileLabel">موبايل</span></button>
+        <button data-view="desktop" class="active" id="viewBtnDesktop">
+          <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg></span>
+          <span data-i18n="viewDesktopLabel">كمبيوتر</span>
+        </button>
+        <button data-view="mobile" id="viewBtnMobile">
+          <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M11 18.5h2"/></svg></span>
+          <span data-i18n="viewMobileLabel">موبايل</span>
+        </button>
       </div>
-      <button class="admin-btn" id="accountOpenBtn" data-i18n="accountBtnGuest">تسجيل الدخول</button>
+      <button class="admin-btn" id="accountOpenBtn">تسجيل الدخول</button>
       <button class="admin-btn" id="trackOpenBtn" data-i18n="trackBtn">تتبع طلبي</button>
       <button class="admin-btn" id="adminOpenBtn" data-i18n="adminBtn" style="display:none;">لوحة الإدارة</button>
     </div>
@@ -253,10 +259,6 @@
 </section>
 
 <section class="cat-section collapsible" id="children">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon icon-children" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.2 4.9 5.3.5-4 3.6 1.3 5.3L12 15.1l-4.8 2.7 1.3-5.3-4-3.6 5.3-.5L12 3.5z"/></svg></span><h2 data-i18n="secChildrenTitle">قسم الأطفال</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-children"></div>
@@ -266,10 +268,6 @@
 </section>
 
 <section class="cat-section collapsible" id="male">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon icon-male" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5h6l.9 2.6-1.9 1.7 1.6 9-3.6 3.7-3.6-3.7 1.6-9-1.9-1.7L9 3.5z"/></svg></span><h2 data-i18n="secMaleTitle">القسم الرجالي</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-male"></div>
@@ -279,10 +277,6 @@
 </section>
 
 <section class="cat-section collapsible" id="female">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon icon-female" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2l2.8 3.6-1.3 1.2 2 11a1 1 0 0 1-1 1.2H9.5a1 1 0 0 1-1-1.2l2-11-1.3-1.2L12 3.2z"/></svg></span><h2 data-i18n="secFemaleTitle">القسم النسائي</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-female"></div>
@@ -292,10 +286,6 @@
 </section>
 
 <section class="cat-section collapsible" id="business">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon icon-business" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="7.5" width="17.6" height="11.5" rx="2"/><path d="M8.5 7.5V6a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v1.5"/><path d="M3.2 12.8h17.6"/></svg></span><h2 data-i18n="secBusinessTitle">قسم Business</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-business"></div>
@@ -305,10 +295,6 @@
 </section>
 
 <section class="cat-section collapsible" id="cinematic">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon icon-cinematic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9.2l1-4.2h15l1 4.2"/><rect x="3" y="9.2" width="18" height="10.3" rx="1.5"/><path d="M7 5l2.2 4.2M12 5l2.2 4.2M17 5l2.2 4.2"/></svg></span><h2 data-i18n="secCinematicTitle">قسم Cinematic</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-cinematic"></div>
@@ -318,10 +304,6 @@
 </section>
 
 <section class="cat-section collapsible" id="luxury">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon icon-luxury" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.3 3.5h11.4l3 5-8.7 12-8.7-12 3-5z"/><path d="M2.6 8.5h18.8M9 3.5l-1.8 5 4.8 12 4.8-12-1.8-5"/></svg></span><h2 data-i18n="secLuxuryTitle">قسم Luxury</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-luxury"></div>
@@ -331,10 +313,6 @@
 </section>
 
 <section class="cat-section collapsible" id="artistic">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon icon-artistic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2a8.8 8.8 0 1 0 0 17.6c1.3 0 1.9-.9 1.9-1.8 0-.5-.2-1-.5-1.4-.3-.4-.5-.9-.5-1.4 0-1.1.9-2 2-2h2a4 4 0 0 0 4-4c0-3.9-4-7-8.9-7z"/><circle cx="7.6" cy="10.8" r="1"/><circle cx="9.6" cy="7.2" r="1"/><circle cx="14.2" cy="6.6" r="1"/><circle cx="17" cy="9.8" r="1"/></svg></span><h2 data-i18n="secArtisticTitle">قسم Artistic</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-artistic"></div>
@@ -344,10 +322,6 @@
 </section>
 
 <section class="cat-section collapsible" id="magazine">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon icon-magazine" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6c3.3-1.4 6.5-1.4 9.5.3 3-1.7 6.2-1.7 9.5-.3v12.4c-3.3-1.4-6.5-1.4-9.5.3-3-1.7-6.2-1.7-9.5-.3V6z"/><path d="M12 6.3v12.4"/></svg></span><h2 data-i18n="secMagazineTitle">قسم Magazine / Poster</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-magazine"></div>
@@ -396,18 +370,29 @@
 </section>
 
 <div class="section-tabs" id="sectionTabsRow">
-  <button type="button" class="section-tab-btn" data-target="whyUs"><span aria-hidden="true">✅</span> <span data-i18n="whyUsTitle">لماذا Miga-Photobook؟</span></button>
-  <button type="button" class="section-tab-btn" data-target="howItWorks"><span aria-hidden="true">&#10068;</span> <span data-i18n="howItWorksTitle">كيف يعمل؟</span></button>
-  <button type="button" class="section-tab-btn" data-target="testimonials"><span aria-hidden="true">&#11088;</span> <span data-i18n="testimonialsTitle">آراء تهمنا</span></button>
-  <button type="button" class="section-tab-btn" data-target="aboutUs"><span aria-hidden="true">&#128101;</span> <span data-i18n="aboutUsTitle">من نحن</span></button>
-  <button type="button" class="section-tab-btn" data-target="faq"><span aria-hidden="true">&#10067;</span> <span data-i18n="faqTitle">أسئلة شائعة</span></button>
+  <button type="button" class="section-tab-btn" data-target="whyUs">
+    <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.6 2.6 5.4-6"/></svg></span>
+    <span data-i18n="whyUsTitle">لماذا Miga-Photobook؟</span>
+  </button>
+  <button type="button" class="section-tab-btn" data-target="howItWorks">
+    <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6.5" r="1.6"/><circle cx="6" cy="12" r="1.6"/><circle cx="6" cy="17.5" r="1.6"/><path d="M10.5 6.5h9M10.5 12h9M10.5 17.5h9"/></svg></span>
+    <span data-i18n="howItWorksTitle">كيف يعمل؟</span>
+  </button>
+  <button type="button" class="section-tab-btn" data-target="testimonials">
+    <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 3.5l2.2 4.9 5.3.5-4 3.6 1.3 5.3L12 15.1l-4.8 2.7 1.3-5.3-4-3.6 5.3-.5L12 3.5z"/></svg></span>
+    <span data-i18n="testimonialsTitle">آراء تهمنا</span>
+  </button>
+  <button type="button" class="section-tab-btn" data-target="aboutUs">
+    <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8" r="2.6"/><path d="M3.5 18a5 5 0 0 1 10 0"/><circle cx="16.5" cy="9" r="2.2"/><path d="M14.8 12.3a4 4 0 0 1 5.7 3.6"/></svg></span>
+    <span data-i18n="aboutUsTitle">من نحن</span>
+  </button>
+  <button type="button" class="section-tab-btn" data-target="faq">
+    <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 1 1 3.2 2.4c-.7.25-1.2.85-1.2 1.6v.3"/><circle cx="11.9" cy="16.7" r="0.9" fill="currentColor" stroke="none"/></svg></span>
+    <span data-i18n="faqTitle">أسئلة شائعة</span>
+  </button>
 </div>
 
 <section class="cat-section collapsible" id="whyUs">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">✅</span><h2 data-i18n="whyUsTitle">لماذا Miga-Photobook؟</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="why-us-grid">
     <div class="why-item">✅ <span data-i18n="whyUs1">نتائج احترافية</span></div>
@@ -440,10 +425,6 @@
 </section>
 
 <section class="cat-section collapsible open" id="howItWorks">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">&#10068;</span><h2 data-i18n="howItWorksTitle">كيف يعمل؟</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="how-grid">
     <div class="how-step">
@@ -477,10 +458,6 @@
 </section>
 
 <section class="cat-section collapsible" id="testimonials">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">&#11088;</span><h2 data-i18n="testimonialsTitle">شوف نتائج Miga-Photobook</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
     <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
       <button class="btn-ghost" id="writeReviewBtn" data-i18n="writeReviewBtn">اكتب تقييمك</button>
@@ -511,20 +488,12 @@
 </section>
 
 <section class="cat-section collapsible" id="aboutUs">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">&#128101;</span><h2 data-i18n="aboutUsTitle">من نحن</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <p class="sub" style="max-width:680px; font-size:15px;" data-i18n="aboutUsText">Miga-Photobook مشروع مصري بدأ بفكرة بسيطة: خلي جلسة التصوير الاحترافية متاحة لأي حد وبسعر معقول. بنحوّل صورتك الشخصية لتحفة فنية بجودة استوديو باستخدام الذكاء الاصطناعي — ارفع صورتك واختار الأسلوب، وإحنا نتولى الباقي بعناية عشان تضمن نتيجة تستحق اسمك.</p>
   </div>
 </section>
 
 <section class="cat-section collapsible" id="faq">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">&#10067;</span><h2 data-i18n="faqTitle">أسئلة شائعة</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="faq-list">
     <details class="faq-item">

@@ -618,6 +618,7 @@ function applyLanguage(lang){
     b.classList.toggle('active', b.dataset.lang === currentLang);
   });
   refreshThemeToggleLabels();
+  updateAccountButton();
 
   // The privacy note in the transform modal depends on whether a real
   // image-generation backend is configured (BACKEND_BASE) — override the
@@ -2208,13 +2209,6 @@ function getCategoryOf(productId){
 }
 
 
-// ---------- Collapsible sections (How it works / Testimonials / About / FAQ / Why us) ----------
-document.querySelectorAll('.cat-section.collapsible > .section-head').forEach(head=>{
-  head.addEventListener('click', ()=>{
-    head.parentElement.classList.toggle('open');
-  });
-});
-
 // ---------- Quick-nav row (single row of tabs above the five sections above) ----------
 document.getElementById('sectionTabsRow').addEventListener('click', (e)=>{
   const btn = e.target.closest('.section-tab-btn');
@@ -2326,15 +2320,22 @@ function scrollToProductCard(p){
  * every call so labels follow the current language. */
 function getStaticSearchIndex(){
   const cats = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
-  const items = cats.map(c => ({ id:c, label: catLabel(c), keywords:[catLabel(c).toLowerCase()], icon:`<span class="cicon ${ICON_COLOR_CLASS[c]}" style="display:inline-flex;font-size:15px;vertical-align:-2px;">${CAT_ICON[c]}</span>` }));
+  const items = cats.map(c => ({ id:c, label: catLabel(c), keywords:[catLabel(c)], icon:`<span class="cicon ${ICON_COLOR_CLASS[c]}" style="display:inline-flex;font-size:15px;vertical-align:-2px;">${CAT_ICON[c]}</span>` }));
   items.push(
-    { id:'howItWorks', label:t('howItWorksTitle'), keywords:[t('howItWorksTitle').toLowerCase()], icon:'❔' },
-    { id:'testimonials', label:t('testimonialsTitle'), keywords:[t('testimonialsTitle').toLowerCase(), 'تقييم', 'تقييمات', 'review', 'reviews', 'rating'], icon:'⭐' },
-    { id:'aboutUs', label:t('aboutUsTitle'), keywords:[t('aboutUsTitle').toLowerCase()], icon:'👥' },
-    { id:'faq', label:t('faqTitle'), keywords:[t('faqTitle').toLowerCase(), 'اسئلة', 'أسئلة', 'faq', 'questions'], icon:'❓' },
-    { id:'whyUs', label:t('whyUsTitle'), keywords:[t('whyUsTitle').toLowerCase()], icon:'✅' },
-    { id:'mostRequested', label:t('mostRequestedTitle'), keywords:[t('mostRequestedTitle').toLowerCase()], icon:'🔥' },
+    { id:'howItWorks', label:t('howItWorksTitle'), keywords:[t('how1Title'), t('how1Desc'), t('how2Title'), t('how2Desc'), t('how3Title'), t('how3Desc')], icon:'❔' },
+    { id:'testimonials', label:t('testimonialsTitle'), keywords:['تقييم', 'تقييمات', 'review', 'reviews', 'rating'], icon:'⭐' },
+    { id:'aboutUs', label:t('aboutUsTitle'), keywords:[t('aboutUsText')], icon:'👥' },
+    { id:'faq', label:t('faqTitle'), keywords:['اسئلة', 'أسئلة', 'faq', 'questions', t('faqQ1'), t('faqA1'), t('faqQ2'), t('faqA2'), t('faqQ3'), t('faqA3'), t('faqQ4'), t('faqA4')], icon:'❓' },
+    { id:'whyUs', label:t('whyUsTitle'), keywords:[t('whyUs1'), t('whyUs2'), t('whyUs3'), t('whyUs4'), t('whyUs5'), t('trustBadge1'), t('trustBadge2'), t('trustBadge3'), t('trustBadge4')], icon:'✅' },
+    { id:'mostRequested', label:t('mostRequestedTitle'), keywords:[], icon:'🔥' },
+    { id:'pricing', label:t('pricingTitle'), keywords:[t('pricingSub'), t('plan1Title'), t('plan1Price'), t('plan2Title'), t('plan2Unit')], icon:'💳' },
   );
+  // Every section's whole body text (title + every keyword phrase) is
+  // flattened into one lowercase haystack, so a query whose words are
+  // scattered across a question and its answer — or a title and a bullet
+  // several lines below it — still matches, instead of requiring both
+  // words to land inside the same short phrase.
+  items.forEach(it => { it.searchText = [it.label, ...it.keywords].filter(Boolean).join(' ').toLowerCase(); });
   return items;
 }
 
@@ -2349,6 +2350,16 @@ function scrollToSiteSection(id){
   document.querySelector(`.cat-tile[data-cat="${id}"]`)?.classList.add('open');
   document.querySelector(`.cat-tile[data-cat="${id}"]`)?.setAttribute('aria-expanded', 'true');
   el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/** Splits a query into its individual words and requires every one of them
+ * to appear somewhere in the given text (in any order, anywhere in it) —
+ * so "دعم مباشر" still finds a phrase like "دعم فني سريع ومباشر" even
+ * though the two query words aren't adjacent there. */
+function textHasAllWords(text, words){
+  if(!text || !words.length) return false;
+  const hay = text.toLowerCase();
+  return words.every(w => hay.includes(w));
 }
 
 function renderSearchDropdown(query){
@@ -2368,11 +2379,12 @@ function renderSearchDropdown(query){
         </div>`).join('');
     return;
   }
+  const words = query.split(/\s+/).filter(Boolean);
   const sectionMatches = getStaticSearchIndex()
-    .filter(s => s.label.toLowerCase().includes(query) || s.keywords.some(k => k.includes(query)))
+    .filter(s => textHasAllWords(s.searchText, words))
     .slice(0, 6);
   const productMatches = products
-    .filter(p => productTitle(p).toLowerCase().includes(query) || p.title.toLowerCase().includes(query))
+    .filter(p => textHasAllWords(productTitle(p), words) || textHasAllWords(p.title, words))
     .slice(0, 8);
 
   if(!sectionMatches.length && !productMatches.length){
@@ -2680,7 +2692,8 @@ async function checkLoggedInUser(){
 function updateAccountButton(){
   const btn = document.getElementById('accountOpenBtn');
   if(!btn) return;
-  btn.textContent = currentUser ? `👤 ${currentUser.name}` : t('accountBtnGuest');
+  const personIcon = '<span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"/></svg></span>';
+  btn.innerHTML = personIcon + `<span>${currentUser ? escapeHtml(currentUser.name) : t('accountBtnGuest')}</span>`;
 }
 
 const accountModalBg = document.getElementById('accountModalBg');
