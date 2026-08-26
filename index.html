@@ -742,6 +742,19 @@
   </div>
 </div>
 
+<div class="modal-bg" id="dailyReportModalBg">
+  <div class="modal" style="max-width:460px;">
+    <button class="close-x" id="dailyReportModalClose">×</button>
+    <h3 data-i18n="dailyReportTitle">📊 تقرير اليوم</h3>
+    <p class="sub" id="dailyReportSubtitle" style="font-size:12.5px; margin-top:-6px;"></p>
+    <div id="dailyReportBody" style="display:flex; flex-direction:column; gap:14px; margin-top:10px;"></div>
+    <div class="modal-actions">
+      <button class="btn-primary" id="dailyReportDownloadBtn" data-i18n="dailyReportDownloadBtn">⬇️ حفظ التقرير</button>
+      <button class="btn-ghost" id="dailyReportCloseBtn" data-i18n="cancelBtn">إغلاق</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-bg" id="trackModalBg">
   <div class="modal">
     <button class="close-x" id="trackModalClose">×</button>
@@ -905,6 +918,7 @@
             <span class="tt-knob-moon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg></span>
           </span>
         </button>
+        <button type="button" class="admin-icon-btn" id="dailyReportBtn" title="تقرير يومي" aria-label="تقرير يومي" onclick="openDailyReport()">📊</button>
         <button type="button" class="admin-icon-btn" id="adminAlertsBtn" title="تنبيهات الطلبات" aria-label="تنبيهات الطلبات">&#128276;</button>
         <button type="button" class="admin-icon-btn" id="adminCollapseBtn" title="طي اللوحة" aria-label="طي اللوحة">&#8211;</button>
         <button type="button" class="admin-icon-btn" id="adminModalClose" title="إغلاق" aria-label="إغلاق">&times;</button>
@@ -986,7 +1000,10 @@
           <button class="btn-primary" id="pSaveBtn" data-i18n="pSaveBtn">إضافة المنتج</button>
           <button class="btn-ghost" id="pCancelEditBtn" style="display:none;" data-i18n="pCancelEditBtn">إلغاء التعديل / منتج جديد</button>
         </div>
-        <div id="adminProductsList" style="margin-top:20px;"></div>
+        <div style="margin-top:20px; display:flex; justify-content:flex-end;">
+          <button type="button" class="btn-ghost" id="archiveAllBtn" onclick="downloadAllArchive()" data-i18n="downloadAllArchiveBtn">⬇️ تحميل أرشيف كل المنتجات</button>
+        </div>
+        <div id="adminProductsList" style="margin-top:12px;"></div>
       </div>
 
       <div id="adminTabOrders" style="display:none;">
@@ -1251,6 +1268,7 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

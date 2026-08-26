@@ -223,6 +223,13 @@ const translations = {
     toastCoverSaveFailed:'اتغيّرت على الشاشة، بس الحفظ فشل — جرّب تاني.',
     toastLinkCopied:'تم نسخ رابط المنتج ✅', toastImageLinkCopied:'تم نسخ رابط الصورة ✅',
     toastNoImageYet:'المنتج ده لسه مفيهوش صورة.',
+    downloadArchiveBtn:'⬇️ تحميل أرشيف القسم', downloadAllArchiveBtn:'⬇️ تحميل أرشيف كل المنتجات',
+    toastArchiveFailed:'تعذّر إنشاء الأرشيف، حاول تاني',
+    dailyReportTitle:'📊 تقرير اليوم', dailyReportLoading:'جاري تجميع البيانات...',
+    dailyReportTodaySuffix:'آخر 24 ساعة', dailyReportAllTimeSuffix:'كل الفترة — لا يوجد تاريخ مسجل للتقييمات',
+    dailyReportOrdersTitle:'الطلبات', dailyReportTotal:'الإجمالي', dailyReportRevenue:'الإيرادات',
+    dailyReportReviewsTitle:'التقييمات', reviewStatPendingLabel:'قيد المراجعة', reviewStatApprovedLabel:'تمت الموافقة',
+    dailyReportVisitorsTitle:'الزوار', dailyReportDownloadBtn:'⬇️ حفظ التقرير',
     adminSub:'لوحة إدارة المنتجات والطلبات.',
     adminPassLabel:'كلمة المرور', adminLoginBtn:'دخول',
     tabProducts:'إضافة منتج', tabOrders:'الطلبات',
@@ -481,6 +488,13 @@ const translations = {
     toastCoverSaveFailed:'Changed on screen, but saving failed — please try again.',
     toastLinkCopied:'Product link copied ✅', toastImageLinkCopied:'Image link copied ✅',
     toastNoImageYet:'This product has no image yet.',
+    downloadArchiveBtn:'⬇️ Download Category Archive', downloadAllArchiveBtn:'⬇️ Download Full Archive',
+    toastArchiveFailed:'Could not create the archive, please try again',
+    dailyReportTitle:'📊 Daily Report', dailyReportLoading:'Gathering data...',
+    dailyReportTodaySuffix:'last 24 hours', dailyReportAllTimeSuffix:'all time — reviews have no recorded date',
+    dailyReportOrdersTitle:'Orders', dailyReportTotal:'Total', dailyReportRevenue:'Revenue',
+    dailyReportReviewsTitle:'Reviews', reviewStatPendingLabel:'Pending', reviewStatApprovedLabel:'Approved',
+    dailyReportVisitorsTitle:'Visitors', dailyReportDownloadBtn:'⬇️ Save Report',
     adminSub:'Product and order management panel.',
     adminPassLabel:'Password', adminLoginBtn:'Login',
     tabProducts:'Add Product', tabOrders:'Orders',
@@ -967,7 +981,7 @@ function renderHeroStrip(){
   const track = document.getElementById('heroStrip');
   const list = (products.length ? products : seedProducts())
     .filter(p => p.image !== PLACEHOLDER_IMG)
-    .sort((a,b) => (a.order ?? 9999) - (b.order ?? 9999));
+    .sort((a,b) => (b.order ?? 9999) - (a.order ?? 9999));
   const doubled = [...list, ...list];
   track.innerHTML = doubled.map((p,i) => `
     <div class="frame">
@@ -1048,7 +1062,7 @@ function renderGrids(){
     // draft with no photo yet stays a backstage admin concern instead of a
     // customer-facing empty tile.
     const allItems = products.filter(p=>p.category===cat && p.image && p.image !== PLACEHOLDER_IMG)
-      .sort((a,b) => (a.order ?? 9999) - (b.order ?? 9999));
+      .sort((a,b) => (b.order ?? 9999) - (a.order ?? 9999));
     const dotsEl = document.getElementById('gridDots-'+cat);
 
     if(!allItems.length){
@@ -1275,7 +1289,7 @@ function renderCatTiles(){
   const wrap = document.getElementById('categoryTilesGrid');
   if(!wrap) return;
   wrap.innerHTML = CAT_IDS.map(cat=>{
-    const items = products.filter(p=>p.category===cat).sort((a,b) => (a.order ?? 9999) - (b.order ?? 9999));
+    const items = products.filter(p=>p.category===cat).sort((a,b) => (b.order ?? 9999) - (a.order ?? 9999));
     const cover = categoryCover(items);
     const isOpen = document.getElementById(cat)?.classList.contains('open');
     // One photo, swapped only when the small ⟳ control is pressed. The tile's
@@ -4156,13 +4170,244 @@ async function deleteProduct(id){
   showToast(t('toastProductDeleted'));
 }
 
+// ---------- Product archive downloads (admin only) ----------
+// Reuses the exact image URLs already shown in the storefront <img> tags —
+// no new upload or storage involved. Requires the image host (R2) to answer
+// with permissive CORS headers for fetch() to read the bytes; <img> tags
+// don't need this, so if downloads fail with a console CORS error, that's
+// the one thing to enable on the R2 bucket / Worker route, not a bug here.
+async function fetchImageAsBlob(url){
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('fetch failed: ' + url);
+  return await res.blob();
+}
+function sanitizeFilename(name){
+  return String(name || 'product').replace(/[\\/:*?"<>|]/g, '_').trim() || 'product';
+}
+function extFromBlob(blob){
+  const type = blob.type || '';
+  if(type.includes('png')) return 'png';
+  if(type.includes('webp')) return 'webp';
+  if(type.includes('gif')) return 'gif';
+  return 'jpg';
+}
+function uniqueZipName(usedNames, base, ext){
+  let name = `${base}.${ext}`, n = 1;
+  while(usedNames.has(name)) name = `${base} (${++n}).${ext}`;
+  usedNames.add(name);
+  return name;
+}
+function triggerBlobDownload(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(()=> URL.revokeObjectURL(url), 4000);
+}
+async function downloadCategoryArchive(cat){
+  if(typeof JSZip === 'undefined'){ showToast(t('toastArchiveFailed')); return; }
+  const btn = document.getElementById('archiveBtn-' + cat);
+  const items = products.filter(p => p.category === cat && p.image && p.image !== PLACEHOLDER_IMG);
+  if(!items.length){ showToast(t('toastNoImageYet')); return; }
+  const originalLabel = btn ? btn.textContent : '';
+  if(btn){ btn.disabled = true; }
+  try{
+    const zip = new JSZip();
+    const usedNames = new Set();
+    for(let i = 0; i < items.length; i++){
+      if(btn) btn.textContent = `⏳ ${i}/${items.length}`;
+      try{
+        const blob = await fetchImageAsBlob(items[i].image);
+        const name = uniqueZipName(usedNames, sanitizeFilename(items[i].title), extFromBlob(blob));
+        zip.file(name, blob);
+      }catch(e){ console.error('archive: failed to fetch', items[i].title, e); }
+    }
+    const content = await zip.generateAsync({type:'blob'});
+    triggerBlobDownload(content, `${sanitizeFilename(catLabel(cat))} - Miga-Photobook.zip`);
+  }catch(e){
+    showToast(t('toastArchiveFailed'));
+  }finally{
+    if(btn){ btn.disabled = false; btn.textContent = originalLabel || t('downloadArchiveBtn'); }
+  }
+}
+async function downloadAllArchive(){
+  if(typeof JSZip === 'undefined'){ showToast(t('toastArchiveFailed')); return; }
+  const btn = document.getElementById('archiveAllBtn');
+  const cats = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
+  const relevant = products.filter(p => p.image && p.image !== PLACEHOLDER_IMG);
+  if(!relevant.length){ showToast(t('toastNoImageYet')); return; }
+  const originalLabel = btn ? btn.textContent : '';
+  if(btn){ btn.disabled = true; }
+  try{
+    const zip = new JSZip();
+    let done = 0;
+    for(const cat of cats){
+      const items = products.filter(p => p.category === cat && p.image && p.image !== PLACEHOLDER_IMG);
+      if(!items.length) continue;
+      const folder = zip.folder(sanitizeFilename(catLabel(cat)));
+      const usedNames = new Set();
+      for(const p of items){
+        if(btn) btn.textContent = `⏳ ${done}/${relevant.length}`;
+        try{
+          const blob = await fetchImageAsBlob(p.image);
+          const name = uniqueZipName(usedNames, sanitizeFilename(p.title), extFromBlob(blob));
+          folder.file(name, blob);
+        }catch(e){ console.error('archive: failed to fetch', p.title, e); }
+        done++;
+      }
+    }
+    const content = await zip.generateAsync({type:'blob'});
+    const stamp = new Date().toISOString().slice(0,10);
+    triggerBlobDownload(content, `Miga-Photobook-Archive-${stamp}.zip`);
+  }catch(e){
+    showToast(t('toastArchiveFailed'));
+  }finally{
+    if(btn){ btn.disabled = false; btn.textContent = originalLabel || t('downloadAllArchiveBtn'); }
+  }
+}
+
+// ---------- Daily report (admin only) ----------
+function reportStatTile(num, label){
+  return `<div class="order-stat"><span class="order-stat-num">${num}</span><span class="order-stat-label">${escapeHtml(label)}</span></div>`;
+}
+function findTimestamp(obj, fallbackFields){
+  for(const f of fallbackFields){
+    if(obj && obj[f] != null){
+      const v = obj[f];
+      const n = typeof v === 'number' ? v : Date.parse(v);
+      if(!isNaN(n)) return n;
+    }
+  }
+  return null;
+}
+async function openDailyReport(){
+  const modal = document.getElementById('dailyReportModalBg');
+  const body = document.getElementById('dailyReportBody');
+  const subtitle = document.getElementById('dailyReportSubtitle');
+  modal.classList.add('show');
+  body.innerHTML = `<div class="empty-note">${t('dailyReportLoading')}</div>`;
+  subtitle.textContent = new Date().toLocaleString();
+
+  const dayMs = 24 * 60 * 60 * 1000;
+  const cutoff = Date.now() - dayMs;
+
+  // Orders — createdAt is a known, reliable field (used throughout the orders UI already).
+  await loadOrders();
+  const todayOrders = orders.filter(o => (o.createdAt || 0) >= cutoff);
+  const ordersByStatus = {
+    pending: todayOrders.filter(o => o.status === 'pending').length,
+    approved: todayOrders.filter(o => o.status === 'approved').length,
+    rejected: todayOrders.filter(o => o.status === 'rejected').length,
+  };
+  const todayRevenue = todayOrders.filter(o => o.status === 'approved')
+    .reduce((sum, o) => sum + (Number(o.price) || 0), 0);
+
+  // Reviews — the exact timestamp field isn't confirmed server-side, so this
+  // tries a few plausible names; if none of today's or any review carries one,
+  // it reports all-time totals instead of a silently wrong daily count.
+  let reviewsByStatus = { pending: 0, approved: 0 };
+  let reviewsLabelSuffix = t('dailyReportTodaySuffix');
+  try{
+    const [pendingRes, approvedRes] = await Promise.all([
+      fetch(`${BACKEND_BASE}/reviews/pending?password=${encodeURIComponent(adminPasswordCache)}`),
+      fetch(`${BACKEND_BASE}/reviews/list`)
+    ]);
+    const pendingData = await pendingRes.json().catch(()=>({reviews:[]}));
+    const approvedData = await approvedRes.json().catch(()=>({reviews:[]}));
+    const allPending = pendingData.reviews || [];
+    const allApproved = approvedData.reviews || [];
+    const tsFields = ['createdAt','created_at','submittedAt','submitted_at','timestamp'];
+    const anyTimestamped = [...allPending, ...allApproved].some(r => findTimestamp(r, tsFields) != null);
+    if(anyTimestamped){
+      reviewsByStatus.pending = allPending.filter(r => (findTimestamp(r, tsFields) || 0) >= cutoff).length;
+      reviewsByStatus.approved = allApproved.filter(r => (findTimestamp(r, tsFields) || 0) >= cutoff).length;
+    }else{
+      reviewsByStatus.pending = allPending.length;
+      reviewsByStatus.approved = allApproved.length;
+      reviewsLabelSuffix = t('dailyReportAllTimeSuffix');
+    }
+  }catch(e){ /* leave counts at 0 if the reviews endpoints fail */ }
+
+  // Visitors — the backend already computes "today" itself.
+  let visitorsToday = 0;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/visits/stats?password=${encodeURIComponent(adminPasswordCache)}`);
+    const data = await res.json();
+    visitorsToday = data.today ?? 0;
+  }catch(e){}
+
+  body.innerHTML = `
+    <div>
+      <h4 style="margin:0 0 8px; font-size:14px; color:var(--brass);">${t('dailyReportOrdersTitle')}</h4>
+      <div style="display:flex; gap:18px; flex-wrap:wrap;">
+        ${reportStatTile(todayOrders.length, t('dailyReportTotal'))}
+        ${reportStatTile(ordersByStatus.pending, t('orderStatusPending'))}
+        ${reportStatTile(ordersByStatus.approved, t('orderStatusApproved'))}
+        ${reportStatTile(ordersByStatus.rejected, t('orderStatusRejected'))}
+        ${reportStatTile(todayRevenue + ' ' + CURRENCY, t('dailyReportRevenue'))}
+      </div>
+    </div>
+    <div>
+      <h4 style="margin:0 0 8px; font-size:14px; color:var(--brass);">${t('dailyReportReviewsTitle')} <span style="font-weight:400; color:var(--paper-dim); font-size:11.5px;">(${reviewsLabelSuffix})</span></h4>
+      <div style="display:flex; gap:18px; flex-wrap:wrap;">
+        ${reportStatTile(reviewsByStatus.pending, t('reviewStatPendingLabel'))}
+        ${reportStatTile(reviewsByStatus.approved, t('reviewStatApprovedLabel'))}
+      </div>
+    </div>
+    <div>
+      <h4 style="margin:0 0 8px; font-size:14px; color:var(--brass);">${t('dailyReportVisitorsTitle')}</h4>
+      <div style="display:flex; gap:18px; flex-wrap:wrap;">
+        ${reportStatTile(visitorsToday, t('visitorsTodayLabel'))}
+      </div>
+    </div>`;
+
+  // Stash the numbers on the modal so the download button doesn't need to re-fetch.
+  modal.dataset.report = JSON.stringify({
+    generatedAt: new Date().toLocaleString(),
+    orders: { total: todayOrders.length, ...ordersByStatus, revenue: todayRevenue + ' ' + CURRENCY },
+    reviews: { ...reviewsByStatus, scope: reviewsLabelSuffix },
+    visitorsToday
+  });
+}
+function downloadDailyReport(){
+  const modal = document.getElementById('dailyReportModalBg');
+  let r;
+  try{ r = JSON.parse(modal.dataset.report || '{}'); }catch(e){ r = {}; }
+  const lines = [
+    `Miga-Photobook — ${t('dailyReportTitle')}`,
+    r.generatedAt || new Date().toLocaleString(),
+    '',
+    `${t('dailyReportOrdersTitle')}:`,
+    `  ${t('dailyReportTotal')}: ${r.orders?.total ?? 0}`,
+    `  ${t('orderStatusPending')}: ${r.orders?.pending ?? 0}`,
+    `  ${t('orderStatusApproved')}: ${r.orders?.approved ?? 0}`,
+    `  ${t('orderStatusRejected')}: ${r.orders?.rejected ?? 0}`,
+    `  ${t('dailyReportRevenue')}: ${r.orders?.revenue ?? '0'}`,
+    '',
+    `${t('dailyReportReviewsTitle')} (${r.reviews?.scope || ''}):`,
+    `  ${t('reviewStatPendingLabel')}: ${r.reviews?.pending ?? 0}`,
+    `  ${t('reviewStatApprovedLabel')}: ${r.reviews?.approved ?? 0}`,
+    '',
+    `${t('dailyReportVisitorsTitle')}:`,
+    `  ${t('visitorsTodayLabel')}: ${r.visitorsToday ?? 0}`,
+  ];
+  const blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
+  const stamp = new Date().toISOString().slice(0,10);
+  triggerBlobDownload(blob, `Miga-Photobook-Report-${stamp}.txt`);
+}
+document.getElementById('dailyReportDownloadBtn').onclick = downloadDailyReport;
+document.getElementById('dailyReportModalClose').onclick = ()=> document.getElementById('dailyReportModalBg').classList.remove('show');
+document.getElementById('dailyReportCloseBtn').onclick = ()=> document.getElementById('dailyReportModalBg').classList.remove('show');
+
 function renderAdminProductsList(){
   const el = document.getElementById('adminProductsList');
   if(!el) return;
   const cats = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
   let html = '';
   cats.forEach(cat=>{
-    const items = products.filter(p=>p.category===cat).sort((a,b)=>(a.order??9999)-(b.order??9999));
+    const items = products.filter(p=>p.category===cat).sort((a,b)=>(b.order??9999)-(a.order??9999));
     if(!items.length) return;
     html += `<div class="admin-cat-group"><h4>${catLabel(cat)}</h4>`;
     items.forEach((p, idx)=>{
@@ -4190,7 +4435,10 @@ function renderAdminProductsList(){
         </div>
       </div>`;
     });
-    html += `</div>`;
+    html += `</div>
+    <div style="display:flex; justify-content:flex-end; margin:6px 0 18px;">
+      <button type="button" class="btn-ghost" id="archiveBtn-${cat}" onclick="downloadCategoryArchive('${cat}')" data-i18n="downloadArchiveBtn">⬇️ تحميل أرشيف القسم</button>
+    </div>`;
   });
   el.innerHTML = html || `<div class="empty-note">${t('emptyNoteCategory')}</div>`;
 }
@@ -4198,7 +4446,7 @@ function renderAdminProductsList(){
 async function moveProductOrder(id, direction){
   const p = products.find(x=>x.id===id);
   if(!p) return;
-  const siblings = products.filter(x=>x.category===p.category).sort((a,b)=>(a.order??9999)-(b.order??9999));
+  const siblings = products.filter(x=>x.category===p.category).sort((a,b)=>(b.order??9999)-(a.order??9999));
   const idx = siblings.findIndex(x=>x.id===id);
   const swapIdx = idx + direction;
   if(swapIdx < 0 || swapIdx >= siblings.length) return;
