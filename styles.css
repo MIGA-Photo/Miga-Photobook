@@ -440,10 +440,31 @@
   html[dir="rtl"] .ba-arrow{display:inline-block; transform:scaleX(-1);}
 
   .testimonials-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:16px;}
+  .review-photo-thumb{
+    position:relative; width:66px; height:66px; border-radius:10px; overflow:hidden;
+    border:2.5px solid var(--line); cursor:pointer; flex-shrink:0; transition:border-color .15s ease;
+  }
+  .review-photo-thumb img{width:100%; height:100%; object-fit:cover; display:block;}
+  .review-photo-thumb.selected{border-color:var(--brass);}
+  .review-photo-thumb.selected::after{
+    content:"✓"; position:absolute; top:2px; right:2px; width:18px; height:18px;
+    background:var(--brass); color:var(--ink); border-radius:50%; font-size:11px;
+    font-weight:800; display:flex; align-items:center; justify-content:center;
+  }
+  .proof-results-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(130px,1fr)); gap:12px;
+  }
+  .proof-tile{
+    aspect-ratio:4/5; border-radius:12px; overflow:hidden; border:1.5px solid var(--brass-dim);
+    box-shadow:0 6px 18px rgba(0,0,0,0.3);
+  }
+  .proof-tile img{width:100%; height:100%; object-fit:cover; display:block;}
   .testimonial-card{
     background:var(--ink-2); border:1px solid var(--line); border-radius:12px; padding:20px;
   }
   .testimonial-card .stars{font-size:15px; margin-bottom:10px;}
+  .testimonial-photo{width:100%; aspect-ratio:4/5; border-radius:10px; overflow:hidden; margin-bottom:10px;}
+  .testimonial-photo img{width:100%; height:100%; object-fit:cover; display:block;}
   .testimonial-card p{color:var(--paper); font-size:14.5px; font-style:italic; margin:0;}
   .testimonial-author{color:var(--brass); font-size:12.5px; margin-top:10px; font-weight:600;}
 
@@ -770,7 +791,7 @@
   }
   .plan.featured{border-color:var(--brass); position:relative; background:linear-gradient(180deg, rgba(255,201,77,0.12), transparent 60%);}
   .plan.featured::before{
-    content:"🔥 الأكثر طلبًا"; position:absolute; top:-13px; right:24px; background:var(--brass);
+    content:"⭐ الأكثر طلبًا"; position:absolute; top:-13px; right:24px; background:var(--brass);
     color:var(--ink); font-size:11.5px; font-weight:700; padding:4px 12px; border-radius:100px;
   }
   .plan h3{font-size:20px; color:var(--paper);}

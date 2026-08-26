@@ -63,7 +63,7 @@ const translations = {
     emailLabel:'البريد الإلكتروني', passwordLabel:'كلمة المرور', nameLabel:'الاسم',
     loginBtn:'دخول', registerBtn:'إنشاء الحساب', logoutBtn:'تسجيل الخروج',
     accountWelcome:'أهلاً بيك!',
-    writeReviewBtn:'اكتب تقييمك', writeReviewTitle:'شاركنا رأيك',
+    writeReviewBtn:'اكتب تقييمك', writeReviewTitle:'شاركنا رأيك', reviewPhotoLabel:'أرفق صورة نتيجتك (اختياري)',
     ratingLabel:'تقييمك', commentLabel:'تعليقك', submitReviewBtn:'إرسال التقييم',
     reviewModerationNote:'سيظهر تقييمك بعد مراجعته من فريقنا.',
     tabReviews:'التقييمات', noPendingReviews:'لا توجد تقييمات جديدة للمراجعة.',
@@ -113,9 +113,9 @@ const translations = {
     toastReviewSubmitted:'تم إرسال تقييمك، هيظهر بعد المراجعة. شكرًا ليك!',
     viewDesktopLabel:'كمبيوتر', viewMobileLabel:'موبايل',
     heroEyebrow:'Miga-Photobook',
-    promoMarqueeText:'حوّل أي صورة عادية إلى بورتريه استوديو احترافي بالذكاء الاصطناعي في ثوانٍ — عرض الافتتاح: كل صورة بـ 25 جنيه بدلاً من 50 جنيه لفترة محدودة.',
+    promoMarqueeText:'حوّل أي صورة عادية إلى بورتريه استوديو احترافي بالذكاء الاصطناعي خلال دقائق — عرض الافتتاح: كل صورة بـ 25 جنيه بدلاً من 50 جنيه لفترة محدودة.',
     heroSlogan:'لقطتك... تتحول لتحفة فنية',
-    promoVideoTitle:'شوف Miga-Photobook وهو شغال', promoVideoSub:'ثوانٍ معدودة، وصورتك العادية بتتحول لتحفة فنية احترافية.',
+    promoVideoTitle:'شوف Miga-Photobook وهو شغال', promoVideoSub:'دقائق معدودة، وصورتك العادية بتتحول لتحفة فنية احترافية.',
     trustCheck1:'✅ استلام فوري', trustCheck2:'✅ دفع آمن', trustCheck3:'✅ دعم فني مباشر', trustCheck4:'✅ تحديثات مستمرة',
     whyUsTitle:'لماذا Miga-Photobook؟',
     rowPrevLabel:'الصور السابقة', rowNextLabel:'الصور التالية',
@@ -123,17 +123,17 @@ const translations = {
     whyEdgeP1:'الأداة مش هي المشكلة — البرومبت هو المشكلة.',
     whyEdgeP3:'كل صورة في المعرض هنا نتيجة برومبت اتظبط قبل كده عشرات المرات، فبتوصلك من أول مرة من غير تخمين.',
     whyEdgeP4:'وعشان واثقين في كده، بنبيعلك البرومبت نفسه بـ10 جنيه لو حابب تجربه بنفسك. <a href="#children" class="why-edge-link">تصفّح الصور واختار البرومبت ←</a>',
-    whyUs1:'نتائج احترافية', whyUs2:'تحويل تلقائي بالكامل', whyUs3:'جاهزة خلال ثوانٍ', whyUs4:'بدون أي خبرة تقنية', whyUs5:'خصوصيتك محفوظة بالكامل',
+    whyUs1:'نتائج احترافية', whyUs2:'تحويل تلقائي بالكامل', whyUs3:'جاهزة خلال دقائق', whyUs4:'بدون أي خبرة تقنية', whyUs5:'خصوصيتك محفوظة بالكامل',
     howItWorksTitle:'كيف يعمل؟',
-    how1Title:'اختر التصميم', how1Desc:'تصفح المكتبة واختر الأسلوب اللي يعجبك من أي قسم.',
-    how2Title:'ارفع صورتك', how2Desc:'بنأكد تحويلك (عادةً خلال دقائق)، وبعدها ترفع صورتك بجودة واضحة.',
-    how3Title:'نحوّلها تلقائيًا', how3Desc:'نطبّق الأسلوب اللي اخترته على صورتك بالذكاء الاصطناعي.',
-    how4Title:'احصل على النتيجة', how4Desc:'استلم صورتك الاحترافية الجديدة خلال ثوانٍ.',
+    how1Title:'اختار الستايل', how1Desc:'تصفح المكتبة واختر الأسلوب اللي يعجبك من أي قسم.',
+    how2Title:'ادفع', how2Desc:'حوّل قيمة الطلب عن طريق InstaPay أو فودافون كاش، وسجّل رقم العملية.',
+    how3Title:'ارفع صورتك', how3Desc:'بعد تأكيد التحويل (عادةً خلال دقائق)، ارفع صورتك بجودة واضحة.',
+    how4Title:'استلم النتيجة', how4Desc:'هنطبّق الأسلوب اللي اخترته بالذكاء الاصطناعي، وتستلم صورتك الاحترافية خلال دقايق.',
     howItWorksCta:'ابدأ دلوقتي',
     mostRequestedTitle:'الأكثر طلبا',
-    testimonialsTitle:'تقييمات عملائنا',
+    testimonialsTitle:'شوف نتائج Miga-Photobook',
     testimonial1:'"أفضل تحويل صور جربته على الإطلاق"', testimonial2:'"حوّلت صوري إلى مستوى احترافي"',
-    testimonialsNote:'* كل تقييم هنا من عميل حقيقي، بعد مراجعته.', testimonialsEmpty:'جرّب الخدمة وكن أول من يشارك تجربته هنا 🙌',
+    testimonialsNote:'* نماذج حقيقية من نتائج Miga-Photobook الفعلية.',
     trustBadge1:'جودة احترافية في كل صورة', trustBadge2:'تحديث مستمر للأساليب الفنية المتاحة',
     trustBadge3:'دعم فني سريع ومباشر', trustBadge4:'أمان وخصوصية في كل عملية',
     aboutUsTitle:'من نحن',
@@ -145,8 +145,8 @@ const translations = {
     faqQ3:'هل أحتاج خبرة؟', faqA3:'لأ خالص، بس بترفع صورتك وتختار الأسلوب، وإحنا بنعمل الباقي بالكامل.',
     faqQ4:'هل أستطيع استخدامه تجاريًا؟', faqA4:'الصورة الناتجة مرخّصة للاستخدام الشخصي. للاستخدام التجاري (إعادة بيع أو مشاريع عملاء)، تواصل معنا أولاً لترخيص مناسب.',
     faqQ5:'كيف أستلم النتيجة؟', faqA5:'فور تأكيد الدفع، بترفع صورتك على الموقع وتستلم النتيجة المُحوّلة مباشرة، وتقدر تحمّلها في أي وقت.',
-    heroTitle:'حوّل صورتك إلى بورتريه احترافي<br>بجودة استوديو باستخدام <span class="brand-mark">Miga-Photobook ميجا فوتوبوك</span><br>خلال ثوانٍ.',
-    heroP:'ارفع صورتك الشخصية — لك أو لطفلك — واختار الأسلوب اللي يعجبك، وإحنا نحوّلها لك تلقائيًا بجودة استوديو خلال ثوانٍ بعد تأكيد الدفع.',
+    heroTitle:'حوّل صورتك إلى بورتريه احترافي<br>بجودة استوديو باستخدام <span class="brand-mark">Miga-Photobook ميجا فوتوبوك</span><br>خلال دقائق.',
+    heroP:'ارفع صورتك الشخصية — لك أو لطفلك — واختار الأسلوب اللي يعجبك، وإحنا نحوّلها لك تلقائيًا بجودة استوديو خلال دقائق بعد تأكيد الدفع.',
     heroCta1:'اعمل صورتك دلوقتي بـ25 جنيه', heroCta2:'الأسعار والعروض',
     bafTitle:'صورة واحدة منك... نحولها لأجمل صورة من اختيارك من عندنا',
     bafSub:'دي نفس الصورة، بعد ما Miga-Photobook حوّلها لأكتر من ستايل. اختار اللي يعجبك وجرّبه على صورتك.',
@@ -319,7 +319,7 @@ const translations = {
     emailLabel:'Email', passwordLabel:'Password', nameLabel:'Name',
     loginBtn:'Log In', registerBtn:'Create Account', logoutBtn:'Log Out',
     accountWelcome:'Welcome!',
-    writeReviewBtn:'Write a Review', writeReviewTitle:'Share Your Feedback',
+    writeReviewBtn:'Write a Review', writeReviewTitle:'Share Your Feedback', reviewPhotoLabel:'Attach your result photo (optional)',
     ratingLabel:'Your Rating', commentLabel:'Your Comment', submitReviewBtn:'Submit Review',
     reviewModerationNote:'Your review will appear after our team reviews it.',
     tabReviews:'Reviews', noPendingReviews:'No new reviews to moderate.',
@@ -369,9 +369,9 @@ const translations = {
     toastReviewSubmitted:'Your review has been submitted and will appear after moderation. Thank you!',
     viewDesktopLabel:'Computer', viewMobileLabel:'Mobile',
     heroEyebrow:'Miga-Photobook',
-    promoMarqueeText:'Turn any ordinary photo into a professional studio portrait with AI, in seconds — launch offer: every photo for 25 EGP instead of 50 EGP, for a limited time.',
+    promoMarqueeText:'Turn any ordinary photo into a professional studio portrait with AI, in minutes — launch offer: every photo for 25 EGP instead of 50 EGP, for a limited time.',
     heroSlogan:'Your shot... becomes a masterpiece',
-    promoVideoTitle:'See Miga-Photobook in action', promoVideoSub:'A few seconds, and your ordinary photo becomes a professional work of art.',
+    promoVideoTitle:'See Miga-Photobook in action', promoVideoSub:'A few minutes, and your ordinary photo becomes a professional work of art.',
     trustCheck1:'✅ Instant delivery', trustCheck2:'✅ Secure payment', trustCheck3:'✅ Direct support', trustCheck4:'✅ Ongoing updates',
     whyUsTitle:'Why Miga-Photobook?',
     rowPrevLabel:'Previous photos', rowNextLabel:'Next photos',
@@ -379,17 +379,17 @@ const translations = {
     whyEdgeP1:'The tool is not the hard part — the prompt is.',
     whyEdgeP3:'Every image in this gallery is the result of a prompt refined dozens of times, so it delivers the first time — no guesswork.',
     whyEdgeP4:'And because we stand behind that, we will sell you the prompt itself for 10 EGP if you would rather run it yourself. <a href="#children" class="why-edge-link">Browse the gallery and pick a prompt &rarr;</a>',
-    whyUs1:'Professional results', whyUs2:'Fully automatic transformation', whyUs3:'Ready in seconds', whyUs4:'No technical experience needed', whyUs5:'Your privacy is fully protected',
+    whyUs1:'Professional results', whyUs2:'Fully automatic transformation', whyUs3:'Ready in minutes', whyUs4:'No technical experience needed', whyUs5:'Your privacy is fully protected',
     howItWorksTitle:'How does it work?',
     how1Title:'Pick a style', how1Desc:'Browse the library and pick the look you like from any section.',
-    how2Title:'Upload your photo', how2Desc:'We confirm your transfer (usually within minutes), then you upload a clear photo.',
-    how3Title:'We transform it', how3Desc:'We apply the style you picked to your photo using AI.',
-    how4Title:'Get your result', how4Desc:'Receive your new professional photo in seconds.',
+    how2Title:'Pay', how2Desc:'Transfer the amount via InstaPay or Vodafone Cash, and note the transaction reference.',
+    how3Title:'Upload your photo', how3Desc:'Once your transfer is confirmed (usually within minutes), upload a clear photo.',
+    how4Title:'Get your result', how4Desc:"We'll apply the style you picked using AI, and you'll receive your professional photo within minutes.",
     howItWorksCta:'Start Now',
     mostRequestedTitle:'Most Ordered',
-    testimonialsTitle:'Customer Reviews',
+    testimonialsTitle:'See Miga-Photobook Results',
     testimonial1:'"Best photo transformation I have tried"', testimonial2:'"Turned my photos pro-level"',
-    testimonialsNote:'* Every review here is from a real customer, after moderation.', testimonialsEmpty:'Try the service and be the first to share your experience here 🙌',
+    testimonialsNote:'* Real samples from actual Miga-Photobook results.',
     trustBadge1:'Professional quality in every photo', trustBadge2:'Constantly growing prompt library',
     trustBadge3:'Fast, direct support', trustBadge4:'Security and privacy on every order',
     aboutUsTitle:'About Us',
@@ -401,7 +401,7 @@ const translations = {
     faqQ3:'Do I need experience?', faqA3:'Not at all — just upload your photo and pick a style, we handle everything else.',
     faqQ4:'Can I use it commercially?', faqA4:'The resulting image is licensed for personal use. For commercial use (resale or client projects), please contact us first for proper licensing.',
     faqQ5:'How do I get my result?', faqA5:'Right after payment is confirmed, upload your photo on the site and get the transformed result directly — downloadable anytime.',
-    heroTitle:'Turn your photo into a professional,<br>studio-quality portrait with <span class="brand-mark">Miga-Photobook</span><br>in seconds.',
+    heroTitle:'Turn your photo into a professional,<br>studio-quality portrait with <span class="brand-mark">Miga-Photobook</span><br>in minutes.',
     heroP:'A library of professional, ready-to-use prompts for transforming personal photos — for children, men, and women — carefully written and tested. Buy, unlock instantly, and use right away.',
     heroCta1:'Make Your Photo Now — 25 EGP', heroCta2:'Pricing & Offers',
     bafTitle:'One Photo From You... Turned Into Your Favorite Style',
@@ -2915,12 +2915,40 @@ document.getElementById('thanksShareBtn').onclick = ()=>
 document.getElementById('thanksReviewBtn').onclick = ()=>
   document.getElementById('writeReviewBtn').click();
 
+let selectedReviewPhotoUrl = null;
+function populateReviewPhotoPicker(){
+  const field = document.getElementById('reviewPhotoField');
+  const picker = document.getElementById('reviewPhotoPicker');
+  selectedReviewPhotoUrl = null;
+  picker.innerHTML = '';
+  const urls = Object.values(transformedResults || {}).filter(Boolean);
+  if(!urls.length){ field.style.display = 'none'; return; }
+  field.style.display = 'block';
+  urls.forEach((url, i)=>{
+    const thumb = document.createElement('div');
+    thumb.className = 'review-photo-thumb';
+    thumb.innerHTML = `<img src="${url}" alt="نتيجتك ${i+1}" loading="lazy">`;
+    thumb.onclick = ()=>{
+      const alreadySelected = thumb.classList.contains('selected');
+      picker.querySelectorAll('.review-photo-thumb').forEach(t=>t.classList.remove('selected'));
+      if(alreadySelected){ selectedReviewPhotoUrl = null; }
+      else { thumb.classList.add('selected'); selectedReviewPhotoUrl = url; }
+    };
+    picker.appendChild(thumb);
+  });
+  // Default to the most recent result pre-selected, since most people reviewing
+  // just finished looking at it — one tap to deselect if they'd rather not.
+  const first = picker.querySelector('.review-photo-thumb');
+  if(first){ first.classList.add('selected'); selectedReviewPhotoUrl = urls[0]; }
+}
+
 document.getElementById('writeReviewBtn').onclick = ()=>{
   if(!currentUser){
     showToast(t('toastLoginRequired'));
     document.getElementById('accountOpenBtn').click();
     return;
   }
+  populateReviewPhotoPicker();
   reviewModalBg.classList.add('show');
 };
 document.getElementById('reviewModalClose').onclick = ()=> reviewModalBg.classList.remove('show');
@@ -2934,12 +2962,13 @@ document.getElementById('reviewSubmitBtn').onclick = async ()=>{
   try{
     const res = await fetch(`${BACKEND_BASE}/reviews/submit`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ token, rating, comment })
+      body: JSON.stringify({ token, rating, comment, resultImageUrl: selectedReviewPhotoUrl || undefined })
     });
     const data = await res.json();
     if(!res.ok){ showToast(data.error || t('toastGenerateFailed')); return; }
     reviewModalBg.classList.remove('show');
     document.getElementById('reviewComment').value = '';
+    selectedReviewPhotoUrl = null;
     showToast(t('toastReviewSubmitted'));
   }catch(e){ showToast(t('toastGenerateFailed')); }
 };
@@ -2954,6 +2983,7 @@ async function renderTestimonials(){
     if(data.reviews && data.reviews.length){
       grid.innerHTML = data.reviews.map(r => `
         <div class="testimonial-card">
+          ${r.resultImageUrl ? `<div class="testimonial-photo"><img src="${r.resultImageUrl}" alt="نتيجة العميل" loading="lazy"></div>` : ''}
           <div class="stars">${'⭐'.repeat(r.rating)}</div>
           <p>"${escapeHtml(r.comment)}"</p>
           <div class="testimonial-author">— ${escapeHtml(r.user_name)}</div>
@@ -2988,6 +3018,7 @@ async function loadPendingReviews(){
     }
     el.innerHTML = reviews.map(r => `
       <div class="admin-product-row">
+        ${r.resultImageUrl ? `<img src="${r.resultImageUrl}" alt="نتيجة مرفقة" style="width:44px; height:56px; object-fit:cover; border-radius:6px; flex-shrink:0;">` : ''}
         <div class="admin-product-info">
           <b>${'⭐'.repeat(r.rating)} — ${escapeHtml(r.user_name)}</b>
           <span>${escapeHtml(r.comment)}</span>
