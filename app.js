@@ -53,7 +53,7 @@ const translations = {
     searchPlaceholder:'ابحث في الموقع...', searchHistoryLabel:'بحثك السابق', searchNoHistory:'لا يوجد بحث سابق',
     searchResultsLabel:'نتائج البحث', searchNoResults:'لا توجد نتائج', searchSectionsLabel:'أقسام الموقع',
     navAll:'الكل', navChildren:'أطفال', navMale:'رجالي', navFemale:'نسائي',
-    navBusiness:'Business', navCinematic:'Cinematic', navLuxury:'Luxury', navArtistic:'Artistic', navMagazine:'Magazine',
+    navBusiness:'أعمال', navCinematic:'سينمائي', navLuxury:'فاخر', navArtistic:'فني', navMagazine:'مجلات',
     trackBtn:'تتبع طلبي', adminBtn:'لوحة الإدارة', adminQuickLabel:'لوحة التحكم',
     accountBtnGuest:'تسجيل الدخول', loginTab:'تسجيل الدخول', registerTab:'حساب جديد',
     continueGoogle:'المتابعة بحساب جوجل', continueApple:'المتابعة بحساب Apple', continueFacebook:'المتابعة بحساب فيسبوك',
