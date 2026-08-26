@@ -125,7 +125,7 @@ const translations = {
     whyEdgeTitle:'وأدوات الذكاء الاصطناعي المتاحة للكل؟',
     whyEdgeP1:'الأداة مش هي المشكلة — البرومبت هو المشكلة.',
     whyEdgeP3:'كل صورة في المعرض هنا نتيجة برومبت اتظبط قبل كده عشرات المرات، فبتوصلك من أول مرة من غير تخمين.',
-    whyEdgeP4:'وعشان واثقين في كده، بنبيعلك البرومبت نفسه بـ10 جنيه لو حابب تجربه بنفسك. <a href="#children" class="why-edge-link">تصفّح الصور واختار البرومبت ←</a>',
+    whyEdgeP4:'إحنا اختصرنا عليك كل التجربة والتعديل — تدفع وتستلم صورتك جاهزة على طول. حابب تجرب بنفسك في المرات الجاية؟ تقدر تشتري البرومبت وحده بـ10 جنيه (اختياري). <a href="#children" class="why-edge-link">تصفّح الصور واختار البرومبت ←</a>',
     whyUs1:'نتائج احترافية', whyUs2:'تحويل تلقائي بالكامل', whyUs3:'جاهزة خلال دقائق', whyUs4:'بدون أي خبرة تقنية', whyUs5:'خصوصيتك محفوظة بالكامل',
     howItWorksTitle:'كيف يعمل؟',
     how1Title:'اختار الستايل', how1Desc:'تصفح المكتبة واختر الأسلوب اللي يعجبك من أي قسم.',
@@ -148,19 +148,20 @@ const translations = {
     faqQ3:'هل أحتاج خبرة؟', faqA3:'لأ خالص، بس بترفع صورتك وتختار الأسلوب، وإحنا بنعمل الباقي بالكامل.',
     faqQ4:'هل أستطيع استخدامه تجاريًا؟', faqA4:'الصورة الناتجة مرخّصة للاستخدام الشخصي. للاستخدام التجاري (إعادة بيع أو مشاريع عملاء)، تواصل معنا أولاً لترخيص مناسب.',
     faqQ5:'كيف أستلم النتيجة؟', faqA5:'فور تأكيد الدفع، بترفع صورتك على الموقع وتستلم النتيجة المُحوّلة مباشرة، وتقدر تحمّلها في أي وقت.',
+    faqQ7:'هل أقدر أختار أكثر من ستايل؟', faqA7:'أكيد! تقدر تطلب أكتر من ستايل لنفس الصورة أو لصور مختلفة — كل ستايل بيتحسب طلب منفصل، أو استخدم إحدى الباقات (10 أو 25 صورة) عشان توفر لو محتاج أكتر من نتيجة.',
     heroTitle:'حوّل صورتك إلى بورتريه احترافي<br>بجودة استوديو باستخدام <span class="brand-mark">Miga-Photobook ميجا فوتوبوك</span><br>خلال دقائق.',
     heroP:'ارفع صورتك الشخصية — لك أو لطفلك — واختار الأسلوب اللي يعجبك، وإحنا نحوّلها لك تلقائيًا بجودة استوديو خلال دقائق بعد تأكيد الدفع.',
     heroCta1:'اعمل صورتك دلوقتي بـ25 جنيه', heroCta2:'الأسعار والعروض',
     bafTitle:'صورة واحدة منك... نحولها لأجمل صورة من اختيارك من عندنا',
     bafSub:'دي نفس الصورة، بعد ما Miga-Photobook حوّلها لأكتر من ستايل. اختار اللي يعجبك وجرّبه على صورتك.',
     bafCenterLabel:'صورتك الأصلية',
-    bafCta:'اعمل صورتي الآن',
+    bafCta:'اعمل صورتك دلوقتي بـ25 جنيه',
     secChildrenTitle:'قسم الأطفال', secMaleTitle:'القسم الرجالي', secFemaleTitle:'القسم النسائي',
     secBusinessTitle:'قسم الأعمال', secCinematicTitle:'القسم السينمائي', secLuxuryTitle:'القسم الفاخر',
     secArtisticTitle:'القسم الفني', secMagazineTitle:'قسم المجلات والملصقات',
     pricingTitle:'الأسعار والعروض',
     pricingSub:'اطلب تحويل صورك منفردة، أو وفّر أكثر مع الباقات. كل باقة تُطبّق كخصم عند طلب العدد المطابق من الصور ضمن أي قسم.',
-    plan1Title:'الباقة الفردية', plan1Price:'من 25 جنيه', currencyLabel:'جنيه',
+    plan1Title:'الباقة الفردية', plan1Price:'25 جنيه فقط', currencyLabel:'جنيه',
     plan1Li1:'تحويل صورة واحدة بالسعر المعروض', plan1Li2:'تنفيذ فوري بعد الدفع', plan1Li3:'مناسبة للتجربة', plan1Cta:'تصفح الآن',
     plan2Title:'باقة الاحترافي', plan2Unit:'/ 10 صور',
     plan2Li1:'وفّر 50 جنيه عن السعر الفردي', plan2Li2:'اختيار حر من أي قسم', plan2Li3:'دعم فني بالأولوية',
@@ -226,11 +227,15 @@ const translations = {
     toastNoImageYet:'المنتج ده لسه مفيهوش صورة.',
     downloadArchiveBtn:'⬇️ تحميل أرشيف القسم', downloadAllArchiveBtn:'⬇️ تحميل أرشيف كل المنتجات',
     toastArchiveFailed:'تعذّر إنشاء الأرشيف، حاول تاني',
-    dailyReportTitle:'📊 تقرير اليوم', dailyReportLoading:'جاري تجميع البيانات...',
+    dailyReportTitle:'📊 تقرير الأداء', dailyReportLoading:'جاري تجميع البيانات...',
     dailyReportTodaySuffix:'آخر 24 ساعة', dailyReportAllTimeSuffix:'كل الفترة — لا يوجد تاريخ مسجل للتقييمات',
     dailyReportOrdersTitle:'الطلبات', dailyReportTotal:'الإجمالي', dailyReportRevenue:'الإيرادات',
     dailyReportReviewsTitle:'التقييمات', reviewStatPendingLabel:'قيد المراجعة', reviewStatApprovedLabel:'تمت الموافقة',
-    dailyReportVisitorsTitle:'الزوار', dailyReportDownloadBtn:'⬇️ حفظ التقرير',
+    dailyReportVisitorsTitle:'الزوار', dailyReportDownloadBtn:'⬇️ تصدير Excel',
+    periodDailyBtn:'اليوم', periodWeeklyBtn:'آخر 7 أيام', periodCustomBtn:'فترة مخصصة', periodApplyBtn:'تطبيق',
+    periodCustomMissing:'اختار تاريخ البداية والنهاية الأول', reportChartTitle:'الأداء خلال الفترة',
+    reportNarrativeTitle:'📋 ملخص وتوصيات', reportVsPrevious:'عن الفترة اللي قبلها', reportDownloadChartBtn:'⬇️ صورة الرسم البياني',
+    visitorsAllTimeNote:'إجمالي كل الفترات', toastExcelLibFailed:'مكتبة تصدير Excel لسه بتتحمّل، جرب تاني بعد شوية',
     adminSub:'لوحة إدارة المنتجات والطلبات.',
     adminPassLabel:'كلمة المرور', adminLoginBtn:'دخول',
     tabProducts:'إضافة منتج', tabOrders:'الطلبات',
@@ -281,7 +286,7 @@ const translations = {
     confirmDeleteOrder:'هل أنت متأكد إنك عايز تحذف الطلب المرفوض ده نهائيًا؟',
     toastOrderRejected:'تم رفض الطلب', toastOrderDeleted:'تم حذف الطلب',
     statTotalLabel:'إجمالي الطلبات', statApprovedLabel:'تم تنفيذها', statPendingLabel:'قيد المراجعة',
-    statRevenueLabel:'إجمالي المبلغ المحصّل',
+    statRevenueLabel:'إجمالي المبلغ المحصّل', exportOrdersBtn:'⬇️ تصدير كل الطلبات Excel',
     reviewStatTotalLabel:'إجمالي التقييمات', reviewStatApprovedLabel:'منشورة', reviewStatPendingLabel:'قيد المراجعة',
     reviewColRating:'التقييم', reviewColComment:'التعليق',
     statColCode:'الكود', statColProduct:'المنتج', statColStatus:'الحالة', statColTime:'الوقت', statColBuyer:'الطالب',
@@ -391,7 +396,7 @@ const translations = {
     whyEdgeTitle:'What about the AI tools everyone can use?',
     whyEdgeP1:'The tool is not the hard part — the prompt is.',
     whyEdgeP3:'Every image in this gallery is the result of a prompt refined dozens of times, so it delivers the first time — no guesswork.',
-    whyEdgeP4:'And because we stand behind that, we will sell you the prompt itself for 10 EGP if you would rather run it yourself. <a href="#children" class="why-edge-link">Browse the gallery and pick a prompt &rarr;</a>',
+    whyEdgeP4:'We already did all the trial and error for you — pay once and get your finished photo right away. Want to experiment yourself next time? You can buy the prompt alone for 10 EGP (optional). <a href="#children" class="why-edge-link">Browse the gallery and pick a prompt &rarr;</a>',
     whyUs1:'Professional results', whyUs2:'Fully automatic transformation', whyUs3:'Ready in minutes', whyUs4:'No technical experience needed', whyUs5:'Your privacy is fully protected',
     howItWorksTitle:'How does it work?',
     how1Title:'Pick a style', how1Desc:'Browse the library and pick the look you like from any section.',
@@ -414,19 +419,20 @@ const translations = {
     faqQ3:'Do I need experience?', faqA3:'Not at all — just upload your photo and pick a style, we handle everything else.',
     faqQ4:'Can I use it commercially?', faqA4:'The resulting image is licensed for personal use. For commercial use (resale or client projects), please contact us first for proper licensing.',
     faqQ5:'How do I get my result?', faqA5:'Right after payment is confirmed, upload your photo on the site and get the transformed result directly — downloadable anytime.',
+    faqQ7:'Can I choose more than one style?', faqA7:'Of course! You can order more than one style for the same photo or for different photos — each style counts as a separate order, or use one of the bundles (10 or 25 photos) to save if you need more than one result.',
     heroTitle:'Turn your photo into a professional,<br>studio-quality portrait with <span class="brand-mark">Miga-Photobook</span><br>in minutes.',
     heroP:'A library of professional, ready-to-use prompts for transforming personal photos — for children, men, and women — carefully written and tested. Buy, unlock instantly, and use right away.',
     heroCta1:'Make Your Photo Now — 25 EGP', heroCta2:'Pricing & Offers',
     bafTitle:'One Photo From You... Turned Into Your Favorite Style',
     bafSub:'This is the same photo, after Miga-Photobook transformed it into different styles. Pick one you like and try it on your own photo.',
     bafCenterLabel:'Your Original Photo',
-    bafCta:'Create My Photo Now',
+    bafCta:'Make Your Photo Now — 25 EGP',
     secChildrenTitle:"Children's Section", secMaleTitle:"Men's Section", secFemaleTitle:"Women's Section",
     secBusinessTitle:'Business Section', secCinematicTitle:'Cinematic Section', secLuxuryTitle:'Luxury Section',
     secArtisticTitle:'Artistic Section', secMagazineTitle:'Magazine / Poster Section',
     pricingTitle:'Pricing & Offers',
     pricingSub:'Order photo transformations individually, or save more with bundles. Each bundle applies as a discount for the matching number of photos from any section.',
-    plan1Title:'Single Transformation', plan1Price:'From 25 EGP', currencyLabel:'EGP',
+    plan1Title:'Single Transformation', plan1Price:'Only 25 EGP', currencyLabel:'EGP',
     plan1Li1:'One photo transformation at its listed price', plan1Li2:'Instant processing after payment', plan1Li3:'Good for trying it out', plan1Cta:'Browse Now',
     plan2Title:'Pro Bundle', plan2Unit:'/ 10 photos',
     plan2Li1:'Save 50 EGP off individual price', plan2Li2:'Free choice from any section', plan2Li3:'Priority support',
@@ -492,11 +498,15 @@ const translations = {
     toastNoImageYet:'This product has no image yet.',
     downloadArchiveBtn:'⬇️ Download Category Archive', downloadAllArchiveBtn:'⬇️ Download Full Archive',
     toastArchiveFailed:'Could not create the archive, please try again',
-    dailyReportTitle:'📊 Daily Report', dailyReportLoading:'Gathering data...',
+    dailyReportTitle:'📊 Performance Report', dailyReportLoading:'Gathering data...',
     dailyReportTodaySuffix:'last 24 hours', dailyReportAllTimeSuffix:'all time — reviews have no recorded date',
     dailyReportOrdersTitle:'Orders', dailyReportTotal:'Total', dailyReportRevenue:'Revenue',
     dailyReportReviewsTitle:'Reviews', reviewStatPendingLabel:'Pending', reviewStatApprovedLabel:'Approved',
-    dailyReportVisitorsTitle:'Visitors', dailyReportDownloadBtn:'⬇️ Save Report',
+    dailyReportVisitorsTitle:'Visitors', dailyReportDownloadBtn:'⬇️ Export Excel',
+    periodDailyBtn:'Today', periodWeeklyBtn:'Last 7 days', periodCustomBtn:'Custom range', periodApplyBtn:'Apply',
+    periodCustomMissing:'Pick a start and end date first', reportChartTitle:'Performance over the period',
+    reportNarrativeTitle:'📋 Summary & recommendations', reportVsPrevious:'vs. the previous period', reportDownloadChartBtn:'⬇️ Chart image',
+    visitorsAllTimeNote:'all-time total', toastExcelLibFailed:'Excel export library is still loading, try again shortly',
     adminSub:'Product and order management panel.',
     adminPassLabel:'Password', adminLoginBtn:'Login',
     tabProducts:'Add Product', tabOrders:'Orders',
@@ -547,7 +557,7 @@ const translations = {
     confirmDeleteOrder:'Are you sure you want to permanently delete this rejected order?',
     toastOrderRejected:'Order rejected', toastOrderDeleted:'Order deleted',
     statTotalLabel:'Total Orders', statApprovedLabel:'Completed', statPendingLabel:'Under Review',
-    statRevenueLabel:'Total Revenue Collected',
+    statRevenueLabel:'Total Revenue Collected', exportOrdersBtn:'⬇️ Export All Orders (Excel)',
     reviewStatTotalLabel:'Total Reviews', reviewStatApprovedLabel:'Published', reviewStatPendingLabel:'Under Review',
     reviewColRating:'Rating', reviewColComment:'Comment',
     statColCode:'Code', statColProduct:'Product', statColStatus:'Status', statColTime:'Time', statColBuyer:'Buyer',
@@ -3784,6 +3794,40 @@ function renderOrdersList(){
       </div>
     </div>`).join('');
 }
+/** Full order-ledger export (admin panel, Orders tab) — reuses the same
+ * SheetJS instance already loaded for the performance report, so this adds
+ * no extra dependency. Exports every order currently loaded client-side
+ * (same `orders` array the list above already renders from). */
+function exportOrdersExcel(){
+  if(typeof XLSX === 'undefined'){ showToast(t('toastExcelLibFailed')); return; }
+  if(!orders.length){ showToast(t('ordersEmptyNote')); return; }
+  const header = [
+    t('orderLabelCode'), t('orderLabelType'), t('orderLabelProduct'),
+    t('dailyReportRevenue'), t('orderLabelStatus'), t('orderLabelPhone'),
+    t('orderLabelBuyer'), t('orderLabelPayApp'), t('orderLabelRef'), t('dailyReportTitle') + ' — ' + t('statColTime')
+  ];
+  const sorted = [...orders].sort((a,b)=> b.createdAt - a.createdAt);
+  const rows = sorted.map(o => [
+    o.code,
+    o.orderType==='prompt' ? t('orderTypePrompt') : t('orderTypeTransform'),
+    o.productTitle,
+    (Number(o.price)||0) + ' ' + CURRENCY,
+    orderStatusLabel(o.status),
+    o.phone || '',
+    o.buyerName || o.buyerEmail || '',
+    o.appUsed || '',
+    o.ref || '',
+    o.createdAt ? new Date(o.createdAt).toLocaleString() : ''
+  ]);
+  const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
+  ws['!cols'] = [{wch:10},{wch:12},{wch:26},{wch:12},{wch:12},{wch:14},{wch:22},{wch:12},{wch:14},{wch:18}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Orders');
+  const stamp = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `Miga-Photobook-Orders-${stamp}.xlsx`);
+}
+const exportOrdersBtnEl = document.getElementById('exportOrdersBtn');
+if(exportOrdersBtnEl) exportOrdersBtnEl.onclick = exportOrdersExcel;
 
 /** Compact recent-orders table shown when the stats bar is expanded — same
  * `orders` array already loaded for the full list below, just condensed to
@@ -4294,7 +4338,7 @@ async function downloadAllArchive(){
   }
 }
 
-// ---------- Daily report (admin only) ----------
+// ---------- Performance report (admin only) — period-flexible: daily / weekly / custom ----------
 function reportStatTile(num, label){
   return `<div class="order-stat"><span class="order-stat-num">${num}</span><span class="order-stat-label">${escapeHtml(label)}</span></div>`;
 }
@@ -4308,33 +4352,165 @@ function findTimestamp(obj, fallbackFields){
   }
   return null;
 }
-async function openDailyReport(){
-  const modal = document.getElementById('dailyReportModalBg');
+let reportPeriod = 'daily'; // 'daily' | 'weekly' | 'custom'
+let reportCustomFrom = null; // 'YYYY-MM-DD' from the date input
+let reportCustomTo = null;   // 'YYYY-MM-DD' from the date input
+let lastReportSnapshot = null; // stashed here so the export buttons don't need to re-fetch
+
+function fmtShortDate(ms){
+  const d = new Date(ms);
+  return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
+}
+/** Resolves the currently selected period into a concrete {start,end} range
+ * plus which bucket size the chart/table should use. */
+function getReportRange(period){
+  const now = Date.now();
+  const dayMs = 24*60*60*1000;
+  if(period === 'weekly'){
+    return { start: now - 7*dayMs, end: now, bucket:'day', label: t('periodWeeklyBtn') };
+  }
+  if(period === 'custom'){
+    const from = reportCustomFrom ? new Date(reportCustomFrom+'T00:00:00').getTime() : (now - dayMs);
+    const to = reportCustomTo ? new Date(reportCustomTo+'T23:59:59').getTime() : now;
+    const spanDays = Math.max(1, Math.round((to - from) / dayMs));
+    return { start: from, end: to, bucket: spanDays > 60 ? 'week' : 'day', label: t('periodCustomBtn') };
+  }
+  // daily (default)
+  return { start: now - dayMs, end: now, bucket:'hour', label: t('periodDailyBtn') };
+}
+function buildReportBuckets(range){
+  const buckets = [];
+  if(range.bucket === 'hour'){
+    const hourMs = 60*60*1000;
+    const n = Math.max(1, Math.ceil((range.end - range.start) / hourMs));
+    for(let i=0;i<n;i++){
+      const bStart = range.start + i*hourMs;
+      buckets.push({ start:bStart, end:bStart+hourMs, label: new Date(bStart).getHours()+':00' });
+    }
+  } else if(range.bucket === 'week'){
+    const weekMs = 7*24*60*60*1000;
+    const n = Math.max(1, Math.ceil((range.end - range.start) / weekMs));
+    for(let i=0;i<n;i++){
+      const bStart = range.start + i*weekMs;
+      const bEnd = Math.min(bStart+weekMs, range.end);
+      buckets.push({ start:bStart, end:bEnd, label: fmtShortDate(bStart)+'–'+fmtShortDate(bEnd) });
+    }
+  } else { // day
+    const dayMs = 24*60*60*1000;
+    const n = Math.max(1, Math.ceil((range.end - range.start) / dayMs));
+    for(let i=0;i<n;i++){
+      const bStart = range.start + i*dayMs;
+      buckets.push({ start:bStart, end:Math.min(bStart+dayMs, range.end), label: fmtShortDate(bStart) });
+    }
+  }
+  return buckets;
+}
+function orderTotals(arr){
+  const approved = arr.filter(o => o.status === 'approved');
+  return {
+    total: arr.length,
+    approved: approved.length,
+    pending: arr.filter(o => o.status === 'pending').length,
+    rejected: arr.filter(o => o.status === 'rejected').length,
+    revenue: approved.reduce((sum,o) => sum + (Number(o.price) || 0), 0),
+  };
+}
+function aggregateOrdersByBucket(ordersArr, buckets){
+  return buckets.map(b => {
+    const inBucket = ordersArr.filter(o => (o.createdAt||0) >= b.start && (o.createdAt||0) < b.end);
+    const t = orderTotals(inBucket);
+    return { label: b.label, total:t.total, approved:t.approved, pending:t.pending, rejected:t.rejected, revenue:t.revenue };
+  });
+}
+/** Draws a simple themed bar chart (revenue per bucket) with no external
+ * dependency — canvas is already used elsewhere in this file (crop tool),
+ * so this stays consistent and 100% works on mobile Safari too. */
+function drawReportChart(canvas, buckets){
+  const cssW = canvas.clientWidth || 300, cssH = 170;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = cssW*dpr; canvas.height = cssH*dpr;
+  canvas.style.height = cssH+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,cssW,cssH);
+  const styles = getComputedStyle(document.documentElement);
+  const brass = (styles.getPropertyValue('--brass')||'#ffc94d').trim();
+  const dim = (styles.getPropertyValue('--paper-dim')||'#999').trim();
+  const line = (styles.getPropertyValue('--line')||'rgba(255,255,255,.15)').trim();
+  const padL=36, padB=20, padT=10, padR=6;
+  const chartW = Math.max(10, cssW - padL - padR);
+  const chartH = Math.max(10, cssH - padT - padB);
+  const max = Math.max(1, ...buckets.map(b => b.revenue));
+  ctx.strokeStyle = line; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(padL, cssH-padB+0.5); ctx.lineTo(cssW-padR, cssH-padB+0.5); ctx.stroke();
+  ctx.fillStyle = dim; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
+  ctx.fillText(String(Math.round(max)), padL-6, padT+8);
+  const n = buckets.length || 1;
+  const barGap = 4;
+  const barW = Math.max(2, (chartW / n) - barGap);
+  const labelEvery = n <= 12 ? 1 : Math.ceil(n/12);
+  buckets.forEach((b,i) => {
+    const h = max>0 ? (b.revenue/max)*chartH : 0;
+    const x = padL + i*(chartW/n) + barGap/2;
+    const y = cssH - padB - h;
+    ctx.fillStyle = brass;
+    ctx.fillRect(x, y, barW, h);
+    if(i % labelEvery === 0){
+      ctx.fillStyle = dim; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(b.label, x + barW/2, cssH-6);
+    }
+  });
+}
+/** Builds a short Arabic narrative — positives/negatives + a couple of
+ * concrete, heuristic next-step suggestions. Kept simple and honest: no
+ * invented numbers, just plain comparisons against the previous equal-length
+ * period (which is already available client-side, no extra network call). */
+function buildReportNarrative(cur, prev, reviewsByStatus){
+  const lines = [];
+  const pct = (a,b) => b>0 ? Math.round(((a-b)/b)*100) : (a>0 ? 100 : 0);
+  const revChange = pct(cur.revenue, prev.revenue);
+  if(cur.total === 0){
+    lines.push(currentLang==='en' ? '❕ No orders in this period — worth checking your ad spend or posting times.' : '❕ مفيش طلبات في الفترة دي — يستاهل تراجع الإعلانات أو مواعيد النشر.');
+  } else if(revChange > 5){
+    lines.push((currentLang==='en' ? `📈 Revenue is up ${revChange}% vs. the previous period — good momentum.` : `📈 الإيرادات زادت ${revChange}% عن الفترة اللي قبلها — أداء كويس.`));
+  } else if(revChange < -5){
+    lines.push((currentLang==='en' ? `📉 Revenue is down ${Math.abs(revChange)}% vs. the previous period.` : `📉 الإيرادات قلّت ${Math.abs(revChange)}% عن الفترة اللي قبلها.`));
+  } else {
+    lines.push(currentLang==='en' ? '➖ Revenue is roughly flat vs. the previous period.' : '➖ الإيرادات مستقرة تقريبًا عن الفترة اللي قبلها.');
+  }
+  const rejectRate = cur.total>0 ? Math.round((cur.rejected/cur.total)*100) : 0;
+  if(cur.total >= 5 && rejectRate >= 20){
+    lines.push(currentLang==='en' ? `⚠️ ${rejectRate}% of orders were rejected — worth checking the most common rejection reason and whether the payment steps are clear.` : `⚠️ ${rejectRate}% من الطلبات مرفوضة — يستاهل تتأكد من سبب الرفض الشائع ووضوح خطوات الدفع.`);
+  }
+  if(reviewsByStatus.pending >= 5){
+    lines.push(currentLang==='en' ? `🔔 ${reviewsByStatus.pending} reviews are waiting for moderation — approving them adds real social proof to the site.` : `🔔 عندك ${reviewsByStatus.pending} تقييم قيد المراجعة — موافقتك عليهم بتظهرهم كتقييمات حقيقية على الموقع.`);
+  }
+  if(cur.total > 0 && (cur.pending/cur.total) > 0.3){
+    lines.push(currentLang==='en' ? '💡 A large share of orders are still pending review — reviewing transfers faster reduces drop-off.' : '💡 نسبة كبيرة من الطلبات لسه قيد المراجعة — مراجعة التحويلات بسرعة أكبر بتقلل فقدان العملاء.');
+  }
+  return lines;
+}
+async function renderPerformanceReport(){
   const body = document.getElementById('dailyReportBody');
   const subtitle = document.getElementById('dailyReportSubtitle');
-  modal.classList.add('show');
   body.innerHTML = `<div class="empty-note">${t('dailyReportLoading')}</div>`;
-  subtitle.textContent = new Date().toLocaleString();
 
-  const dayMs = 24 * 60 * 60 * 1000;
-  const cutoff = Date.now() - dayMs;
+  const range = getReportRange(reportPeriod);
+  const prevSpan = range.end - range.start;
+  const prevRange = { start: range.start - prevSpan, end: range.start };
+  subtitle.textContent = `${range.label} · ${fmtShortDate(range.start)} → ${fmtShortDate(range.end)}`;
 
-  // Orders — createdAt is a known, reliable field (used throughout the orders UI already).
   await loadOrders();
-  const todayOrders = orders.filter(o => (o.createdAt || 0) >= cutoff);
-  const ordersByStatus = {
-    pending: todayOrders.filter(o => o.status === 'pending').length,
-    approved: todayOrders.filter(o => o.status === 'approved').length,
-    rejected: todayOrders.filter(o => o.status === 'rejected').length,
-  };
-  const todayRevenue = todayOrders.filter(o => o.status === 'approved')
-    .reduce((sum, o) => sum + (Number(o.price) || 0), 0);
+  const curOrders = orders.filter(o => (o.createdAt||0) >= range.start && (o.createdAt||0) < range.end);
+  const prevOrders = orders.filter(o => (o.createdAt||0) >= prevRange.start && (o.createdAt||0) < prevRange.end);
+  const curTotals = orderTotals(curOrders);
+  const prevTotals = orderTotals(prevOrders);
+  const buckets = aggregateOrdersByBucket(curOrders, buildReportBuckets(range));
 
-  // Reviews — the exact timestamp field isn't confirmed server-side, so this
-  // tries a few plausible names; if none of today's or any review carries one,
-  // it reports all-time totals instead of a silently wrong daily count.
+  // Reviews — same defensive timestamp-detection as before, just applied to
+  // the selected range instead of a fixed 24h window.
   let reviewsByStatus = { pending: 0, approved: 0 };
-  let reviewsLabelSuffix = t('dailyReportTodaySuffix');
+  let reviewsScopeNote = '';
   try{
     const [pendingRes, approvedRes] = await Promise.all([
       fetch(`${BACKEND_BASE}/reviews/pending?password=${encodeURIComponent(adminPasswordCache)}`),
@@ -4347,83 +4523,150 @@ async function openDailyReport(){
     const tsFields = ['createdAt','created_at','submittedAt','submitted_at','timestamp'];
     const anyTimestamped = [...allPending, ...allApproved].some(r => findTimestamp(r, tsFields) != null);
     if(anyTimestamped){
-      reviewsByStatus.pending = allPending.filter(r => (findTimestamp(r, tsFields) || 0) >= cutoff).length;
-      reviewsByStatus.approved = allApproved.filter(r => (findTimestamp(r, tsFields) || 0) >= cutoff).length;
+      reviewsByStatus.pending = allPending.filter(r => { const ts = findTimestamp(r, tsFields); return ts!=null && ts>=range.start && ts<range.end; }).length;
+      reviewsByStatus.approved = allApproved.filter(r => { const ts = findTimestamp(r, tsFields); return ts!=null && ts>=range.start && ts<range.end; }).length;
     }else{
       reviewsByStatus.pending = allPending.length;
       reviewsByStatus.approved = allApproved.length;
-      reviewsLabelSuffix = t('dailyReportAllTimeSuffix');
+      reviewsScopeNote = t('dailyReportAllTimeSuffix');
     }
   }catch(e){ /* leave counts at 0 if the reviews endpoints fail */ }
 
-  // Visitors — the backend already computes "today" itself.
-  let visitorsToday = 0;
+  // Visitors — the Worker only exposes a same-day "today" count right now.
+  // For non-daily periods we honestly label this as an all-time total rather
+  // than fabricate a range figure the backend doesn't actually compute yet.
+  let visitorsLabel = '—';
   try{
     const res = await fetch(`${BACKEND_BASE}/visits/stats?password=${encodeURIComponent(adminPasswordCache)}`);
     const data = await res.json();
-    visitorsToday = data.today ?? 0;
+    visitorsLabel = reportPeriod === 'daily'
+      ? `${data.today ?? 0}`
+      : `${data.total ?? 0} (${t('visitorsAllTimeNote')})`;
   }catch(e){}
 
+  const narrative = buildReportNarrative(curTotals, prevTotals, reviewsByStatus);
+  const revPct = prevTotals.revenue>0 ? Math.round(((curTotals.revenue-prevTotals.revenue)/prevTotals.revenue)*100) : (curTotals.revenue>0?100:0);
+  const cmpCls = revPct >= 0 ? 'report-up' : 'report-down';
+  const cmpSign = revPct > 0 ? '+' : '';
+
   body.innerHTML = `
+    <div class="report-compare-note"><span class="${cmpCls}">${cmpSign}${revPct}%</span> ${t('reportVsPrevious')}</div>
     <div>
-      <h4 style="margin:0 0 8px; font-size:14px; color:var(--brass);">${t('dailyReportOrdersTitle')}</h4>
+      <h4 class="report-h4">${t('dailyReportOrdersTitle')}</h4>
       <div style="display:flex; gap:18px; flex-wrap:wrap;">
-        ${reportStatTile(todayOrders.length, t('dailyReportTotal'))}
-        ${reportStatTile(ordersByStatus.pending, t('orderStatusPending'))}
-        ${reportStatTile(ordersByStatus.approved, t('orderStatusApproved'))}
-        ${reportStatTile(ordersByStatus.rejected, t('orderStatusRejected'))}
-        ${reportStatTile(todayRevenue + ' ' + CURRENCY, t('dailyReportRevenue'))}
+        ${reportStatTile(curTotals.total, t('dailyReportTotal'))}
+        ${reportStatTile(curTotals.pending, t('orderStatusPending'))}
+        ${reportStatTile(curTotals.approved, t('orderStatusApproved'))}
+        ${reportStatTile(curTotals.rejected, t('orderStatusRejected'))}
+        ${reportStatTile(curTotals.revenue + ' ' + CURRENCY, t('dailyReportRevenue'))}
       </div>
     </div>
     <div>
-      <h4 style="margin:0 0 8px; font-size:14px; color:var(--brass);">${t('dailyReportReviewsTitle')} <span style="font-weight:400; color:var(--paper-dim); font-size:11.5px;">(${reviewsLabelSuffix})</span></h4>
+      <h4 class="report-h4">${t('reportChartTitle')}</h4>
+      <div class="report-chart-wrap"><canvas id="reportChartCanvas"></canvas></div>
+    </div>
+    <div>
+      <h4 class="report-h4">${t('dailyReportReviewsTitle')} ${reviewsScopeNote ? `<span class="report-scope-note">(${reviewsScopeNote})</span>` : ''}</h4>
       <div style="display:flex; gap:18px; flex-wrap:wrap;">
         ${reportStatTile(reviewsByStatus.pending, t('reviewStatPendingLabel'))}
         ${reportStatTile(reviewsByStatus.approved, t('reviewStatApprovedLabel'))}
       </div>
     </div>
     <div>
-      <h4 style="margin:0 0 8px; font-size:14px; color:var(--brass);">${t('dailyReportVisitorsTitle')}</h4>
+      <h4 class="report-h4">${t('dailyReportVisitorsTitle')}</h4>
       <div style="display:flex; gap:18px; flex-wrap:wrap;">
-        ${reportStatTile(visitorsToday, t('visitorsTodayLabel'))}
+        ${reportStatTile(visitorsLabel, t('visitorsTodayLabel'))}
       </div>
+    </div>
+    <div class="report-narrative">
+      <h4 class="report-h4">${t('reportNarrativeTitle')}</h4>
+      ${narrative.map(l => `<p>${escapeHtml(l)}</p>`).join('')}
     </div>`;
 
-  // Stash the numbers on the modal so the download button doesn't need to re-fetch.
-  modal.dataset.report = JSON.stringify({
-    generatedAt: new Date().toLocaleString(),
-    orders: { total: todayOrders.length, ...ordersByStatus, revenue: todayRevenue + ' ' + CURRENCY },
-    reviews: { ...reviewsByStatus, scope: reviewsLabelSuffix },
-    visitorsToday
+  requestAnimationFrame(() => {
+    const canvas = document.getElementById('reportChartCanvas');
+    if(canvas) drawReportChart(canvas, buckets);
   });
+
+  lastReportSnapshot = { range, buckets, totals: curTotals, prevTotals, reviews: reviewsByStatus, visitorsLabel, narrative };
 }
-function downloadDailyReport(){
+async function openDailyReport(){
   const modal = document.getElementById('dailyReportModalBg');
-  let r;
-  try{ r = JSON.parse(modal.dataset.report || '{}'); }catch(e){ r = {}; }
-  const lines = [
-    `Miga-Photobook — ${t('dailyReportTitle')}`,
-    r.generatedAt || new Date().toLocaleString(),
-    '',
-    `${t('dailyReportOrdersTitle')}:`,
-    `  ${t('dailyReportTotal')}: ${r.orders?.total ?? 0}`,
-    `  ${t('orderStatusPending')}: ${r.orders?.pending ?? 0}`,
-    `  ${t('orderStatusApproved')}: ${r.orders?.approved ?? 0}`,
-    `  ${t('orderStatusRejected')}: ${r.orders?.rejected ?? 0}`,
-    `  ${t('dailyReportRevenue')}: ${r.orders?.revenue ?? '0'}`,
-    '',
-    `${t('dailyReportReviewsTitle')} (${r.reviews?.scope || ''}):`,
-    `  ${t('reviewStatPendingLabel')}: ${r.reviews?.pending ?? 0}`,
-    `  ${t('reviewStatApprovedLabel')}: ${r.reviews?.approved ?? 0}`,
-    '',
-    `${t('dailyReportVisitorsTitle')}:`,
-    `  ${t('visitorsTodayLabel')}: ${r.visitorsToday ?? 0}`,
-  ];
-  const blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
-  const stamp = new Date().toISOString().slice(0,10);
-  triggerBlobDownload(blob, `Miga-Photobook-Report-${stamp}.txt`);
+  modal.classList.add('show');
+  await renderPerformanceReport();
 }
-document.getElementById('dailyReportDownloadBtn').onclick = downloadDailyReport;
+/** Exports the current report snapshot as a real, organized .xlsx workbook
+ * (Summary sheet + a per-bucket breakdown sheet) via SheetJS. Degrades
+ * gracefully with a toast — never a silent failure or a broken button —
+ * if the CDN script hasn't finished loading yet. */
+function exportReportExcel(){
+  if(typeof XLSX === 'undefined'){ showToast(t('toastExcelLibFailed')); return; }
+  if(!lastReportSnapshot) return;
+  const { range, buckets, totals, reviews, visitorsLabel, narrative } = lastReportSnapshot;
+
+  const summaryRows = [
+    ['Miga-Photobook — ' + t('dailyReportTitle')],
+    [t('reportChartTitle'), range.label],
+    ['From / من', new Date(range.start).toLocaleString()],
+    ['To / إلى', new Date(range.end).toLocaleString()],
+    [],
+    [t('dailyReportTotal'), totals.total],
+    [t('orderStatusApproved'), totals.approved],
+    [t('orderStatusPending'), totals.pending],
+    [t('orderStatusRejected'), totals.rejected],
+    [t('dailyReportRevenue'), totals.revenue + ' ' + CURRENCY],
+    [],
+    [t('reviewStatPendingLabel'), reviews.pending],
+    [t('reviewStatApprovedLabel'), reviews.approved],
+    [],
+    [t('dailyReportVisitorsTitle'), visitorsLabel],
+    [],
+    [t('reportNarrativeTitle')],
+    ...narrative.map(l => [l]),
+  ];
+  const wb = XLSX.utils.book_new();
+  const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
+  wsSummary['!cols'] = [{wch:30},{wch:38}];
+  XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+
+  const detailHeader = [t('reportChartTitle'), t('dailyReportTotal'), t('orderStatusApproved'), t('orderStatusPending'), t('orderStatusRejected'), t('dailyReportRevenue')];
+  const detailRows = buckets.map(b => [b.label, b.total, b.approved, b.pending, b.rejected, b.revenue]);
+  const wsDetail = XLSX.utils.aoa_to_sheet([detailHeader, ...detailRows]);
+  wsDetail['!cols'] = [{wch:14},{wch:10},{wch:12},{wch:12},{wch:10},{wch:12}];
+  XLSX.utils.book_append_sheet(wb, wsDetail, 'Breakdown');
+
+  const stamp = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `Miga-Photobook-Report-${range.label}-${stamp}.xlsx`);
+}
+function downloadReportChartImage(){
+  const canvas = document.getElementById('reportChartCanvas');
+  if(!canvas || !lastReportSnapshot) return;
+  canvas.toBlob(blob => {
+    if(!blob) return;
+    const stamp = new Date().toISOString().slice(0,10);
+    triggerBlobDownload(blob, `Miga-Photobook-Chart-${lastReportSnapshot.range.label}-${stamp}.png`);
+  }, 'image/png');
+}
+document.querySelectorAll('.report-period-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.report-period-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    reportPeriod = btn.dataset.period;
+    const customRow = document.getElementById('reportCustomRange');
+    if(customRow) customRow.style.display = reportPeriod === 'custom' ? 'flex' : 'none';
+    if(reportPeriod !== 'custom') renderPerformanceReport();
+  });
+});
+const reportApplyRangeBtn = document.getElementById('reportApplyRangeBtn');
+if(reportApplyRangeBtn) reportApplyRangeBtn.addEventListener('click', () => {
+  reportCustomFrom = document.getElementById('reportFromDate').value;
+  reportCustomTo = document.getElementById('reportToDate').value;
+  if(!reportCustomFrom || !reportCustomTo){ showToast(t('periodCustomMissing')); return; }
+  renderPerformanceReport();
+});
+document.getElementById('dailyReportDownloadBtn').onclick = exportReportExcel;
+const reportDownloadChartBtn = document.getElementById('reportDownloadChartBtn');
+if(reportDownloadChartBtn) reportDownloadChartBtn.onclick = downloadReportChartImage;
 document.getElementById('dailyReportModalClose').onclick = ()=> document.getElementById('dailyReportModalBg').classList.remove('show');
 document.getElementById('dailyReportCloseBtn').onclick = ()=> document.getElementById('dailyReportModalBg').classList.remove('show');
 
