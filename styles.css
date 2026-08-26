@@ -1365,3 +1365,11 @@
   .report-narrative{background:var(--ink-3); border:1px solid var(--line); border-radius:10px; padding:12px 14px;}
   .report-narrative p{margin:0 0 8px; font-size:13px; color:var(--paper-dim); line-height:1.6;}
   .report-narrative p:last-child{margin-bottom:0;}
+
+  /* Regeneration guarantee — kept near the pricing plans/CTA per audit
+     feedback, instead of being buried only inside the FAQ accordion. */
+  .pricing-guarantee{
+    margin-top:16px; text-align:center; font-size:13.5px; font-weight:600;
+    color:var(--brass); background:rgba(255,201,77,0.08); border:1px solid var(--brass-dim);
+    border-radius:10px; padding:10px 16px;
+  }
