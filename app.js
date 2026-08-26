@@ -112,6 +112,8 @@ const translations = {
     toastLoginRequired:'سجّل دخولك الأول عشان تقدر تكتب تقييم',
     toastReviewSubmitted:'تم إرسال تقييمك، هيظهر بعد المراجعة. شكرًا ليك!',
     viewDesktopLabel:'كمبيوتر', viewMobileLabel:'موبايل',
+    themeDayLabel:'الوضع النهاري', themeNightLabel:'الوضع الليلي',
+    themeToggleTitle:'التبديل بين الوضع النهاري والوضع الليلي',
     heroEyebrow:'Miga-Photobook',
     promoMarqueeText:'حوّل أي صورة عادية إلى بورتريه استوديو احترافي بالذكاء الاصطناعي خلال دقائق — عرض الافتتاح: كل صورة بـ 25 جنيه بدلاً من 50 جنيه لفترة محدودة.',
     heroSlogan:'لقطتك... تتحول لتحفة فنية',
@@ -368,6 +370,8 @@ const translations = {
     toastLoginRequired:'Please log in first to write a review',
     toastReviewSubmitted:'Your review has been submitted and will appear after moderation. Thank you!',
     viewDesktopLabel:'Computer', viewMobileLabel:'Mobile',
+    themeDayLabel:'Day Mode', themeNightLabel:'Night Mode',
+    themeToggleTitle:'Switch between day mode and night mode',
     heroEyebrow:'Miga-Photobook',
     promoMarqueeText:'Turn any ordinary photo into a professional studio portrait with AI, in minutes — launch offer: every photo for 25 EGP instead of 50 EGP, for a limited time.',
     heroSlogan:'Your shot... becomes a masterpiece',
@@ -575,7 +579,7 @@ function productTitle(p){
 }
 
 async function saveUiPrefs(){
-  try{ localStorage.setItem('megaPromptUiPrefs', JSON.stringify({lang: currentLang, view: currentViewMode})); }
+  try{ localStorage.setItem('megaPromptUiPrefs', JSON.stringify({lang: currentLang, view: currentViewMode, theme: currentTheme})); }
   catch(e){ console.error('save prefs failed', e); }
 }
 async function loadUiPrefs(){
@@ -613,6 +617,8 @@ function applyLanguage(lang){
   document.querySelectorAll('#langToggle button').forEach(b=>{
     b.classList.toggle('active', b.dataset.lang === currentLang);
   });
+  refreshThemeToggleLabels();
+  updateAccountButton();
 
   // The privacy note in the transform modal depends on whether a real
   // image-generation backend is configured (BACKEND_BASE) — override the
@@ -644,6 +650,34 @@ function applyViewMode(mode){
   });
   saveUiPrefs();
 }
+
+/** Day/night display theme — independent of language and of view mode, and
+ * shared by every toggle button on the page (main header + admin panel), so
+ * flipping it anywhere flips the whole document (a single data-theme
+ * attribute on <html> drives every colour via CSS variables). Defaults to
+ * 'dark' to match the site's original look for anyone who hasn't chosen yet. */
+let currentTheme = 'dark';
+function refreshThemeToggleLabels(){
+  const isNight = currentTheme === 'dark';
+  document.querySelectorAll('.theme-toggle').forEach(btn=>{
+    btn.classList.toggle('is-night', isNight);
+    btn.setAttribute('aria-label', t(isNight ? 'themeNightLabel' : 'themeDayLabel'));
+    btn.title = t('themeToggleTitle');
+    btn.setAttribute('aria-pressed', String(isNight));
+  });
+}
+function applyTheme(theme){
+  currentTheme = (theme === 'light') ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  refreshThemeToggleLabels();
+  saveUiPrefs();
+}
+function toggleTheme(){
+  applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+}
+document.querySelectorAll('.theme-toggle').forEach(btn=>{
+  btn.addEventListener('click', toggleTheme);
+});
 
 document.getElementById('langToggle').addEventListener('click', (e)=>{
   const btn = e.target.closest('button');
@@ -954,7 +988,7 @@ function renderMostRequested(){
   const grid = document.getElementById('mostRequestedGrid');
   if(!section || !grid) return;
   const ranked = products
-    .filter(p => (productPopularity[p.id] || 0) > 0)
+    .filter(p => p.image && p.image !== PLACEHOLDER_IMG && (productPopularity[p.id] || 0) > 0)
     .sort((a,b) => (productPopularity[b.id]||0) - (productPopularity[a.id]||0))
     .slice(0, 12);
   if(!ranked.length){
@@ -1004,7 +1038,16 @@ function renderGrids(){
   CAT_IDS.forEach(cat=>{
     const el = document.getElementById('grid-'+cat);
     if(!el) return;
-    const allItems = products.filter(p=>p.category===cat)
+    // Products the admin has written up (title, prompt, price) but hasn't
+    // attached a real photo to yet still carry PLACEHOLDER_IMG — a mostly
+    // empty dark rectangle with small centered text. Left unfiltered here,
+    // every one of those showed up as a large, blank-looking card in the
+    // live customer grid alongside the real photos. The category tiles
+    // already exclude these from their own cover photo (see categoryCover);
+    // this brings the actual product grid in line with that same rule, so a
+    // draft with no photo yet stays a backstage admin concern instead of a
+    // customer-facing empty tile.
+    const allItems = products.filter(p=>p.category===cat && p.image && p.image !== PLACEHOLDER_IMG)
       .sort((a,b) => (a.order ?? 9999) - (b.order ?? 9999));
     const dotsEl = document.getElementById('gridDots-'+cat);
 
@@ -1157,7 +1200,24 @@ function renderProductCard(p){
 }
 
 const CAT_IDS = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
-const CAT_TAG_LABEL = { children:'CHILDREN', male:'NATURAL MALE', female:'FEMALE', business:'BUSINESS', cinematic:'CINEMATIC', luxury:'LUXURY', artistic:'ARTISTIC', magazine:'MAGAZINE' };
+/** One small line-icon per category, shared everywhere a category shows its
+ * identity (overview tile, opened section header, search results) so the
+ * icon+name pairing reads as a single deliberate mark instead of the old
+ * name-plus-separate-colour-tag duplication. No width/height baked in — each
+ * context sizes it with CSS (font-size + 1em svg) so the same markup works
+ * small in a chip and larger in a section header. Colour comes from
+ * currentColor, inherited from whichever tag-<cat>/icon-<cat> class wraps it. */
+const CAT_ICON = {
+  children: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.2 4.9 5.3.5-4 3.6 1.3 5.3L12 15.1l-4.8 2.7 1.3-5.3-4-3.6 5.3-.5L12 3.5z"/></svg>',
+  male: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5h6l.9 2.6-1.9 1.7 1.6 9-3.6 3.7-3.6-3.7 1.6-9-1.9-1.7L9 3.5z"/></svg>',
+  female: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2l2.8 3.6-1.3 1.2 2 11a1 1 0 0 1-1 1.2H9.5a1 1 0 0 1-1-1.2l2-11-1.3-1.2L12 3.2z"/></svg>',
+  business: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="7.5" width="17.6" height="11.5" rx="2"/><path d="M8.5 7.5V6a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v1.5"/><path d="M3.2 12.8h17.6"/></svg>',
+  cinematic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9.2l1-4.2h15l1 4.2"/><rect x="3" y="9.2" width="18" height="10.3" rx="1.5"/><path d="M7 5l2.2 4.2M12 5l2.2 4.2M17 5l2.2 4.2"/></svg>',
+  luxury: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.3 3.5h11.4l3 5-8.7 12-8.7-12 3-5z"/><path d="M2.6 8.5h18.8M9 3.5l-1.8 5 4.8 12 4.8-12-1.8-5"/></svg>',
+  artistic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2a8.8 8.8 0 1 0 0 17.6c1.3 0 1.9-.9 1.9-1.8 0-.5-.2-1-.5-1.4-.3-.4-.5-.9-.5-1.4 0-1.1.9-2 2-2h2a4 4 0 0 0 4-4c0-3.9-4-7-8.9-7z"/><circle cx="7.6" cy="10.8" r="1"/><circle cx="9.6" cy="7.2" r="1"/><circle cx="14.2" cy="6.6" r="1"/><circle cx="17" cy="9.8" r="1"/></svg>',
+  magazine: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6c3.3-1.4 6.5-1.4 9.5.3 3-1.7 6.2-1.7 9.5-.3v12.4c-3.3-1.4-6.5-1.4-9.5.3-3-1.7-6.2-1.7-9.5-.3V6z"/><path d="M12 6.3v12.4"/></svg>',
+};
+const ICON_COLOR_CLASS = { children:'icon-children', male:'icon-male', female:'icon-female', business:'icon-business', cinematic:'icon-cinematic', luxury:'icon-luxury', artistic:'icon-artistic', magazine:'icon-magazine' };
 
 /** One tile per category: its "icon" is a 2x2 collage built from that
  * category's own real product photos (falls back to the placeholder art
@@ -1242,8 +1302,10 @@ function renderCatTiles(){
         ${coverHtml}
         ${items.length ? `<span class="ct-count">${items.length}</span>` : ''}
         <div class="cat-tile-label">
-          <span class="ct-name">${escapeHtml(catLabel(cat))}</span>
-          <span class="tag tag-${cat}">${CAT_TAG_LABEL[cat]}</span>
+          <span class="cat-chip tag-${cat}">
+            <span class="cicon" aria-hidden="true">${CAT_ICON[cat]}</span>
+            <span class="cc-name">${escapeHtml(catLabel(cat))}</span>
+          </span>
         </div>
       </div>
       <span class="sh-chevron" aria-hidden="true">&#9660;</span>
@@ -2156,25 +2218,54 @@ function getCategoryOf(productId){
 }
 
 
-// ---------- Collapsible sections (How it works / Testimonials / About / FAQ / Why us) ----------
-document.querySelectorAll('.cat-section.collapsible > .section-head').forEach(head=>{
-  head.addEventListener('click', ()=>{
-    head.parentElement.classList.toggle('open');
-  });
-});
+// ---------- Promo video: don't fetch any of the ~14MB file until the visitor
+// actually scrolls near it, instead of downloading it on every page load. ----------
+(function(){
+  const vid = document.getElementById('promoVideoEl');
+  if(!vid) return;
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        vid.src = vid.dataset.src;
+        vid.play().catch(()=>{}); // ignore autoplay-blocked errors; the poster + controls still work
+        io.disconnect();
+      }
+    });
+  }, {rootMargin: '200px'});
+  io.observe(vid);
+})();
 
 // ---------- Quick-nav row (single row of tabs above the five sections above) ----------
-document.getElementById('sectionTabsRow').addEventListener('click', (e)=>{
-  const btn = e.target.closest('.section-tab-btn');
-  if(!btn) return;
-  document.querySelectorAll('.section-tab-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  const targetId = btn.dataset.target;
+// Accordion behaviour: tapping a tab expands its content directly beneath
+// the row and hides the other four tabs, so the open one and its content
+// read as a single expanded block. Tapping the same (now-lone) tab again
+// collapses it and brings the other four back. Only ever one section open
+// at a time, matching how the sections themselves already worked — this
+// just makes the tab row follow the same rule instead of staying a fixed
+// row of five above whichever section happens to be open.
+function setActiveSectionTab(targetId, {scroll} = {scroll: true}){
+  const row = document.getElementById('sectionTabsRow');
+  document.querySelectorAll('.section-tab-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.target === targetId);
+  });
   document.querySelectorAll('#whyUs, #howItWorks, #testimonials, #aboutUs, #faq').forEach(sec=>{
     sec.classList.toggle('open', sec.id === targetId);
   });
-  document.getElementById(targetId)?.scrollIntoView({behavior:'smooth', block:'start'});
+  row.classList.toggle('has-active', !!targetId);
+  if(targetId && scroll){
+    document.getElementById(targetId)?.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+}
+document.getElementById('sectionTabsRow').addEventListener('click', (e)=>{
+  const btn = e.target.closest('.section-tab-btn');
+  if(!btn) return;
+  const alreadyActive = btn.classList.contains('active');
+  setActiveSectionTab(alreadyActive ? null : btn.dataset.target, {scroll: !alreadyActive});
 });
+// howItWorks starts open by default (see its markup), so the row starts in
+// the same collapsed-to-one-tab state a click would produce, instead of
+// showing all five tabs above a section that's already expanded.
+setActiveSectionTab('howItWorks', {scroll: false});
 
 // ---------- Back to top + vertical scroll ruler ----------
 const backToTopBtn = document.getElementById('backToTopBtn');
@@ -2274,15 +2365,22 @@ function scrollToProductCard(p){
  * every call so labels follow the current language. */
 function getStaticSearchIndex(){
   const cats = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
-  const items = cats.map(c => ({ id:c, label: catLabel(c), keywords:[catLabel(c).toLowerCase()], icon:'📁' }));
+  const items = cats.map(c => ({ id:c, label: catLabel(c), keywords:[catLabel(c)], icon:`<span class="cicon ${ICON_COLOR_CLASS[c]}" style="display:inline-flex;font-size:15px;vertical-align:-2px;">${CAT_ICON[c]}</span>` }));
   items.push(
-    { id:'howItWorks', label:t('howItWorksTitle'), keywords:[t('howItWorksTitle').toLowerCase()], icon:'❔' },
-    { id:'testimonials', label:t('testimonialsTitle'), keywords:[t('testimonialsTitle').toLowerCase(), 'تقييم', 'تقييمات', 'review', 'reviews', 'rating'], icon:'⭐' },
-    { id:'aboutUs', label:t('aboutUsTitle'), keywords:[t('aboutUsTitle').toLowerCase()], icon:'👥' },
-    { id:'faq', label:t('faqTitle'), keywords:[t('faqTitle').toLowerCase(), 'اسئلة', 'أسئلة', 'faq', 'questions'], icon:'❓' },
-    { id:'whyUs', label:t('whyUsTitle'), keywords:[t('whyUsTitle').toLowerCase()], icon:'✅' },
-    { id:'mostRequested', label:t('mostRequestedTitle'), keywords:[t('mostRequestedTitle').toLowerCase()], icon:'🔥' },
+    { id:'howItWorks', label:t('howItWorksTitle'), keywords:[t('how1Title'), t('how1Desc'), t('how2Title'), t('how2Desc'), t('how3Title'), t('how3Desc')], icon:'❔' },
+    { id:'testimonials', label:t('testimonialsTitle'), keywords:['تقييم', 'تقييمات', 'review', 'reviews', 'rating'], icon:'⭐' },
+    { id:'aboutUs', label:t('aboutUsTitle'), keywords:[t('aboutUsText')], icon:'👥' },
+    { id:'faq', label:t('faqTitle'), keywords:['اسئلة', 'أسئلة', 'faq', 'questions', t('faqQ1'), t('faqA1'), t('faqQ2'), t('faqA2'), t('faqQ3'), t('faqA3'), t('faqQ4'), t('faqA4')], icon:'❓' },
+    { id:'whyUs', label:t('whyUsTitle'), keywords:[t('whyUs1'), t('whyUs2'), t('whyUs3'), t('whyUs4'), t('whyUs5'), t('trustBadge1'), t('trustBadge2'), t('trustBadge3'), t('trustBadge4')], icon:'✅' },
+    { id:'mostRequested', label:t('mostRequestedTitle'), keywords:[], icon:'🔥' },
+    { id:'pricing', label:t('pricingTitle'), keywords:[t('pricingSub'), t('plan1Title'), t('plan1Price'), t('plan2Title'), t('plan2Unit')], icon:'💳' },
   );
+  // Every section's whole body text (title + every keyword phrase) is
+  // flattened into one lowercase haystack, so a query whose words are
+  // scattered across a question and its answer — or a title and a bullet
+  // several lines below it — still matches, instead of requiring both
+  // words to land inside the same short phrase.
+  items.forEach(it => { it.searchText = [it.label, ...it.keywords].filter(Boolean).join(' ').toLowerCase(); });
   return items;
 }
 
@@ -2293,10 +2391,24 @@ function scrollToSiteSection(id){
   addSearchHistory(term);
   const el = document.getElementById(id);
   if(!el) return;
-  el.classList.add('open'); // opens it if it's one of the collapsible sections
+  if(['whyUs','howItWorks','testimonials','aboutUs','faq'].includes(id)){
+    setActiveSectionTab(id, {scroll: false}); // keeps the tab row's hide/show in sync
+  } else {
+    el.classList.add('open'); // opens it if it's one of the collapsible category sections
+  }
   document.querySelector(`.cat-tile[data-cat="${id}"]`)?.classList.add('open');
   document.querySelector(`.cat-tile[data-cat="${id}"]`)?.setAttribute('aria-expanded', 'true');
   el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/** Splits a query into its individual words and requires every one of them
+ * to appear somewhere in the given text (in any order, anywhere in it) —
+ * so "دعم مباشر" still finds a phrase like "دعم فني سريع ومباشر" even
+ * though the two query words aren't adjacent there. */
+function textHasAllWords(text, words){
+  if(!text || !words.length) return false;
+  const hay = text.toLowerCase();
+  return words.every(w => hay.includes(w));
 }
 
 function renderSearchDropdown(query){
@@ -2316,11 +2428,12 @@ function renderSearchDropdown(query){
         </div>`).join('');
     return;
   }
+  const words = query.split(/\s+/).filter(Boolean);
   const sectionMatches = getStaticSearchIndex()
-    .filter(s => s.label.toLowerCase().includes(query) || s.keywords.some(k => k.includes(query)))
+    .filter(s => textHasAllWords(s.searchText, words))
     .slice(0, 6);
   const productMatches = products
-    .filter(p => productTitle(p).toLowerCase().includes(query) || p.title.toLowerCase().includes(query))
+    .filter(p => textHasAllWords(productTitle(p), words) || textHasAllWords(p.title, words))
     .slice(0, 8);
 
   if(!sectionMatches.length && !productMatches.length){
@@ -2628,7 +2741,8 @@ async function checkLoggedInUser(){
 function updateAccountButton(){
   const btn = document.getElementById('accountOpenBtn');
   if(!btn) return;
-  btn.textContent = currentUser ? `👤 ${currentUser.name}` : t('accountBtnGuest');
+  const personIcon = '<span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"/></svg></span>';
+  btn.innerHTML = personIcon + `<span>${currentUser ? escapeHtml(currentUser.name) : t('accountBtnGuest')}</span>`;
 }
 
 const accountModalBg = document.getElementById('accountModalBg');
@@ -3218,7 +3332,10 @@ document.getElementById('scSaveBtn').onclick = async ()=>{
 /** Loads the saved showcase images (if any) into the homepage circle. If the
  * backend has nothing configured yet, the default images already baked into
  * the HTML (before-after/before-after/*.jpg) stay exactly as they are — this
- * only overrides them once real choices exist. */
+ * only overrides them once real choices exist. Each swap keeps the original
+ * default as a fallback: if a custom-uploaded URL turns out to be broken
+ * (deleted, expired, failed upload), the slot reverts to its default photo
+ * instead of showing a broken-image icon in the circle. */
 async function loadShowcaseOnHomepage(){
   if(!BACKEND_BASE) return;
   try{
@@ -3226,9 +3343,18 @@ async function loadShowcaseOnHomepage(){
     const data = await res.json().catch(()=>null);
     if(!data || !data.center || !Array.isArray(data.items) || data.items.length < 8) return;
     const centerImg = document.querySelector('.baf-center img');
-    if(centerImg) centerImg.src = data.center;
+    if(centerImg && data.center){
+      const fallback = centerImg.src;
+      centerImg.onerror = ()=>{ centerImg.onerror = null; centerImg.src = fallback; };
+      centerImg.src = data.center;
+    }
     const itemImgs = document.querySelectorAll('.baf-item img');
-    itemImgs.forEach((img,i)=>{ if(data.items[i]) img.src = data.items[i]; });
+    itemImgs.forEach((img,i)=>{
+      if(!data.items[i]) return;
+      const fallback = img.src;
+      img.onerror = ()=>{ img.onerror = null; img.src = fallback; };
+      img.src = data.items[i];
+    });
   }catch(e){ /* keep default images on any failure */ }
 }
 loadShowcaseOnHomepage();
@@ -4171,6 +4297,7 @@ function showToast(msg){
     if(savedAdminPass) await adminLoginWithPassword(savedAdminPass);
   }catch(e){}
 
+  applyTheme(prefs?.theme || 'dark');
   applyLanguage(prefs?.lang || 'ar');
   applyViewMode(prefs?.view || 'desktop');
   await checkLoggedInUser();

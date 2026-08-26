@@ -81,7 +81,7 @@
     </div>
     <div class="cat-dropdown" id="adminQuickAccess" style="display:none;">
       <button type="button" class="cat-dropdown-btn admin-bell-btn" id="adminBellBtn" aria-haspopup="true" aria-expanded="false">
-        <span class="cdi" aria-hidden="true">&#128276;</span>
+        <span class="cdi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9.5a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 13.5 6 9.5z"/><path d="M10.3 18.5a1.9 1.9 0 0 0 3.4 0"/></svg></span>
         <span data-i18n="adminQuickLabel">لوحة التحكم</span>
         <span class="admin-bell-badge" id="adminBellBadge" style="display:none;">0</span>
         <span class="cdc" aria-hidden="true">&#9660;</span>
@@ -100,7 +100,7 @@
     </div>
     <div class="cat-dropdown" id="catDropdown">
       <button type="button" class="cat-dropdown-btn" id="catDropdownBtn" aria-haspopup="true" aria-expanded="false">
-        <span class="cdi" aria-hidden="true">&#9776;</span>
+        <span class="cdi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg></span>
         <span id="catDropdownLabel" data-i18n="categoriesLabel">الأقسام</span>
         <span class="cdc" aria-hidden="true">&#9660;</span>
       </button>
@@ -109,17 +109,17 @@
         <button data-cat="children" data-i18n="navChildren" role="menuitem">أطفال</button>
         <button data-cat="male" data-i18n="navMale" role="menuitem">رجالي</button>
         <button data-cat="female" data-i18n="navFemale" role="menuitem">نسائي</button>
-        <button data-cat="business" data-i18n="navBusiness" role="menuitem">Business</button>
-        <button data-cat="cinematic" data-i18n="navCinematic" role="menuitem">Cinematic</button>
-        <button data-cat="luxury" data-i18n="navLuxury" role="menuitem">Luxury</button>
-        <button data-cat="artistic" data-i18n="navArtistic" role="menuitem">Artistic</button>
-        <button data-cat="magazine" data-i18n="navMagazine" role="menuitem">Magazine</button>
+        <button data-cat="business" data-i18n="navBusiness" role="menuitem">أعمال</button>
+        <button data-cat="cinematic" data-i18n="navCinematic" role="menuitem">سينمائي</button>
+        <button data-cat="luxury" data-i18n="navLuxury" role="menuitem">فاخر</button>
+        <button data-cat="artistic" data-i18n="navArtistic" role="menuitem">فني</button>
+        <button data-cat="magazine" data-i18n="navMagazine" role="menuitem">مجلات</button>
       </div>
     </div>
 
     <div class="search-box" id="searchBox">
       <button type="button" class="search-icon-btn" id="searchIconBtn" aria-label="بحث" title="بحث">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><circle cx="10.3" cy="10.3" r="6.6" stroke-width="2.1"/><path d="M8 6.6a4 4 0 0 0-2.7 3.9" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/><line x1="15.2" y1="15.2" x2="21" y2="21" stroke-width="2.6" stroke-linecap="round"/></svg>
       </button>
       <input type="text" id="searchInput" data-i18n-ph="searchPlaceholder" placeholder="ابحث في الموقع...">
       <div class="search-dropdown" id="searchDropdown"></div>
@@ -130,11 +130,30 @@
         <button data-lang="ar" class="active">عربي</button>
         <button data-lang="en">English</button>
       </div>
+      <button type="button" class="theme-toggle" aria-pressed="true">
+        <span class="tt-stars" aria-hidden="true">
+          <span class="tt-star" style="inset-inline-start:8px; top:6px;"></span>
+          <span class="tt-star" style="inset-inline-start:16px; top:14px;"></span>
+          <span class="tt-star" style="inset-inline-start:24px; top:5px;"></span>
+        </span>
+        <span class="tt-icon tt-sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"/></svg></span>
+        <span class="tt-icon tt-moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg></span>
+        <span class="tt-knob" aria-hidden="true">
+          <span class="tt-knob-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"/></svg></span>
+          <span class="tt-knob-moon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg></span>
+        </span>
+      </button>
       <div class="ctrl-group" id="viewToggle">
-        <button data-view="desktop" class="active" id="viewBtnDesktop">💻 <span data-i18n="viewDesktopLabel">كمبيوتر</span></button>
-        <button data-view="mobile" id="viewBtnMobile">📱 <span data-i18n="viewMobileLabel">موبايل</span></button>
+        <button data-view="desktop" class="active" id="viewBtnDesktop">
+          <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg></span>
+          <span data-i18n="viewDesktopLabel">كمبيوتر</span>
+        </button>
+        <button data-view="mobile" id="viewBtnMobile">
+          <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M11 18.5h2"/></svg></span>
+          <span data-i18n="viewMobileLabel">موبايل</span>
+        </button>
       </div>
-      <button class="admin-btn" id="accountOpenBtn" data-i18n="accountBtnGuest">تسجيل الدخول</button>
+      <button class="admin-btn" id="accountOpenBtn">تسجيل الدخول</button>
       <button class="admin-btn" id="trackOpenBtn" data-i18n="trackBtn">تتبع طلبي</button>
       <button class="admin-btn" id="adminOpenBtn" data-i18n="adminBtn" style="display:none;">لوحة الإدارة</button>
     </div>
@@ -174,9 +193,9 @@
   .baf-title{ font-size:clamp(20px,4.5vw,28px); margin:0 0 6px; }
   .baf-sub{ color:var(--paper-dim); max-width:520px; margin:0 auto 28px; font-size:14.5px; }
   .baf-wrap{ position:relative; width:min(94vw,560px); aspect-ratio:1/1; margin:0 auto; }
-  .baf-orbit{ position:absolute; inset:0; animation:bafOrbitSpin 48s linear infinite; }
+  .baf-orbit{ position:absolute; inset:0; animation:bafOrbitSpin 22s linear infinite; }
   @keyframes bafOrbitSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
-  .baf-item-spin{ width:100%; height:100%; animation:bafOrbitCounterSpin 48s linear infinite; }
+  .baf-item-spin{ width:100%; height:100%; animation:bafOrbitCounterSpin 22s linear infinite; }
   @keyframes bafOrbitCounterSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(-360deg); } }
   @media(prefers-reduced-motion:reduce){ .baf-orbit, .baf-item-spin{ animation:none; } }
   .baf-center{ position:absolute; top:50%; left:50%; width:clamp(120px,32vw,190px); height:clamp(120px,32vw,190px); transform:translate(-50%,-50%); border-radius:50%; overflow:hidden; border:2px solid #3b8ef0; box-shadow:0 0 0 6px var(--ink), 0 0 18px rgba(59,142,240,0.4), 0 8px 24px rgba(0,0,0,0.4); z-index:5; }
@@ -202,14 +221,14 @@
       <div class="baf-connector" style="--angle:225deg; --radius:clamp(120px,36vw,225px);"></div>
       <div class="baf-connector" style="--angle:270deg; --radius:clamp(120px,36vw,225px);"></div>
       <div class="baf-connector" style="--angle:315deg; --radius:clamp(120px,36vw,225px);"></div>
-      <div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-1.jpg" alt="نتيجة 1" loading="lazy"></div></div>
-      <div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-2.jpg" alt="نتيجة 2" loading="lazy"></div></div>
-      <div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-3.jpg" alt="نتيجة 3" loading="lazy"></div></div>
-      <div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-4.jpg" alt="نتيجة 4" loading="lazy"></div></div>
-      <div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-5.jpg" alt="نتيجة 5" loading="lazy"></div></div>
-      <div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-6.jpg" alt="نتيجة 6" loading="lazy"></div></div>
-      <div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-7.jpg" alt="نتيجة 7" loading="lazy"></div></div>
-      <div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-8.jpg" alt="نتيجة 8" loading="lazy"></div></div>
+      <div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-1.jpg" alt="نتيجة 1" loading="eager" decoding="async"></div></div>
+      <div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-2.jpg" alt="نتيجة 2" loading="eager" decoding="async"></div></div>
+      <div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-3.jpg" alt="نتيجة 3" loading="eager" decoding="async"></div></div>
+      <div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-4.jpg" alt="نتيجة 4" loading="eager" decoding="async"></div></div>
+      <div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-5.jpg" alt="نتيجة 5" loading="eager" decoding="async"></div></div>
+      <div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-6.jpg" alt="نتيجة 6" loading="eager" decoding="async"></div></div>
+      <div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-7.jpg" alt="نتيجة 7" loading="eager" decoding="async"></div></div>
+      <div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-8.jpg" alt="نتيجة 8" loading="eager" decoding="async"></div></div>
     </div>
     <div class="baf-center">
       <img src="before-after/before-after/before.jpg" alt="الصورة الأصلية">
@@ -240,10 +259,6 @@
 </section>
 
 <section class="cat-section collapsible" id="children">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">📁</span><h2 data-i18n="secChildrenTitle">قسم الأطفال</h2><span class="tag tag-children">CHILDREN</span></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-children"></div>
@@ -253,10 +268,6 @@
 </section>
 
 <section class="cat-section collapsible" id="male">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">📁</span><h2 data-i18n="secMaleTitle">القسم الرجالي</h2><span class="tag tag-male">NATURAL MALE</span></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-male"></div>
@@ -266,10 +277,6 @@
 </section>
 
 <section class="cat-section collapsible" id="female">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">📁</span><h2 data-i18n="secFemaleTitle">القسم النسائي</h2><span class="tag tag-female">FEMALE</span></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-female"></div>
@@ -279,10 +286,6 @@
 </section>
 
 <section class="cat-section collapsible" id="business">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">📁</span><h2 data-i18n="secBusinessTitle">قسم Business</h2><span class="tag tag-business">BUSINESS</span></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-business"></div>
@@ -292,10 +295,6 @@
 </section>
 
 <section class="cat-section collapsible" id="cinematic">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">📁</span><h2 data-i18n="secCinematicTitle">قسم Cinematic</h2><span class="tag tag-cinematic">CINEMATIC</span></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-cinematic"></div>
@@ -305,10 +304,6 @@
 </section>
 
 <section class="cat-section collapsible" id="luxury">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">📁</span><h2 data-i18n="secLuxuryTitle">قسم Luxury</h2><span class="tag tag-luxury">LUXURY</span></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-luxury"></div>
@@ -318,10 +313,6 @@
 </section>
 
 <section class="cat-section collapsible" id="artistic">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">📁</span><h2 data-i18n="secArtisticTitle">قسم Artistic</h2><span class="tag tag-artistic">ARTISTIC</span></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-artistic"></div>
@@ -331,10 +322,6 @@
 </section>
 
 <section class="cat-section collapsible" id="magazine">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">📁</span><h2 data-i18n="secMagazineTitle">قسم Magazine / Poster</h2><span class="tag tag-magazine">MAGAZINE</span></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-magazine"></div>
@@ -383,18 +370,29 @@
 </section>
 
 <div class="section-tabs" id="sectionTabsRow">
-  <button type="button" class="section-tab-btn" data-target="whyUs"><span aria-hidden="true">✅</span> <span data-i18n="whyUsTitle">لماذا Miga-Photobook؟</span></button>
-  <button type="button" class="section-tab-btn" data-target="howItWorks"><span aria-hidden="true">&#10068;</span> <span data-i18n="howItWorksTitle">كيف يعمل؟</span></button>
-  <button type="button" class="section-tab-btn" data-target="testimonials"><span aria-hidden="true">&#11088;</span> <span data-i18n="testimonialsTitle">آراء تهمنا</span></button>
-  <button type="button" class="section-tab-btn" data-target="aboutUs"><span aria-hidden="true">&#128101;</span> <span data-i18n="aboutUsTitle">من نحن</span></button>
-  <button type="button" class="section-tab-btn" data-target="faq"><span aria-hidden="true">&#10067;</span> <span data-i18n="faqTitle">أسئلة شائعة</span></button>
+  <button type="button" class="section-tab-btn" data-target="whyUs">
+    <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.6 2.6 5.4-6"/></svg></span>
+    <span data-i18n="whyUsTitle">لماذا Miga-Photobook؟</span>
+  </button>
+  <button type="button" class="section-tab-btn" data-target="howItWorks">
+    <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6.5" r="1.6"/><circle cx="6" cy="12" r="1.6"/><circle cx="6" cy="17.5" r="1.6"/><path d="M10.5 6.5h9M10.5 12h9M10.5 17.5h9"/></svg></span>
+    <span data-i18n="howItWorksTitle">كيف يعمل؟</span>
+  </button>
+  <button type="button" class="section-tab-btn" data-target="testimonials">
+    <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 3.5l2.2 4.9 5.3.5-4 3.6 1.3 5.3L12 15.1l-4.8 2.7 1.3-5.3-4-3.6 5.3-.5L12 3.5z"/></svg></span>
+    <span data-i18n="testimonialsTitle">آراء تهمنا</span>
+  </button>
+  <button type="button" class="section-tab-btn" data-target="aboutUs">
+    <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8" r="2.6"/><path d="M3.5 18a5 5 0 0 1 10 0"/><circle cx="16.5" cy="9" r="2.2"/><path d="M14.8 12.3a4 4 0 0 1 5.7 3.6"/></svg></span>
+    <span data-i18n="aboutUsTitle">من نحن</span>
+  </button>
+  <button type="button" class="section-tab-btn" data-target="faq">
+    <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 1 1 3.2 2.4c-.7.25-1.2.85-1.2 1.6v.3"/><circle cx="11.9" cy="16.7" r="0.9" fill="currentColor" stroke="none"/></svg></span>
+    <span data-i18n="faqTitle">أسئلة شائعة</span>
+  </button>
 </div>
 
 <section class="cat-section collapsible" id="whyUs">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">✅</span><h2 data-i18n="whyUsTitle">لماذا Miga-Photobook؟</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="why-us-grid">
     <div class="why-item">✅ <span data-i18n="whyUs1">نتائج احترافية</span></div>
@@ -412,25 +410,7 @@
   </div>
 </section>
 
-<section class="cat-section promo-video-section" id="promoVideo">
-  <div class="promo-video-outer">
-  <div class="promo-video-wrap">
-    <div class="promo-video-copy">
-      <h2 data-i18n="promoVideoTitle">شوف Miga-Photobook وهو شغال</h2>
-      <p class="sub" data-i18n="promoVideoSub">دقائق معدودة، وصورتك العادية بتتحول لتحفة فنية احترافية.</p>
-    </div>
-    <div class="promo-video-frame">
-      <video class="promo-video" src="promo-video.mp4" preload="none" autoplay muted loop playsinline controls></video>
-    </div>
-  </div>
-  </div>
-</section>
-
 <section class="cat-section collapsible open" id="howItWorks">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">&#10068;</span><h2 data-i18n="howItWorksTitle">كيف يعمل؟</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="how-grid">
     <div class="how-step">
@@ -464,10 +444,6 @@
 </section>
 
 <section class="cat-section collapsible" id="testimonials">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">&#11088;</span><h2 data-i18n="testimonialsTitle">شوف نتائج Miga-Photobook</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
     <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
       <button class="btn-ghost" id="writeReviewBtn" data-i18n="writeReviewBtn">اكتب تقييمك</button>
@@ -488,30 +464,13 @@
   </div>
 </section>
 
-<section class="cat-section" id="trustStrip">
-  <div class="trust-badges">
-    <div class="trust-badge">🏆 <span data-i18n="trustBadge1">جودة احترافية في كل صورة</span></div>
-    <div class="trust-badge">🔄 <span data-i18n="trustBadge2">تحديث مستمر للأساليب الفنية المتاحة</span></div>
-    <div class="trust-badge">💬 <span data-i18n="trustBadge3">دعم فني سريع ومباشر</span></div>
-    <div class="trust-badge">🔒 <span data-i18n="trustBadge4">أمان وخصوصية في كل عملية</span></div>
-  </div>
-</section>
-
 <section class="cat-section collapsible" id="aboutUs">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">&#128101;</span><h2 data-i18n="aboutUsTitle">من نحن</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <p class="sub" style="max-width:680px; font-size:15px;" data-i18n="aboutUsText">Miga-Photobook مشروع مصري بدأ بفكرة بسيطة: خلي جلسة التصوير الاحترافية متاحة لأي حد وبسعر معقول. بنحوّل صورتك الشخصية لتحفة فنية بجودة استوديو باستخدام الذكاء الاصطناعي — ارفع صورتك واختار الأسلوب، وإحنا نتولى الباقي بعناية عشان تضمن نتيجة تستحق اسمك.</p>
   </div>
 </section>
 
 <section class="cat-section collapsible" id="faq">
-  <div class="section-head">
-    <span class="sh-left"><span class="sh-icon" aria-hidden="true">&#10067;</span><h2 data-i18n="faqTitle">أسئلة شائعة</h2></span>
-    <span class="sh-chevron" aria-hidden="true">&#9660;</span>
-  </div>
   <div class="cs-body">
   <div class="faq-list">
     <details class="faq-item">
@@ -539,6 +498,29 @@
       <p data-i18n="faqA5">فور تأكيد الدفع، بترفع صورتك على الموقع وتستلم النتيجة المُحوّلة مباشرة، وتقدر تحمّلها في أي وقت.</p>
     </details>
   </div>
+  </div>
+</section>
+
+<section class="cat-section promo-video-section" id="promoVideo">
+  <div class="promo-video-outer">
+  <div class="promo-video-wrap">
+    <div class="promo-video-copy">
+      <h2 data-i18n="promoVideoTitle">شوف Miga-Photobook وهو شغال</h2>
+      <p class="sub" data-i18n="promoVideoSub">دقائق معدودة، وصورتك العادية بتتحول لتحفة فنية احترافية.</p>
+    </div>
+    <div class="promo-video-frame">
+      <video class="promo-video" id="promoVideoEl" poster="promo-video-poster.jpg" data-src="promo-video.mp4" preload="none" muted loop playsinline controls></video>
+    </div>
+  </div>
+  </div>
+</section>
+
+<section class="cat-section" id="trustStrip">
+  <div class="trust-badges">
+    <div class="trust-badge">🏆 <span data-i18n="trustBadge1">جودة احترافية في كل صورة</span></div>
+    <div class="trust-badge">🔄 <span data-i18n="trustBadge2">تحديث مستمر للأساليب الفنية المتاحة</span></div>
+    <div class="trust-badge">💬 <span data-i18n="trustBadge3">دعم فني سريع ومباشر</span></div>
+    <div class="trust-badge">🔒 <span data-i18n="trustBadge4">أمان وخصوصية في كل عملية</span></div>
   </div>
 </section>
 
@@ -910,6 +892,19 @@
     <div class="admin-head">
       <h3 id="adminTitle" data-i18n="adminTitle">دخول لوحة الإدارة</h3>
       <div class="admin-head-actions">
+        <button type="button" class="theme-toggle theme-toggle-sm" aria-pressed="true">
+          <span class="tt-stars" aria-hidden="true">
+            <span class="tt-star" style="inset-inline-start:8px; top:6px;"></span>
+            <span class="tt-star" style="inset-inline-start:16px; top:14px;"></span>
+            <span class="tt-star" style="inset-inline-start:24px; top:5px;"></span>
+          </span>
+          <span class="tt-icon tt-sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"/></svg></span>
+          <span class="tt-icon tt-moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg></span>
+          <span class="tt-knob" aria-hidden="true">
+            <span class="tt-knob-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"/></svg></span>
+            <span class="tt-knob-moon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg></span>
+          </span>
+        </button>
         <button type="button" class="admin-icon-btn" id="adminAlertsBtn" title="تنبيهات الطلبات" aria-label="تنبيهات الطلبات">&#128276;</button>
         <button type="button" class="admin-icon-btn" id="adminCollapseBtn" title="طي اللوحة" aria-label="طي اللوحة">&#8211;</button>
         <button type="button" class="admin-icon-btn" id="adminModalClose" title="إغلاق" aria-label="إغلاق">&times;</button>
@@ -942,11 +937,11 @@
             <option value="children" data-i18n="optChildren">أطفال</option>
             <option value="male" data-i18n="optMale">رجالي</option>
             <option value="female" data-i18n="optFemale">نسائي</option>
-            <option value="business" data-i18n="optBusiness">Business</option>
-            <option value="cinematic" data-i18n="optCinematic">Cinematic</option>
-            <option value="luxury" data-i18n="optLuxury">Luxury</option>
-            <option value="artistic" data-i18n="optArtistic">Artistic</option>
-            <option value="magazine" data-i18n="optMagazine">Magazine / Poster</option>
+            <option value="business" data-i18n="optBusiness">أعمال</option>
+            <option value="cinematic" data-i18n="optCinematic">سينمائي</option>
+            <option value="luxury" data-i18n="optLuxury">فاخر</option>
+            <option value="artistic" data-i18n="optArtistic">فني</option>
+            <option value="magazine" data-i18n="optMagazine">مجلات وملصقات</option>
           </select>
         </div>
         <div class="field">
