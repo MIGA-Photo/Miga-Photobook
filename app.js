@@ -64,6 +64,7 @@ const translations = {
     loginBtn:'دخول', registerBtn:'إنشاء الحساب', logoutBtn:'تسجيل الخروج',
     accountWelcome:'أهلاً بيك!',
     writeReviewBtn:'ضع تقييمك هنا', writeReviewTitle:'شاركنا رأيك', reviewPhotoLabel:'أرفق صورة نتيجتك (اختياري)',
+    reviewPhotoConsentLabel:'انشر صورة نتيجتي مع التقييم', toastPickReviewPhoto:'اختار صورة النتيجة اللي عايز تنشرها',
     ratingLabel:'تقييمك', commentLabel:'تعليقك', submitReviewBtn:'إرسال التقييم',
     reviewModerationNote:'سيظهر تقييمك بعد مراجعته من فريقنا.',
     tabReviews:'التقييمات', noPendingReviews:'لا توجد تقييمات جديدة للمراجعة.',
@@ -329,6 +330,7 @@ const translations = {
     loginBtn:'Log In', registerBtn:'Create Account', logoutBtn:'Log Out',
     accountWelcome:'Welcome!',
     writeReviewBtn:'Add Your Review Here', writeReviewTitle:'Share Your Feedback', reviewPhotoLabel:'Attach your result photo (optional)',
+    reviewPhotoConsentLabel:'Publish my result photo with the review', toastPickReviewPhoto:'Pick which result photo you want to publish',
     ratingLabel:'Your Rating', commentLabel:'Your Comment', submitReviewBtn:'Submit Review',
     reviewModerationNote:'Your review will appear after our team reviews it.',
     tabReviews:'Reviews', noPendingReviews:'No new reviews to moderate.',
@@ -3044,31 +3046,50 @@ document.getElementById('thanksReviewBtn').onclick = ()=>
   document.getElementById('writeReviewBtn').click();
 
 let selectedReviewPhotoUrl = null;
+let reviewResultUrls = [];
 function populateReviewPhotoPicker(){
   const field = document.getElementById('reviewPhotoField');
   const picker = document.getElementById('reviewPhotoPicker');
+  const consent = document.getElementById('reviewPhotoConsent');
   selectedReviewPhotoUrl = null;
+  consent.checked = false;
+  picker.style.display = 'none';
   picker.innerHTML = '';
-  const urls = Object.values(transformedResults || {}).filter(Boolean);
-  if(!urls.length){ field.style.display = 'none'; return; }
+  reviewResultUrls = Object.values(transformedResults || {}).filter(Boolean);
+  if(!reviewResultUrls.length){ field.style.display = 'none'; return; }
   field.style.display = 'block';
-  urls.forEach((url, i)=>{
+  reviewResultUrls.forEach((url, i)=>{
     const thumb = document.createElement('div');
     thumb.className = 'review-photo-thumb';
     thumb.innerHTML = `<img src="${url}" alt="نتيجتك ${i+1}" loading="lazy">`;
     thumb.onclick = ()=>{
-      const alreadySelected = thumb.classList.contains('selected');
       picker.querySelectorAll('.review-photo-thumb').forEach(t=>t.classList.remove('selected'));
-      if(alreadySelected){ selectedReviewPhotoUrl = null; }
-      else { thumb.classList.add('selected'); selectedReviewPhotoUrl = url; }
+      thumb.classList.add('selected');
+      selectedReviewPhotoUrl = url;
     };
     picker.appendChild(thumb);
   });
-  // Default to the most recent result pre-selected, since most people reviewing
-  // just finished looking at it — one tap to deselect if they'd rather not.
-  const first = picker.querySelector('.review-photo-thumb');
-  if(first){ first.classList.add('selected'); selectedReviewPhotoUrl = urls[0]; }
 }
+document.getElementById('reviewPhotoConsent').addEventListener('change', function(){
+  const picker = document.getElementById('reviewPhotoPicker');
+  if(this.checked){
+    if(reviewResultUrls.length > 1){
+      // More than one result on file — show the thumbnails so the customer
+      // picks which one, none pre-selected until they actually tap one.
+      picker.style.display = 'flex';
+      selectedReviewPhotoUrl = null;
+    }else{
+      // Only one result exists — checking the box is the whole decision,
+      // no picker needed.
+      picker.style.display = 'none';
+      selectedReviewPhotoUrl = reviewResultUrls[0] || null;
+    }
+  }else{
+    picker.style.display = 'none';
+    selectedReviewPhotoUrl = null;
+    picker.querySelectorAll('.review-photo-thumb').forEach(t=>t.classList.remove('selected'));
+  }
+});
 
 document.getElementById('writeReviewBtn').onclick = ()=>{
   if(!currentUser){
@@ -3087,6 +3108,10 @@ document.getElementById('reviewSubmitBtn').onclick = async ()=>{
   const comment = document.getElementById('reviewComment').value.trim();
   const token = localStorage.getItem('megaPromptAuthToken');
   if(!comment){ showToast(t('toastFillFields')); return; }
+  if(document.getElementById('reviewPhotoConsent').checked && reviewResultUrls.length > 1 && !selectedReviewPhotoUrl){
+    showToast(t('toastPickReviewPhoto'));
+    return;
+  }
   try{
     const res = await fetch(`${BACKEND_BASE}/reviews/submit`, {
       method:'POST', headers:{'Content-Type':'application/json'},

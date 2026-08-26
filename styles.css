@@ -467,6 +467,10 @@
     position:relative; width:66px; height:66px; border-radius:10px; overflow:hidden;
     border:2.5px solid var(--line); cursor:pointer; flex-shrink:0; transition:border-color .15s ease;
   }
+  .review-photo-consent{
+    display:flex; align-items:center; gap:9px; cursor:pointer; font-size:13.5px; color:var(--paper);
+  }
+  .review-photo-consent input[type="checkbox"]{width:18px; height:18px; accent-color:var(--brass); cursor:pointer; flex-shrink:0;}
   .review-photo-thumb img{width:100%; height:100%; object-fit:cover; display:block;}
   .review-photo-thumb.selected{border-color:var(--brass);}
   .review-photo-thumb.selected::after{

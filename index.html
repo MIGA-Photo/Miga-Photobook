@@ -874,8 +874,11 @@
       <textarea id="reviewComment"></textarea>
     </div>
     <div class="field" id="reviewPhotoField" style="display:none;">
-      <label data-i18n="reviewPhotoLabel">أرفق صورة نتيجتك (اختياري)</label>
-      <div id="reviewPhotoPicker" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
+      <label class="review-photo-consent" for="reviewPhotoConsent">
+        <input type="checkbox" id="reviewPhotoConsent">
+        <span data-i18n="reviewPhotoConsentLabel">انشر صورة نتيجتي مع التقييم</span>
+      </label>
+      <div id="reviewPhotoPicker" style="display:none; gap:10px; flex-wrap:wrap; margin-top:10px;"></div>
     </div>
     <p class="sub" style="font-size:12px;" data-i18n="reviewModerationNote">سيظهر تقييمك بعد مراجعته من فريقنا.</p>
     <div class="modal-actions">
