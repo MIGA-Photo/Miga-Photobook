@@ -216,16 +216,14 @@
      about / faq), so a visitor finds all of it at a glance instead of
      scrolling past five separate stacked headers. */
   .section-tabs{
-    display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; margin:0 0 28px;
+    display:grid; grid-template-columns:1fr; gap:12px; margin:0 0 28px;
   }
-  @media(min-width:640px){ .section-tabs{grid-template-columns:repeat(3, 1fr);} }
-  @media(min-width:980px){ .section-tabs{grid-template-columns:repeat(5, 1fr);} }
   .section-tab-btn{
-    display:flex; align-items:center; justify-content:center; gap:10px;
-    width:100%; height:56px; box-sizing:border-box; text-align:center;
+    display:flex; align-items:center; justify-content:center; gap:12px;
+    width:100%; height:66px; box-sizing:border-box; text-align:center;
     background:var(--ink-2); border:1.5px solid var(--brass); color:var(--paper);
-    padding:0 14px; border-radius:12px;
-    font-size:15px; font-weight:800; letter-spacing:0.2px; font-family:inherit;
+    padding:0 20px; border-radius:14px;
+    font-size:18px; font-weight:800; letter-spacing:0.2px; font-family:inherit;
     transition:.2s;
   }
   .section-tab-btn:hover{background:rgba(255,201,77,0.08);}
@@ -233,15 +231,15 @@
     background:var(--brass); color:var(--ink); border-color:var(--brass);
   }
   .section-tab-btn.active .icon-badge{border-color:var(--ink); color:var(--ink);}
+  @media(max-width:700px){
+    .section-tab-btn{font-size:16px; height:60px; padding:0 16px;}
+  }
   /* Accordion mode: once a tab is active, the other four are hidden and the
      active one stretches across the row, so it sits directly above its own
      content instead of floating alone in a mostly-empty grid. Re-clicking it
      (still the only visible button) is what brings the other four back. */
   .section-tabs.has-active .section-tab-btn{display:none;}
   .section-tabs.has-active .section-tab-btn.active{display:flex; grid-column:1/-1;}
-  @media(max-width:700px){
-    .section-tab-btn{font-size:13.5px; height:52px; padding:0 10px;}
-  }
 
   /* Admin orders: total/completed/pending counts, click to expand a live table */
   .order-stats-bar{

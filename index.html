@@ -193,9 +193,9 @@
   .baf-title{ font-size:clamp(20px,4.5vw,28px); margin:0 0 6px; }
   .baf-sub{ color:var(--paper-dim); max-width:520px; margin:0 auto 28px; font-size:14.5px; }
   .baf-wrap{ position:relative; width:min(94vw,560px); aspect-ratio:1/1; margin:0 auto; }
-  .baf-orbit{ position:absolute; inset:0; animation:bafOrbitSpin 48s linear infinite; }
+  .baf-orbit{ position:absolute; inset:0; animation:bafOrbitSpin 22s linear infinite; }
   @keyframes bafOrbitSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
-  .baf-item-spin{ width:100%; height:100%; animation:bafOrbitCounterSpin 48s linear infinite; }
+  .baf-item-spin{ width:100%; height:100%; animation:bafOrbitCounterSpin 22s linear infinite; }
   @keyframes bafOrbitCounterSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(-360deg); } }
   @media(prefers-reduced-motion:reduce){ .baf-orbit, .baf-item-spin{ animation:none; } }
   .baf-center{ position:absolute; top:50%; left:50%; width:clamp(120px,32vw,190px); height:clamp(120px,32vw,190px); transform:translate(-50%,-50%); border-radius:50%; overflow:hidden; border:2px solid #3b8ef0; box-shadow:0 0 0 6px var(--ink), 0 0 18px rgba(59,142,240,0.4), 0 8px 24px rgba(0,0,0,0.4); z-index:5; }
