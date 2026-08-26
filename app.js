@@ -225,7 +225,7 @@ const translations = {
     adminPassLabel:'كلمة المرور', adminLoginBtn:'دخول',
     tabProducts:'إضافة منتج', tabOrders:'الطلبات',
     pCatLabel:'القسم', optChildren:'أطفال', optMale:'رجالي', optFemale:'نسائي',
-    optBusiness:'Business', optCinematic:'Cinematic', optLuxury:'Luxury', optArtistic:'Artistic', optMagazine:'Magazine / Poster',
+    optBusiness:'أعمال', optCinematic:'سينمائي', optLuxury:'فاخر', optArtistic:'فني', optMagazine:'مجلات وملصقات',
     pTitleLabel:'عنوان المنتج', pTitlePh:'مثال: بورتريه إضاءة سينمائية',
     pTitleEnLabel:'العنوان بالإنجليزي (اختياري — يظهر للعميل لما يبدّل للإنجليزي)', pTitleEnPh:'مثال: Cinematic Lighting Portrait',
     pPriceLabel:'السعر (جنيه)', pImageLabel:'صورة المنتج',
