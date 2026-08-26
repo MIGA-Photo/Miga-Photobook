@@ -53,7 +53,7 @@ const translations = {
     searchPlaceholder:'ابحث في الموقع...', searchHistoryLabel:'بحثك السابق', searchNoHistory:'لا يوجد بحث سابق',
     searchResultsLabel:'نتائج البحث', searchNoResults:'لا توجد نتائج', searchSectionsLabel:'أقسام الموقع',
     navAll:'الكل', navChildren:'أطفال', navMale:'رجالي', navFemale:'نسائي',
-    navBusiness:'Business', navCinematic:'Cinematic', navLuxury:'Luxury', navArtistic:'Artistic', navMagazine:'Magazine',
+    navBusiness:'أعمال', navCinematic:'سينمائي', navLuxury:'فاخر', navArtistic:'فني', navMagazine:'مجلات',
     trackBtn:'تتبع طلبي', adminBtn:'لوحة الإدارة', adminQuickLabel:'لوحة التحكم',
     accountBtnGuest:'تسجيل الدخول', loginTab:'تسجيل الدخول', registerTab:'حساب جديد',
     continueGoogle:'المتابعة بحساب جوجل', continueApple:'المتابعة بحساب Apple', continueFacebook:'المتابعة بحساب فيسبوك',
@@ -155,8 +155,8 @@ const translations = {
     bafCenterLabel:'صورتك الأصلية',
     bafCta:'اعمل صورتي الآن',
     secChildrenTitle:'قسم الأطفال', secMaleTitle:'القسم الرجالي', secFemaleTitle:'القسم النسائي',
-    secBusinessTitle:'قسم Business', secCinematicTitle:'قسم Cinematic', secLuxuryTitle:'قسم Luxury',
-    secArtisticTitle:'قسم Artistic', secMagazineTitle:'قسم Magazine / Poster',
+    secBusinessTitle:'قسم الأعمال', secCinematicTitle:'القسم السينمائي', secLuxuryTitle:'القسم الفاخر',
+    secArtisticTitle:'القسم الفني', secMagazineTitle:'قسم المجلات والملصقات',
     pricingTitle:'الأسعار والعروض',
     pricingSub:'اطلب تحويل صورك منفردة، أو وفّر أكثر مع الباقات. كل باقة تُطبّق كخصم عند طلب العدد المطابق من الصور ضمن أي قسم.',
     plan1Title:'الباقة الفردية', plan1Price:'من 25 جنيه', currencyLabel:'جنيه',
@@ -227,7 +227,7 @@ const translations = {
     adminPassLabel:'كلمة المرور', adminLoginBtn:'دخول',
     tabProducts:'إضافة منتج', tabOrders:'الطلبات',
     pCatLabel:'القسم', optChildren:'أطفال', optMale:'رجالي', optFemale:'نسائي',
-    optBusiness:'Business', optCinematic:'Cinematic', optLuxury:'Luxury', optArtistic:'Artistic', optMagazine:'Magazine / Poster',
+    optBusiness:'أعمال', optCinematic:'سينمائي', optLuxury:'فاخر', optArtistic:'فني', optMagazine:'مجلات وملصقات',
     pTitleLabel:'عنوان المنتج', pTitlePh:'مثال: بورتريه إضاءة سينمائية',
     pTitleEnLabel:'العنوان بالإنجليزي (اختياري — يظهر للعميل لما يبدّل للإنجليزي)', pTitleEnPh:'مثال: Cinematic Lighting Portrait',
     pPriceLabel:'السعر (جنيه)', pImageLabel:'صورة المنتج',
@@ -2218,6 +2218,23 @@ function getCategoryOf(productId){
 }
 
 
+// ---------- Promo video: don't fetch any of the ~14MB file until the visitor
+// actually scrolls near it, instead of downloading it on every page load. ----------
+(function(){
+  const vid = document.getElementById('promoVideoEl');
+  if(!vid) return;
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        vid.src = vid.dataset.src;
+        vid.play().catch(()=>{}); // ignore autoplay-blocked errors; the poster + controls still work
+        io.disconnect();
+      }
+    });
+  }, {rootMargin: '200px'});
+  io.observe(vid);
+})();
+
 // ---------- Quick-nav row (single row of tabs above the five sections above) ----------
 // Accordion behaviour: tapping a tab expands its content directly beneath
 // the row and hides the other four tabs, so the open one and its content
@@ -3284,7 +3301,10 @@ document.getElementById('scSaveBtn').onclick = async ()=>{
 /** Loads the saved showcase images (if any) into the homepage circle. If the
  * backend has nothing configured yet, the default images already baked into
  * the HTML (before-after/before-after/*.jpg) stay exactly as they are — this
- * only overrides them once real choices exist. */
+ * only overrides them once real choices exist. Each swap keeps the original
+ * default as a fallback: if a custom-uploaded URL turns out to be broken
+ * (deleted, expired, failed upload), the slot reverts to its default photo
+ * instead of showing a broken-image icon in the circle. */
 async function loadShowcaseOnHomepage(){
   if(!BACKEND_BASE) return;
   try{
@@ -3292,9 +3312,18 @@ async function loadShowcaseOnHomepage(){
     const data = await res.json().catch(()=>null);
     if(!data || !data.center || !Array.isArray(data.items) || data.items.length < 8) return;
     const centerImg = document.querySelector('.baf-center img');
-    if(centerImg) centerImg.src = data.center;
+    if(centerImg && data.center){
+      const fallback = centerImg.src;
+      centerImg.onerror = ()=>{ centerImg.onerror = null; centerImg.src = fallback; };
+      centerImg.src = data.center;
+    }
     const itemImgs = document.querySelectorAll('.baf-item img');
-    itemImgs.forEach((img,i)=>{ if(data.items[i]) img.src = data.items[i]; });
+    itemImgs.forEach((img,i)=>{
+      if(!data.items[i]) return;
+      const fallback = img.src;
+      img.onerror = ()=>{ img.onerror = null; img.src = fallback; };
+      img.src = data.items[i];
+    });
   }catch(e){ /* keep default images on any failure */ }
 }
 loadShowcaseOnHomepage();

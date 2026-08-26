@@ -109,11 +109,11 @@
         <button data-cat="children" data-i18n="navChildren" role="menuitem">أطفال</button>
         <button data-cat="male" data-i18n="navMale" role="menuitem">رجالي</button>
         <button data-cat="female" data-i18n="navFemale" role="menuitem">نسائي</button>
-        <button data-cat="business" data-i18n="navBusiness" role="menuitem">Business</button>
-        <button data-cat="cinematic" data-i18n="navCinematic" role="menuitem">Cinematic</button>
-        <button data-cat="luxury" data-i18n="navLuxury" role="menuitem">Luxury</button>
-        <button data-cat="artistic" data-i18n="navArtistic" role="menuitem">Artistic</button>
-        <button data-cat="magazine" data-i18n="navMagazine" role="menuitem">Magazine</button>
+        <button data-cat="business" data-i18n="navBusiness" role="menuitem">أعمال</button>
+        <button data-cat="cinematic" data-i18n="navCinematic" role="menuitem">سينمائي</button>
+        <button data-cat="luxury" data-i18n="navLuxury" role="menuitem">فاخر</button>
+        <button data-cat="artistic" data-i18n="navArtistic" role="menuitem">فني</button>
+        <button data-cat="magazine" data-i18n="navMagazine" role="menuitem">مجلات</button>
       </div>
     </div>
 
@@ -221,14 +221,14 @@
       <div class="baf-connector" style="--angle:225deg; --radius:clamp(120px,36vw,225px);"></div>
       <div class="baf-connector" style="--angle:270deg; --radius:clamp(120px,36vw,225px);"></div>
       <div class="baf-connector" style="--angle:315deg; --radius:clamp(120px,36vw,225px);"></div>
-      <div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-1.jpg" alt="نتيجة 1" loading="lazy"></div></div>
-      <div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-2.jpg" alt="نتيجة 2" loading="lazy"></div></div>
-      <div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-3.jpg" alt="نتيجة 3" loading="lazy"></div></div>
-      <div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-4.jpg" alt="نتيجة 4" loading="lazy"></div></div>
-      <div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-5.jpg" alt="نتيجة 5" loading="lazy"></div></div>
-      <div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-6.jpg" alt="نتيجة 6" loading="lazy"></div></div>
-      <div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-7.jpg" alt="نتيجة 7" loading="lazy"></div></div>
-      <div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-8.jpg" alt="نتيجة 8" loading="lazy"></div></div>
+      <div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-1.jpg" alt="نتيجة 1" loading="eager" decoding="async"></div></div>
+      <div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-2.jpg" alt="نتيجة 2" loading="eager" decoding="async"></div></div>
+      <div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-3.jpg" alt="نتيجة 3" loading="eager" decoding="async"></div></div>
+      <div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-4.jpg" alt="نتيجة 4" loading="eager" decoding="async"></div></div>
+      <div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-5.jpg" alt="نتيجة 5" loading="eager" decoding="async"></div></div>
+      <div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-6.jpg" alt="نتيجة 6" loading="eager" decoding="async"></div></div>
+      <div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-7.jpg" alt="نتيجة 7" loading="eager" decoding="async"></div></div>
+      <div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-8.jpg" alt="نتيجة 8" loading="eager" decoding="async"></div></div>
     </div>
     <div class="baf-center">
       <img src="before-after/before-after/before.jpg" alt="الصورة الأصلية">
@@ -509,7 +509,7 @@
       <p class="sub" data-i18n="promoVideoSub">ثوانٍ معدودة، وصورتك العادية بتتحول لتحفة فنية احترافية.</p>
     </div>
     <div class="promo-video-frame">
-      <video class="promo-video" src="promo-video.mp4" preload="none" autoplay muted loop playsinline controls></video>
+      <video class="promo-video" id="promoVideoEl" poster="promo-video-poster.jpg" data-src="promo-video.mp4" preload="none" muted loop playsinline controls></video>
     </div>
   </div>
   </div>
@@ -933,11 +933,11 @@
             <option value="children" data-i18n="optChildren">أطفال</option>
             <option value="male" data-i18n="optMale">رجالي</option>
             <option value="female" data-i18n="optFemale">نسائي</option>
-            <option value="business" data-i18n="optBusiness">Business</option>
-            <option value="cinematic" data-i18n="optCinematic">Cinematic</option>
-            <option value="luxury" data-i18n="optLuxury">Luxury</option>
-            <option value="artistic" data-i18n="optArtistic">Artistic</option>
-            <option value="magazine" data-i18n="optMagazine">Magazine / Poster</option>
+            <option value="business" data-i18n="optBusiness">أعمال</option>
+            <option value="cinematic" data-i18n="optCinematic">سينمائي</option>
+            <option value="luxury" data-i18n="optLuxury">فاخر</option>
+            <option value="artistic" data-i18n="optArtistic">فني</option>
+            <option value="magazine" data-i18n="optMagazine">مجلات وملصقات</option>
           </select>
         </div>
         <div class="field">
