@@ -63,7 +63,7 @@ const translations = {
     emailLabel:'البريد الإلكتروني', passwordLabel:'كلمة المرور', nameLabel:'الاسم',
     loginBtn:'دخول', registerBtn:'إنشاء الحساب', logoutBtn:'تسجيل الخروج',
     accountWelcome:'أهلاً بيك!',
-    writeReviewBtn:'اكتب تقييمك', writeReviewTitle:'شاركنا رأيك', reviewPhotoLabel:'أرفق صورة نتيجتك (اختياري)',
+    writeReviewBtn:'ضع تقييمك هنا', writeReviewTitle:'شاركنا رأيك', reviewPhotoLabel:'أرفق صورة نتيجتك (اختياري)',
     ratingLabel:'تقييمك', commentLabel:'تعليقك', submitReviewBtn:'إرسال التقييم',
     reviewModerationNote:'سيظهر تقييمك بعد مراجعته من فريقنا.',
     tabReviews:'التقييمات', noPendingReviews:'لا توجد تقييمات جديدة للمراجعة.',
@@ -133,7 +133,7 @@ const translations = {
     how4Title:'استلم النتيجة', how4Desc:'هنطبّق الأسلوب اللي اخترته بالذكاء الاصطناعي، وتستلم صورتك الاحترافية خلال دقايق.',
     howItWorksCta:'ابدأ دلوقتي',
     mostRequestedTitle:'الأكثر طلبا',
-    testimonialsTitle:'شوف نتائج Miga-Photobook',
+    testimonialsTitle:'تقييمات وآراء عملائنا',
     testimonial1:'"أفضل تحويل صور جربته على الإطلاق"', testimonial2:'"حوّلت صوري إلى مستوى احترافي"',
     testimonialsNote:'* نماذج حقيقية من نتائج Miga-Photobook الفعلية.',
     trustBadge1:'جودة احترافية في كل صورة', trustBadge2:'تحديث مستمر للأساليب الفنية المتاحة',
@@ -328,7 +328,7 @@ const translations = {
     emailLabel:'Email', passwordLabel:'Password', nameLabel:'Name',
     loginBtn:'Log In', registerBtn:'Create Account', logoutBtn:'Log Out',
     accountWelcome:'Welcome!',
-    writeReviewBtn:'Write a Review', writeReviewTitle:'Share Your Feedback', reviewPhotoLabel:'Attach your result photo (optional)',
+    writeReviewBtn:'Add Your Review Here', writeReviewTitle:'Share Your Feedback', reviewPhotoLabel:'Attach your result photo (optional)',
     ratingLabel:'Your Rating', commentLabel:'Your Comment', submitReviewBtn:'Submit Review',
     reviewModerationNote:'Your review will appear after our team reviews it.',
     tabReviews:'Reviews', noPendingReviews:'No new reviews to moderate.',
@@ -398,7 +398,7 @@ const translations = {
     how4Title:'Get your result', how4Desc:"We'll apply the style you picked using AI, and you'll receive your professional photo within minutes.",
     howItWorksCta:'Start Now',
     mostRequestedTitle:'Most Ordered',
-    testimonialsTitle:'See Miga-Photobook Results',
+    testimonialsTitle:'Customer Reviews & Testimonials',
     testimonial1:'"Best photo transformation I have tried"', testimonial2:'"Turned my photos pro-level"',
     testimonialsNote:'* Real samples from actual Miga-Photobook results.',
     trustBadge1:'Professional quality in every photo', trustBadge2:'Constantly growing prompt library',
@@ -4138,6 +4138,7 @@ document.getElementById('pCancelEditBtn').onclick = ()=>{
   resetEditUI();
   resetProductFormToDefaults();
 };
+document.getElementById('pCat').addEventListener('change', renderAdminProductsList);
 
 function editProduct(id){
   const p = products.find(x=>x.id===id);
@@ -4404,7 +4405,9 @@ document.getElementById('dailyReportCloseBtn').onclick = ()=> document.getElemen
 function renderAdminProductsList(){
   const el = document.getElementById('adminProductsList');
   if(!el) return;
-  const cats = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
+  const allCats = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
+  const selectedCat = document.getElementById('pCat')?.value;
+  const cats = allCats.includes(selectedCat) ? [selectedCat] : allCats;
   let html = '';
   cats.forEach(cat=>{
     const items = products.filter(p=>p.category===cat).sort((a,b)=>(b.order??9999)-(a.order??9999));
@@ -4418,7 +4421,7 @@ function renderAdminProductsList(){
           <b>${escapeHtml(p.title)}</b>
           <span>${p.price} ${CURRENCY}</span>
           <select class="admin-move-cat" onchange="moveProductCategory('${p.id}', this.value)" title="${t('moveCategoryTitle')}">
-            ${cats.map(c => `<option value="${c}" ${c===p.category?'selected':''}>${catLabel(c)}</option>`).join('')}
+            ${allCats.map(c => `<option value="${c}" ${c===p.category?'selected':''}>${catLabel(c)}</option>`).join('')}
           </select>
         </div>
         <span class="popularity-badge" title="${t('popularityCountTitle')}">🔥 ${productPopularity[p.id] || 0}</span>

@@ -380,7 +380,7 @@
   </button>
   <button type="button" class="section-tab-btn" data-target="testimonials">
     <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 3.5l2.2 4.9 5.3.5-4 3.6 1.3 5.3L12 15.1l-4.8 2.7 1.3-5.3-4-3.6 5.3-.5L12 3.5z"/></svg></span>
-    <span data-i18n="testimonialsTitle">آراء تهمنا</span>
+    <span data-i18n="testimonialsTitle">تقييمات وآراء عملائنا</span>
   </button>
   <button type="button" class="section-tab-btn" data-target="aboutUs">
     <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8" r="2.6"/><path d="M3.5 18a5 5 0 0 1 10 0"/><circle cx="16.5" cy="9" r="2.2"/><path d="M14.8 12.3a4 4 0 0 1 5.7 3.6"/></svg></span>
@@ -446,7 +446,7 @@
 <section class="cat-section collapsible" id="testimonials">
   <div class="cs-body">
     <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
-      <button class="btn-ghost" id="writeReviewBtn" data-i18n="writeReviewBtn">اكتب تقييمك</button>
+      <button class="btn-ghost" id="writeReviewBtn" data-i18n="writeReviewBtn">ضع تقييمك هنا</button>
     </div>
   <div class="testimonials-grid" id="testimonialsGrid">
     <div class="proof-results-grid" style="grid-column:1/-1;" id="testimonialsProofGrid">
@@ -945,30 +945,34 @@
       </div>
 
       <div id="adminTabProducts">
-        <div class="field">
-          <label data-i18n="pCatLabel">القسم</label>
-          <select id="pCat">
-            <option value="children" data-i18n="optChildren">أطفال</option>
-            <option value="male" data-i18n="optMale">رجالي</option>
-            <option value="female" data-i18n="optFemale">نسائي</option>
-            <option value="business" data-i18n="optBusiness">أعمال</option>
-            <option value="cinematic" data-i18n="optCinematic">سينمائي</option>
-            <option value="luxury" data-i18n="optLuxury">فاخر</option>
-            <option value="artistic" data-i18n="optArtistic">فني</option>
-            <option value="magazine" data-i18n="optMagazine">مجلات وملصقات</option>
-          </select>
+        <div class="field-grid-2">
+          <div class="field">
+            <label data-i18n="pCatLabel">القسم</label>
+            <select id="pCat">
+              <option value="children" data-i18n="optChildren">أطفال</option>
+              <option value="male" data-i18n="optMale">رجالي</option>
+              <option value="female" data-i18n="optFemale">نسائي</option>
+              <option value="business" data-i18n="optBusiness">أعمال</option>
+              <option value="cinematic" data-i18n="optCinematic">سينمائي</option>
+              <option value="luxury" data-i18n="optLuxury">فاخر</option>
+              <option value="artistic" data-i18n="optArtistic">فني</option>
+              <option value="magazine" data-i18n="optMagazine">مجلات وملصقات</option>
+            </select>
+          </div>
+          <div class="field">
+            <label data-i18n="pPriceLabel">السعر (جنيه)</label>
+            <input type="number" id="pPrice" value="25" placeholder="25" min="0">
+          </div>
         </div>
-        <div class="field">
-          <label data-i18n="pTitleLabel">عنوان المنتج</label>
-          <input type="text" id="pTitle" value="Miga-photobook" placeholder="مثال: بورتريه إضاءة سينمائية" data-i18n-ph="pTitlePh">
-        </div>
-        <div class="field">
-          <label data-i18n="pTitleEnLabel">Product Title (English) — optional, shown to customers when they switch to English</label>
-          <input type="text" id="pTitleEn" value="Miga-photobook" placeholder="e.g. Cinematic Lighting Portrait" data-i18n-ph="pTitleEnPh">
-        </div>
-        <div class="field">
-          <label data-i18n="pPriceLabel">السعر (جنيه)</label>
-          <input type="number" id="pPrice" value="25" placeholder="25" min="0">
+        <div class="field-grid-2">
+          <div class="field">
+            <label data-i18n="pTitleLabel">عنوان المنتج</label>
+            <input type="text" id="pTitle" value="Miga-photobook" placeholder="مثال: بورتريه إضاءة سينمائية" data-i18n-ph="pTitlePh">
+          </div>
+          <div class="field">
+            <label data-i18n="pTitleEnLabel">Product Title (English) — optional, shown to customers when they switch to English</label>
+            <input type="text" id="pTitleEn" value="Miga-photobook" placeholder="e.g. Cinematic Lighting Portrait" data-i18n-ph="pTitleEnPh">
+          </div>
         </div>
         <div class="field" id="pShareLinkField" style="display:none;">
           <label data-i18n="pShareLinkLabel">رابط المنتج (للإعلانات) — انسخه وضعه في منشور المنصة</label>

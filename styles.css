@@ -860,6 +860,7 @@
     align-items:center; justify-content:center; z-index:200; padding:20px;
   }
   .modal-bg.show{display:flex;}
+  #dailyReportModalBg{z-index:260;}
   .modal{
     background:var(--ink-2); border:1px solid var(--line); border-radius:12px;
     max-width:440px; width:100%; padding:26px; max-height:88vh; overflow:auto;
@@ -1027,6 +1028,9 @@
   .modal.admin-modal.collapsed p.sub{display:none !important;}
   .modal.admin-modal.collapsed{padding-bottom:18px;}
   .modal.admin-modal{max-width:520px;}
+  body.view-mode-desktop .modal.admin-modal{max-width:920px;}
+  .field-grid-2{display:grid; grid-template-columns:1fr; gap:0 16px;}
+  body.view-mode-desktop .field-grid-2{grid-template-columns:1fr 1fr;}
   .admin-tabs{flex-wrap:wrap;}
   .admin-tabs button{flex:1 1 auto; min-width:104px;}
 
