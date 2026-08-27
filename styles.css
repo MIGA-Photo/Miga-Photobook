@@ -865,6 +865,13 @@
   }
   .modal-bg.show{display:flex;}
   #dailyReportModalBg{z-index:260;}
+  /* Crop tool opens while the admin panel is still open behind it — both
+     shared the same .modal-bg z-index (200), and since #adminModalBg comes
+     later in the DOM, it was winning the stacking tie and burying the crop
+     tool underneath the admin panel. Bumping this above 200 (matching the
+     daily-report modal's own fix above) makes it appear on top as expected,
+     and closing/confirming it correctly reveals the admin panel again. */
+  #cropModalBg{z-index:260;}
   .modal{
     background:var(--ink-2); border:1px solid var(--line); border-radius:12px;
     max-width:440px; width:100%; padding:26px; max-height:88vh; overflow:auto;
@@ -1333,4 +1340,36 @@
   @media (prefers-reduced-motion: reduce){
     .strip-track{animation:none;}
     .prompt-panel.unlocked{animation:none;}
+  }
+
+  /* ===== Performance report (period selector, chart, narrative) ===== */
+  .report-period-tabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .report-period-btn{
+    padding:6px 14px; border-radius:100px; border:1px solid var(--line);
+    background:transparent; color:var(--paper-dim); font-size:12.5px; cursor:pointer;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .report-period-btn.active{background:var(--brass); color:var(--ink); border-color:var(--brass); font-weight:600;}
+  .report-custom-range{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px;}
+  .report-custom-range input[type="date"]{
+    background:var(--ink-3); border:1px solid var(--line); color:var(--paper);
+    border-radius:6px; padding:6px 8px; font-size:12.5px;
+  }
+  .report-h4{margin:0 0 8px; font-size:14px; color:var(--brass); font-weight:700;}
+  .report-scope-note{font-weight:400; color:var(--paper-dim); font-size:11.5px;}
+  .report-compare-note{font-size:13px; color:var(--paper-dim);}
+  .report-up{color:var(--sage); font-weight:700;}
+  .report-down{color:#e07a7a; font-weight:700;}
+  .report-chart-wrap{background:var(--ink-3); border:1px solid var(--line); border-radius:10px; padding:10px;}
+  .report-chart-wrap canvas{width:100%; display:block;}
+  .report-narrative{background:var(--ink-3); border:1px solid var(--line); border-radius:10px; padding:12px 14px;}
+  .report-narrative p{margin:0 0 8px; font-size:13px; color:var(--paper-dim); line-height:1.6;}
+  .report-narrative p:last-child{margin-bottom:0;}
+
+  /* Regeneration guarantee — kept near the pricing plans/CTA per audit
+     feedback, instead of being buried only inside the FAQ accordion. */
+  .pricing-guarantee{
+    margin-top:16px; text-align:center; font-size:13.5px; font-weight:600;
+    color:var(--brass); background:rgba(255,201,77,0.08); border:1px solid var(--brass-dim);
+    border-radius:10px; padding:10px 16px;
   }
