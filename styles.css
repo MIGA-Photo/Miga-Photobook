@@ -140,38 +140,15 @@
     position:sticky; top:0; z-index:55;
     display:flex; flex-direction:column;
   }
-  /* ===== Option 3: pill cluster + prominent full-width search + visible
-     category pills. Logo and the pill cluster (login + overflow "⋯") share
-     the top row; search gets its own full-width row since it's what most
-     visitors reach for first; categories sit as a horizontally scrollable
-     pill strip below — reusing the exact same #catNav click handling as the
-     dropdown version, just always visible instead of hidden behind a button. */
-  .header-pill-cluster{
-    display:flex; align-items:center; gap:4px;
-    background:var(--ink-2); border:1px solid var(--line); border-radius:100px; padding:4px;
-  }
-  .admin-btn.admin-btn-compact{height:34px; padding:0 14px; font-size:12.5px; border-radius:100px;}
-  .pill-divider{width:1px; height:20px; background:var(--line);}
-  .utility-dots-btn{
-    width:34px; height:34px; padding:0; justify-content:center; border:none; border-radius:100px;
-    color:var(--paper-dim); font-size:18px; line-height:1;
-  }
-  .utility-dots-btn:hover{color:var(--brass); background:transparent;}
-  .utility-menu.cat-dropdown-menu{
-    padding:12px; min-width:auto; display:none; flex-direction:column; align-items:flex-end; gap:10px;
-  }
-  #utilityDropdown.open .utility-menu{display:flex;}
-  .search-row-opt3{max-width:1180px; margin:0 auto; padding:0 24px 14px;}
-  .search-row-opt3 .search-box{width:100%;}
-  .search-row-opt3 .search-box input{width:100%;}
-  /* Category pills row — same #catNav element and click logic as the
-     dropdown version, restyled to render inline instead of as a hidden
-     panel. The trigger button stays in the DOM (hidden) so nothing in the
-     existing dropdown-open/close JS needs to change. */
-  .cat-dropdown.cat-pills-mode{max-width:1180px; margin:0 auto; padding:0 24px 14px;}
+  /* ===== Category pills row (Option 1 + visible pills) — same #catNav
+     element and click logic as the dropdown version, restyled to render as
+     an always-visible horizontal-scroll strip instead of a hidden panel.
+     The trigger button stays in the DOM (hidden) so nothing in the existing
+     dropdown-open/close JS needs to change. */
+  .cat-dropdown.cat-pills-mode{max-width:1180px; margin:0 auto; padding:0 24px 16px;}
   .cat-dropdown.cat-pills-mode .cat-dropdown-menu{
     position:static; display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch;
-    background:transparent; border:none; padding:2px 0; box-shadow:none; min-width:auto;
+    background:transparent; border:none; padding:2px 0 12px; box-shadow:none; min-width:auto;
   }
   .cat-dropdown.cat-pills-mode .cat-dropdown-menu button{
     display:inline-block; width:auto; white-space:nowrap; flex-shrink:0;
@@ -182,10 +159,28 @@
   .cat-dropdown.cat-pills-mode .cat-dropdown-menu button.active{
     color:var(--ink); background:var(--brass); border-color:var(--brass);
   }
+  /* Brand-colored scrollbar for the pills strip — a slim gold thumb on a
+     dark track instead of the browser's default flat grey bar, so even the
+     scroll hint reads as part of the site's own look rather than generic
+     chrome. Chromium/Safari via ::-webkit-scrollbar*, Firefox via the
+     scrollbar-color/-width properties (both applied for full coverage). */
+  .cat-dropdown.cat-pills-mode .cat-dropdown-menu{
+    scrollbar-width:thin; scrollbar-color:var(--brass) var(--ink-3);
+  }
+  .cat-dropdown.cat-pills-mode .cat-dropdown-menu::-webkit-scrollbar{
+    height:6px;
+  }
+  .cat-dropdown.cat-pills-mode .cat-dropdown-menu::-webkit-scrollbar-track{
+    background:var(--ink-3); border-radius:100px;
+  }
+  .cat-dropdown.cat-pills-mode .cat-dropdown-menu::-webkit-scrollbar-thumb{
+    background:var(--brass); border-radius:100px;
+  }
+  .cat-dropdown.cat-pills-mode .cat-dropdown-menu::-webkit-scrollbar-thumb:hover{
+    background:var(--brass-dim);
+  }
   @media(max-width:700px){
-    .nav-wrap-opt3{padding:12px 16px;}
-    .search-row-opt3{padding:0 16px 12px;}
-    .cat-dropdown.cat-pills-mode{padding:0 16px 12px;}
+    .cat-dropdown.cat-pills-mode{padding:0 16px 14px;}
   }
 
   header{
