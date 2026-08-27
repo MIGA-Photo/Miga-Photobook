@@ -35,7 +35,7 @@ const GOOGLE_CLIENT_ID = "";
 const FACEBOOK_APP_ID = "";
 const APPLE_CLIENT_ID = "";
 const APPLE_REDIRECT_URI = window.location.origin + window.location.pathname;
-let adminPasswordCache = ''; // cached only in memory after a successful server-verified login
+let adminSessionToken = ''; // a short-lived session token issued by the server after login — the admin's actual password is never stored or resent after the initial /admin/verify call
 const PLACEHOLDER_IMG = "data:image/svg+xml;utf8," + encodeURIComponent(
   `<svg xmlns='http://www.w3.org/2000/svg' width='400' height='500'><rect width='100%' height='100%' fill='#17161d'/><text x='50%' y='50%' fill='#e3a429' font-size='16' font-family='sans-serif' text-anchor='middle'>Miga-Photobook</text></svg>`
 );
@@ -788,7 +788,7 @@ async function upsertProductRemote(product){
   try{
     const res = await fetch(`${BACKEND_BASE}/products/upsert`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ password: adminPasswordCache, product })
+      body: JSON.stringify({ token: adminSessionToken, product })
     });
     return res.ok;
   }catch(e){ console.error('upsert product failed', e); return false; }
@@ -798,7 +798,7 @@ async function deleteProductRemote(id){
   try{
     const res = await fetch(`${BACKEND_BASE}/products/delete`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ password: adminPasswordCache, id })
+      body: JSON.stringify({ token: adminSessionToken, id })
     });
     return res.ok;
   }catch(e){ console.error('delete product failed', e); return false; }
@@ -868,9 +868,9 @@ async function savePurchases(){
 // creating an order and tracking a single order by code have their own public routes
 // that don't expose the full order list. See the specific call sites below.
 async function loadOrders(){
-  if(!BACKEND_BASE || !adminPasswordCache){ orders = []; return; }
+  if(!BACKEND_BASE || !adminSessionToken){ orders = []; return; }
   try{
-    const res = await fetch(`${BACKEND_BASE}/orders/list?password=${encodeURIComponent(adminPasswordCache)}`);
+    const res = await fetch(`${BACKEND_BASE}/orders/list?token=${encodeURIComponent(adminSessionToken)}`);
     const data = await res.json();
     orders = (data && data.value) ? JSON.parse(data.value) : [];
   }catch(e){ orders = []; }
@@ -2676,7 +2676,7 @@ function announceNewOrders(pending){
 async function refreshAdminBellBadge(){
   if(!adminLoggedIn || !BACKEND_BASE) return;
   try{
-    const res = await fetch(`${BACKEND_BASE}/orders/list?password=${encodeURIComponent(adminPasswordCache)}`);
+    const res = await fetch(`${BACKEND_BASE}/orders/list?token=${encodeURIComponent(adminSessionToken)}`);
     if(!res.ok) return;
     const data = await res.json();
     const list = (data && data.value) ? JSON.parse(data.value) : [];
@@ -3161,7 +3161,7 @@ async function loadPendingReviews(){
   if(!el || !BACKEND_BASE) return;
   try{
     const [pendingRes, approvedRes] = await Promise.all([
-      fetch(`${BACKEND_BASE}/reviews/pending?password=${encodeURIComponent(adminPasswordCache)}`),
+      fetch(`${BACKEND_BASE}/reviews/pending?token=${encodeURIComponent(adminSessionToken)}`),
       fetch(`${BACKEND_BASE}/reviews/list`)
     ]);
     const pendingData = await pendingRes.json();
@@ -3234,7 +3234,7 @@ async function approveReview(id){
   try{
     await fetch(`${BACKEND_BASE}/reviews/approve`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ password: adminPasswordCache, id })
+      body: JSON.stringify({ token: adminSessionToken, id })
     });
     await loadPendingReviews();
     renderTestimonials();
@@ -3329,7 +3329,7 @@ SHOWCASE_SLOTS.forEach(slot=>{
     try{
       const form = new FormData();
       form.append('image', file);
-      const res = await fetch(`${BACKEND_BASE}/admin/upload-image?password=${encodeURIComponent(adminPasswordCache)}`, {
+      const res = await fetch(`${BACKEND_BASE}/admin/upload-image?token=${encodeURIComponent(adminSessionToken)}`, {
         method:'POST', body: form
       });
       const data = await res.json().catch(()=>null);
@@ -3360,7 +3360,7 @@ document.getElementById('scSaveBtn').onclick = async ()=>{
       center: showcaseState['center'],
       items: [1,2,3,4,5,6,7,8].map(n=>showcaseState[String(n)])
     };
-    const res = await fetch(`${BACKEND_BASE}/admin/showcase?password=${encodeURIComponent(adminPasswordCache)}`, {
+    const res = await fetch(`${BACKEND_BASE}/admin/showcase?token=${encodeURIComponent(adminSessionToken)}`, {
       method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
     });
     const data = await res.json().catch(()=>null);
@@ -3441,7 +3441,7 @@ PROMO_IMAGE_SLOTS.forEach(slot=>{
     try{
       const form = new FormData();
       form.append('image', file);
-      const res = await fetch(`${BACKEND_BASE}/admin/upload-image?password=${encodeURIComponent(adminPasswordCache)}`, {
+      const res = await fetch(`${BACKEND_BASE}/admin/upload-image?token=${encodeURIComponent(adminSessionToken)}`, {
         method:'POST', body: form
       });
       const data = await res.json().catch(()=>null);
@@ -3487,7 +3487,7 @@ document.getElementById('piSaveBtn').onclick = async ()=>{
   btn.disabled = true;
   btn.textContent = t('uploadingImage');
   try{
-    const res = await fetch(`${BACKEND_BASE}/admin/promo-images?password=${encodeURIComponent(adminPasswordCache)}`, {
+    const res = await fetch(`${BACKEND_BASE}/admin/promo-images?token=${encodeURIComponent(adminSessionToken)}`, {
       method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ items })
     });
     const data = await res.json().catch(()=>null);
@@ -3660,7 +3660,7 @@ async function loadVisitorStats(){
   const listEl = document.getElementById('visitorsLogList');
   if(!BACKEND_BASE) return;
   try{
-    const res = await fetch(`${BACKEND_BASE}/visits/stats?password=${encodeURIComponent(adminPasswordCache)}`);
+    const res = await fetch(`${BACKEND_BASE}/visits/stats?token=${encodeURIComponent(adminSessionToken)}`);
     const data = await res.json();
     document.getElementById('visitorsTotalStat').textContent = data.total ?? 0;
     document.getElementById('visitorsTodayStat').textContent = data.today ?? 0;
@@ -3875,7 +3875,7 @@ async function rejectOrderPrompt(code){
   try{
     const res = await fetch(`${BACKEND_BASE}/orders/reject`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ password: adminPasswordCache, code })
+      body: JSON.stringify({ token: adminSessionToken, code })
     });
     if(!res.ok){ showToast(t('toastOrderFailed')); return; }
     await loadOrders();
@@ -3894,7 +3894,7 @@ async function deleteOrderPrompt(code){
   try{
     const res = await fetch(`${BACKEND_BASE}/orders/delete`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ password: adminPasswordCache, code })
+      body: JSON.stringify({ token: adminSessionToken, code })
     });
     if(!res.ok){ showToast(t('toastOrderFailed')); return; }
     await loadOrders();
@@ -3909,7 +3909,7 @@ async function approveOrder(code){
   try{
     const res = await fetch(`${BACKEND_BASE}/orders/approve`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ password: adminPasswordCache, code })
+      body: JSON.stringify({ token: adminSessionToken, code })
     });
     if(!res.ok){ showToast(t('toastWrongPassword')); return; }
     await loadOrders();
@@ -3963,7 +3963,7 @@ function thankCustomerViaWhatsApp(code){
   fetch(`${BACKEND_BASE}/orders/mark-thanked`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ code, password: adminPasswordCache })
+    body: JSON.stringify({ code, token: adminSessionToken })
   }).catch(()=>{
     // Saving the note failed; the message itself was still handed to WhatsApp.
     // Say so plainly rather than leaving a tick that will vanish on reload.
@@ -3993,7 +3993,7 @@ document.getElementById('adminModalClose').onclick = ()=>{
 async function loadAdminProducts(){
   if(!BACKEND_BASE) return;
   try{
-    const res = await fetch(`${BACKEND_BASE}/admin/products?password=${encodeURIComponent(adminPasswordCache)}`);
+    const res = await fetch(`${BACKEND_BASE}/admin/products?token=${encodeURIComponent(adminSessionToken)}`);
     const data = await res.json();
     let parsed = null;
     if(data && data.value){
@@ -4009,10 +4009,10 @@ document.getElementById('adminLoginBtn').onclick = async ()=>{
   if(!ok) showToast(t('toastWrongPassword'));
 };
 
-/** Shared by the manual login button and by the silent auto-login on page load.
- * Always re-verifies against the server rather than trusting a stored flag, so
- * a changed/rotated admin password on the backend correctly logs the browser
- * out instead of leaving a stale session. */
+/** Fresh login only — the one moment the real admin password is ever sent.
+ * The server verifies it and hands back a session token; that token (never
+ * the password itself) is what gets stored and reused from here on, so a
+ * compromised browser/device leaks a revocable token, not the master password. */
 async function adminLoginWithPassword(val){
   if(!BACKEND_BASE || !val) return false;
   try{
@@ -4021,34 +4021,72 @@ async function adminLoginWithPassword(val){
       body: JSON.stringify({ password: val })
     });
     const data = await res.json();
-    if(res.ok && data.ok){
-      adminPasswordCache = val;
-      adminLoggedIn = true;
-      document.getElementById('adminLoginView').style.display = 'none';
-      document.getElementById('adminFormView').style.display = 'block';
-      await loadAdminProducts(); // full prompt text — only this authenticated session sees it
-      applyChildrenVisibility();
-      renderAdminProductsList();
-      showAdminQuickAccess();
-      // Kept in localStorage so the admin stays logged in across page refreshes,
-      // the same way a customer account does. This is the site owner's own
-      // device/browser — if that ever changes, use "خروج" to clear it.
-      try{ localStorage.setItem('megaPromptAdminPass', val); }catch(e){}
-      return true;
+    if(res.ok && data.ok && data.token){
+      return await activateAdminSession(data.token, true);
     }
     return false;
   }catch(e){
     return false;
   }
 }
+/** Restores a previously-issued session token on page load (e.g. after a
+ * refresh) by re-checking it with the server. Never touches the raw password.
+ * If the token was revoked, rotated, or expired server-side, this correctly
+ * logs the browser out instead of leaving a stale session. */
+async function adminRestoreSession(token){
+  if(!BACKEND_BASE || !token) return false;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/verify`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ token })
+    });
+    const data = await res.json();
+    if(res.ok && data.ok){
+      return await activateAdminSession(token, false);
+    }
+    try{ localStorage.removeItem('megaPromptAdminToken'); }catch(e){}
+    return false;
+  }catch(e){
+    return false;
+  }
+}
+/** Shared activation step for both a fresh login and a restored session. */
+async function activateAdminSession(token, persist){
+  adminSessionToken = token;
+  adminLoggedIn = true;
+  document.getElementById('adminLoginView').style.display = 'none';
+  document.getElementById('adminFormView').style.display = 'block';
+  await loadAdminProducts(); // full prompt text — only this authenticated session sees it
+  applyChildrenVisibility();
+  renderAdminProductsList();
+  showAdminQuickAccess();
+  if(persist){
+    // Kept in localStorage so the admin stays logged in across page refreshes,
+    // the same way a customer account does — but this is a revocable session
+    // token, not the master password. Use "خروج" to revoke it from this device.
+    try{ localStorage.setItem('megaPromptAdminToken', token); }catch(e){}
+  }
+  return true;
+}
 document.getElementById('adminLogoutBtn').onclick = async ()=>{
+  const tokenToRevoke = adminSessionToken;
   adminLoggedIn = false;
-  adminPasswordCache = '';
+  adminSessionToken = '';
   adminModalBg.classList.remove('show');
   editingProductId = null;
   resetEditUI();
   document.getElementById('adminFab').classList.remove('show');
-  try{ localStorage.removeItem('megaPromptAdminPass'); }catch(e){}
+  try{ localStorage.removeItem('megaPromptAdminToken'); }catch(e){}
+  // Best-effort server-side revoke — the browser logs out locally either way,
+  // but this also invalidates the token so it can't be reused if it ever leaked.
+  if(BACKEND_BASE && tokenToRevoke){
+    try{
+      await fetch(`${BACKEND_BASE}/admin/logout`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ token: tokenToRevoke })
+      });
+    }catch(e){}
+  }
   await loadProducts(); // drop back to the prompt-free public list
   renderGrids();
   renderHeroStrip();
@@ -4174,7 +4212,7 @@ document.getElementById('pSaveBtn').onclick = async ()=>{
     try{
       const form = new FormData();
       form.append('image', pendingCroppedBlob, 'product.jpg');
-      const res = await fetch(`${BACKEND_BASE}/admin/upload-image?password=${encodeURIComponent(adminPasswordCache)}`, {
+      const res = await fetch(`${BACKEND_BASE}/admin/upload-image?token=${encodeURIComponent(adminSessionToken)}`, {
         method:'POST', body: form
       });
       const data = await res.json().catch(()=>null);
@@ -4513,7 +4551,7 @@ async function renderPerformanceReport(){
   let reviewsScopeNote = '';
   try{
     const [pendingRes, approvedRes] = await Promise.all([
-      fetch(`${BACKEND_BASE}/reviews/pending?password=${encodeURIComponent(adminPasswordCache)}`),
+      fetch(`${BACKEND_BASE}/reviews/pending?token=${encodeURIComponent(adminSessionToken)}`),
       fetch(`${BACKEND_BASE}/reviews/list`)
     ]);
     const pendingData = await pendingRes.json().catch(()=>({reviews:[]}));
@@ -4537,7 +4575,7 @@ async function renderPerformanceReport(){
   // than fabricate a range figure the backend doesn't actually compute yet.
   let visitorsLabel = '—';
   try{
-    const res = await fetch(`${BACKEND_BASE}/visits/stats?password=${encodeURIComponent(adminPasswordCache)}`);
+    const res = await fetch(`${BACKEND_BASE}/visits/stats?token=${encodeURIComponent(adminSessionToken)}`);
     const data = await res.json();
     visitorsLabel = reportPeriod === 'daily'
       ? `${data.today ?? 0}`
@@ -4746,7 +4784,7 @@ document.getElementById('adminQuickImageInput').addEventListener('change', async
   try{
     const form = new FormData();
     form.append('image', blob, 'product.jpg');
-    const res = await fetch(`${BACKEND_BASE}/admin/upload-image?password=${encodeURIComponent(adminPasswordCache)}`, {
+    const res = await fetch(`${BACKEND_BASE}/admin/upload-image?token=${encodeURIComponent(adminSessionToken)}`, {
       method:'POST', body: form
     });
     const data = await res.json().catch(()=>null);
@@ -4812,8 +4850,8 @@ function showToast(msg){
   // re-verify and restore it — same behavior as a saved customer login,
   // instead of asking for the password again on every refresh.
   try{
-    const savedAdminPass = localStorage.getItem('megaPromptAdminPass');
-    if(savedAdminPass) await adminLoginWithPassword(savedAdminPass);
+    const savedAdminToken = localStorage.getItem('megaPromptAdminToken');
+    if(savedAdminToken) await adminRestoreSession(savedAdminToken);
   }catch(e){}
 
   applyTheme(prefs?.theme || 'dark');
