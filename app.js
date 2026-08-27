@@ -274,7 +274,7 @@ const translations = {
     toastReadyToTransform:'تم تأكيد طلبك — جاهز تحوّل صورتك دلوقتي', toastOrderPending:'الطلب لا يزال قيد المراجعة، حاول لاحقًا',
     toastCopyFailed:'تعذّر النسخ التلقائي',
     toastOrderApproved:'تمت الموافقة على الطلب — يمكن للعميل تحويل صورته بالكود الآن',
-    toastWrongPassword:'كلمة المرور غير صحيحة', toastAdminRateLimited:'محاولات كتير أوي في وقت قصير — استنى شوية (لحد 10 دقايق) وجرب تاني', toastFillFields:'يرجى إكمال العنوان والسعر وتعليمات التحويل',
+    toastWrongPassword:'كلمة المرور غير صحيحة', toastAdminRateLimited:'محاولات كتير أوي في وقت قصير — استنى شوية (لحد 10 دقايق) وجرب تاني', toastAdminServerError:'السيرفر فيه مشكلة مؤقتة (مش كلمة السر) — جرب تاني بعد شوية، أو راجع حد الكتابة اليومي في Cloudflare KV', toastFillFields:'يرجى إكمال العنوان والسعر وتعليمات التحويل',
     toastProductAdded:'تم إضافة المنتج بنجاح',
     uploadingImage:'جاري رفع الصورة...', toastImageUploadFailed:'تعذّر رفع الصورة، تأكد من اتصالك وحاول تاني',
     toastContactPro:'للاشتراك في باقة الاحترافي، يرجى التواصل معنا', toastContactAgency:'للاشتراك في باقة الوكالة، يرجى التواصل معنا',
@@ -545,7 +545,7 @@ const translations = {
     toastReadyToTransform:'Order confirmed — ready to transform your photo', toastOrderPending:'Order still under review, try again later',
     toastCopyFailed:"Couldn't copy automatically",
     toastOrderApproved:'Order approved — the customer can now unlock the prompt with the code',
-    toastWrongPassword:'Incorrect password', toastAdminRateLimited:'Too many attempts in a short time — wait a bit (up to 10 minutes) and try again', toastFillFields:'Please complete the title, price, and prompt',
+    toastWrongPassword:'Incorrect password', toastAdminRateLimited:'Too many attempts in a short time — wait a bit (up to 10 minutes) and try again', toastAdminServerError:'The server hit a temporary issue (not your password) — try again shortly, or check the daily Cloudflare KV write limit', toastFillFields:'Please complete the title, price, and prompt',
     toastProductAdded:'Product added successfully',
     uploadingImage:'Uploading image...', toastImageUploadFailed:'Could not upload the image, check your connection and try again',
     toastContactPro:'To subscribe to the Pro Bundle, please contact us', toastContactAgency:'To subscribe to the Agency Bundle, please contact us',
@@ -4027,7 +4027,9 @@ document.getElementById('adminLoginBtn').onclick = async ()=>{
   const val = document.getElementById('adminPass').value;
   const result = await adminLoginWithPassword(val);
   if(!result.ok){
-    showToast(result.reason === 'rateLimited' ? t('toastAdminRateLimited') : t('toastWrongPassword'));
+    if(result.reason === 'rateLimited') showToast(t('toastAdminRateLimited'));
+    else if(result.reason === 'serverError') showToast(t('toastAdminServerError'));
+    else showToast(t('toastWrongPassword'));
   }
 };
 
@@ -4048,8 +4050,14 @@ async function adminLoginWithPassword(val){
       body: JSON.stringify({ password: val })
     });
     if(res.status === 429) return { ok:false, reason:'rateLimited' };
+    // Any other non-2xx (500, 502, etc.) means the server itself failed
+    // before it ever got to compare the password — most likely cause on
+    // this backend is the daily KV write-operation cap. Surfacing this
+    // distinctly instead of folding it into "wrong password" is exactly
+    // what would have saved a lot of back-and-forth diagnosing this before.
+    if(!res.ok) return { ok:false, reason:'serverError' };
     const data = await res.json();
-    if(res.ok && data.ok && data.token){
+    if(data.ok && data.token){
       await activateAdminSession(data.token, true);
       return { ok:true };
     }
