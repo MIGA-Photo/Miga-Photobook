@@ -64,37 +64,7 @@
   </div>
 </div>
 <header>
-  <div class="header-utility">
-    <div class="ctrl-group ctrl-group-sm" id="langToggle">
-      <button data-lang="ar" class="active">عربي</button>
-      <button data-lang="en">English</button>
-    </div>
-    <button type="button" class="theme-toggle theme-toggle-sm" aria-pressed="true">
-      <span class="tt-stars" aria-hidden="true">
-        <span class="tt-star" style="inset-inline-start:8px; top:6px;"></span>
-        <span class="tt-star" style="inset-inline-start:16px; top:14px;"></span>
-        <span class="tt-star" style="inset-inline-start:24px; top:5px;"></span>
-      </span>
-      <span class="tt-icon tt-sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"/></svg></span>
-      <span class="tt-icon tt-moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg></span>
-      <span class="tt-knob" aria-hidden="true">
-        <span class="tt-knob-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"/></svg></span>
-        <span class="tt-knob-moon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg></span>
-      </span>
-    </button>
-    <div class="ctrl-group ctrl-group-sm" id="viewToggle">
-      <button data-view="desktop" class="active" id="viewBtnDesktop">
-        <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg></span>
-        <span data-i18n="viewDesktopLabel">كمبيوتر</span>
-      </button>
-      <button data-view="mobile" id="viewBtnMobile">
-        <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M11 18.5h2"/></svg></span>
-        <span data-i18n="viewMobileLabel">موبايل</span>
-      </button>
-    </div>
-    <button type="button" class="util-link" id="trackOpenBtn" data-i18n="trackBtn">تتبع طلبي</button>
-  </div>
-  <div class="nav-wrap">
+  <div class="nav-wrap nav-wrap-opt3">
     <div class="logo">
       <svg class="logo-mark" viewBox="0 0 48 48" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
         <!-- open book -->
@@ -128,25 +98,50 @@
         <button type="button" id="adminQuickLogout" data-i18n="adminLogoutBtn" role="menuitem" style="color:#e07a7a;">خروج</button>
       </div>
     </div>
-    <div class="cat-dropdown" id="catDropdown">
-      <button type="button" class="cat-dropdown-btn" id="catDropdownBtn" aria-haspopup="true" aria-expanded="false">
-        <span class="cdi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg></span>
-        <span id="catDropdownLabel" data-i18n="categoriesLabel">الأقسام</span>
-        <span class="cdc" aria-hidden="true">&#9660;</span>
-      </button>
-      <div class="cat-dropdown-menu" id="catNav" role="menu">
-        <button data-cat="all" class="active" data-i18n="navAll" role="menuitem">الكل</button>
-        <button data-cat="children" data-i18n="navChildren" role="menuitem">أطفال</button>
-        <button data-cat="male" data-i18n="navMale" role="menuitem">رجالي</button>
-        <button data-cat="female" data-i18n="navFemale" role="menuitem">نسائي</button>
-        <button data-cat="business" data-i18n="navBusiness" role="menuitem">أعمال</button>
-        <button data-cat="cinematic" data-i18n="navCinematic" role="menuitem">سينمائي</button>
-        <button data-cat="luxury" data-i18n="navLuxury" role="menuitem">فاخر</button>
-        <button data-cat="artistic" data-i18n="navArtistic" role="menuitem">فني</button>
-        <button data-cat="magazine" data-i18n="navMagazine" role="menuitem">مجلات</button>
+
+    <div class="header-pill-cluster">
+      <button class="admin-btn admin-btn-primary admin-btn-compact" id="accountOpenBtn">تسجيل الدخول</button>
+      <div class="pill-divider"></div>
+      <div class="cat-dropdown" id="utilityDropdown">
+        <button type="button" class="cat-dropdown-btn utility-dots-btn" id="utilityDropdownBtn" aria-haspopup="true" aria-expanded="false" aria-label="إعدادات إضافية">
+          <span class="cdi" aria-hidden="true">⋯</span>
+        </button>
+        <div class="cat-dropdown-menu utility-menu" id="utilityMenu" role="menu">
+          <div class="ctrl-group ctrl-group-sm" id="langToggle">
+            <button data-lang="ar" class="active">عربي</button>
+            <button data-lang="en">English</button>
+          </div>
+          <button type="button" class="theme-toggle theme-toggle-sm" aria-pressed="true">
+            <span class="tt-stars" aria-hidden="true">
+              <span class="tt-star" style="inset-inline-start:8px; top:6px;"></span>
+              <span class="tt-star" style="inset-inline-start:16px; top:14px;"></span>
+              <span class="tt-star" style="inset-inline-start:24px; top:5px;"></span>
+            </span>
+            <span class="tt-icon tt-sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"/></svg></span>
+            <span class="tt-icon tt-moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg></span>
+            <span class="tt-knob" aria-hidden="true">
+              <span class="tt-knob-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"/></svg></span>
+              <span class="tt-knob-moon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg></span>
+            </span>
+          </button>
+          <div class="ctrl-group ctrl-group-sm" id="viewToggle">
+            <button data-view="desktop" class="active" id="viewBtnDesktop">
+              <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg></span>
+              <span data-i18n="viewDesktopLabel">كمبيوتر</span>
+            </button>
+            <button data-view="mobile" id="viewBtnMobile">
+              <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M11 18.5h2"/></svg></span>
+              <span data-i18n="viewMobileLabel">موبايل</span>
+            </button>
+          </div>
+          <button type="button" class="util-link" id="trackOpenBtn" data-i18n="trackBtn">تتبع طلبي</button>
+        </div>
       </div>
     </div>
+    <button class="admin-btn" id="adminOpenBtn" data-i18n="adminBtn" style="display:none;">لوحة الإدارة</button>
+  </div>
 
+  <div class="search-row-opt3">
     <div class="search-box" id="searchBox">
       <button type="button" class="search-icon-btn" id="searchIconBtn" aria-label="بحث" title="بحث">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><circle cx="10.3" cy="10.3" r="6.6" stroke-width="2.1"/><path d="M8 6.6a4 4 0 0 0-2.7 3.9" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/><line x1="15.2" y1="15.2" x2="21" y2="21" stroke-width="2.6" stroke-linecap="round"/></svg>
@@ -154,9 +149,25 @@
       <input type="text" id="searchInput" data-i18n-ph="searchPlaceholder" placeholder="ابحث في الموقع...">
       <div class="search-dropdown" id="searchDropdown"></div>
     </div>
+  </div>
 
-    <button class="admin-btn admin-btn-primary" id="accountOpenBtn">تسجيل الدخول</button>
-    <button class="admin-btn" id="adminOpenBtn" data-i18n="adminBtn" style="display:none;">لوحة الإدارة</button>
+  <div class="cat-dropdown cat-pills-mode" id="catDropdown">
+    <button type="button" class="cat-dropdown-btn" id="catDropdownBtn" aria-haspopup="true" aria-expanded="false" style="display:none;">
+      <span class="cdi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg></span>
+      <span id="catDropdownLabel" data-i18n="categoriesLabel">الأقسام</span>
+      <span class="cdc" aria-hidden="true">&#9660;</span>
+    </button>
+    <div class="cat-dropdown-menu" id="catNav" role="menu">
+      <button data-cat="all" class="active" data-i18n="navAll" role="menuitem">الكل</button>
+      <button data-cat="children" data-i18n="navChildren" role="menuitem">أطفال</button>
+      <button data-cat="male" data-i18n="navMale" role="menuitem">رجالي</button>
+      <button data-cat="female" data-i18n="navFemale" role="menuitem">نسائي</button>
+      <button data-cat="business" data-i18n="navBusiness" role="menuitem">أعمال</button>
+      <button data-cat="cinematic" data-i18n="navCinematic" role="menuitem">سينمائي</button>
+      <button data-cat="luxury" data-i18n="navLuxury" role="menuitem">فاخر</button>
+      <button data-cat="artistic" data-i18n="navArtistic" role="menuitem">فني</button>
+      <button data-cat="magazine" data-i18n="navMagazine" role="menuitem">مجلات</button>
+    </div>
   </div>
 </header>
 

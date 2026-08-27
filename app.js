@@ -2551,6 +2551,30 @@ document.addEventListener('keydown', (e)=>{
   if(e.key === 'Escape') closeCatDropdown();
 });
 
+// ---------- Utility overflow menu ("⋯" — lang/theme/view/track order) ----------
+// Same open/close pattern as the categories dropdown above, kept as an
+// independent block since it's a separate trigger/panel pair.
+const utilityDropdown = document.getElementById('utilityDropdown');
+const utilityDropdownBtn = document.getElementById('utilityDropdownBtn');
+if(utilityDropdown && utilityDropdownBtn){
+  const closeUtilityDropdown = ()=>{
+    utilityDropdown.classList.remove('open');
+    utilityDropdownBtn.setAttribute('aria-expanded', 'false');
+  };
+  utilityDropdownBtn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    const willOpen = !utilityDropdown.classList.contains('open');
+    utilityDropdown.classList.toggle('open', willOpen);
+    utilityDropdownBtn.setAttribute('aria-expanded', String(willOpen));
+  });
+  document.addEventListener('click', (e)=>{
+    if(!utilityDropdown.contains(e.target)) closeUtilityDropdown();
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape') closeUtilityDropdown();
+  });
+}
+
 document.getElementById('catNav').addEventListener('click', (e)=>{
   const btn = e.target.closest('button');
   if(!btn) return;
