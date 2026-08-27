@@ -274,7 +274,7 @@ const translations = {
     toastReadyToTransform:'تم تأكيد طلبك — جاهز تحوّل صورتك دلوقتي', toastOrderPending:'الطلب لا يزال قيد المراجعة، حاول لاحقًا',
     toastCopyFailed:'تعذّر النسخ التلقائي',
     toastOrderApproved:'تمت الموافقة على الطلب — يمكن للعميل تحويل صورته بالكود الآن',
-    toastWrongPassword:'كلمة المرور غير صحيحة', toastFillFields:'يرجى إكمال العنوان والسعر وتعليمات التحويل',
+    toastWrongPassword:'كلمة المرور غير صحيحة', toastAdminRateLimited:'محاولات كتير أوي في وقت قصير — استنى شوية (لحد 10 دقايق) وجرب تاني', toastFillFields:'يرجى إكمال العنوان والسعر وتعليمات التحويل',
     toastProductAdded:'تم إضافة المنتج بنجاح',
     uploadingImage:'جاري رفع الصورة...', toastImageUploadFailed:'تعذّر رفع الصورة، تأكد من اتصالك وحاول تاني',
     toastContactPro:'للاشتراك في باقة الاحترافي، يرجى التواصل معنا', toastContactAgency:'للاشتراك في باقة الوكالة، يرجى التواصل معنا',
@@ -545,7 +545,7 @@ const translations = {
     toastReadyToTransform:'Order confirmed — ready to transform your photo', toastOrderPending:'Order still under review, try again later',
     toastCopyFailed:"Couldn't copy automatically",
     toastOrderApproved:'Order approved — the customer can now unlock the prompt with the code',
-    toastWrongPassword:'Incorrect password', toastFillFields:'Please complete the title, price, and prompt',
+    toastWrongPassword:'Incorrect password', toastAdminRateLimited:'Too many attempts in a short time — wait a bit (up to 10 minutes) and try again', toastFillFields:'Please complete the title, price, and prompt',
     toastProductAdded:'Product added successfully',
     uploadingImage:'Uploading image...', toastImageUploadFailed:'Could not upload the image, check your connection and try again',
     toastContactPro:'To subscribe to the Pro Bundle, please contact us', toastContactAgency:'To subscribe to the Agency Bundle, please contact us',
@@ -4025,28 +4025,37 @@ async function loadAdminProducts(){
 
 document.getElementById('adminLoginBtn').onclick = async ()=>{
   const val = document.getElementById('adminPass').value;
-  const ok = await adminLoginWithPassword(val);
-  if(!ok) showToast(t('toastWrongPassword'));
+  const result = await adminLoginWithPassword(val);
+  if(!result.ok){
+    showToast(result.reason === 'rateLimited' ? t('toastAdminRateLimited') : t('toastWrongPassword'));
+  }
 };
 
 /** Fresh login only — the one moment the real admin password is ever sent.
  * The server verifies it and hands back a session token; that token (never
  * the password itself) is what gets stored and reused from here on, so a
- * compromised browser/device leaks a revocable token, not the master password. */
+ * compromised browser/device leaks a revocable token, not the master password.
+ * Returns a small status object instead of a bare boolean so the caller can
+ * tell "wrong password" apart from "too many attempts, try later" — showing
+ * the same generic toast for both was exactly what made an earlier real
+ * rate-limit lockout look identical to a typo, and cost a lot of time to
+ * track down. */
 async function adminLoginWithPassword(val){
-  if(!BACKEND_BASE || !val) return false;
+  if(!BACKEND_BASE || !val) return { ok:false, reason:'network' };
   try{
     const res = await fetch(`${BACKEND_BASE}/admin/verify`, {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ password: val })
     });
+    if(res.status === 429) return { ok:false, reason:'rateLimited' };
     const data = await res.json();
     if(res.ok && data.ok && data.token){
-      return await activateAdminSession(data.token, true);
+      await activateAdminSession(data.token, true);
+      return { ok:true };
     }
-    return false;
+    return { ok:false, reason:'wrongPassword' };
   }catch(e){
-    return false;
+    return { ok:false, reason:'network' };
   }
 }
 /** Restores a previously-issued session token on page load (e.g. after a
