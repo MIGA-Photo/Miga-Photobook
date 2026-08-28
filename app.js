@@ -2414,18 +2414,18 @@ function getCategoryOf(productId){
 
 // ---------- Quick-nav row (single row of tabs above the five sections above) ----------
 // Accordion behaviour: tapping a tab expands its content directly beneath
-// the row and hides the other four tabs, so the open one and its content
+// the row and hides the other tabs, so the open one and its content
 // read as a single expanded block. Tapping the same (now-lone) tab again
-// collapses it and brings the other four back. Only ever one section open
-// at a time, matching how the sections themselves already worked — this
-// just makes the tab row follow the same rule instead of staying a fixed
-// row of five above whichever section happens to be open.
+// collapses it and brings the others back. Only ever one section open
+// at a time — except "تقييمات" (testimonials), which is no longer part of
+// this accordion at all: it's always visible on the page now, so its tab
+// button is a plain scroll-to-it shortcut rather than an open/close toggle.
 function setActiveSectionTab(targetId, {scroll} = {scroll: true}){
   const row = document.getElementById('sectionTabsRow');
   document.querySelectorAll('.section-tab-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.target === targetId);
   });
-  document.querySelectorAll('#whyUs, #howItWorks, #testimonials, #aboutUs, #faq').forEach(sec=>{
+  document.querySelectorAll('#whyUs, #howItWorks, #aboutUs, #faq').forEach(sec=>{
     sec.classList.toggle('open', sec.id === targetId);
   });
   row.classList.toggle('has-active', !!targetId);
@@ -2436,12 +2436,18 @@ function setActiveSectionTab(targetId, {scroll} = {scroll: true}){
 document.getElementById('sectionTabsRow').addEventListener('click', (e)=>{
   const btn = e.target.closest('.section-tab-btn');
   if(!btn) return;
+  if(btn.dataset.target === 'testimonials'){
+    // Reviews are always visible now (not part of the accordion) — this
+    // button just scrolls to them, it never hides/collapses anything else.
+    document.getElementById('testimonials')?.scrollIntoView({behavior:'smooth', block:'start'});
+    return;
+  }
   const alreadyActive = btn.classList.contains('active');
   setActiveSectionTab(alreadyActive ? null : btn.dataset.target, {scroll: !alreadyActive});
 });
 // howItWorks starts open by default (see its markup), so the row starts in
 // the same collapsed-to-one-tab state a click would produce, instead of
-// showing all five tabs above a section that's already expanded.
+// showing all tabs above a section that's already expanded.
 setActiveSectionTab('howItWorks', {scroll: false});
 
 // ---------- Back to top + vertical scroll ruler ----------
@@ -3295,13 +3301,18 @@ async function renderTestimonials(){
     const res = await fetch(`${BACKEND_BASE}/reviews/list`);
     const data = await res.json();
     if(data.reviews && data.reviews.length){
-      grid.innerHTML = data.reviews.map(r => `
+      // Same display style as Design MIGA 3: text-only cards in a horizontal
+      // scrollable row, with filled/empty stars reflecting the exact rating.
+      grid.innerHTML = data.reviews.map(r => {
+        const rating = r.rating || 5;
+        const starsStr = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+        return `
         <div class="testimonial-card">
-          ${r.resultImageUrl ? `<div class="testimonial-photo"><img src="${r.resultImageUrl}" alt="نتيجة العميل" loading="lazy"></div>` : ''}
-          <div class="stars">${'⭐'.repeat(r.rating)}</div>
+          <div class="stars">${starsStr}</div>
           <p>"${escapeHtml(r.comment)}"</p>
           <div class="testimonial-author">— ${escapeHtml(r.user_name)}</div>
-        </div>`).join('');
+        </div>`;
+      }).join('');
       if(note) note.style.display = 'none';
     }
   }catch(e){ /* keep the example placeholders on failure */ }
