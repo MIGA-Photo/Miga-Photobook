@@ -466,8 +466,12 @@
   </button>
 </div>
 
-<section class="cat-section" id="whyUs">
-  <div class="cs-body">
+<!-- Tab-panel switcher: one fixed content area right below the tab row.
+     Clicking a tab instantly swaps which of these four shows here — no
+     scrolling, no animated accordion expand, just a plain visible/hidden
+     swap, so the content always appears in the same spot as the buttons. -->
+<div id="sectionTabPanel">
+<section class="cat-section tab-panel" id="whyUs">
   <div class="why-us-grid">
     <div class="why-item">✅ <span data-i18n="whyUs1">نتائج احترافية</span></div>
     <div class="why-item">✅ <span data-i18n="whyUs2">تحويل تلقائي بالكامل</span></div>
@@ -475,24 +479,9 @@
     <div class="why-item">✅ <span data-i18n="whyUs4">بدون أي خبرة تقنية</span></div>
     <div class="why-item">✅ <span data-i18n="whyUs5">خصوصيتك محفوظة بالكامل</span></div>
   </div>
-  </div>
 </section>
 
-<!-- The "السر" card was split out of the collapsible whyUs section above
-     into its own always-visible section, per explicit request — it no
-     longer needs a tab click to be seen, matching how testimonials works. -->
-<section class="cat-section" id="whyEdge">
-  <div class="why-edge">
-    <h3 data-i18n="whyEdgeTitle">وأدوات الذكاء الاصطناعي المتاحة للكل؟</h3>
-    <p class="lead" data-i18n="whyEdgeP1">الأداة مش هي المشكلة — البرومبت هو المشكلة.</p>
-    <p data-i18n="whyEdgeP3">كل صورة في المعرض هنا نتيجة برومبت اتظبط قبل كده عشرات المرات، فبتوصلك من أول مرة من غير تخمين.</p>
-    <p data-i18n-html="whyEdgeP4">إحنا اختصرنا عليك كل التجربة والتعديل — تدفع وتستلم صورتك جاهزة على طول. حابب تجرب بنفسك في المرات الجاية؟ تقدر تشتري البرومبت وحده بـ10 جنيه (اختياري). <a href="#children" class="why-edge-link">تصفّح الصور واختار البرومبت ←</a></p>
-  </div>
-</section>
-
-
-<section class="cat-section" id="howItWorks">
-  <div class="cs-body">
+<section class="cat-section tab-panel" id="howItWorks">
   <div class="how-grid">
     <div class="how-step">
       <div class="how-step-num">1</div>
@@ -521,38 +510,13 @@
   <div class="hero-ctas" style="margin-top:22px; justify-content:center;">
     <a href="#children" class="btn-primary" data-i18n="howItWorksCta">ابدأ دلوقتي</a>
   </div>
-  </div>
 </section>
 
-<section class="cat-section" id="testimonials">
-  <div class="cs-body">
-    <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
-      <button class="btn-ghost" id="writeReviewBtn" data-i18n="writeReviewBtn">ضع تقييمك هنا</button>
-    </div>
-  <div class="testimonials-grid" id="testimonialsGrid">
-    <div class="proof-results-grid" style="grid-column:1/-1;" id="testimonialsProofGrid">
-      <div class="proof-tile"><img src="before-after/before-after/after-1.jpg" alt="نتيجة حقيقية 1" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-2.jpg" alt="نتيجة حقيقية 2" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-3.jpg" alt="نتيجة حقيقية 3" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-4.jpg" alt="نتيجة حقيقية 4" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-5.jpg" alt="نتيجة حقيقية 5" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-6.jpg" alt="نتيجة حقيقية 6" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-7.jpg" alt="نتيجة حقيقية 7" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-8.jpg" alt="نتيجة حقيقية 8" loading="lazy"></div>
-    </div>
-  </div>
-  <p class="sub" style="margin-top:16px; opacity:0.7; font-size:12.5px;" id="testimonialsNoteEl" data-i18n="testimonialsNote">* نماذج حقيقية من نتائج Miga-Photobook الفعلية.</p>
-  </div>
-</section>
-
-<section class="cat-section" id="aboutUs">
-  <div class="cs-body">
+<section class="cat-section tab-panel" id="aboutUs">
   <p class="sub" style="max-width:680px; font-size:15px;" data-i18n="aboutUsText">Miga-Photobook مشروع مصري بدأ بفكرة بسيطة: خلي جلسة التصوير الاحترافية متاحة لأي حد وبسعر معقول. بنحوّل صورتك الشخصية لتحفة فنية بجودة استوديو باستخدام الذكاء الاصطناعي — ارفع صورتك واختار الأسلوب، وإحنا نتولى الباقي بعناية عشان تضمن نتيجة تستحق اسمك.</p>
-  </div>
 </section>
 
-<section class="cat-section collapsible" id="faq">
-  <div class="cs-body">
+<section class="cat-section tab-panel" id="faq">
   <div class="faq-list">
     <details class="faq-item">
       <summary data-i18n="faqQ1">إزاي تتم عملية التحويل؟</summary>
@@ -583,8 +547,39 @@
       <p data-i18n="faqA7">أكيد! تقدر تطلب أكتر من ستايل لنفس الصورة أو لصور مختلفة — كل ستايل بيتحسب طلب منفصل، أو استخدم إحدى الباقات (10 أو 25 صورة) عشان توفر لو محتاج أكتر من نتيجة.</p>
     </details>
   </div>
+</section>
+</div>
+
+<!-- These two stay always-visible below the tab panel, unaffected by which
+     tab is selected above — per explicit request. -->
+<section class="cat-section" id="whyEdge">
+  <div class="why-edge">
+    <h3 data-i18n="whyEdgeTitle">وأدوات الذكاء الاصطناعي المتاحة للكل؟</h3>
+    <p class="lead" data-i18n="whyEdgeP1">الأداة مش هي المشكلة — البرومبت هو المشكلة.</p>
+    <p data-i18n="whyEdgeP3">كل صورة في المعرض هنا نتيجة برومبت اتظبط قبل كده عشرات المرات، فبتوصلك من أول مرة من غير تخمين.</p>
+    <p data-i18n-html="whyEdgeP4">إحنا اختصرنا عليك كل التجربة والتعديل — تدفع وتستلم صورتك جاهزة على طول. حابب تجرب بنفسك في المرات الجاية؟ تقدر تشتري البرومبت وحده بـ10 جنيه (اختياري). <a href="#children" class="why-edge-link">تصفّح الصور واختار البرومبت ←</a></p>
   </div>
 </section>
+
+<section class="cat-section" id="testimonials">
+  <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+    <button class="btn-ghost" id="writeReviewBtn" data-i18n="writeReviewBtn">ضع تقييمك هنا</button>
+  </div>
+  <div class="testimonials-grid" id="testimonialsGrid">
+    <div class="proof-results-grid" style="grid-column:1/-1;" id="testimonialsProofGrid">
+      <div class="proof-tile"><img src="before-after/before-after/after-1.jpg" alt="نتيجة حقيقية 1" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-2.jpg" alt="نتيجة حقيقية 2" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-3.jpg" alt="نتيجة حقيقية 3" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-4.jpg" alt="نتيجة حقيقية 4" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-5.jpg" alt="نتيجة حقيقية 5" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-6.jpg" alt="نتيجة حقيقية 6" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-7.jpg" alt="نتيجة حقيقية 7" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-8.jpg" alt="نتيجة حقيقية 8" loading="lazy"></div>
+    </div>
+  </div>
+  <p class="sub" style="margin-top:16px; opacity:0.7; font-size:12.5px;" id="testimonialsNoteEl" data-i18n="testimonialsNote">* نماذج حقيقية من نتائج Miga-Photobook الفعلية.</p>
+</section>
+
 
 <section class="cat-section promo-video-section" id="promoVideo">
   <div class="promo-video-outer">
