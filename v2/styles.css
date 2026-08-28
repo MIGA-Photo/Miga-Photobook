@@ -13,6 +13,14 @@ body{
   font-family:'IBM Plex Sans Arabic', sans-serif;
   line-height:1.65; min-height:100vh;
 }
+/* Same brand-colored scrollbar treatment as Design MIGA 1 — a gold thumb
+   on a dark track everywhere, instead of the browser's default grey. */
+*{ scrollbar-width:thin; scrollbar-color:var(--brass) var(--ink-3); }
+*::-webkit-scrollbar{ width:8px; height:8px; }
+*::-webkit-scrollbar-track{ background:var(--ink-3); border-radius:100px; }
+*::-webkit-scrollbar-thumb{ background:var(--brass); border-radius:100px; border:2px solid var(--ink-3); }
+*::-webkit-scrollbar-thumb:hover{ background:var(--brass-dim); }
+*::-webkit-scrollbar-corner{ background:var(--ink-3); }
 .display{ font-family:'Rakkas', serif; }
 .wrap{ max-width:1080px; margin:0 auto; padding:0 20px; }
 img{ max-width:100%; }
