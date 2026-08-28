@@ -275,6 +275,8 @@ const translations = {
     toastCopyFailed:'تعذّر النسخ التلقائي',
     toastOrderApproved:'تمت الموافقة على الطلب — يمكن للعميل تحويل صورته بالكود الآن',
     toastWrongPassword:'كلمة المرور غير صحيحة', toastAdminRateLimited:'محاولات كتير أوي في وقت قصير — استنى شوية (لحد 10 دقايق) وجرب تاني', toastAdminServerError:'السيرفر فيه مشكلة مؤقتة (مش كلمة السر) — جرب تاني بعد شوية، أو راجع حد الكتابة اليومي في Cloudflare KV', toastFillFields:'يرجى إكمال العنوان والسعر وتعليمات التحويل',
+    changePassTitle:'تغيير كلمة مرور الأدمن', currentPassLabel:'كلمة المرور الحالية', newPassLabel:'كلمة المرور الجديدة', confirmNewPassLabel:'تأكيد كلمة المرور الجديدة', changePassBtn:'تغيير كلمة المرور',
+    toastPassChanged:'تم تغيير كلمة المرور بنجاح', toastPassMismatch:'كلمة المرور الجديدة وتأكيدها غير متطابقين', toastPassTooShort:'كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل', toastCurrentPassWrong:'كلمة المرور الحالية غير صحيحة', toastFillPassFields:'يرجى إدخال كل الحقول',
     toastProductAdded:'تم إضافة المنتج بنجاح',
     uploadingImage:'جاري رفع الصورة...', toastImageUploadFailed:'تعذّر رفع الصورة، تأكد من اتصالك وحاول تاني',
     toastContactPro:'للاشتراك في باقة الاحترافي، يرجى التواصل معنا', toastContactAgency:'للاشتراك في باقة الوكالة، يرجى التواصل معنا',
@@ -546,6 +548,8 @@ const translations = {
     toastCopyFailed:"Couldn't copy automatically",
     toastOrderApproved:'Order approved — the customer can now unlock the prompt with the code',
     toastWrongPassword:'Incorrect password', toastAdminRateLimited:'Too many attempts in a short time — wait a bit (up to 10 minutes) and try again', toastAdminServerError:'The server hit a temporary issue (not your password) — try again shortly, or check the daily Cloudflare KV write limit', toastFillFields:'Please complete the title, price, and prompt',
+    changePassTitle:'Change admin password', currentPassLabel:'Current password', newPassLabel:'New password', confirmNewPassLabel:'Confirm new password', changePassBtn:'Change password',
+    toastPassChanged:'Password changed successfully', toastPassMismatch:'New password and confirmation do not match', toastPassTooShort:'New password must be at least 8 characters', toastCurrentPassWrong:'Current password is incorrect', toastFillPassFields:'Please fill in all fields',
     toastProductAdded:'Product added successfully',
     uploadingImage:'Uploading image...', toastImageUploadFailed:'Could not upload the image, check your connection and try again',
     toastContactPro:'To subscribe to the Pro Bundle, please contact us', toastContactAgency:'To subscribe to the Agency Bundle, please contact us',
@@ -4131,8 +4135,64 @@ document.getElementById('adminLogoutBtn').onclick = async ()=>{
   hideAdminQuickAccess();
 };
 
+/** Changes the admin password. Requires the current session token (proves
+ * this browser is already logged in) plus the current password (proves the
+ * person typing isn't just riding a leaked/stolen session token). The new
+ * password is sent once over HTTPS and never stored client-side — same
+ * trust model as the original login. */
+document.getElementById('changeAdminPassBtn').onclick = async ()=>{
+  const currentPassInput = document.getElementById('currentAdminPass');
+  const newPassInput = document.getElementById('newAdminPass');
+  const confirmPassInput = document.getElementById('confirmNewAdminPass');
+  const currentPass = currentPassInput.value;
+  const newPass = newPassInput.value;
+  const confirmPass = confirmPassInput.value;
+
+  if(!currentPass || !newPass || !confirmPass){ showToast(t('toastFillPassFields')); return; }
+  if(newPass !== confirmPass){ showToast(t('toastPassMismatch')); return; }
+  if(newPass.length < 8){ showToast(t('toastPassTooShort')); return; }
+  if(!BACKEND_BASE || !adminSessionToken){ showToast(t('toastAdminServerError')); return; }
+
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/change-password`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ token: adminSessionToken, currentPassword: currentPass, newPassword: newPass })
+    });
+    if(res.status === 429){ showToast(t('toastAdminRateLimited')); return; }
+    if(res.status === 401){
+      const data = await res.json().catch(()=>({}));
+      // A 401 here means either the current password was wrong, or the
+      // session itself expired — tell them apart so a stale-session case
+      // doesn't get misread as "you typed your own current password wrong".
+      if(data.error === 'Session expired, please log in again'){
+        showToast(t('toastAdminServerError'));
+      } else {
+        showToast(t('toastCurrentPassWrong'));
+      }
+      return;
+    }
+    if(!res.ok){ showToast(t('toastAdminServerError')); return; }
+    const data = await res.json();
+    if(data.ok){
+      showToast(t('toastPassChanged'));
+      currentPassInput.value = '';
+      newPassInput.value = '';
+      confirmPassInput.value = '';
+    } else {
+      showToast(t('toastAdminServerError'));
+    }
+  }catch(e){
+    showToast(t('toastAdminServerError'));
+  }
+};
+
 const NEW_PRODUCT_DEFAULT_TITLE = 'Miga-photobook';
 const NEW_PRODUCT_DEFAULT_PRICE = 25;
+// Every new product's AI-transform prompt starts with this watermark
+// instruction pre-filled — it's still a normal editable textarea, so the
+// admin can add to it or delete it per product, but it no longer has to be
+// re-typed from scratch every single time.
+const NEW_PRODUCT_DEFAULT_PROMPT = 'Add  a custom luxury signature watermark logo at bottom-right: royal king crown with "Miga-photobook " in shield crest, metallic gold, elegant, minimal, premium, glowing edges, embossed texture, naturally blending.';
 
 /** Puts the add-product form back to a clean state for the *next* product:
  * the suggested name and price are filled in ready to be typed over, rather
@@ -4162,7 +4222,7 @@ function resetProductFormToDefaults(){
   document.getElementById('pTitle').value = NEW_PRODUCT_DEFAULT_TITLE;
   document.getElementById('pTitleEn').value = NEW_PRODUCT_DEFAULT_TITLE;
   document.getElementById('pPrice').value = NEW_PRODUCT_DEFAULT_PRICE;
-  document.getElementById('pPrompt').value = '';
+  document.getElementById('pPrompt').value = NEW_PRODUCT_DEFAULT_PROMPT;
   document.getElementById('pImage').value = '';
   pendingCroppedBlob = null;
 }

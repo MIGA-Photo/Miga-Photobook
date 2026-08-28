@@ -1288,6 +1288,27 @@
         </div>
       </div>
 
+      <div id="adminChangePasswordSection" style="margin-top:18px; padding-top:14px; border-top:1px solid var(--brass-dim);">
+        <div style="font-size:14px; font-weight:600; margin-bottom:10px; color:var(--brass);" data-i18n="changePassTitle">تغيير كلمة مرور الأدمن</div>
+        <div class="field">
+          <label data-i18n="currentPassLabel">كلمة المرور الحالية</label>
+          <input type="password" id="currentAdminPass" placeholder="••••••••" autocomplete="off">
+        </div>
+        <div class="field-grid-2">
+          <div class="field">
+            <label data-i18n="newPassLabel">كلمة المرور الجديدة</label>
+            <input type="password" id="newAdminPass" placeholder="••••••••" autocomplete="off">
+          </div>
+          <div class="field">
+            <label data-i18n="confirmNewPassLabel">تأكيد كلمة المرور الجديدة</label>
+            <input type="password" id="confirmNewAdminPass" placeholder="••••••••" autocomplete="off">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-ghost" id="changeAdminPassBtn" data-i18n="changePassBtn">تغيير كلمة المرور</button>
+        </div>
+      </div>
+
       <div class="modal-actions" style="margin-top:14px;">
         <button class="btn-ghost" id="adminLogoutBtn" data-i18n="adminLogoutBtn">خروج</button>
       </div>
