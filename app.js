@@ -2412,20 +2412,19 @@ function getCategoryOf(productId){
   io.observe(vid);
 })();
 
-// ---------- Quick-nav row (single row of tabs above the five sections above) ----------
-// Accordion behaviour: tapping a tab expands its content directly beneath
-// the row and hides the other tabs, so the open one and its content
-// read as a single expanded block. Tapping the same (now-lone) tab again
-// collapses it and brings the others back. Only ever one section open
-// at a time — except "تقييمات" (testimonials), which is no longer part of
-// this accordion at all: it's always visible on the page now, so its tab
-// button is a plain scroll-to-it shortcut rather than an open/close toggle.
+// ---------- Quick-nav row ----------
+// Only "أسئلة شائعة" (FAQ) is still a real accordion tab — a genuine list
+// of separate Q&As is the one case that still benefits from being tucked
+// away until asked for. Every other tab ("لماذا Miga-Photobook؟",
+// "كيف يعمل؟", "تقييمات وآراء عملائنا", "من نحن") is now an always-visible
+// section on the page; its tab button is just a scroll-to shortcut, not an
+// open/close toggle.
 function setActiveSectionTab(targetId, {scroll} = {scroll: true}){
   const row = document.getElementById('sectionTabsRow');
   document.querySelectorAll('.section-tab-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.target === targetId);
   });
-  document.querySelectorAll('#whyUs, #howItWorks, #aboutUs, #faq').forEach(sec=>{
+  document.querySelectorAll('#faq').forEach(sec=>{
     sec.classList.toggle('open', sec.id === targetId);
   });
   row.classList.toggle('has-active', !!targetId);
@@ -2436,19 +2435,16 @@ function setActiveSectionTab(targetId, {scroll} = {scroll: true}){
 document.getElementById('sectionTabsRow').addEventListener('click', (e)=>{
   const btn = e.target.closest('.section-tab-btn');
   if(!btn) return;
-  if(btn.dataset.target === 'testimonials'){
-    // Reviews are always visible now (not part of the accordion) — this
-    // button just scrolls to them, it never hides/collapses anything else.
-    document.getElementById('testimonials')?.scrollIntoView({behavior:'smooth', block:'start'});
+  if(btn.dataset.target !== 'faq'){
+    // Always-visible sections — the tab just scrolls to them.
+    document.getElementById(btn.dataset.target)?.scrollIntoView({behavior:'smooth', block:'start'});
     return;
   }
   const alreadyActive = btn.classList.contains('active');
   setActiveSectionTab(alreadyActive ? null : btn.dataset.target, {scroll: !alreadyActive});
 });
-// howItWorks starts open by default (see its markup), so the row starts in
-// the same collapsed-to-one-tab state a click would produce, instead of
-// showing all tabs above a section that's already expanded.
-setActiveSectionTab('howItWorks', {scroll: false});
+// FAQ is the only collapsible tab left now, and it starts closed like any
+// accordion normally would — no special initial state needed anymore.
 
 // ---------- Back to top + vertical scroll ruler ----------
 const backToTopBtn = document.getElementById('backToTopBtn');
@@ -2574,11 +2570,13 @@ function scrollToSiteSection(id){
   addSearchHistory(term);
   const el = document.getElementById(id);
   if(!el) return;
-  if(['whyUs','howItWorks','testimonials','aboutUs','faq'].includes(id)){
-    setActiveSectionTab(id, {scroll: false}); // keeps the tab row's hide/show in sync
-  } else {
+  if(id === 'faq'){
+    setActiveSectionTab(id, {scroll: false}); // the only real accordion tab left — keeps the tab row's hide/show in sync
+  } else if(!['whyUs','howItWorks','testimonials','aboutUs','whyEdge'].includes(id)){
     el.classList.add('open'); // opens it if it's one of the collapsible category sections
   }
+  // whyUs/howItWorks/testimonials/aboutUs/whyEdge are always-visible now —
+  // nothing to open, the scrollIntoView below is all they need.
   document.querySelector(`.cat-tile[data-cat="${id}"]`)?.classList.add('open');
   document.querySelector(`.cat-tile[data-cat="${id}"]`)?.setAttribute('aria-expanded', 'true');
   el.scrollIntoView({behavior:'smooth', block:'start'});
