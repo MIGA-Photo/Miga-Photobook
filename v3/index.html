@@ -2,24 +2,33 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<!-- Design-switch bootstrap — generic across any number of designs; see
-     Design MIGA 1's root index.html for the full explanation. MY_DESIGN_ID
-     is the only line that differs between each design's copy of this
-     script. Synchronous XHR is deliberate here too, to avoid a flash of
-     the wrong design before redirecting; a short timeout + try/catch means
-     a slow or unreachable Worker just leaves this page (Design MIGA 3)
-     showing. -->
+<!-- Design-switch bootstrap. IMPORTANT FIX: an earlier version of this used
+     a synchronous XHR with `.timeout` set — browsers throw an
+     InvalidAccessError the instant that combination runs (timeout is
+     invalid on synchronous requests per the XHR spec), which our own
+     try/catch was silently swallowing. That meant the redirect check never
+     actually ran, on any page, ever. This version uses a normal async
+     fetch instead, hiding the page with `visibility:hidden` until the
+     check resolves (or a 1.2s fallback fires) so there's still no flash of
+     the wrong design. MY_DESIGN_ID is the only line that differs between
+     each design's own copy of this same script. -->
+<style id="__bootHide">html{visibility:hidden;}</style>
 <script>
 (function(){
   var MY_DESIGN_ID = 'v3';
-  try{
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'https://miga-photobook-api.magdyfarouk380.workers.dev/site-config', false);
-    xhr.timeout = 1200;
-    xhr.send(null);
-    if(xhr.status === 200){
-      var data = JSON.parse(xhr.responseText);
-      if(data.activeDesign && data.activeDesign !== MY_DESIGN_ID){
+  var revealed = false;
+  function reveal(){
+    if(revealed) return;
+    revealed = true;
+    var s = document.getElementById('__bootHide');
+    if(s) s.remove();
+  }
+  var fallback = setTimeout(reveal, 1200);
+  fetch('https://miga-photobook-api.magdyfarouk380.workers.dev/site-config')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      clearTimeout(fallback);
+      if(data && data.activeDesign && data.activeDesign !== MY_DESIGN_ID){
         var target = (data.availableDesigns || []).filter(function(d){ return d.id === data.activeDesign; })[0];
         var folder = target ? target.folder : '';
         var myFolder = MY_DESIGN_ID === 'v1' ? '' : MY_DESIGN_ID;
@@ -27,10 +36,11 @@
         if(myFolder === '' && folder !== ''){ dest = './' + folder + '/'; }
         else if(myFolder !== '' && folder === ''){ dest = '../'; }
         else if(myFolder !== '' && folder !== ''){ dest = '../' + folder + '/'; }
-        if(dest) window.location.replace(dest);
+        if(dest){ window.location.replace(dest); return; }
       }
-    }
-  }catch(e){ /* Worker unreachable or slow — just show this design (Design MIGA 3) */ }
+      reveal();
+    })
+    .catch(function(){ clearTimeout(fallback); reveal(); });
 })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
