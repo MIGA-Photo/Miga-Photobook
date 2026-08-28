@@ -271,6 +271,21 @@
   .cat-section.collapsible.open > .cs-body{max-height:100000px;}
   .cat-section.collapsible > .cs-body > *:first-child{margin-top:20px;}
 
+  /* The 52px/16px vertical padding below comes from the shared .cat-section
+     rule further down and applies to the <section> itself, not to .cs-body —
+     so a CLOSED collapsible section was still reserving ~68px of empty,
+     transparent vertical space even with its content fully hidden. With 8
+     category sections plus 4 more (why-us/how-it-works/testimonials/about/
+     faq) closed by default, that space stacks up into a large gap where the
+     fixed watermark background shows through clearly instead of staying a
+     subtle texture in a normal margin. Zeroing it while closed, and only
+     restoring it once .open is added, removes that gap without touching how
+     an opened section looks. */
+  .cat-section.collapsible{ padding:0 24px; transition:padding .25s ease; }
+  .cat-section.collapsible.open{ padding:52px 24px 16px; }
+  body.view-mode-mobile .cat-section.collapsible{ padding:0 16px; }
+  body.view-mode-mobile .cat-section.collapsible.open{ padding:36px 16px 10px; }
+
   /* Quick-nav row: one row of bold, large tab buttons that jump to and open
      each of the sections below (why-us / how it works / testimonials /
      about / faq), so a visitor finds all of it at a glance instead of
