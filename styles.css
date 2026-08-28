@@ -175,6 +175,7 @@
   .cat-dropdown.cat-pills-mode .cat-dropdown-menu{
     position:static; display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch;
     background:transparent; border:none; padding:2px 0 12px; box-shadow:none; min-width:auto;
+    overscroll-behavior-x:contain;
   }
   .cat-dropdown.cat-pills-mode .cat-dropdown-menu button{
     display:inline-block; width:auto; white-space:nowrap; flex-shrink:0;
@@ -581,7 +582,7 @@
   /* Reviews — same display style as Design MIGA 3: a horizontal scrollable
      row of compact text-only cards (no result photo), with filled/empty
      stars reflecting the exact rating rather than always five icons. */
-  .testimonials-grid{ display:flex; gap:14px; overflow-x:auto; padding-bottom:8px; -webkit-overflow-scrolling:touch; }
+  .testimonials-grid{ display:flex; gap:14px; overflow-x:auto; padding-bottom:8px; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain; }
   .review-photo-thumb{
     position:relative; width:66px; height:66px; border-radius:10px; overflow:hidden;
     border:2.5px solid var(--line); cursor:pointer; flex-shrink:0; transition:border-color .15s ease;
@@ -811,6 +812,12 @@
     scroll-snap-type:x mandatory; scroll-behavior:smooth;
     scrollbar-width:none; -ms-overflow-style:none;
     padding-bottom:4px;
+    /* Without this, dragging past the first (or last) card triggers iOS
+       Safari's native elastic "rubber-band" overscroll bounce — which
+       briefly reveals whatever sits behind the carousel's edge instead of
+       just stopping cleanly, reading as the card being shifted/misaligned.
+       This contains the bounce to the carousel itself. */
+    overscroll-behavior-x:contain;
   }
   .grid::-webkit-scrollbar{display:none;}
   .grid > .card{
@@ -1455,7 +1462,7 @@
   }
   body.view-mode-mobile .header-utility{justify-content:center; flex-wrap:wrap; padding:6px 16px;}
   body.view-mode-mobile .nav-wrap{flex-wrap:wrap; gap:10px; padding:14px 16px;}
-  body.view-mode-mobile nav.cats{width:100%; order:3; overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch;}
+  body.view-mode-mobile nav.cats{width:100%; order:3; overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain;}
   body.view-mode-mobile .hero{grid-template-columns:1fr; padding:28px 18px 24px; gap:24px;}
   body.view-mode-mobile .hero::before{width:320px; height:320px; top:-80px; left:-80px; filter:blur(50px);}
   body.view-mode-mobile .hero h1{font-size:26px;}
