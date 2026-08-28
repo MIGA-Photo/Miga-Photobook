@@ -2582,6 +2582,20 @@ function scrollToSiteSection(id){
   el.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
+// The "السر" card's closing link (".why-edge-link", injected via
+// data-i18n-html so it has no ID of its own to bind to directly) used to be
+// a plain `href="#children"` anchor. Since the "أطفال" category section is
+// collapsed by default, that just scrolled the page to an empty, still-
+// closed section — nothing visibly happened, so it read as broken. Event
+// delegation here intercepts the click and routes it through the same
+// open-and-scroll logic every other in-page link already uses.
+document.addEventListener('click', (e)=>{
+  const link = e.target.closest('.why-edge-link');
+  if(!link) return;
+  e.preventDefault();
+  scrollToSiteSection('children');
+});
+
 /** Splits a query into its individual words and requires every one of them
  * to appear somewhere in the given text (in any order, anywhere in it) —
  * so "دعم مباشر" still finds a phrase like "دعم فني سريع ومباشر" even
