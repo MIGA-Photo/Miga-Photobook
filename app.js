@@ -2413,19 +2413,21 @@ function getCategoryOf(productId){
 })();
 
 // ---------- Quick-nav row ----------
-// Only "أسئلة شائعة" (FAQ) is still a real accordion tab — a genuine list
-// of separate Q&As is the one case that still benefits from being tucked
-// away until asked for. Every other tab ("لماذا Miga-Photobook؟",
-// "كيف يعمل؟", "تقييمات وآراء عملائنا", "من نحن") is now an always-visible
-// section on the page; its tab button is just a scroll-to shortcut, not an
-// open/close toggle.
+// "لماذا Miga-Photobook؟" / "كيف يعمل؟" / "من نحن" / "أسئلة شائعة" now share
+// one fixed content area right below the tab row (#sectionTabPanel):
+// clicking a tab is an instant show/hide swap — no scrolling, no animated
+// accordion expand — so the content always appears in the exact same spot
+// as the buttons. "تقييمات وآراء عملائنا" isn't part of this panel (it's
+// always visible further down the page, per explicit request), so its tab
+// is still a plain scroll-to-it shortcut.
+const TAB_PANEL_IDS = ['whyUs', 'howItWorks', 'aboutUs', 'faq'];
 function setActiveSectionTab(targetId, {scroll} = {scroll: true}){
   const row = document.getElementById('sectionTabsRow');
   document.querySelectorAll('.section-tab-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.target === targetId);
   });
-  document.querySelectorAll('#faq').forEach(sec=>{
-    sec.classList.toggle('open', sec.id === targetId);
+  TAB_PANEL_IDS.forEach(id=>{
+    document.getElementById(id)?.classList.toggle('active', id === targetId);
   });
   row.classList.toggle('has-active', !!targetId);
   if(targetId && scroll){
@@ -2435,16 +2437,19 @@ function setActiveSectionTab(targetId, {scroll} = {scroll: true}){
 document.getElementById('sectionTabsRow').addEventListener('click', (e)=>{
   const btn = e.target.closest('.section-tab-btn');
   if(!btn) return;
-  if(btn.dataset.target !== 'faq'){
-    // Always-visible sections — the tab just scrolls to them.
+  if(!TAB_PANEL_IDS.includes(btn.dataset.target)){
+    // "تقييمات" — always visible elsewhere on the page, just scroll to it.
     document.getElementById(btn.dataset.target)?.scrollIntoView({behavior:'smooth', block:'start'});
     return;
   }
   const alreadyActive = btn.classList.contains('active');
-  setActiveSectionTab(alreadyActive ? null : btn.dataset.target, {scroll: !alreadyActive});
+  // Swapping tabs never needs to scroll — the panel is already right here.
+  setActiveSectionTab(alreadyActive ? null : btn.dataset.target, {scroll: false});
 });
-// FAQ is the only collapsible tab left now, and it starts closed like any
-// accordion normally would — no special initial state needed anymore.
+// The panel starts on "لماذا Miga-Photobook؟" so visitors see something
+// the instant they reach this row, instead of an empty gap before their
+// first click.
+setActiveSectionTab('whyUs', {scroll: false});
 
 // ---------- Back to top + vertical scroll ruler ----------
 const backToTopBtn = document.getElementById('backToTopBtn');
@@ -2570,13 +2575,12 @@ function scrollToSiteSection(id){
   addSearchHistory(term);
   const el = document.getElementById(id);
   if(!el) return;
-  if(id === 'faq'){
-    setActiveSectionTab(id, {scroll: false}); // the only real accordion tab left — keeps the tab row's hide/show in sync
-  } else if(!['whyUs','howItWorks','testimonials','aboutUs','whyEdge'].includes(id)){
+  if(TAB_PANEL_IDS.includes(id)){
+    setActiveSectionTab(id, {scroll: false}); // switches the shared tab panel to this one
+  } else if(!['testimonials','whyEdge'].includes(id)){
     el.classList.add('open'); // opens it if it's one of the collapsible category sections
   }
-  // whyUs/howItWorks/testimonials/aboutUs/whyEdge are always-visible now —
-  // nothing to open, the scrollIntoView below is all they need.
+  // testimonials/whyEdge are always-visible — nothing to open, scrollIntoView below is enough.
   document.querySelector(`.cat-tile[data-cat="${id}"]`)?.classList.add('open');
   document.querySelector(`.cat-tile[data-cat="${id}"]`)?.setAttribute('aria-expanded', 'true');
   el.scrollIntoView({behavior:'smooth', block:'start'});
