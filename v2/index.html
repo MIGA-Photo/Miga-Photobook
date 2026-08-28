@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<!-- Mutual design-switch bootstrap — mirrors Design MIGA 1's root check, but
+     inverted: if the admin has switched back to Design MIGA 1, anyone who
+     still has this /v2/ page bookmarked or open gets sent back automatically.
+     Synchronous XHR is deliberate here too, to avoid a flash of the wrong
+     design before redirecting; a short timeout + try/catch means a slow or
+     unreachable Worker just leaves this page (v2) showing. -->
+<script>
+(function(){
+  try{
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'https://miga-photobook-api.magdyfarouk380.workers.dev/site-config', false);
+    xhr.timeout = 1200;
+    xhr.send(null);
+    if(xhr.status === 200){
+      var data = JSON.parse(xhr.responseText);
+      if(data.activeDesign && data.activeDesign !== 'v2'){
+        window.location.replace('../');
+      }
+    }
+  }catch(e){ /* Worker unreachable or slow — just show this design (v2) */ }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Miga-Photobook — حوّل صورك لتحف فنية بالذكاء الاصطناعي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rakkas&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
+<!-- Google Analytics 4 — same property as Design MIGA 1, so traffic across
+     both designs rolls up into one set of numbers. -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-98HS77F9E9');
+</script>
+<script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+  document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', 'PIXEL_ID_HERE');
+  fbq('track', 'PageView');
+</script>
+</head>
+<body>
+
+<header>
+  <div class="nav-row">
+    <div class="logo">Miga<span class="logo-accent">-Photobook</span></div>
+    <div class="nav-actions">
+      <button type="button" class="nav-link" onclick="document.getElementById('pricingSection').scrollIntoView({behavior:'smooth'})">الأسعار</button>
+      <button type="button" class="nav-cta" onclick="document.getElementById('productsSection').scrollIntoView({behavior:'smooth'})">اطلب دلوقتي</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero wrap">
+  <div>
+    <div class="eyebrow">نتيجة حقيقية — مش تصميم</div>
+    <h1>صورتك العادية<br>تتحول لـ<span class="display"> تحفة استوديو</span><br>قدام عينك دلوقتي</h1>
+    <p class="hero-p">مش هنقولك "صدقنا" — اسحب الدائرة وشوف الفرق بنفسك. نتيجة احترافية خلال دقائق.</p>
+    <div class="hero-ctas">
+      <button type="button" class="btn-primary" onclick="document.getElementById('productsSection').scrollIntoView({behavior:'smooth'})">جرّب بصورتك دلوقتي</button>
+      <button type="button" class="btn-ghost" onclick="document.getElementById('pricingSection').scrollIntoView({behavior:'smooth'})">شوف الأسعار</button>
+    </div>
+    <div class="trust-row">
+      <span><span class="trust-dot">✓</span> نتيجة خلال دقائق</span>
+      <span><span class="trust-dot">✓</span> دفع آمن InstaPay/فودافون كاش</span>
+    </div>
+  </div>
+  <div>
+    <div class="slider-card" id="bafSlider">
+      <img id="imgBefore" alt="قبل">
+      <div class="slider-after-wrap" id="afterWrap"><img id="imgAfter" alt="بعد"></div>
+      <div class="slider-line" id="sliderLine"></div>
+      <button type="button" class="slider-handle" id="sliderHandle">↔</button>
+      <span class="tag tag-before">قبل</span>
+      <span class="tag tag-after">بعد</span>
+      <button type="button" class="slider-nav slider-nav-prev" id="navPrev" aria-label="السابق">‹</button>
+      <button type="button" class="slider-nav slider-nav-next" id="navNext" aria-label="التالي">›</button>
+    </div>
+    <div class="slider-dots" id="sliderDots"></div>
+    <p class="slider-hint">اسحب يمين وشمال، ودوس ‹ › تتنقل بين أمثلة مختلفة</p>
+  </div>
+</section>
+
+<section class="wrap" id="productsSection">
+  <div class="section-head">
+    <h2>اختار الستايل اللي يعجبك</h2>
+    <p class="section-sub">فلتر واحد بس — من غير ما تفتح وتقفل أقسام.</p>
+  </div>
+  <div class="chip-row" id="chipRow"></div>
+  <div class="grid" id="productGrid"></div>
+</section>
+
+<section class="wrap" id="pricingSection">
+  <div class="section-head">
+    <h2>الأسعار والباقات</h2>
+    <p class="section-sub">مسار دفع واحد للكل — مفيش تحويل لواتساب.</p>
+  </div>
+  <div class="pricing-grid">
+    <div class="plan">
+      <h3>صورة واحدة</h3>
+      <div class="price">25 <span>جنيه</span></div>
+      <ul><li>أي ستايل من التصنيفات</li><li>نتيجة خلال دقائق</li></ul>
+      <button type="button" class="btn-ghost btn-block" onclick="document.getElementById('productsSection').scrollIntoView({behavior:'smooth'})">اختار صورتك</button>
+    </div>
+    <div class="plan featured">
+      <h3>باقة الاحترافي</h3>
+      <div class="price">200 <span>/ 10 صور</span></div>
+      <ul><li>وفّر 50 جنيه</li><li>اختيار حر من أي قسم</li></ul>
+      <button type="button" class="btn-primary btn-block" onclick="openPackageBuyModal(10)">اطلب الباقة</button>
+    </div>
+    <div class="plan">
+      <h3>باقة الوكالة</h3>
+      <div class="price">450 <span>/ 25 صورة</span></div>
+      <ul><li>18 جنيه للصورة</li><li>مناسبة للاستوديوهات</li></ul>
+      <button type="button" class="btn-ghost btn-block" onclick="openPackageBuyModal(25)">اطلب الباقة</button>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="section-head"><h2>ليه Miga-Photobook؟</h2></div>
+  <div class="info-cards">
+    <div class="info-card">
+      <h3>احترافية بدون استوديو</h3>
+      <p>نتيجة بجودة استوديو تصوير حقيقي، من غير ما تحجز أو تسافر أو تستأجر معدات.</p>
+    </div>
+    <div class="info-card">
+      <h3>إزاي بيشتغل؟</h3>
+      <ul>
+        <li>اختار الستايل اللي عايزه</li>
+        <li>ادفع وارفع صورتك</li>
+        <li>استلم نتيجتك خلال دقائق</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" id="reviewsSection">
+  <div class="section-head"><h2>آراء عملائنا</h2></div>
+  <div class="review-row" id="reviewRow"></div>
+</section>
+
+<footer class="wrap">
+  Miga-Photobook © 2026 — <a href="../">تصفح Design MIGA 1</a>
+</footer>
+
+<!-- ---------- Buy modal ---------- -->
+<div class="modal-bg" id="buyModalBg">
+  <div class="modal">
+    <button type="button" class="modal-close" id="buyCloseBtn">×</button>
+    <div id="payFormFields">
+      <h3 id="buyTitle"></h3>
+      <p class="sub">المبلغ المطلوب: <b id="buyPrice"></b></p>
+      <div class="pay-tabs">
+        <button type="button" class="pay-tab active" data-method="instapay">InstaPay</button>
+        <button type="button" class="pay-tab" data-method="vodafone">فودافون كاش</button>
+      </div>
+      <div class="pay-number-box" id="ipBox">
+        حوّل على رقم إنستاباي:<br><span class="num" id="ipNumber"></span>
+      </div>
+      <div class="pay-number-box" id="vfBox" style="display:none;">
+        حوّل على رقم فودافون كاش:<br><span class="num" id="vfNumber"></span>
+      </div>
+      <div class="field">
+        <label>رقم موبايلك</label>
+        <input type="tel" id="buyerPhone" placeholder="01xxxxxxxxx">
+      </div>
+      <div class="field">
+        <label>رقم عملية التحويل (من الإيصال)</label>
+        <input type="text" id="payerRef" placeholder="مثال: 123456789">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-primary btn-block" id="buySubmitBtn">تأكيد الدفع</button>
+      </div>
+    </div>
+    <div id="payStatusPanel" style="display:none;">
+      <div class="order-status-spinner"></div>
+      <div class="order-code-box" id="payStatusCode"></div>
+      <p class="sub" id="payStatusText" style="text-align:center;"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ---------- Transform modal ---------- -->
+<div class="modal-bg" id="transformModalBg">
+  <div class="modal">
+    <button type="button" class="modal-close" id="transformCloseBtn">×</button>
+    <h3 id="transformTitle"></h3>
+    <p class="sub">ارفع صورتك الشخصية وهنحوّلها بنفس الستايل ده.</p>
+    <div class="field">
+      <input type="file" id="transformFileInput" accept="image/*">
+    </div>
+    <img id="transformPreview" style="display:none; width:100%; border-radius:12px; margin-bottom:14px;">
+    <div class="modal-actions">
+      <button type="button" class="btn-primary btn-block" id="transformGenerateBtn">حوّل الصورة</button>
+    </div>
+  </div>
+</div>
+
+<!-- ---------- Lightbox ---------- -->
+<div class="modal-bg" id="lightboxBg">
+  <img id="lightboxImg" style="max-width:92vw; max-height:88vh; border-radius:12px;">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
