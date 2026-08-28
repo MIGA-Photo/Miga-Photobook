@@ -50,33 +50,26 @@
   .wm-photos{
     position:absolute; inset:-12% -6%; width:112%; height:124%;
     display:grid; grid-template-columns:repeat(6, 1fr); grid-auto-rows:230px; gap:16px;
-    animation: wmDrift 34s ease-in-out infinite;
-    will-change:transform;
+    /* Was a permanent 34s drift animation — now a still texture. With this,
+       the circle showcase, and the hero strip all animating non-stop at the
+       same time, it read as visual noise competing for attention rather
+       than atmosphere. A still backdrop still gives the "living background"
+       depth without fighting the page's one intentional motion moment. */
+    will-change:auto;
   }
   @media(max-width:760px){ .wm-photos{ grid-template-columns:repeat(3, 1fr); grid-auto-rows:180px; } }
   .wm-photos img{
     width:100%; height:100%; object-fit:cover; border-radius:18px;
     filter:grayscale(15%) blur(0.5px) brightness(1.1) contrast(1.05); opacity:0.28;
   }
-  @keyframes wmDrift{
-    0%,100%{ transform:translate(0,0) scale(1); }
-    50%{ transform:translate(-3.5%, -4.5%) scale(1.05); }
-  }
   .wm-logo-layer{
     position:absolute; inset:-35% -15%; display:flex; flex-direction:column; justify-content:space-between;
-    transform:rotate(-13deg); animation: wmLogoDrift 55s linear infinite; will-change:transform;
+    transform:rotate(-13deg);
   }
   .wm-logo-row{
     display:flex; gap:64px; white-space:nowrap;
     font-family:'Rakkas','IBM Plex Sans Arabic',serif;
     font-size:52px; color:var(--brass); opacity:0.09; letter-spacing:4px;
-  }
-  @keyframes wmLogoDrift{
-    0%{ transform:rotate(-13deg) translateX(0); }
-    100%{ transform:rotate(-13deg) translateX(-800px); }
-  }
-  @media(prefers-reduced-motion: reduce){
-    .wm-photos, .wm-logo-layer{ animation:none; }
   }
 
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -270,6 +263,21 @@
   }
   .cat-section.collapsible.open > .cs-body{max-height:100000px;}
   .cat-section.collapsible > .cs-body > *:first-child{margin-top:20px;}
+
+  /* The 52px/16px vertical padding below comes from the shared .cat-section
+     rule further down and applies to the <section> itself, not to .cs-body —
+     so a CLOSED collapsible section was still reserving ~68px of empty,
+     transparent vertical space even with its content fully hidden. With 8
+     category sections plus 4 more (why-us/how-it-works/testimonials/about/
+     faq) closed by default, that space stacks up into a large gap where the
+     fixed watermark background shows through clearly instead of staying a
+     subtle texture in a normal margin. Zeroing it while closed, and only
+     restoring it once .open is added, removes that gap without touching how
+     an opened section looks. */
+  .cat-section.collapsible{ padding:0 24px; transition:padding .25s ease; }
+  .cat-section.collapsible.open{ padding:52px 24px 16px; }
+  body.view-mode-mobile .cat-section.collapsible{ padding:0 16px; }
+  body.view-mode-mobile .cat-section.collapsible.open{ padding:36px 16px 10px; }
 
   /* Quick-nav row: one row of bold, large tab buttons that jump to and open
      each of the sections below (why-us / how it works / testimonials /

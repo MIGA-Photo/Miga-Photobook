@@ -2,6 +2,27 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<!-- Design-switch bootstrap — must run before anything else paints, so it
+     uses a (deliberately rare) synchronous XHR: an async fetch here would
+     let this page flash on screen before redirecting to v2. A short 1.2s
+     timeout and a wrapping try/catch mean any network hiccup just leaves
+     this page (v1) showing, rather than ever blocking the site. -->
+<script>
+(function(){
+  try{
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'https://miga-photobook-api.magdyfarouk380.workers.dev/site-config', false);
+    xhr.timeout = 1200;
+    xhr.send(null);
+    if(xhr.status === 200){
+      var data = JSON.parse(xhr.responseText);
+      if(data.activeDesign === 'v2'){
+        window.location.replace('./v2/');
+      }
+    }
+  }catch(e){ /* Worker unreachable or slow — just show this design (v1) */ }
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Miga-Photobook — حوّل صورك لتحف فنية بالذكاء الاصطناعي | AI Photo Transformation</title>
 <meta name="description" content="ارفع صورتك واختر المكان والأسلوب اللي عايزه، ونحوّلها لك تلقائيًا بجودة استوديو باستخدام الذكاء الاصطناعي — خلال دقائق.">
@@ -49,6 +70,29 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rakkas&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-98HS77F9E9');
+</script>
+
+<!-- Meta Pixel — base snippet installed and ready; PIXEL_ID_HERE gets swapped
+     for the real Pixel ID once it exists (Meta Business Suite → Events
+     Manager → create Pixel). Until then this loads fbq() safely as a no-op
+     against a placeholder ID, so nothing breaks when it's filled in later. -->
+<script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+  document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', 'PIXEL_ID_HERE');
+  fbq('track', 'PageView');
+</script>
 </head>
 <body>
 <div class="site-watermark-bg" id="siteWatermarkBg" aria-hidden="true">
@@ -194,9 +238,13 @@
   .baf-title{ font-size:clamp(20px,4.5vw,28px); margin:0 0 6px; }
   .baf-sub{ color:var(--paper-dim); max-width:520px; margin:0 auto 28px; font-size:14.5px; }
   .baf-wrap{ position:relative; width:min(94vw,560px); aspect-ratio:1/1; margin:0 auto; }
-  .baf-orbit{ position:absolute; inset:0; animation:bafOrbitSpin 22s linear infinite; }
+  /* Slowed from 22s to 90s — the circle stays as the site's one distinctive
+     visual, but no longer spins fast enough to compete for attention with
+     everything else on the page. A near-static circle still reads as "alive"
+     without feeling busy. */
+  .baf-orbit{ position:absolute; inset:0; animation:bafOrbitSpin 90s linear infinite; }
   @keyframes bafOrbitSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
-  .baf-item-spin{ width:100%; height:100%; animation:bafOrbitCounterSpin 22s linear infinite; }
+  .baf-item-spin{ width:100%; height:100%; animation:bafOrbitCounterSpin 90s linear infinite; }
   @keyframes bafOrbitCounterSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(-360deg); } }
   @media(prefers-reduced-motion:reduce){ .baf-orbit, .baf-item-spin{ animation:none; } }
   .baf-center{ position:absolute; top:50%; left:50%; width:clamp(120px,32vw,190px); height:clamp(120px,32vw,190px); transform:translate(-50%,-50%); border-radius:50%; overflow:hidden; border:2px solid #3b8ef0; box-shadow:0 0 0 6px var(--ink), 0 0 18px rgba(59,142,240,0.4), 0 8px 24px rgba(0,0,0,0.4); z-index:5; }
@@ -355,7 +403,7 @@
         <li data-i18n="plan2Li2">اختيار حر من أي قسم</li>
         <li data-i18n="plan2Li3">دعم فني بالأولوية</li>
       </ul>
-      <a class="btn-primary" href="https://wa.me/201202530308?text=%D8%B9%D8%A7%D9%88%D8%B2%20%D8%A8%D8%A7%D9%82%D8%A9%20%D8%A7%D9%84%D8%A7%D8%AD%D8%AA%D8%B1%D8%A7%D9%81%D9%8A%20(10%20%D8%B5%D9%88%D8%B1%20-%20200%20%D8%AC%D9%86%D9%8A%D9%87)" target="_blank" rel="noopener" data-i18n="planWhatsBtn">اطلب الباقة عبر واتساب</a>
+      <button type="button" class="btn-primary" onclick="openPackageBuyModal(10)" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
     </div>
     <div class="plan">
       <h3 data-i18n="plan3Title">باقة الوكالة</h3>
@@ -365,7 +413,7 @@
         <li data-i18n="plan3Li2">تحديثات مجانية للأساليب المتاحة</li>
         <li data-i18n="plan3Li3">مناسبة للاستوديوهات والوكالات</li>
       </ul>
-      <a class="btn-ghost" href="https://wa.me/201202530308?text=%D8%B9%D8%A7%D9%88%D8%B2%20%D8%A8%D8%A7%D9%82%D8%A9%20%D8%A7%D9%84%D9%88%D9%83%D8%A7%D9%84%D8%A9%20(25%20%D8%B5%D9%88%D8%B1%D8%A9%20-%20450%20%D8%AC%D9%86%D9%8A%D9%87)" target="_blank" rel="noopener" data-i18n="planWhatsBtn">اطلب الباقة عبر واتساب</a>
+      <button type="button" class="btn-ghost" onclick="openPackageBuyModal(25)" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
     </div>
   </div>
   <div class="pricing-guarantee">
@@ -964,6 +1012,8 @@
         <button data-tab="visitors" id="tabBtnVisitors" data-i18n="tabVisitors">الزوار</button>
         <button data-tab="showcase" id="tabBtnShowcase" data-i18n="tabShowcase">الدائرة</button>
         <button data-tab="promoimages" id="tabBtnPromoImages" data-i18n="tabPromoImages">صور العرض</button>
+        <button data-tab="changepassword" id="tabBtnChangePassword" data-i18n="tabChangePassword">تغيير كلمة المرور</button>
+        <button data-tab="sitedesign" id="tabBtnSiteDesign" data-i18n="tabSiteDesign">تصميم الموقع</button>
       </div>
 
       <div id="adminTabProducts">
@@ -1285,6 +1335,38 @@
         </div>
         <div class="modal-actions" style="margin-top:14px;">
           <button class="btn-primary" id="piSaveBtn" data-i18n="piSaveBtn">حفظ صور العرض</button>
+        </div>
+      </div>
+
+      <div id="adminTabChangePassword" style="display:none;">
+        <p class="sub" style="margin-bottom:14px;" data-i18n="changePassIntro">غيّر كلمة مرور دخول لوحة الإدارة. لازم تعرف الكلمة الحالية عشان تقدر تغيّرها.</p>
+        <div class="field">
+          <label data-i18n="currentPassLabel">كلمة المرور الحالية</label>
+          <input type="password" id="currentAdminPass" placeholder="••••••••" autocomplete="off">
+        </div>
+        <div class="field-grid-2">
+          <div class="field">
+            <label data-i18n="newPassLabel">كلمة المرور الجديدة</label>
+            <input type="password" id="newAdminPass" placeholder="••••••••" autocomplete="off">
+          </div>
+          <div class="field">
+            <label data-i18n="confirmNewPassLabel">تأكيد كلمة المرور الجديدة</label>
+            <input type="password" id="confirmNewAdminPass" placeholder="••••••••" autocomplete="off">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="changeAdminPassBtn" data-i18n="changePassBtn">تغيير كلمة المرور</button>
+        </div>
+      </div>
+
+      <div id="adminTabSiteDesign" style="display:none;">
+        <p class="sub" style="margin-bottom:14px;" data-i18n="siteDesignIntro">اختار الشكل اللي هيشوفه العميل لما يفتح الموقع. لوحة الإدارة نفسها بتفضل زي ما هي دايمًا مهما كان اختيارك هنا.</p>
+        <div class="field">
+          <label data-i18n="siteDesignLabel">التصميم الفعّال</label>
+          <select id="siteDesignSelect"><!-- populated dynamically from /site-config so a future Design MIGA 3/4 appears automatically once added to the backend registry --></select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="saveSiteDesignBtn" data-i18n="siteDesignSaveBtn">حفظ الاختيار</button>
         </div>
       </div>
 

@@ -44,7 +44,29 @@ let products = [];
 let purchases = [];
 let orders = [];
 let currentBuyId = null;
-let currentBuyType = 'transform'; // 'transform' | 'prompt' — which of the two products the open buy modal is for
+let currentBuyType = 'transform'; // 'transform' | 'prompt' | 'package' — which of the three the open buy modal is for
+let currentPackageSize = null; // 10 | 25 — only set when currentBuyType === 'package'
+
+/** Fixed package pricing, mirrored server-side (the server never trusts a
+ * client-sent package price — see createOrder). Kept here just so the
+ * checkout UI has a title/price to show without waiting on a network call. */
+const PACKAGE_CATALOG = {
+  10: { price: 200, title: 'باقة الاحترافي — 10 صور', titleEn: 'Professional Package — 10 photos' },
+  25: { price: 450, title: 'باقة الوكالة — 25 صورة', titleEn: 'Agency Package — 25 photos' },
+};
+
+/** Returns whatever is currently being purchased — a real product, or (for
+ * package purchases) a synthetic pseudo-product built from the fixed
+ * package pricing above — so every existing "p.title / p.price" call site
+ * in the checkout flow works unchanged for both individual photos and
+ * packages, instead of needing a parallel code path for each. */
+function getBuyItem(){
+  if(currentBuyType === 'package' && currentPackageSize && PACKAGE_CATALOG[currentPackageSize]){
+    const pkg = PACKAGE_CATALOG[currentPackageSize];
+    return { id: currentBuyId, title: pkg.title, titleEn: pkg.titleEn, price: pkg.price, category: null };
+  }
+  return products.find(x=>x.id===currentBuyId);
+}
 
 // ---------- i18n ----------
 const translations = {
@@ -165,7 +187,7 @@ const translations = {
     plan1Li1:'تحويل صورة واحدة بالسعر المعروض', plan1Li2:'تنفيذ خلال دقائق بعد الدفع', plan1Li3:'مناسبة للتجربة', plan1Cta:'تصفح الآن',
     plan2Title:'باقة الاحترافي', plan2Unit:'/ 10 صور',
     plan2Li1:'وفّر 50 جنيه عن السعر الفردي', plan2Li2:'اختيار حر من أي قسم', plan2Li3:'دعم فني بالأولوية',
-    planBuyBtn:'🔷 احصل على التحويل', planWhatsBtn:'اطلب الباقة عبر واتساب',
+    planBuyBtn:'اطلب الباقة دلوقتي', planWhatsBtn:'اطلب الباقة عبر واتساب',
     plan3Title:'باقة الوكالة', plan3Unit:'/ 25 صورة',
     plan3Li1:'18 جنيه للصورة — وفّر 175 جنيه', plan3Li2:'تحديثات مجانية للأساليب المتاحة', plan3Li3:'مناسبة للاستوديوهات والوكالات',
     buyModalTitle:'الدفع عبر إنستاباي',
@@ -260,11 +282,16 @@ const translations = {
     buyBtnPrefix:'🔷 احصل عليها الآن', emptyNoteCategory:'لا توجد منتجات في هذا القسم بعد — أضِف منتجات من لوحة الإدارة.',
     buyModalTextTemplate:'شراء "{title}" مقابل {price} جنيه.',
     buyPromptModalTextTemplate:'شراء البرومبت الاحترافي لـ "{title}" مقابل {price} جنيه.',
+    buyPackageModalTextTemplate:'شراء "{title}" مقابل {price} جنيه — تقدر تستخدمها على أي منتجات تختارها بعد التأكيد.',
     buyPromptBtnPrefix:'احصل على البرومبت الاحترافي',
     copyPromptBtn:'نسخ البرومبت', promptPendingBtn:'البرومبت قيد المراجعة',
     orderTypeTransform:'تحويل صورة', orderTypePrompt:'شراء برومبت',
     statusPromptApprovedText:'تم تأكيد الدفع ✅ البرومبت جاهز — هتلاقيه في "تتبع طلبي".',
     toastPromptReady:'تم تأكيد الدفع — البرومبت جاهز الآن',
+    statusPackageApprovedText:'تم تأكيد الدفع ✅ عندك {n} صورة متاحة — اختار أي منتج ودوس "استخدم من باقتك".',
+    toastPackageReady:'تم تأكيد الدفع — باقتك جاهزة للاستخدام',
+    toastPackageProductAlreadyUsed:'استخدمت رصيد باقتك على المنتج ده قبل كده — اختار منتج تاني',
+    usePackageCreditBtnPrefix:'استخدم من باقتك',
     toastPromptCopied:'تم نسخ البرومبت',
     toastPromptNotReady:'البرومبت لسه قيد المراجعة',
     toastCopiedNumber:'تم نسخ الرقم', toastEnterPhone:'يرجى إدخال رقم الموبايل الذي حوّلت منه',
@@ -274,7 +301,10 @@ const translations = {
     toastReadyToTransform:'تم تأكيد طلبك — جاهز تحوّل صورتك دلوقتي', toastOrderPending:'الطلب لا يزال قيد المراجعة، حاول لاحقًا',
     toastCopyFailed:'تعذّر النسخ التلقائي',
     toastOrderApproved:'تمت الموافقة على الطلب — يمكن للعميل تحويل صورته بالكود الآن',
-    toastWrongPassword:'كلمة المرور غير صحيحة', toastAdminRateLimited:'محاولات كتير أوي في وقت قصير — استنى شوية (لحد 10 دقايق) وجرب تاني', toastFillFields:'يرجى إكمال العنوان والسعر وتعليمات التحويل',
+    toastWrongPassword:'كلمة المرور غير صحيحة', toastAdminRateLimited:'محاولات كتير أوي في وقت قصير — استنى شوية (لحد 10 دقايق) وجرب تاني', toastAdminServerError:'السيرفر فيه مشكلة مؤقتة (مش كلمة السر) — جرب تاني بعد شوية، أو راجع حد الكتابة اليومي في Cloudflare KV', toastFillFields:'يرجى إكمال العنوان والسعر وتعليمات التحويل',
+    changePassTitle:'تغيير كلمة مرور الأدمن', tabChangePassword:'تغيير كلمة المرور', changePassIntro:'غيّر كلمة مرور دخول لوحة الإدارة. لازم تعرف الكلمة الحالية عشان تقدر تغيّرها.', currentPassLabel:'كلمة المرور الحالية', newPassLabel:'كلمة المرور الجديدة', confirmNewPassLabel:'تأكيد كلمة المرور الجديدة', changePassBtn:'تغيير كلمة المرور',
+    tabSiteDesign:'تصميم الموقع', siteDesignIntro:'اختار الشكل اللي هيشوفه العميل لما يفتح الموقع. لوحة الإدارة نفسها بتفضل زي ما هي دايمًا مهما كان اختيارك هنا.', siteDesignLabel:'التصميم الفعّال', siteDesignV1Option:'التصميم الأول (الحالي)', siteDesignV2Option:'التصميم الثاني (الجديد)', siteDesignSaveBtn:'حفظ الاختيار', toastSiteDesignSaved:'تم حفظ التصميم — هيظهر للعملاء من زيارتهم الجاية',
+    toastPassChanged:'تم تغيير كلمة المرور بنجاح', toastPassMismatch:'كلمة المرور الجديدة وتأكيدها غير متطابقين', toastPassTooShort:'كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل', toastCurrentPassWrong:'كلمة المرور الحالية غير صحيحة', toastFillPassFields:'يرجى إدخال كل الحقول',
     toastProductAdded:'تم إضافة المنتج بنجاح',
     uploadingImage:'جاري رفع الصورة...', toastImageUploadFailed:'تعذّر رفع الصورة، تأكد من اتصالك وحاول تاني',
     toastContactPro:'للاشتراك في باقة الاحترافي، يرجى التواصل معنا', toastContactAgency:'للاشتراك في باقة الوكالة، يرجى التواصل معنا',
@@ -436,7 +466,7 @@ const translations = {
     plan1Li1:'One photo transformation at its listed price', plan1Li2:'Instant processing after payment', plan1Li3:'Good for trying it out', plan1Cta:'Browse Now',
     plan2Title:'Pro Bundle', plan2Unit:'/ 10 photos',
     plan2Li1:'Save 50 EGP off individual price', plan2Li2:'Free choice from any section', plan2Li3:'Priority support',
-    planBuyBtn:'🔷 Get the Transformation', planWhatsBtn:'Order via WhatsApp',
+    planBuyBtn:'Order this package now', planWhatsBtn:'Order via WhatsApp',
     plan3Title:'Agency Bundle', plan3Unit:'/ 25 photos',
     plan3Li1:'18 EGP per photo — save 175 EGP', plan3Li2:'Free style library updates', plan3Li3:'Great for studios and agencies',
     buyModalTitle:'Pay via InstaPay',
@@ -531,11 +561,16 @@ const translations = {
     buyBtnPrefix:'🔷 Get It Now', emptyNoteCategory:'No products in this section yet — add products from the admin panel.',
     buyModalTextTemplate:'Buy "{title}" for {price} EGP.',
     buyPromptModalTextTemplate:'Buy the professional prompt for "{title}" for {price} EGP.',
+    buyPackageModalTextTemplate:'Buy "{title}" for {price} EGP — use it on any products you choose after confirmation.',
     buyPromptBtnPrefix:'Get the Pro Prompt',
     copyPromptBtn:'Copy Prompt', promptPendingBtn:'Prompt Under Review',
     orderTypeTransform:'Photo Transform', orderTypePrompt:'Prompt Purchase',
     statusPromptApprovedText:'Payment confirmed ✅ Your prompt is ready — find it under "Track Order".',
     toastPromptReady:'Payment confirmed — your prompt is ready',
+    statusPackageApprovedText:'Payment confirmed ✅ You have {n} photos available — pick any product and tap "Use a package credit".',
+    toastPackageReady:'Payment confirmed — your package is ready to use',
+    toastPackageProductAlreadyUsed:'You already used a package credit on this product — pick a different one',
+    usePackageCreditBtnPrefix:'Use a package credit',
     toastPromptCopied:'Prompt copied',
     toastPromptNotReady:'This prompt is still under review',
     toastCopiedNumber:'Number copied', toastEnterPhone:'Please enter the mobile number you transferred from',
@@ -545,7 +580,10 @@ const translations = {
     toastReadyToTransform:'Order confirmed — ready to transform your photo', toastOrderPending:'Order still under review, try again later',
     toastCopyFailed:"Couldn't copy automatically",
     toastOrderApproved:'Order approved — the customer can now unlock the prompt with the code',
-    toastWrongPassword:'Incorrect password', toastAdminRateLimited:'Too many attempts in a short time — wait a bit (up to 10 minutes) and try again', toastFillFields:'Please complete the title, price, and prompt',
+    toastWrongPassword:'Incorrect password', toastAdminRateLimited:'Too many attempts in a short time — wait a bit (up to 10 minutes) and try again', toastAdminServerError:'The server hit a temporary issue (not your password) — try again shortly, or check the daily Cloudflare KV write limit', toastFillFields:'Please complete the title, price, and prompt',
+    changePassTitle:'Change admin password', tabChangePassword:'Change password', changePassIntro:'Change the password used to log in to the admin panel. You need to know the current one to change it.', currentPassLabel:'Current password', newPassLabel:'New password', confirmNewPassLabel:'Confirm new password', changePassBtn:'Change password',
+    tabSiteDesign:'Site Design', siteDesignIntro:'Choose which look customers see when they open the site. The admin panel itself always stays the same regardless of your choice here.', siteDesignLabel:'Active design', siteDesignV1Option:'Design 1 (current)', siteDesignV2Option:'Design 2 (new)', siteDesignSaveBtn:'Save choice', toastSiteDesignSaved:'Design saved — customers will see it on their next visit',
+    toastPassChanged:'Password changed successfully', toastPassMismatch:'New password and confirmation do not match', toastPassTooShort:'New password must be at least 8 characters', toastCurrentPassWrong:'Current password is incorrect', toastFillPassFields:'Please fill in all fields',
     toastProductAdded:'Product added successfully',
     uploadingImage:'Uploading image...', toastImageUploadFailed:'Could not upload the image, check your connection and try again',
     toastContactPro:'To subscribe to the Pro Bundle, please contact us', toastContactAgency:'To subscribe to the Agency Bundle, please contact us',
@@ -823,6 +861,12 @@ let productPopularity = {}; // productId -> approved-order count, from the publi
 let promptPurchases = [];
 let promptOrderCodes = {};
 let purchasedPromptTexts = {}; // productId -> prompt text, once its order is approved
+// Package credits — a package order isn't tied to one productId server-side
+// (see /transform's package branch in the Worker); it just carries a shared
+// credit count the customer can spend on any product. This mirrors that
+// locally so the storefront can show "N photos left in your package" and
+// offer a "use a package credit" button on any product card.
+let packageCredits = {}; // { [orderCode]: { size, remaining, usedProductIds: [] } }
 async function loadPurchases(){
   try{
     const raw = localStorage.getItem('megaPromptPurchases');
@@ -848,6 +892,10 @@ async function loadPurchases(){
     const raw = localStorage.getItem('megaPromptPurchasedPromptTexts');
     purchasedPromptTexts = raw ? JSON.parse(raw) : {};
   }catch(e){ purchasedPromptTexts = {}; }
+  try{
+    const raw = localStorage.getItem('megaPromptPackageCredits');
+    packageCredits = raw ? JSON.parse(raw) : {};
+  }catch(e){ packageCredits = {}; }
 }
 async function savePurchases(){
   try{ localStorage.setItem('megaPromptPurchases', JSON.stringify(purchases)); }
@@ -862,6 +910,8 @@ async function savePurchases(){
   catch(e){ console.error('save prompt order codes failed', e); }
   try{ localStorage.setItem('megaPromptPurchasedPromptTexts', JSON.stringify(purchasedPromptTexts)); }
   catch(e){ console.error('save purchased prompt texts failed', e); }
+  try{ localStorage.setItem('megaPromptPackageCredits', JSON.stringify(packageCredits)); }
+  catch(e){ console.error('save package credits failed', e); }
 }
 
 // Orders: admin-only listing goes through the Worker (password-checked server-side);
@@ -1195,6 +1245,8 @@ function renderProductCard(p){
   const owned = purchases.includes(p.id);
   const alreadyTransformed = !!transformedResults[p.id];
   const requestCount = productPopularity[p.id] || 0;
+  const activePkg = !owned ? activePackageWithCredits() : null;
+  const pkgAvailableHere = activePkg && !activePkg.usedProductIds.includes(p.id);
   return `
   <div class="card">
     <div class="card-media">
@@ -1213,6 +1265,9 @@ function renderProductCard(p){
           : SOFT_LAUNCH
             ? `<button class="buy-btn" onclick="claimFree('${p.id}')">${t('claimFreeBtn')}</button>`
             : `<button class="buy-btn" onclick="openBuyModal('${p.id}', 'transform')">${t('buyBtnPrefix')} — ${p.price} ${CURRENCY}</button>`}
+        ${pkgAvailableHere
+          ? `<button class="buy-btn package-credit-btn" onclick="usePackageCredit('${p.id}')">${t('usePackageCreditBtnPrefix')} (${activePkg.remaining})</button>`
+          : ''}
         ${promptPurchases.includes(p.id)
           ? (purchasedPromptTexts[p.id]
               ? `<button class="buy-btn prompt-btn" onclick="copyPurchasedPrompt('${p.id}')">${t('copyPromptBtn')}</button>`
@@ -1551,15 +1606,34 @@ function armStayNudge(){
   }, 45000);
 }
 
+/** Central funnel-tracking helper. Sends the same event to both GA4 (gtag)
+ * and Meta Pixel (fbq) when they're available, and silently does nothing
+ * otherwise — analytics must never be able to break the actual purchase flow,
+ * so every call is wrapped and failures are swallowed. `gaName`/`gaParams`
+ * go to GA4 as a custom event; `fbName`/`fbParams` go to Pixel as a
+ * standard event (PageView, InitiateCheckout, Purchase, etc. — see
+ * https://developers.facebook.com/docs/meta-pixel/reference for the list). */
+function trackFunnelEvent(gaName, gaParams, fbName, fbParams){
+  try{ if(typeof gtag === 'function') gtag('event', gaName, gaParams || {}); }catch(e){}
+  try{ if(typeof fbq === 'function') fbq('track', fbName, fbParams || {}); }catch(e){}
+}
+
 function openBuyModal(id, type){
   currentBuyId = id;
-  currentBuyType = type === 'prompt' ? 'prompt' : 'transform';
-  const p = products.find(x=>x.id===id);
+  currentBuyType = type === 'prompt' ? 'prompt' : type === 'package' ? 'package' : 'transform';
+  if(currentBuyType !== 'package') currentPackageSize = null;
+  const p = getBuyItem();
   const displayPrice = currentBuyType === 'prompt' ? PROMPT_PRICE : p.price;
+  trackFunnelEvent(
+    'begin_checkout', { currency:'EGP', value: displayPrice, items:[{ item_id:id, item_name: p?.title || '', price: displayPrice }] },
+    'InitiateCheckout', { currency:'EGP', value: displayPrice, content_ids:[id], content_name: p?.title || '' }
+  );
   document.getElementById('ipNumber').innerText = INSTAPAY_NUMBER;
   document.getElementById('buyModalText').innerText = currentBuyType === 'prompt'
     ? t('buyPromptModalTextTemplate').replace('{title}', productTitle(p)).replace('{price}', displayPrice)
-    : t('buyModalTextTemplate').replace('{title}', productTitle(p)).replace('{price}', displayPrice);
+    : currentBuyType === 'package'
+      ? t('buyPackageModalTextTemplate').replace('{title}', productTitle(p)).replace('{price}', displayPrice)
+      : t('buyModalTextTemplate').replace('{title}', productTitle(p)).replace('{price}', displayPrice);
   document.getElementById('buyerPhone').value='';
   document.getElementById('payerRef').value='';
   document.getElementById('payConfirmChk').checked = false;
@@ -1577,6 +1651,15 @@ function openBuyModal(id, type){
   document.getElementById('payFormFields').style.display = '';
   document.getElementById('payStatusPanel').style.display = 'none';
   document.getElementById('buyModalBg').classList.add('show');
+}
+
+/** Package purchases now go through the exact same in-site checkout as a
+ * single photo — InstaPay/Vodafone/card/Fawry, no WhatsApp detour. This is
+ * the single entry point the pricing cards call. */
+function openPackageBuyModal(size){
+  if(!PACKAGE_CATALOG[size]) return;
+  currentPackageSize = size;
+  openBuyModal('package-' + size, 'package');
 }
 
 /** The order button stays inert until the customer has actively ticked the
@@ -1628,7 +1711,7 @@ document.getElementById('payCardFawryBtn').onclick = async ()=>{
   const phone = document.getElementById('payerPhone').value.trim();
   const email = document.getElementById('payerEmail').value.trim();
   if(!name || !phone){ showToast(t('toastFillFields')); return; }
-  const p = products.find(x=>x.id===currentBuyId);
+  const p = getBuyItem();
   const amount = currentBuyType === 'prompt' ? PROMPT_PRICE : p.price;
   if(!BACKEND_BASE){ showToast(t('toastOrderFailed')); return; }
 
@@ -1636,7 +1719,7 @@ document.getElementById('payCardFawryBtn').onclick = async ()=>{
     // Create the underlying order first (same order system as InstaPay), then hand off to the gateway.
     const orderRes = await fetch(`${BACKEND_BASE}/orders/create`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: amount, phone, appUsed: method==='card' ? 'Paymob' : 'Fawry', ref:'', buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '', orderType: currentBuyType })
+      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: amount, phone, appUsed: method==='card' ? 'Paymob' : 'Fawry', ref:'', buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '', orderType: currentBuyType, packageSize: currentBuyType==='package' ? currentPackageSize : undefined })
     });
     const orderData = await orderRes.json();
     if(!orderRes.ok || !orderData.code){ showToast(t('toastOrderFailed')); return; }
@@ -1698,19 +1781,23 @@ document.getElementById('buyConfirmBtn').onclick = async ()=>{
     showToast(t('toastEnterRef'));
     return;
   }
-  const p = products.find(x=>x.id===currentBuyId);
+  const p = getBuyItem();
   const amount = currentBuyType === 'prompt' ? PROMPT_PRICE : p.price;
   if(!BACKEND_BASE){ showToast(t('toastOrderFailed')); return; }
   try{
     const res = await fetch(`${BACKEND_BASE}/orders/create`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: amount, phone, appUsed: manualMethod, ref, buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '', orderType: currentBuyType })
+      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: amount, phone, appUsed: manualMethod, ref, buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '', orderType: currentBuyType, packageSize: currentBuyType==='package' ? currentPackageSize : undefined })
     });
     const data = await res.json();
     if(!res.ok || !data.code){
       showToast(res.status === 400 ? t('toastInvalidPhone') : t('toastOrderFailed'));
       return;
     }
+    trackFunnelEvent(
+      'add_payment_info', { currency:'EGP', value: amount, payment_type: manualMethod },
+      'AddPaymentInfo', { currency:'EGP', value: amount, content_ids:[currentBuyId] }
+    );
     saveOrderReference(currentBuyId, currentBuyType, data.code);
     showOrderStatusPanel(currentBuyId, data.code, currentBuyType);
   }catch(e){
@@ -1731,6 +1818,38 @@ function saveOrderReference(productId, type, code){
   savePurchases();
 }
 
+/** The package with credits left that was most recently approved — offered
+ * on every eligible product card's "use a package credit" button. A
+ * customer juggling two active packages at once is rare enough that always
+ * offering the most recent one is a reasonable default. */
+function activePackageWithCredits(){
+  const codes = Object.keys(packageCredits);
+  for(let i = codes.length - 1; i >= 0; i--){
+    const code = codes[i];
+    if(packageCredits[code].remaining > 0) return { code, ...packageCredits[code] };
+  }
+  return null;
+}
+
+/** Redeems one credit from the active package for a specific product,
+ * skipping payment entirely, and opens the exact same upload-and-generate
+ * flow a normal purchase uses — the Worker's /transform route already
+ * accepts any productId against a package order's code (see transformImage),
+ * so nothing else about that flow needs to change. */
+function usePackageCredit(productId){
+  const pkg = activePackageWithCredits();
+  if(!pkg) return;
+  if(pkg.usedProductIds.includes(productId)){
+    showToast(t('toastPackageProductAlreadyUsed'));
+    return;
+  }
+  orderCodes[productId] = pkg.code;
+  if(!purchases.includes(productId)) purchases.push(productId);
+  savePurchases();
+  renderGrids();
+  openTransformModal(productId);
+}
+
 // ---------- Live order status (replaces the old "close modal + remember a
 // code" flow) — the modal stays open and polls the backend on its own, so the
 // customer never has to go find the tracking modal and re-type the code
@@ -1742,7 +1861,7 @@ function stopOrderStatusPolling(){
 }
 
 function showOrderStatusPanel(productId, code, orderType){
-  orderType = orderType === 'prompt' ? 'prompt' : 'transform';
+  orderType = orderType === 'prompt' ? 'prompt' : orderType === 'package' ? 'package' : 'transform';
   document.getElementById('payFormFields').style.display = 'none';
   document.getElementById('payStatusPanel').style.display = 'block';
   document.getElementById('payStatusCode').textContent = code;
@@ -1762,6 +1881,12 @@ function showOrderStatusPanel(productId, code, orderType){
           if(!promptPurchases.includes(productId)) promptPurchases.push(productId);
           promptOrderCodes[productId] = order.code || code;
           if(order.promptText) purchasedPromptTexts[productId] = order.promptText;
+        }else if(orderType === 'package'){
+          packageCredits[order.code || code] = {
+            size: order.packageSize,
+            remaining: order.creditsRemaining,
+            usedProductIds: (order.usedItems || []).map(u => u.productId),
+          };
         }else{
           if(!purchases.includes(productId)) purchases.push(productId);
           orderCodes[productId] = order.code || code;
@@ -1769,8 +1894,15 @@ function showOrderStatusPanel(productId, code, orderType){
         await savePurchases();
         renderGrids();
         document.querySelector('#payStatusPanel .order-status-spinner').style.display = 'none';
-        document.getElementById('payStatusText').textContent = orderType === 'prompt' ? t('statusPromptApprovedText') : t('statusApprovedText');
-        showToast(orderType === 'prompt' ? t('toastPromptReady') : t('toastReadyToTransform'));
+        document.getElementById('payStatusText').textContent =
+          orderType === 'prompt' ? t('statusPromptApprovedText')
+          : orderType === 'package' ? t('statusPackageApprovedText').replace('{n}', order.creditsRemaining)
+          : t('statusApprovedText');
+        showToast(
+          orderType === 'prompt' ? t('toastPromptReady')
+          : orderType === 'package' ? t('toastPackageReady')
+          : t('toastReadyToTransform')
+        );
       }
     }catch(e){ /* network hiccup — the next poll retries automatically */ }
   };
@@ -1781,8 +1913,8 @@ function showOrderStatusPanel(productId, code, orderType){
 document.getElementById('payStatusCloseBtn').onclick = ()=>{
   stopOrderStatusPolling();
   document.getElementById('buyModalBg').classList.remove('show');
-  const p = products.find(x=>x.id===currentBuyId);
-  if(p) openCatSection(p.category)?.scrollIntoView({behavior:'smooth'});
+  const p = getBuyItem();
+  if(p && p.category) openCatSection(p.category)?.scrollIntoView({behavior:'smooth'});
 };
 
 // ---------- Photo transform (client-side style preview) ----------
@@ -2075,6 +2207,17 @@ document.getElementById('transformGenerateBtn').onclick = async ()=>{
         return;
       }
       genBtn.dataset.used = '1';
+      // If this generation was paid for out of a package's shared credits
+      // (not an individually-purchased order), the server's response is the
+      // authoritative source for how many are left — sync local bookkeeping
+      // to it rather than just assuming "minus one" succeeded.
+      if(packageCredits[orderCode]){
+        if(typeof data.creditsRemaining === 'number') packageCredits[orderCode].remaining = data.creditsRemaining;
+        if(!packageCredits[orderCode].usedProductIds.includes(currentTransformId)){
+          packageCredits[orderCode].usedProductIds.push(currentTransformId);
+        }
+        savePurchases();
+      }
       const resultImg = new Image();
       resultImg.crossOrigin = 'anonymous';
       resultImg.onload = ()=>{
@@ -2088,6 +2231,14 @@ document.getElementById('transformGenerateBtn').onclick = async ()=>{
       resultImg.onerror = ()=> showToast(t('toastGenerateFailed'));
       resultImg.src = data.imageUrl;
       transformedResults[currentTransformId] = data.imageUrl;
+      // This is the true "purchase completed" moment — the customer paid AND
+      // actually received their transformed photo, not just placed an order
+      // that might still be pending/rejected. Tracking it here (not at order
+      // creation) is what makes the funnel numbers mean something.
+      trackFunnelEvent(
+        'purchase', { currency:'EGP', value: (products.find(x=>x.id===currentTransformId)||{}).price || 0, transaction_id: orderCode },
+        'Purchase', { currency:'EGP', value: (products.find(x=>x.id===currentTransformId)||{}).price || 0, content_ids:[currentTransformId] }
+      );
       savePurchases();
       renderGrids();
     }catch(e){
@@ -3284,12 +3435,16 @@ function setAdminTab(tab){
   document.getElementById('tabBtnVisitors').classList.toggle('active', tab==='visitors');
   document.getElementById('tabBtnShowcase').classList.toggle('active', tab==='showcase');
   document.getElementById('tabBtnPromoImages').classList.toggle('active', tab==='promoimages');
+  document.getElementById('tabBtnChangePassword').classList.toggle('active', tab==='changepassword');
+  document.getElementById('tabBtnSiteDesign').classList.toggle('active', tab==='sitedesign');
   document.getElementById('adminTabProducts').style.display = tab==='products' ? 'block' : 'none';
   document.getElementById('adminTabOrders').style.display = tab==='orders' ? 'block' : 'none';
   document.getElementById('adminTabReviews').style.display = tab==='reviews' ? 'block' : 'none';
   document.getElementById('adminTabVisitors').style.display = tab==='visitors' ? 'block' : 'none';
   document.getElementById('adminTabShowcase').style.display = tab==='showcase' ? 'block' : 'none';
   document.getElementById('adminTabPromoImages').style.display = tab==='promoimages' ? 'block' : 'none';
+  document.getElementById('adminTabChangePassword').style.display = tab==='changepassword' ? 'block' : 'none';
+  document.getElementById('adminTabSiteDesign').style.display = tab==='sitedesign' ? 'block' : 'none';
 }
 document.getElementById('tabBtnProducts').onclick = ()=> setAdminTab('products');
 document.getElementById('tabBtnOrders').onclick = async ()=>{
@@ -3312,6 +3467,43 @@ document.getElementById('tabBtnShowcase').onclick = async ()=>{
 document.getElementById('tabBtnPromoImages').onclick = async ()=>{
   setAdminTab('promoimages');
   await loadPromoImagesIntoAdmin();
+};
+document.getElementById('tabBtnChangePassword').onclick = ()=> setAdminTab('changepassword');
+document.getElementById('tabBtnSiteDesign').onclick = async ()=>{
+  setAdminTab('sitedesign');
+  await loadSiteDesignIntoAdmin();
+};
+
+/** Loads the list of available designs AND which one is currently live,
+ * building the dropdown from server data — a future Design MIGA 3/4 just
+ * needs one entry added to the Worker's registry to show up here, with no
+ * frontend change needed at all. */
+async function loadSiteDesignIntoAdmin(){
+  if(!BACKEND_BASE) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/site-config`);
+    const data = await res.json();
+    const select = document.getElementById('siteDesignSelect');
+    const lang = document.documentElement.lang === 'en' ? 'nameEn' : 'nameAr';
+    const list = Array.isArray(data.availableDesigns) ? data.availableDesigns : [];
+    select.innerHTML = list.map(d => `<option value="${d.id}">${escapeHtml(d[lang] || d.id)}</option>`).join('');
+    select.value = data.activeDesign === 'v2' ? 'v2' : (list.some(d=>d.id===data.activeDesign) ? data.activeDesign : 'v1');
+  }catch(e){ /* leave the dropdown empty on a network hiccup */ }
+}
+document.getElementById('saveSiteDesignBtn').onclick = async ()=>{
+  const design = document.getElementById('siteDesignSelect').value;
+  if(!BACKEND_BASE || !adminSessionToken) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/set-design?token=${encodeURIComponent(adminSessionToken)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ design })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(res.ok && data.ok) showToast(t('toastSiteDesignSaved'));
+    else showToast(t('toastAdminServerError'));
+  }catch(e){
+    showToast(t('toastAdminServerError'));
+  }
 };
 
 // ---------- Before/After circle showcase (homepage hero section) ----------
@@ -4027,7 +4219,9 @@ document.getElementById('adminLoginBtn').onclick = async ()=>{
   const val = document.getElementById('adminPass').value;
   const result = await adminLoginWithPassword(val);
   if(!result.ok){
-    showToast(result.reason === 'rateLimited' ? t('toastAdminRateLimited') : t('toastWrongPassword'));
+    if(result.reason === 'rateLimited') showToast(t('toastAdminRateLimited'));
+    else if(result.reason === 'serverError') showToast(t('toastAdminServerError'));
+    else showToast(t('toastWrongPassword'));
   }
 };
 
@@ -4048,8 +4242,14 @@ async function adminLoginWithPassword(val){
       body: JSON.stringify({ password: val })
     });
     if(res.status === 429) return { ok:false, reason:'rateLimited' };
+    // Any other non-2xx (500, 502, etc.) means the server itself failed
+    // before it ever got to compare the password — most likely cause on
+    // this backend is the daily KV write-operation cap. Surfacing this
+    // distinctly instead of folding it into "wrong password" is exactly
+    // what would have saved a lot of back-and-forth diagnosing this before.
+    if(!res.ok) return { ok:false, reason:'serverError' };
     const data = await res.json();
-    if(res.ok && data.ok && data.token){
+    if(data.ok && data.token){
       await activateAdminSession(data.token, true);
       return { ok:true };
     }
@@ -4085,6 +4285,11 @@ async function activateAdminSession(token, persist){
   adminLoggedIn = true;
   document.getElementById('adminLoginView').style.display = 'none';
   document.getElementById('adminFormView').style.display = 'block';
+  // Pre-fills the add-product form's defaults (title, price, and the
+  // watermark prompt) right away — without this, a fresh login shows an
+  // empty prompt box until the first save, since that's the only other
+  // place these defaults get applied.
+  if(!editingProductId) resetProductFormToDefaults();
   await loadAdminProducts(); // full prompt text — only this authenticated session sees it
   applyChildrenVisibility();
   renderAdminProductsList();
@@ -4123,8 +4328,64 @@ document.getElementById('adminLogoutBtn').onclick = async ()=>{
   hideAdminQuickAccess();
 };
 
+/** Changes the admin password. Requires the current session token (proves
+ * this browser is already logged in) plus the current password (proves the
+ * person typing isn't just riding a leaked/stolen session token). The new
+ * password is sent once over HTTPS and never stored client-side — same
+ * trust model as the original login. */
+document.getElementById('changeAdminPassBtn').onclick = async ()=>{
+  const currentPassInput = document.getElementById('currentAdminPass');
+  const newPassInput = document.getElementById('newAdminPass');
+  const confirmPassInput = document.getElementById('confirmNewAdminPass');
+  const currentPass = currentPassInput.value;
+  const newPass = newPassInput.value;
+  const confirmPass = confirmPassInput.value;
+
+  if(!currentPass || !newPass || !confirmPass){ showToast(t('toastFillPassFields')); return; }
+  if(newPass !== confirmPass){ showToast(t('toastPassMismatch')); return; }
+  if(newPass.length < 8){ showToast(t('toastPassTooShort')); return; }
+  if(!BACKEND_BASE || !adminSessionToken){ showToast(t('toastAdminServerError')); return; }
+
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/change-password`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ token: adminSessionToken, currentPassword: currentPass, newPassword: newPass })
+    });
+    if(res.status === 429){ showToast(t('toastAdminRateLimited')); return; }
+    if(res.status === 401){
+      const data = await res.json().catch(()=>({}));
+      // A 401 here means either the current password was wrong, or the
+      // session itself expired — tell them apart so a stale-session case
+      // doesn't get misread as "you typed your own current password wrong".
+      if(data.error === 'Session expired, please log in again'){
+        showToast(t('toastAdminServerError'));
+      } else {
+        showToast(t('toastCurrentPassWrong'));
+      }
+      return;
+    }
+    if(!res.ok){ showToast(t('toastAdminServerError')); return; }
+    const data = await res.json();
+    if(data.ok){
+      showToast(t('toastPassChanged'));
+      currentPassInput.value = '';
+      newPassInput.value = '';
+      confirmPassInput.value = '';
+    } else {
+      showToast(t('toastAdminServerError'));
+    }
+  }catch(e){
+    showToast(t('toastAdminServerError'));
+  }
+};
+
 const NEW_PRODUCT_DEFAULT_TITLE = 'Miga-photobook';
 const NEW_PRODUCT_DEFAULT_PRICE = 25;
+// Every new product's AI-transform prompt starts with this watermark
+// instruction pre-filled — it's still a normal editable textarea, so the
+// admin can add to it or delete it per product, but it no longer has to be
+// re-typed from scratch every single time.
+const NEW_PRODUCT_DEFAULT_PROMPT = 'Add  a custom luxury signature watermark logo at bottom-right: royal king crown with "Miga-photobook " in shield crest, metallic gold, elegant, minimal, premium, glowing edges, embossed texture, naturally blending.';
 
 /** Puts the add-product form back to a clean state for the *next* product:
  * the suggested name and price are filled in ready to be typed over, rather
@@ -4154,7 +4415,7 @@ function resetProductFormToDefaults(){
   document.getElementById('pTitle').value = NEW_PRODUCT_DEFAULT_TITLE;
   document.getElementById('pTitleEn').value = NEW_PRODUCT_DEFAULT_TITLE;
   document.getElementById('pPrice').value = NEW_PRODUCT_DEFAULT_PRICE;
-  document.getElementById('pPrompt').value = '';
+  document.getElementById('pPrompt').value = NEW_PRODUCT_DEFAULT_PROMPT;
   document.getElementById('pImage').value = '';
   pendingCroppedBlob = null;
 }
