@@ -1215,7 +1215,12 @@ function scrollRow(key, direction){
   const current = currentRowIndex(rowEl, cards, rtl);
   const maxIndex = Math.max(0, cards.length - perView);
   const target = Math.max(0, Math.min(maxIndex, current + direction * perView));
-  cards[target].scrollIntoView({behavior:'smooth', inline:'start', block:'nearest'});
+  // 'center' (not 'start') so the arrow buttons land on exactly the same
+  // snap point the CSS scroll-snap now uses — 'start' means the RTL
+  // inline-start (right) edge, which combined with flex-basis:100% + gap's
+  // sub-pixel rounding was what left a stray gap bleeding through on the
+  // left on mobile. Centering removes that edge dependency entirely.
+  cards[target].scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
 }
 
 function updateRowArrows(key){

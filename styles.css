@@ -820,7 +820,20 @@
   @media(max-width:1180px){ .grid > .card{flex-basis:calc((100% - 3*18px) / 4);} }
   @media(max-width:980px){ .grid > .card{flex-basis:calc((100% - 2*18px) / 3);} }
   @media(max-width:700px){ .grid{gap:14px;} .grid > .card{flex-basis:calc((100% - 14px) / 2);} }
-  @media(max-width:560px){ .grid > .card{flex-basis:100%;} }
+  @media(max-width:560px){
+    .grid > .card{
+      flex-basis:100%;
+      /* On mobile, exactly one card is meant to fill the view. "start"
+         snapping aligns the card's RIGHT edge (the RTL inline-start) to the
+         container's edge — but flex-basis:100% combined with the row's
+         gap leaves a few sub-pixels of rounding error per card, so that
+         "exact" right-edge alignment consistently left a stray sliver of
+         empty space bleeding through on the left instead of being split
+         evenly. Centering the snap point removes the dependency on either
+         edge being pixel-perfect, so the card sits centered regardless. */
+      scroll-snap-align:center;
+    }
+  }
   .grid > .empty-note{flex:0 0 100%;}
 
   /* Results showcase: smaller, denser thumbnails than the product grid — still
