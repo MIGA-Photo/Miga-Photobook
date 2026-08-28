@@ -73,13 +73,21 @@
   }
 
   *{box-sizing:border-box; margin:0; padding:0;}
-  html{scroll-behavior:smooth;}
+  html{scroll-behavior:smooth; overflow-x:hidden;}
   body{
     background:var(--ink);
     color:var(--paper);
     font-family:'IBM Plex Sans Arabic', sans-serif;
     line-height:1.7;
     min-height:100vh;
+    overflow-x:hidden;
+    /* Clips any element that overflows the viewport horizontally (even by a
+       sub-pixel rounding amount from a grid/gap combination) so the page can
+       never shift sideways off-center — the exact symptom reported: the
+       mobile view sitting slightly right of center instead of flush. Every
+       intentional horizontal-scroll area on the page (category pills, the
+       testimonials row, etc.) already scrolls within its own container via
+       its own overflow-x:auto, so this doesn't affect any of them. */
   }
   /* Site-wide brand-colored scrollbars — a slim gold thumb on a dark track
      everywhere the browser would otherwise draw its flat grey default
