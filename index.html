@@ -964,6 +964,7 @@
         <button data-tab="visitors" id="tabBtnVisitors" data-i18n="tabVisitors">الزوار</button>
         <button data-tab="showcase" id="tabBtnShowcase" data-i18n="tabShowcase">الدائرة</button>
         <button data-tab="promoimages" id="tabBtnPromoImages" data-i18n="tabPromoImages">صور العرض</button>
+        <button data-tab="changepassword" id="tabBtnChangePassword" data-i18n="tabChangePassword">تغيير كلمة المرور</button>
       </div>
 
       <div id="adminTabProducts">
@@ -1288,8 +1289,8 @@
         </div>
       </div>
 
-      <div id="adminChangePasswordSection" style="margin-top:18px; padding-top:14px; border-top:1px solid var(--brass-dim);">
-        <div style="font-size:14px; font-weight:600; margin-bottom:10px; color:var(--brass);" data-i18n="changePassTitle">تغيير كلمة مرور الأدمن</div>
+      <div id="adminTabChangePassword" style="display:none;">
+        <p class="sub" style="margin-bottom:14px;" data-i18n="changePassIntro">غيّر كلمة مرور دخول لوحة الإدارة. لازم تعرف الكلمة الحالية عشان تقدر تغيّرها.</p>
         <div class="field">
           <label data-i18n="currentPassLabel">كلمة المرور الحالية</label>
           <input type="password" id="currentAdminPass" placeholder="••••••••" autocomplete="off">
@@ -1305,7 +1306,7 @@
           </div>
         </div>
         <div class="modal-actions">
-          <button class="btn-ghost" id="changeAdminPassBtn" data-i18n="changePassBtn">تغيير كلمة المرور</button>
+          <button class="btn-primary" id="changeAdminPassBtn" data-i18n="changePassBtn">تغيير كلمة المرور</button>
         </div>
       </div>
 

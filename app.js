@@ -275,7 +275,7 @@ const translations = {
     toastCopyFailed:'تعذّر النسخ التلقائي',
     toastOrderApproved:'تمت الموافقة على الطلب — يمكن للعميل تحويل صورته بالكود الآن',
     toastWrongPassword:'كلمة المرور غير صحيحة', toastAdminRateLimited:'محاولات كتير أوي في وقت قصير — استنى شوية (لحد 10 دقايق) وجرب تاني', toastAdminServerError:'السيرفر فيه مشكلة مؤقتة (مش كلمة السر) — جرب تاني بعد شوية، أو راجع حد الكتابة اليومي في Cloudflare KV', toastFillFields:'يرجى إكمال العنوان والسعر وتعليمات التحويل',
-    changePassTitle:'تغيير كلمة مرور الأدمن', currentPassLabel:'كلمة المرور الحالية', newPassLabel:'كلمة المرور الجديدة', confirmNewPassLabel:'تأكيد كلمة المرور الجديدة', changePassBtn:'تغيير كلمة المرور',
+    changePassTitle:'تغيير كلمة مرور الأدمن', tabChangePassword:'تغيير كلمة المرور', changePassIntro:'غيّر كلمة مرور دخول لوحة الإدارة. لازم تعرف الكلمة الحالية عشان تقدر تغيّرها.', currentPassLabel:'كلمة المرور الحالية', newPassLabel:'كلمة المرور الجديدة', confirmNewPassLabel:'تأكيد كلمة المرور الجديدة', changePassBtn:'تغيير كلمة المرور',
     toastPassChanged:'تم تغيير كلمة المرور بنجاح', toastPassMismatch:'كلمة المرور الجديدة وتأكيدها غير متطابقين', toastPassTooShort:'كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل', toastCurrentPassWrong:'كلمة المرور الحالية غير صحيحة', toastFillPassFields:'يرجى إدخال كل الحقول',
     toastProductAdded:'تم إضافة المنتج بنجاح',
     uploadingImage:'جاري رفع الصورة...', toastImageUploadFailed:'تعذّر رفع الصورة، تأكد من اتصالك وحاول تاني',
@@ -548,7 +548,7 @@ const translations = {
     toastCopyFailed:"Couldn't copy automatically",
     toastOrderApproved:'Order approved — the customer can now unlock the prompt with the code',
     toastWrongPassword:'Incorrect password', toastAdminRateLimited:'Too many attempts in a short time — wait a bit (up to 10 minutes) and try again', toastAdminServerError:'The server hit a temporary issue (not your password) — try again shortly, or check the daily Cloudflare KV write limit', toastFillFields:'Please complete the title, price, and prompt',
-    changePassTitle:'Change admin password', currentPassLabel:'Current password', newPassLabel:'New password', confirmNewPassLabel:'Confirm new password', changePassBtn:'Change password',
+    changePassTitle:'Change admin password', tabChangePassword:'Change password', changePassIntro:'Change the password used to log in to the admin panel. You need to know the current one to change it.', currentPassLabel:'Current password', newPassLabel:'New password', confirmNewPassLabel:'Confirm new password', changePassBtn:'Change password',
     toastPassChanged:'Password changed successfully', toastPassMismatch:'New password and confirmation do not match', toastPassTooShort:'New password must be at least 8 characters', toastCurrentPassWrong:'Current password is incorrect', toastFillPassFields:'Please fill in all fields',
     toastProductAdded:'Product added successfully',
     uploadingImage:'Uploading image...', toastImageUploadFailed:'Could not upload the image, check your connection and try again',
@@ -3288,12 +3288,14 @@ function setAdminTab(tab){
   document.getElementById('tabBtnVisitors').classList.toggle('active', tab==='visitors');
   document.getElementById('tabBtnShowcase').classList.toggle('active', tab==='showcase');
   document.getElementById('tabBtnPromoImages').classList.toggle('active', tab==='promoimages');
+  document.getElementById('tabBtnChangePassword').classList.toggle('active', tab==='changepassword');
   document.getElementById('adminTabProducts').style.display = tab==='products' ? 'block' : 'none';
   document.getElementById('adminTabOrders').style.display = tab==='orders' ? 'block' : 'none';
   document.getElementById('adminTabReviews').style.display = tab==='reviews' ? 'block' : 'none';
   document.getElementById('adminTabVisitors').style.display = tab==='visitors' ? 'block' : 'none';
   document.getElementById('adminTabShowcase').style.display = tab==='showcase' ? 'block' : 'none';
   document.getElementById('adminTabPromoImages').style.display = tab==='promoimages' ? 'block' : 'none';
+  document.getElementById('adminTabChangePassword').style.display = tab==='changepassword' ? 'block' : 'none';
 }
 document.getElementById('tabBtnProducts').onclick = ()=> setAdminTab('products');
 document.getElementById('tabBtnOrders').onclick = async ()=>{
@@ -3317,6 +3319,7 @@ document.getElementById('tabBtnPromoImages').onclick = async ()=>{
   setAdminTab('promoimages');
   await loadPromoImagesIntoAdmin();
 };
+document.getElementById('tabBtnChangePassword').onclick = ()=> setAdminTab('changepassword');
 
 // ---------- Before/After circle showcase (homepage hero section) ----------
 // The 9 slots (center + 8 satellites) are stored server-side as plain image
@@ -4097,6 +4100,11 @@ async function activateAdminSession(token, persist){
   adminLoggedIn = true;
   document.getElementById('adminLoginView').style.display = 'none';
   document.getElementById('adminFormView').style.display = 'block';
+  // Pre-fills the add-product form's defaults (title, price, and the
+  // watermark prompt) right away — without this, a fresh login shows an
+  // empty prompt box until the first save, since that's the only other
+  // place these defaults get applied.
+  if(!editingProductId) resetProductFormToDefaults();
   await loadAdminProducts(); // full prompt text — only this authenticated session sees it
   applyChildrenVisibility();
   renderAdminProductsList();
