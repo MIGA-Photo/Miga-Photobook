@@ -2,14 +2,16 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<!-- Mutual design-switch bootstrap — mirrors Design MIGA 1's root check, but
-     inverted: if the admin has switched back to Design MIGA 1, anyone who
-     still has this /v2/ page bookmarked or open gets sent back automatically.
-     Synchronous XHR is deliberate here too, to avoid a flash of the wrong
-     design before redirecting; a short timeout + try/catch means a slow or
-     unreachable Worker just leaves this page (v2) showing. -->
+<!-- Design-switch bootstrap — generic across any number of designs; see
+     Design MIGA 1's root index.html for the full explanation. MY_DESIGN_ID
+     is the only line that differs between each design's copy of this
+     script. Synchronous XHR is deliberate here too, to avoid a flash of
+     the wrong design before redirecting; a short timeout + try/catch means
+     a slow or unreachable Worker just leaves this page (Design MIGA 2)
+     showing. -->
 <script>
 (function(){
+  var MY_DESIGN_ID = 'v2';
   try{
     var xhr = new XMLHttpRequest();
     xhr.open('GET', 'https://miga-photobook-api.magdyfarouk380.workers.dev/site-config', false);
@@ -17,11 +19,18 @@
     xhr.send(null);
     if(xhr.status === 200){
       var data = JSON.parse(xhr.responseText);
-      if(data.activeDesign && data.activeDesign !== 'v2'){
-        window.location.replace('../');
+      if(data.activeDesign && data.activeDesign !== MY_DESIGN_ID){
+        var target = (data.availableDesigns || []).filter(function(d){ return d.id === data.activeDesign; })[0];
+        var folder = target ? target.folder : '';
+        var myFolder = MY_DESIGN_ID === 'v1' ? '' : MY_DESIGN_ID;
+        var dest = null;
+        if(myFolder === '' && folder !== ''){ dest = './' + folder + '/'; }
+        else if(myFolder !== '' && folder === ''){ dest = '../'; }
+        else if(myFolder !== '' && folder !== ''){ dest = '../' + folder + '/'; }
+        if(dest) window.location.replace(dest);
       }
     }
-  }catch(e){ /* Worker unreachable or slow — just show this design (v2) */ }
+  }catch(e){ /* Worker unreachable or slow — just show this design (Design MIGA 2) */ }
 })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
