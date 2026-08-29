@@ -126,6 +126,18 @@ h1 .display{ color:var(--brass); }
 .slider-dot.active{ background:var(--brass); width:20px; border-radius:5px; }
 .slider-hint{ text-align:center; font-size:12.5px; color:var(--paper-dim); margin-top:10px; }
 
+/* ---------- Permanent showcase slider frame (fixed spot right below the
+   nav, always the interactive slider) ---------- */
+.fixed-slider-section{ padding:22px 0 4px; }
+.fixed-slider-frame{
+  max-width:360px; margin:0 auto; padding:10px;
+  border:2px solid var(--brass); border-radius:calc(var(--radius) + 10px);
+  box-shadow:0 0 0 4px rgba(227,164,41,0.12), 0 20px 50px rgba(0,0,0,0.5);
+  background:linear-gradient(180deg, rgba(227,164,41,0.06), transparent 60%);
+}
+.slider-card-compact{ aspect-ratio:4/5; max-width:none; }
+@media(min-width:860px){ .fixed-slider-frame{ max-width:300px; } }
+
 /* ---------- Circle variant — alternative to the slider, chosen per-design
    from the admin panel. Sized down from Design MIGA 1's original (which
    sits in a full-width standalone section) to fit this hero column. ---------- */
