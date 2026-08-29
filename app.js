@@ -5291,13 +5291,19 @@ async function applyHeroModeForThisDesign(){
     const data = await res.json();
     if(data && data.heroModes && data.heroModes.v1) mode = data.heroModes.v1;
   }catch(e){ /* network hiccup — keep this design's original default */ }
+
+  // The permanent slider (right below the nav) is unconditional — always a
+  // slider, always on, regardless of the toggle further down.
+  const pairs = await loadSliderData();
+  const fixedInst = initSliderInstance('bafSliderFixed');
+  if(fixedInst && pairs.length) fixedInst.setPairs(pairs);
+
   const circleEl = document.getElementById('heroVariantCircle');
   const sliderEl = document.getElementById('heroVariantSlider');
   if(!circleEl || !sliderEl) return;
   if(mode === 'slider'){
     circleEl.hidden = true;
     sliderEl.hidden = false;
-    const pairs = await loadSliderData();
     const inst = initSliderInstance('bafSliderV1');
     if(inst && pairs.length) inst.setPairs(pairs);
   }else{

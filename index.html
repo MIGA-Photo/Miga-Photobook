@@ -249,6 +249,28 @@
 </div>
 </div><!-- /.sticky-top-group -->
 
+<!-- Permanent showcase slider — always the interactive drag slider, in this
+     exact spot, regardless of whichever mode (circle/slider) the admin has
+     chosen for the hero's own toggle-able showcase further down. Framed in
+     the site's brass gold to read as a distinct, deliberate feature. -->
+<section class="wrap fixed-slider-section">
+  <div class="fixed-slider-frame">
+    <div class="slider-wrap-instance" id="bafSliderFixed">
+      <div class="slider-card slider-card-compact" data-slider-card>
+        <img data-slider-before alt="قبل">
+        <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد"></div>
+        <div class="slider-line" data-slider-line></div>
+        <button type="button" class="slider-handle" data-slider-handle>↔</button>
+        <span class="tag tag-before">قبل</span>
+        <span class="tag tag-after">بعد</span>
+        <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق">‹</button>
+        <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي">›</button>
+      </div>
+      <div class="slider-dots" data-slider-dots></div>
+    </div>
+  </div>
+</section>
+
 <section class="hero">
   <div>
     <div class="eyebrow" data-i18n="heroEyebrow">Miga-Photobook</div>
@@ -325,6 +347,18 @@
   .slider-dot{ width:8px; height:8px; border-radius:50%; background:var(--line); border:none; cursor:pointer; padding:0; }
   .slider-dot.active{ background:var(--brass); width:20px; border-radius:5px; }
   .slider-hint{ text-align:center; font-size:12.5px; color:var(--paper-dim); margin-top:10px; }
+
+  /* ---------- Permanent showcase slider frame (fixed spot right below the
+     nav, always the interactive slider) ---------- */
+  .fixed-slider-section{ padding:22px 16px 4px; }
+  .fixed-slider-frame{
+    max-width:360px; margin:0 auto; padding:10px;
+    border:2px solid var(--brass); border-radius:26px;
+    box-shadow:0 0 0 4px rgba(255,201,77,0.12), 0 20px 50px rgba(0,0,0,0.5);
+    background:linear-gradient(180deg, rgba(255,201,77,0.06), transparent 60%);
+  }
+  .slider-card-compact{ aspect-ratio:4/5; max-width:none; }
+  @media(min-width:860px){ .fixed-slider-frame{ max-width:300px; } }
   .hero-showcase-variant[hidden]{ display:none !important; }
 </style>
 
