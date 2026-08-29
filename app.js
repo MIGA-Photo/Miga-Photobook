@@ -3554,26 +3554,23 @@ document.getElementById('saveSiteDesignBtn').onclick = async ()=>{
   }
 };
 
-/** Saves every design's hero-mode row in one go — each design is its own
- * independent request since the backend stores them per-design, but the
- * admin only sees a single "حفظ" click either way. */
+/** Saves every design's hero-mode row in ONE request (not one request per
+ * design) — three rapid writes to the same KV key back-to-back was tripping
+ * Cloudflare's KV write-rate limit, which surfaced to the admin as a random,
+ * unhelpful server error even though nothing was actually misconfigured. */
 document.getElementById('saveHeroModesBtn').onclick = async ()=>{
   if(!BACKEND_BASE || !adminSessionToken) return;
   const selects = [...document.querySelectorAll('[data-hero-mode-select]')];
   if(!selects.length) return;
+  const modes = {};
+  selects.forEach(sel => { modes[sel.getAttribute('data-hero-mode-select')] = sel.value; });
   try{
-    let allOk = true;
-    for(const sel of selects){
-      const design = sel.getAttribute('data-hero-mode-select');
-      const mode = sel.value;
-      const res = await fetch(`${BACKEND_BASE}/admin/set-hero-mode?token=${encodeURIComponent(adminSessionToken)}`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ design, mode })
-      });
-      const data = await res.json().catch(()=>({}));
-      if(!res.ok || !data.ok) allOk = false;
-    }
-    showToast(allOk ? t('toastHeroModesSaved') : t('toastAdminServerError'));
+    const res = await fetch(`${BACKEND_BASE}/admin/set-hero-mode?token=${encodeURIComponent(adminSessionToken)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ modes })
+    });
+    const data = await res.json().catch(()=>({}));
+    showToast((res.ok && data.ok) ? t('toastHeroModesSaved') : t('toastAdminServerError'));
   }catch(e){
     showToast(t('toastAdminServerError'));
   }
