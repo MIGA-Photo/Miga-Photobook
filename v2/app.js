@@ -24,8 +24,14 @@ const APPLE_CLIENT_ID = "";
 const APPLE_REDIRECT_URI = window.location.origin + window.location.pathname;
 let currentUser = null; // { name, email }
 const PACKAGE_CATALOG = {
-  10: { price: 200, title: 'باقة الاحترافي — 10 صور' },
-  25: { price: 450, title: 'باقة الوكالة — 25 صورة' },
+  3:  { price: 59,  title: 'باقة Starter — 3 صور' },
+  15: { price: 259, title: 'باقة Pro — 15 صورة' },
+  30: { price: 419, title: 'باقة Premium — 30 صورة' },
+  // "Monthly" subscription-style packages — same underlying credits
+  // mechanism as the packages above (no auto-recurring billing exists),
+  // just marketed with a monthly framing to encourage repeat purchases.
+  10: { price: 149, title: 'اشتراك شهري — 10 صور/شهريًا' },
+  20: { price: 299, title: 'اشتراك شهري — 20 صورة/شهريًا' },
 };
 const CATEGORIES = [
   { id: 'all', label: 'الكل' },
@@ -134,8 +140,18 @@ function renderChips(){
   });
 }
 
+const CATEGORY_HEADINGS = {
+  business: 'احصل على صورة LinkedIn تزيد احترافيتك خلال 5 دقائق',
+};
 function renderGrid(){
   const grid = document.getElementById('productGrid');
+  const heading = document.getElementById('categoryHeading');
+  if(CATEGORY_HEADINGS[activeCategory]){
+    heading.textContent = CATEGORY_HEADINGS[activeCategory];
+    heading.style.display = '';
+  }else{
+    heading.style.display = 'none';
+  }
   const list = activeCategory === 'all' ? products : products.filter(p=>p.category===activeCategory);
   if(!list.length){
     grid.innerHTML = `<div class="empty-note">مفيش منتجات في القسم ده لسه</div>`;
@@ -1087,7 +1103,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   const prefs = await loadUiPrefs();
   applyTheme(prefs?.theme || 'dark');
   applyHeaderLanguage(prefs?.lang || 'ar');
-  applyViewMode(prefs?.view || 'desktop');
+  applyViewMode(prefs?.view || 'mobile');
   await checkLoggedInUser();
   checkBiometricAvailability();
 

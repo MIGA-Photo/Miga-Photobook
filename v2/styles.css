@@ -97,19 +97,44 @@ h1 .display{ color:var(--brass); }
 .slider-dot.active{ background:var(--brass); width:20px; border-radius:5px; }
 .slider-hint{ text-align:center; font-size:12.5px; color:var(--paper-dim); margin-top:10px; }
 
-/* ---------- Permanent showcase slider (fixed spot right below the nav,
-   always the interactive slider — independent of the toggle-able hero
-   showcase further down). Framed in brass gold as the site's one
-   deliberately eye-catching visual moment right at the top of the page. ---------- */
-.fixed-slider-section{ padding:22px 0 4px; }
+/* ---------- Permanent showcase slider — lives inside the hero row itself
+   (second grid column), right beside the hero text, side-by-side even on
+   mobile (both shrink to fit) per explicit request. ---------- */
+.hero-with-slider{
+  grid-template-columns:1.3fr 1fr !important;
+  gap:14px !important;
+  align-items:center;
+  padding-left:16px !important; padding-right:16px !important;
+}
+/* CSS Grid items default to min-width:auto, refusing to shrink below their
+   content's natural width — exactly what was pushing the row past the
+   viewport edge once the columns got this narrow. This is the fix. */
+.hero-with-slider > *{ min-width:0; }
+.hero-with-slider h1, .hero-with-slider p{ overflow-wrap:break-word; }
 .fixed-slider-frame{
-  max-width:360px; margin:0 auto; padding:10px;
-  border:2px solid var(--brass); border-radius:calc(var(--radius) + 10px);
-  box-shadow:0 0 0 4px rgba(227,164,41,0.12), 0 20px 50px rgba(0,0,0,0.5);
+  padding:6px; border:2px solid var(--brass); border-radius:18px;
+  box-shadow:0 0 0 3px rgba(227,164,41,0.12), 0 12px 30px rgba(0,0,0,0.5);
   background:linear-gradient(180deg, rgba(227,164,41,0.06), transparent 60%);
+  width:100%; max-width:220px; margin-inline-start:auto;
 }
 .slider-card-compact{ aspect-ratio:4/5; max-width:none; }
-@media(min-width:860px){ .fixed-slider-frame{ max-width:300px; } }
+.hero-with-slider .slider-handle{ width:30px; height:30px; font-size:12px; }
+.hero-with-slider .slider-nav{ width:24px; height:24px; font-size:13px; }
+.hero-with-slider .slider-card .tag{ font-size:9px; padding:3px 7px; top:6px; }
+.hero-with-slider .slider-dots{ margin-top:6px; gap:5px; }
+.hero-with-slider .slider-dot{ width:6px; height:6px; }
+.hero-with-slider h1{ font-size:clamp(15px,4.8vw,26px) !important; margin-bottom:10px !important; }
+.hero-with-slider .eyebrow{ font-size:11px !important; margin-bottom:8px !important; }
+.hero-with-slider .hero-p{ font-size:clamp(11px,2.6vw,14px) !important; margin-bottom:12px !important; }
+.hero-with-slider .trust-row{ font-size:10.5px !important; gap:6px !important; }
+.hero-with-slider .hero-ctas{ gap:8px !important; flex-wrap:wrap; margin-bottom:12px; }
+.hero-with-slider .hero-ctas button{ font-size:12.5px !important; padding:10px 14px !important; }
+@media(min-width:860px){ .fixed-slider-frame{ max-width:280px; } }
+@media(max-width:480px){
+  .fixed-slider-frame{ max-width:130px; padding:4px; border-radius:14px; }
+  .hero-with-slider{ gap:8px !important; }
+  .hero-with-slider .trust-row{ display:none; }
+}
 
 /* ---------- Circle variant — alternative to the slider in the hero's own
    showcase slot, chosen per-design from the admin panel. Sized down to fit
@@ -136,6 +161,13 @@ section{ padding:48px 0; }
 .section-head{ margin-bottom:22px; }
 h2{ font-size:clamp(21px,3.8vw,28px); font-weight:800; }
 .section-sub{ color:var(--paper-dim); font-size:14px; max-width:480px; margin-top:6px; }
+.cat-section-heading{
+  font-size:clamp(16px,3.6vw,22px); font-weight:800; text-align:center;
+  color:var(--paper); margin:4px 0 18px;
+}
+/* Every standalone mention of "ميجا" gets this same bold, brand-colored
+   treatment wherever it appears in copy across the site. */
+.brand-mega{ font-weight:800; color:var(--brass); }
 
 /* ---------- Category filter chips (replaces the old accordion) ---------- */
 .chip-row{ display:flex; gap:10px; overflow-x:auto; padding-bottom:6px; margin-bottom:20px; -webkit-overflow-scrolling:touch; }
@@ -426,3 +458,42 @@ footer a{ color:var(--brass); text-decoration:none; }
   @media (prefers-reduced-motion: reduce){
     .theme-toggle, .theme-toggle .tt-knob, .theme-toggle .tt-stars{transition:none;}
   }
+
+  /* ---------- Missing wrap rules from the initial port — without these,
+     the utility strip (lang/theme/view/track) and the main nav row don't
+     wrap on narrow screens and get visibly clipped at the edges. ---------- */
+  @media(max-width:700px){
+    .header-utility{justify-content:center; flex-wrap:wrap; padding:6px 16px; gap:8px;}
+  }
+  body.view-mode-mobile .header-utility{justify-content:center; flex-wrap:wrap; padding:6px 16px;}
+  body.view-mode-mobile .nav-wrap{flex-wrap:wrap; gap:10px; padding:14px 16px;}
+
+/* ---------- 3D button treatment — a solid "edge" shadow beneath each
+   button plus a soft ambient shadow gives a subtle raised/pressable look;
+   pressing it flattens the edge and nudges the button down. color-mix()
+   derives the edge shade FROM each button's own color, so this works
+   correctly with this design's own brass/paper values — no new colors
+   introduced. ---------- */
+.btn-primary, .btn-ghost, .admin-btn, .plan button, .buy-btn, .nav-cta,
+.modal-actions button, .account-tab, .social-btn{
+  transition:transform .12s ease, box-shadow .12s ease, background .22s ease, border-color .22s ease;
+}
+.btn-primary, .nav-cta{
+  box-shadow:0 4px 0 color-mix(in srgb, var(--brass) 60%, black), 0 6px 14px rgba(0,0,0,0.32);
+}
+.btn-primary:active, .nav-cta:active{ transform:translateY(3px); box-shadow:0 1px 0 color-mix(in srgb, var(--brass) 60%, black), 0 2px 6px rgba(0,0,0,0.22); }
+
+.btn-ghost{
+  box-shadow:0 3px 0 color-mix(in srgb, var(--line) 100%, var(--paper) 15%), 0 5px 12px rgba(0,0,0,0.22);
+}
+.btn-ghost:active{ transform:translateY(2px); box-shadow:0 1px 0 color-mix(in srgb, var(--line) 100%, var(--paper) 15%), 0 2px 5px rgba(0,0,0,0.16); }
+
+.admin-btn{
+  box-shadow:0 3px 0 color-mix(in srgb, var(--brass) 55%, black), 0 5px 12px rgba(0,0,0,0.26);
+}
+.admin-btn:active{ transform:translateY(2px); box-shadow:0 1px 0 color-mix(in srgb, var(--brass) 55%, black), 0 2px 5px rgba(0,0,0,0.18); }
+
+.buy-btn{
+  box-shadow:0 3px 0 color-mix(in srgb, var(--brass) 55%, black), 0 5px 10px rgba(0,0,0,0.24);
+}
+.buy-btn:active{ transform:translateY(2px); box-shadow:0 1px 0 color-mix(in srgb, var(--brass) 55%, black), 0 2px 5px rgba(0,0,0,0.16); }

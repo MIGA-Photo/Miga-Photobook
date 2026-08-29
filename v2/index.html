@@ -131,7 +131,25 @@
      exact spot, regardless of whichever mode (circle/slider) the admin has
      chosen for the hero showcase further down. Framed in the site's brass
      gold to read as a distinct, deliberate feature rather than a stray box. -->
-<section class="wrap fixed-slider-section">
+<section class="hero wrap hero-with-slider">
+  <div>
+    <div class="eyebrow">نتيجة حقيقية — مش تصميم</div>
+    <h1>صورتك العادية<br>تتحول لـ<span class="display"> تحفة استوديو</span><br>قدام عينك دلوقتي</h1>
+    <p class="hero-p">مش هنقولك "صدقنا" — اسحب الدائرة وشوف الفرق بنفسك. نتيجة احترافية خلال دقائق.</p>
+    <div class="hero-ctas">
+      <button type="button" class="btn-primary" onclick="document.getElementById('productsSection').scrollIntoView({behavior:'smooth'})">جرّب بصورتك <b class="brand-mega">ميجا</b> دلوقتي</button>
+      <button type="button" class="btn-ghost" onclick="document.getElementById('pricingSection').scrollIntoView({behavior:'smooth'})">شوف الأسعار</button>
+    </div>
+    <div class="trust-row">
+      <span><span class="trust-dot">✓</span> نتيجة خلال دقائق</span>
+      <span><span class="trust-dot">✓</span> دفع آمن InstaPay/فودافون كاش</span>
+    </div>
+  </div>
+
+  <!-- Permanent showcase slider — always the interactive drag slider, right
+       beside the hero text in the same row (per explicit request). The
+       toggle-able circle/slider variant moved to its own section below,
+       since this spot is now taken by the permanent one. -->
   <div class="fixed-slider-frame">
     <div class="slider-wrap-instance" id="bafSliderFixed">
       <div class="slider-card slider-card-compact" data-slider-card>
@@ -149,68 +167,51 @@
   </div>
 </section>
 
-<section class="hero wrap">
-  <div>
-    <div class="eyebrow">نتيجة حقيقية — مش تصميم</div>
-    <h1>صورتك العادية<br>تتحول لـ<span class="display"> تحفة استوديو</span><br>قدام عينك دلوقتي</h1>
-    <p class="hero-p">مش هنقولك "صدقنا" — اسحب الدائرة وشوف الفرق بنفسك. نتيجة احترافية خلال دقائق.</p>
-    <div class="hero-ctas">
-      <button type="button" class="btn-primary" onclick="document.getElementById('productsSection').scrollIntoView({behavior:'smooth'})">جرّب بصورتك دلوقتي</button>
-      <button type="button" class="btn-ghost" onclick="document.getElementById('pricingSection').scrollIntoView({behavior:'smooth'})">شوف الأسعار</button>
-    </div>
-    <div class="trust-row">
-      <span><span class="trust-dot">✓</span> نتيجة خلال دقائق</span>
-      <span><span class="trust-dot">✓</span> دفع آمن InstaPay/فودافون كاش</span>
+<!-- Toggle-able showcase (circle or slider, chosen per-design from the
+     admin panel) — moved here, in its own section, since the hero row's
+     second column is now taken by the permanent slider above. -->
+<section class="wrap" style="padding-top:0;">
+  <div class="hero-showcase-variant baf-wrap-compact" id="heroVariantCircle" hidden>
+    <div class="baf-wrap">
+      <div class="baf-orbit">
+        <div class="baf-connector" style="--angle:0deg; --radius:clamp(90px,30vw,150px);"></div>
+        <div class="baf-connector" style="--angle:45deg; --radius:clamp(90px,30vw,150px);"></div>
+        <div class="baf-connector" style="--angle:90deg; --radius:clamp(90px,30vw,150px);"></div>
+        <div class="baf-connector" style="--angle:135deg; --radius:clamp(90px,30vw,150px);"></div>
+        <div class="baf-connector" style="--angle:180deg; --radius:clamp(90px,30vw,150px);"></div>
+        <div class="baf-connector" style="--angle:225deg; --radius:clamp(90px,30vw,150px);"></div>
+        <div class="baf-connector" style="--angle:270deg; --radius:clamp(90px,30vw,150px);"></div>
+        <div class="baf-connector" style="--angle:315deg; --radius:clamp(90px,30vw,150px);"></div>
+        <div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-1.jpg" alt="نتيجة 1" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-2.jpg" alt="نتيجة 2" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-3.jpg" alt="نتيجة 3" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-4.jpg" alt="نتيجة 4" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-5.jpg" alt="نتيجة 5" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-6.jpg" alt="نتيجة 6" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-7.jpg" alt="نتيجة 7" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-8.jpg" alt="نتيجة 8" loading="eager" decoding="async"></div></div>
+      </div>
+      <div class="baf-center">
+        <img src="before-after/before-after/before.jpg" alt="الصورة الأصلية">
+        <span class="baf-center-label">صورتك الأصلية</span>
+      </div>
     </div>
   </div>
-  <div>
-    <!-- Circle variant — hidden by default (v2's original is the slider);
-         shown via JS if the admin has chosen "circle" mode for this design. -->
-    <div class="hero-showcase-variant baf-wrap-compact" id="heroVariantCircle" hidden>
-      <div class="baf-wrap">
-        <div class="baf-orbit">
-          <div class="baf-connector" style="--angle:0deg; --radius:clamp(90px,30vw,150px);"></div>
-          <div class="baf-connector" style="--angle:45deg; --radius:clamp(90px,30vw,150px);"></div>
-          <div class="baf-connector" style="--angle:90deg; --radius:clamp(90px,30vw,150px);"></div>
-          <div class="baf-connector" style="--angle:135deg; --radius:clamp(90px,30vw,150px);"></div>
-          <div class="baf-connector" style="--angle:180deg; --radius:clamp(90px,30vw,150px);"></div>
-          <div class="baf-connector" style="--angle:225deg; --radius:clamp(90px,30vw,150px);"></div>
-          <div class="baf-connector" style="--angle:270deg; --radius:clamp(90px,30vw,150px);"></div>
-          <div class="baf-connector" style="--angle:315deg; --radius:clamp(90px,30vw,150px);"></div>
-          <div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-1.jpg" alt="نتيجة 1" loading="eager" decoding="async"></div></div>
-          <div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-2.jpg" alt="نتيجة 2" loading="eager" decoding="async"></div></div>
-          <div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-3.jpg" alt="نتيجة 3" loading="eager" decoding="async"></div></div>
-          <div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-4.jpg" alt="نتيجة 4" loading="eager" decoding="async"></div></div>
-          <div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-5.jpg" alt="نتيجة 5" loading="eager" decoding="async"></div></div>
-          <div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-6.jpg" alt="نتيجة 6" loading="eager" decoding="async"></div></div>
-          <div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-7.jpg" alt="نتيجة 7" loading="eager" decoding="async"></div></div>
-          <div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-8.jpg" alt="نتيجة 8" loading="eager" decoding="async"></div></div>
-        </div>
-        <div class="baf-center">
-          <img src="before-after/before-after/before.jpg" alt="الصورة الأصلية">
-          <span class="baf-center-label">صورتك الأصلية</span>
-        </div>
-      </div>
-    </div>
 
-    <!-- Slider variant — v2's original visual, shown by default. This is a
-         SEPARATE, independent slider instance from the permanent one above
-         the fold — switching this one's mode never affects that one. -->
-    <div class="hero-showcase-variant" id="heroVariantSlider">
-      <div class="slider-wrap-instance" id="bafSliderV2">
-        <div class="slider-card" data-slider-card>
-          <img data-slider-before alt="قبل">
-          <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد"></div>
-          <div class="slider-line" data-slider-line></div>
-          <button type="button" class="slider-handle" data-slider-handle>↔</button>
-          <span class="tag tag-before">قبل</span>
-          <span class="tag tag-after">بعد</span>
-          <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق">‹</button>
-          <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي">›</button>
-        </div>
-        <div class="slider-dots" data-slider-dots></div>
-        <p class="slider-hint">اسحب يمين وشمال، ودوس ‹ › تتنقل بين أمثلة مختلفة</p>
+  <div class="hero-showcase-variant" id="heroVariantSlider">
+    <div class="slider-wrap-instance" id="bafSliderV2">
+      <div class="slider-card" data-slider-card>
+        <img data-slider-before alt="قبل">
+        <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد"></div>
+        <div class="slider-line" data-slider-line></div>
+        <button type="button" class="slider-handle" data-slider-handle>↔</button>
+        <span class="tag tag-before">قبل</span>
+        <span class="tag tag-after">بعد</span>
+        <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق">‹</button>
+        <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي">›</button>
       </div>
+      <div class="slider-dots" data-slider-dots></div>
+      <p class="slider-hint">اسحب يمين وشمال، ودوس ‹ › تتنقل بين أمثلة مختلفة</p>
     </div>
   </div>
 </section>
@@ -221,32 +222,52 @@
     <p class="section-sub">فلتر واحد بس — من غير ما تفتح وتقفل أقسام.</p>
   </div>
   <div class="chip-row" id="chipRow"></div>
+  <p class="cat-section-heading" id="categoryHeading" style="display:none;"></p>
   <div class="grid" id="productGrid"></div>
 </section>
 
 <section class="wrap" id="pricingSection">
   <div class="section-head">
     <h2>الأسعار والباقات</h2>
-    <p class="section-sub">مسار دفع واحد للكل — مفيش تحويل لواتساب.</p>
+    <p class="section-sub">اختار الباقة اللي تناسبك — كل باقة بتوفّرلك سعر أقل للصورة.</p>
   </div>
   <div class="pricing-grid">
     <div class="plan">
-      <h3>صورة واحدة</h3>
-      <div class="price">25 <span>جنيه</span></div>
-      <ul><li>أي ستايل من التصنيفات</li><li>نتيجة خلال دقائق</li></ul>
-      <button type="button" class="btn-ghost btn-block" onclick="document.getElementById('productsSection').scrollIntoView({behavior:'smooth'})">اختار صورتك</button>
+      <h3>باقة Starter</h3>
+      <div class="price">59 <span>/ 3 صور</span></div>
+      <ul><li>تقريبًا 20 جنيه للصورة</li><li>اختيار حر من أي قسم</li></ul>
+      <button type="button" class="btn-ghost btn-block" onclick="openPackageBuyModal(3)">اطلب الباقة</button>
     </div>
     <div class="plan featured">
-      <h3>باقة الاحترافي</h3>
-      <div class="price">200 <span>/ 10 صور</span></div>
-      <ul><li>وفّر 50 جنيه</li><li>اختيار حر من أي قسم</li></ul>
-      <button type="button" class="btn-primary btn-block" onclick="openPackageBuyModal(10)">اطلب الباقة</button>
+      <h3>باقة Pro</h3>
+      <div class="price">259 <span>/ 15 صورة</span></div>
+      <ul><li>أقل من 18 جنيه للصورة</li><li>اختيار حر من أي قسم</li></ul>
+      <button type="button" class="btn-primary btn-block" onclick="openPackageBuyModal(15)">اطلب الباقة</button>
     </div>
     <div class="plan">
-      <h3>باقة الوكالة</h3>
-      <div class="price">450 <span>/ 25 صورة</span></div>
-      <ul><li>18 جنيه للصورة</li><li>مناسبة للاستوديوهات</li></ul>
-      <button type="button" class="btn-ghost btn-block" onclick="openPackageBuyModal(25)">اطلب الباقة</button>
+      <h3>باقة Premium</h3>
+      <div class="price">419 <span>/ 30 صورة</span></div>
+      <ul><li>أقل من 14 جنيه للصورة</li><li>مناسبة للاستوديوهات</li></ul>
+      <button type="button" class="btn-ghost btn-block" onclick="openPackageBuyModal(30)">اطلب الباقة</button>
+    </div>
+  </div>
+
+  <div class="section-head" style="margin-top:40px;">
+    <h2>اشترك شهريًا ووفّر أكتر</h2>
+    <p class="section-sub">أسلوب جديد كل شهر، ورصيد صور يتجدد — التجديد بنفس خطوات الدفع اليدوي (مش خصم تلقائي).</p>
+  </div>
+  <div class="pricing-grid">
+    <div class="plan">
+      <h3>اشتراك شهري — 10 صور</h3>
+      <div class="price">149 <span>/ شهريًا</span></div>
+      <ul><li>10 صور كل شهر</li><li>أساليب جديدة تُضاف شهريًا</li></ul>
+      <button type="button" class="btn-ghost btn-block" onclick="openPackageBuyModal(10)">اشترك دلوقتي</button>
+    </div>
+    <div class="plan featured">
+      <h3>اشتراك شهري — 20 صورة</h3>
+      <div class="price">299 <span>/ شهريًا</span></div>
+      <ul><li>20 صورة كل شهر</li><li>أفضل قيمة للاستخدام المستمر</li></ul>
+      <button type="button" class="btn-primary btn-block" onclick="openPackageBuyModal(20)">اشترك دلوقتي</button>
     </div>
   </div>
 </section>
