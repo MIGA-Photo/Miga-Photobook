@@ -71,14 +71,83 @@
 <body>
 
 <header>
-  <div class="nav-row">
-    <div class="logo">Miga<span class="logo-accent">-Photobook</span></div>
-    <div class="nav-actions">
-      <button type="button" class="nav-link" onclick="document.getElementById('pricingSection').scrollIntoView({behavior:'smooth'})">الأسعار</button>
-      <button type="button" class="nav-cta" onclick="document.getElementById('productsSection').scrollIntoView({behavior:'smooth'})">اطلب دلوقتي</button>
+  <div class="header-utility">
+    <div class="ctrl-group ctrl-group-sm" id="langToggle">
+      <button data-lang="ar" class="active">عربي</button>
+      <button data-lang="en">English</button>
     </div>
+    <button type="button" class="theme-toggle theme-toggle-sm" aria-pressed="true">
+      <span class="tt-stars" aria-hidden="true">
+        <span class="tt-star" style="inset-inline-start:8px; top:6px;"></span>
+        <span class="tt-star" style="inset-inline-start:16px; top:14px;"></span>
+        <span class="tt-star" style="inset-inline-start:24px; top:5px;"></span>
+      </span>
+      <span class="tt-icon tt-sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"/></svg></span>
+      <span class="tt-icon tt-moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg></span>
+      <span class="tt-knob" aria-hidden="true">
+        <span class="tt-knob-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"/></svg></span>
+          <span class="tt-knob-moon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg></span>
+      </span>
+    </button>
+    <div class="ctrl-group ctrl-group-sm" id="viewToggle">
+      <button data-view="desktop" class="active" id="viewBtnDesktop">
+        <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg></span>
+        <span>كمبيوتر</span>
+      </button>
+      <button data-view="mobile" id="viewBtnMobile">
+        <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M11 18.5h2"/></svg></span>
+        <span>موبايل</span>
+      </button>
+    </div>
+    <button type="button" class="util-link" id="trackOpenBtn">تتبع طلبي</button>
+  </div>
+  <div class="nav-wrap">
+    <div class="logo">
+      <svg class="logo-mark" viewBox="0 0 48 48" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+        <path d="M24 14 C19 10 10 9 5 11 V37 C10 35 19 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M24 14 C29 10 38 9 43 11 V37 C38 35 29 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M24 14 V40" stroke="var(--brass)" stroke-width="1.5" opacity="0.5"/>
+        <rect x="14" y="18" width="20" height="14" rx="3" fill="var(--ink)" stroke="var(--brass)" stroke-width="2"/>
+        <rect x="20" y="14" width="8" height="5" rx="1.5" fill="var(--ink)" stroke="var(--brass)" stroke-width="2"/>
+        <circle cx="24" cy="25" r="4.5" fill="none" stroke="var(--brass)" stroke-width="2"/>
+        <circle cx="24" cy="25" r="1.6" fill="var(--brass)"/>
+      </svg>
+      <span>Miga<span class="logo-accent">-Photobook</span></span>
+    </div>
+
+    <div class="search-box" id="searchBox">
+      <button type="button" class="search-icon-btn" id="searchIconBtn" aria-label="بحث" title="بحث">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><circle cx="10.3" cy="10.3" r="6.6" stroke-width="2.1"/><path d="M8 6.6a4 4 0 0 0-2.7 3.9" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/><line x1="15.2" y1="15.2" x2="21" y2="21" stroke-width="2.6" stroke-linecap="round"/></svg>
+      </button>
+      <input type="text" id="searchInput" placeholder="ابحث في الموقع...">
+      <div class="search-dropdown" id="searchDropdown"></div>
+    </div>
+
+    <button class="admin-btn admin-btn-primary" id="accountOpenBtn">تسجيل الدخول</button>
   </div>
 </header>
+
+<!-- Permanent showcase slider — always the interactive drag slider, in this
+     exact spot, regardless of whichever mode (circle/slider) the admin has
+     chosen for the hero showcase further down. Framed in the site's brass
+     gold to read as a distinct, deliberate feature rather than a stray box. -->
+<section class="wrap fixed-slider-section">
+  <div class="fixed-slider-frame">
+    <div class="slider-wrap-instance" id="bafSliderFixed">
+      <div class="slider-card slider-card-compact" data-slider-card>
+        <img data-slider-before alt="قبل">
+        <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد"></div>
+        <div class="slider-line" data-slider-line></div>
+        <button type="button" class="slider-handle" data-slider-handle>↔</button>
+        <span class="tag tag-before">قبل</span>
+        <span class="tag tag-after">بعد</span>
+        <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق">‹</button>
+        <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي">›</button>
+      </div>
+      <div class="slider-dots" data-slider-dots></div>
+    </div>
+  </div>
+</section>
 
 <section class="hero wrap">
   <div>
@@ -95,18 +164,54 @@
     </div>
   </div>
   <div>
-    <div class="slider-card" id="bafSlider">
-      <img id="imgBefore" alt="قبل">
-      <div class="slider-after-wrap" id="afterWrap"><img id="imgAfter" alt="بعد"></div>
-      <div class="slider-line" id="sliderLine"></div>
-      <button type="button" class="slider-handle" id="sliderHandle">↔</button>
-      <span class="tag tag-before">قبل</span>
-      <span class="tag tag-after">بعد</span>
-      <button type="button" class="slider-nav slider-nav-prev" id="navPrev" aria-label="السابق">‹</button>
-      <button type="button" class="slider-nav slider-nav-next" id="navNext" aria-label="التالي">›</button>
+    <!-- Circle variant — hidden by default (v2's original is the slider);
+         shown via JS if the admin has chosen "circle" mode for this design. -->
+    <div class="hero-showcase-variant baf-wrap-compact" id="heroVariantCircle" hidden>
+      <div class="baf-wrap">
+        <div class="baf-orbit">
+          <div class="baf-connector" style="--angle:0deg; --radius:clamp(90px,30vw,150px);"></div>
+          <div class="baf-connector" style="--angle:45deg; --radius:clamp(90px,30vw,150px);"></div>
+          <div class="baf-connector" style="--angle:90deg; --radius:clamp(90px,30vw,150px);"></div>
+          <div class="baf-connector" style="--angle:135deg; --radius:clamp(90px,30vw,150px);"></div>
+          <div class="baf-connector" style="--angle:180deg; --radius:clamp(90px,30vw,150px);"></div>
+          <div class="baf-connector" style="--angle:225deg; --radius:clamp(90px,30vw,150px);"></div>
+          <div class="baf-connector" style="--angle:270deg; --radius:clamp(90px,30vw,150px);"></div>
+          <div class="baf-connector" style="--angle:315deg; --radius:clamp(90px,30vw,150px);"></div>
+          <div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-1.jpg" alt="نتيجة 1" loading="eager" decoding="async"></div></div>
+          <div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-2.jpg" alt="نتيجة 2" loading="eager" decoding="async"></div></div>
+          <div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-3.jpg" alt="نتيجة 3" loading="eager" decoding="async"></div></div>
+          <div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-4.jpg" alt="نتيجة 4" loading="eager" decoding="async"></div></div>
+          <div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-5.jpg" alt="نتيجة 5" loading="eager" decoding="async"></div></div>
+          <div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-6.jpg" alt="نتيجة 6" loading="eager" decoding="async"></div></div>
+          <div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-7.jpg" alt="نتيجة 7" loading="eager" decoding="async"></div></div>
+          <div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-8.jpg" alt="نتيجة 8" loading="eager" decoding="async"></div></div>
+        </div>
+        <div class="baf-center">
+          <img src="before-after/before-after/before.jpg" alt="الصورة الأصلية">
+          <span class="baf-center-label">صورتك الأصلية</span>
+        </div>
+      </div>
     </div>
-    <div class="slider-dots" id="sliderDots"></div>
-    <p class="slider-hint">اسحب يمين وشمال، ودوس ‹ › تتنقل بين أمثلة مختلفة</p>
+
+    <!-- Slider variant — v2's original visual, shown by default. This is a
+         SEPARATE, independent slider instance from the permanent one above
+         the fold — switching this one's mode never affects that one. -->
+    <div class="hero-showcase-variant" id="heroVariantSlider">
+      <div class="slider-wrap-instance" id="bafSliderV2">
+        <div class="slider-card" data-slider-card>
+          <img data-slider-before alt="قبل">
+          <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد"></div>
+          <div class="slider-line" data-slider-line></div>
+          <button type="button" class="slider-handle" data-slider-handle>↔</button>
+          <span class="tag tag-before">قبل</span>
+          <span class="tag tag-after">بعد</span>
+          <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق">‹</button>
+          <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي">›</button>
+        </div>
+        <div class="slider-dots" data-slider-dots></div>
+        <p class="slider-hint">اسحب يمين وشمال، ودوس ‹ › تتنقل بين أمثلة مختلفة</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -222,6 +327,104 @@
     <img id="transformPreview" style="display:none; width:100%; border-radius:12px; margin-bottom:14px;">
     <div class="modal-actions">
       <button type="button" class="btn-primary btn-block" id="transformGenerateBtn">حوّل الصورة</button>
+    </div>
+  </div>
+</div>
+
+<!-- ---------- Track order (ported from Design MIGA 1) ---------- -->
+<div class="modal-bg" id="trackModalBg">
+  <div class="modal">
+    <button class="modal-close" id="trackModalClose">×</button>
+    <h3>تتبع طلبك</h3>
+    <div id="myOrdersHistory" style="display:none; margin-bottom:18px;">
+      <div class="sub" style="margin-bottom:8px; font-weight:700;">طلباتك السابقة</div>
+      <div id="myOrdersHistoryList"></div>
+    </div>
+    <p class="sub">أدخل كود المتابعة الذي حصلت عليه بعد إرسال طلب الشراء.</p>
+    <div class="field">
+      <label>كود المتابعة</label>
+      <input type="text" id="trackCode" placeholder="مثال: A1B2C3" style="text-transform:uppercase;">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" id="trackCheckBtn">تحقّق من الحالة</button>
+      <button class="btn-ghost" id="trackCancelBtn">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- ---------- Account (login/register) — ported from Design MIGA 1 ---------- -->
+<div class="modal-bg" id="accountModalBg">
+  <div class="modal" style="max-width:420px;">
+    <button class="modal-close" id="accountModalClose">×</button>
+
+    <div id="accountLoggedOutView">
+      <button class="btn-ghost social-btn" id="biometricLoginBtn" style="display:none; width:100%; margin-bottom:12px; align-items:center; justify-content:center; gap:8px; border-color:var(--brass-dim);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.8"><path d="M12 2a5 5 0 0 0-5 5v2a5 5 0 0 0 .4 2M7 15c0 2 1 4 5 5M17 9v2c0 1.5-.3 2.7-.8 3.6M12 7a2 2 0 0 1 2 2v3a6 6 0 0 1-1 3.4M9 9v2c0 3 1.5 5 4 6"/></svg>
+        <span>الدخول ببصمة الوجه / الإصبع</span>
+      </button>
+      <div class="social-login-row" style="display:none; flex-direction:column; gap:8px; margin-bottom:16px;">
+        <button class="btn-ghost social-btn" id="googleLoginBtn" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+          <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.5 5.1 29.5 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.4-.1-2.5-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l6-6C34.5 5.1 29.5 3 24 3c-7.6 0-14.1 4.3-17.4 10.7z"/><path fill="#4CAF50" d="M24 45c5.3 0 10.1-2 13.7-5.4l-6.3-5.3C29.4 35.9 26.9 37 24 37c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.8 40.6 16.3 45 24 45z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.3 5.3C39.5 37.1 43 31 43 24c0-1.4-.1-2.5-.4-3.5z"/></svg>
+          <span>المتابعة بحساب جوجل</span>
+        </button>
+        <button class="btn-ghost social-btn" id="appleLoginBtn" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16.365 1.43c0 1.14-.446 2.06-1.13 2.79-.75.79-1.94 1.4-2.95 1.32-.13-1.1.44-2.24 1.11-2.95.75-.8 2.03-1.4 2.97-1.16zm4.05 16.53c-.4.93-.87 1.83-1.53 2.7-.9 1.19-1.83 2.38-3.28 2.4-1.42.03-1.88-.83-3.5-.83-1.63 0-2.14.8-3.48.86-1.4.05-2.47-1.28-3.38-2.47-1.85-2.42-3.26-6.84-1.37-9.83.94-1.48 2.61-2.42 4.43-2.44 1.4-.03 2.71.94 3.56.94.84 0 2.44-1.16 4.12-.99.7.03 2.67.28 3.93 2.13-.1.06-2.35 1.37-2.32 4.08.03 3.24 2.84 4.32 2.87 4.33-.02.08-.45 1.54-1.05 3.02z"/></svg>
+          <span>المتابعة بحساب Apple</span>
+        </button>
+        <button class="btn-ghost social-btn" id="facebookLoginBtn" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+          <span>المتابعة بحساب فيسبوك</span>
+        </button>
+      </div>
+      <div class="account-tabs-divider" style="display:none; text-align:center; font-size:12px; color:var(--paper-dim); margin-bottom:14px;">أو بالبريد الإلكتروني</div>
+      <div class="account-tabs">
+        <button class="account-tab active" id="tabLoginBtn">تسجيل الدخول</button>
+        <button class="account-tab" id="tabRegisterBtn">حساب جديد</button>
+      </div>
+
+      <div id="loginFormView">
+        <div class="field">
+          <label>البريد الإلكتروني</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label>كلمة المرور</label>
+          <input type="password" id="loginPassword">
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="loginSubmitBtn">دخول</button>
+        </div>
+      </div>
+
+      <div id="registerFormView" style="display:none;">
+        <div class="field">
+          <label>الاسم</label>
+          <input type="text" id="registerName">
+        </div>
+        <div class="field">
+          <label>البريد الإلكتروني</label>
+          <input type="email" id="registerEmail" placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label>كلمة المرور</label>
+          <input type="password" id="registerPassword" placeholder="6 أحرف على الأقل">
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="registerSubmitBtn">إنشاء الحساب</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="accountLoggedInView" style="display:none;">
+      <h3>أهلاً بيك!</h3>
+      <p class="sub" id="accountUserInfo"></p>
+      <button class="btn-ghost social-btn" id="registerBiometricBtn" style="display:none; width:100%; margin-bottom:14px; align-items:center; justify-content:center; gap:8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a5 5 0 0 0-5 5v2a5 5 0 0 0 .4 2M7 15c0 2 1 4 5 5M17 9v2c0 1.5-.3 2.7-.8 3.6M12 7a2 2 0 0 1 2 2v3a6 6 0 0 1-1 3.4M9 9v2c0 3 1.5 5 4 6"/></svg>
+        <span>تفعيل الدخول ببصمة الوجه/الإصبع لهذا الجهاز</span>
+      </button>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="accountLogoutBtn">تسجيل الخروج</button>
+      </div>
     </div>
   </div>
 </div>
