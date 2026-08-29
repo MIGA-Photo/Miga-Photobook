@@ -304,6 +304,7 @@ const translations = {
     toastWrongPassword:'كلمة المرور غير صحيحة', toastAdminRateLimited:'محاولات كتير أوي في وقت قصير — استنى شوية (لحد 10 دقايق) وجرب تاني', toastAdminServerError:'السيرفر فيه مشكلة مؤقتة (مش كلمة السر) — جرب تاني بعد شوية، أو راجع حد الكتابة اليومي في Cloudflare KV', toastFillFields:'يرجى إكمال العنوان والسعر وتعليمات التحويل',
     changePassTitle:'تغيير كلمة مرور الأدمن', tabChangePassword:'تغيير كلمة المرور', changePassIntro:'غيّر كلمة مرور دخول لوحة الإدارة. لازم تعرف الكلمة الحالية عشان تقدر تغيّرها.', currentPassLabel:'كلمة المرور الحالية', newPassLabel:'كلمة المرور الجديدة', confirmNewPassLabel:'تأكيد كلمة المرور الجديدة', changePassBtn:'تغيير كلمة المرور',
     tabSiteDesign:'تصميم الموقع', siteDesignIntro:'اختار الشكل اللي هيشوفه العميل لما يفتح الموقع. لوحة الإدارة نفسها بتفضل زي ما هي دايمًا مهما كان اختيارك هنا.', siteDesignLabel:'التصميم الفعّال', siteDesignV1Option:'التصميم الأول (الحالي)', siteDesignV2Option:'التصميم الثاني (الجديد)', siteDesignSaveBtn:'حفظ الاختيار', toastSiteDesignSaved:'تم حفظ التصميم — هيظهر للعملاء من زيارتهم الجاية',
+    heroModeIntro:'لكل تصميم، اختار شكل عرض "قبل/بعد" في الصفحة الرئيسية — الدائرة الدوّارة الأصلية، أو السلايدر التفاعلي بالسحب. الاختيار هنا مستقل عن السلايدر الثابت الجديد في التصميم الثاني (ده فاضل سلايدر دايمًا مهما اخترت).', heroModeSaveBtn:'حفظ أوضاع الهيرو', heroModeCircle:'دائرة دوّارة', heroModeSlider:'سلايدر تفاعلي', toastHeroModesSaved:'تم حفظ أوضاع الهيرو لكل التصاميم',
     toastPassChanged:'تم تغيير كلمة المرور بنجاح', toastPassMismatch:'كلمة المرور الجديدة وتأكيدها غير متطابقين', toastPassTooShort:'كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل', toastCurrentPassWrong:'كلمة المرور الحالية غير صحيحة', toastFillPassFields:'يرجى إدخال كل الحقول',
     toastProductAdded:'تم إضافة المنتج بنجاح',
     uploadingImage:'جاري رفع الصورة...', toastImageUploadFailed:'تعذّر رفع الصورة، تأكد من اتصالك وحاول تاني',
@@ -583,6 +584,7 @@ const translations = {
     toastWrongPassword:'Incorrect password', toastAdminRateLimited:'Too many attempts in a short time — wait a bit (up to 10 minutes) and try again', toastAdminServerError:'The server hit a temporary issue (not your password) — try again shortly, or check the daily Cloudflare KV write limit', toastFillFields:'Please complete the title, price, and prompt',
     changePassTitle:'Change admin password', tabChangePassword:'Change password', changePassIntro:'Change the password used to log in to the admin panel. You need to know the current one to change it.', currentPassLabel:'Current password', newPassLabel:'New password', confirmNewPassLabel:'Confirm new password', changePassBtn:'Change password',
     tabSiteDesign:'Site Design', siteDesignIntro:'Choose which look customers see when they open the site. The admin panel itself always stays the same regardless of your choice here.', siteDesignLabel:'Active design', siteDesignV1Option:'Design 1 (current)', siteDesignV2Option:'Design 2 (new)', siteDesignSaveBtn:'Save choice', toastSiteDesignSaved:'Design saved — customers will see it on their next visit',
+    heroModeIntro:'For each design, choose the "before/after" showcase style on the homepage — the original orbiting circle, or the interactive drag slider. This choice is independent of Design 2\'s new fixed slider (that one always stays a slider regardless).', heroModeSaveBtn:'Save hero modes', heroModeCircle:'Orbiting circle', heroModeSlider:'Interactive slider', toastHeroModesSaved:'Hero modes saved for every design',
     toastPassChanged:'Password changed successfully', toastPassMismatch:'New password and confirmation do not match', toastPassTooShort:'New password must be at least 8 characters', toastCurrentPassWrong:'Current password is incorrect', toastFillPassFields:'Please fill in all fields',
     toastProductAdded:'Product added successfully',
     uploadingImage:'Uploading image...', toastImageUploadFailed:'Could not upload the image, check your connection and try again',
@@ -3509,7 +3511,8 @@ document.getElementById('tabBtnSiteDesign').onclick = async ()=>{
 /** Loads the list of available designs AND which one is currently live,
  * building the dropdown from server data — a future Design MIGA 3/4 just
  * needs one entry added to the Worker's registry to show up here, with no
- * frontend change needed at all. */
+ * frontend change needed at all. Also builds the hero-mode (circle/slider)
+ * row for each registered design, from the same /site-config response. */
 async function loadSiteDesignIntoAdmin(){
   if(!BACKEND_BASE) return;
   try{
@@ -3520,6 +3523,19 @@ async function loadSiteDesignIntoAdmin(){
     const list = Array.isArray(data.availableDesigns) ? data.availableDesigns : [];
     select.innerHTML = list.map(d => `<option value="${d.id}">${escapeHtml(d[lang] || d.id)}</option>`).join('');
     select.value = data.activeDesign === 'v2' ? 'v2' : (list.some(d=>d.id===data.activeDesign) ? data.activeDesign : 'v1');
+
+    const heroModes = data.heroModes || {};
+    const rowsEl = document.getElementById('heroModeRows');
+    if(rowsEl){
+      rowsEl.innerHTML = list.map(d => `
+        <div class="field" data-hero-mode-row="${d.id}">
+          <label>${escapeHtml(d[lang] || d.id)}</label>
+          <select data-hero-mode-select="${d.id}">
+            <option value="circle" ${heroModes[d.id]==='circle' ? 'selected' : ''}>${t('heroModeCircle')}</option>
+            <option value="slider" ${heroModes[d.id]==='slider' ? 'selected' : ''}>${t('heroModeSlider')}</option>
+          </select>
+        </div>`).join('');
+    }
   }catch(e){ /* leave the dropdown empty on a network hiccup */ }
 }
 document.getElementById('saveSiteDesignBtn').onclick = async ()=>{
@@ -3533,6 +3549,31 @@ document.getElementById('saveSiteDesignBtn').onclick = async ()=>{
     const data = await res.json().catch(()=>({}));
     if(res.ok && data.ok) showToast(t('toastSiteDesignSaved'));
     else showToast(t('toastAdminServerError'));
+  }catch(e){
+    showToast(t('toastAdminServerError'));
+  }
+};
+
+/** Saves every design's hero-mode row in one go — each design is its own
+ * independent request since the backend stores them per-design, but the
+ * admin only sees a single "حفظ" click either way. */
+document.getElementById('saveHeroModesBtn').onclick = async ()=>{
+  if(!BACKEND_BASE || !adminSessionToken) return;
+  const selects = [...document.querySelectorAll('[data-hero-mode-select]')];
+  if(!selects.length) return;
+  try{
+    let allOk = true;
+    for(const sel of selects){
+      const design = sel.getAttribute('data-hero-mode-select');
+      const mode = sel.value;
+      const res = await fetch(`${BACKEND_BASE}/admin/set-hero-mode?token=${encodeURIComponent(adminSessionToken)}`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ design, mode })
+      });
+      const data = await res.json().catch(()=>({}));
+      if(!res.ok || !data.ok) allOk = false;
+    }
+    showToast(allOk ? t('toastHeroModesSaved') : t('toastAdminServerError'));
   }catch(e){
     showToast(t('toastAdminServerError'));
   }
@@ -5158,6 +5199,116 @@ function showToast(msg){
   toastTimer = setTimeout(()=> t.classList.remove('show'), 3800);
 }
 
+// ---------- Reusable before/after slider (supports multiple independent
+// instances on the same page — each root element uses data-slider-* markers
+// instead of ids, so the same code drives however many instances exist). ----------
+async function loadSliderData(){
+  try{
+    const res = await fetch(`${BACKEND_BASE}/showcase`);
+    const data = await res.json();
+    if(data && data.center && Array.isArray(data.items) && data.items.length){
+      return data.items.filter(Boolean).map(after => ({ before: data.center, after }));
+    }
+  }catch(e){ /* fall through to the static fallback below */ }
+  const withImages = (products || []).filter(p=>p.image).slice(0,3);
+  if(withImages.length) return withImages.map(p => ({ before: withImages[0]?.image, after: p.image }));
+  return [];
+}
+
+function initSliderInstance(rootId){
+  const root = document.getElementById(rootId);
+  if(!root) return null;
+  const els = {
+    card: root.querySelector('[data-slider-card]'),
+    imgBefore: root.querySelector('[data-slider-before]'),
+    imgAfter: root.querySelector('[data-slider-after]'),
+    wrap: root.querySelector('[data-slider-afterwrap]'),
+    line: root.querySelector('[data-slider-line]'),
+    handle: root.querySelector('[data-slider-handle]'),
+    dots: root.querySelector('[data-slider-dots]'),
+    prev: root.querySelector('[data-slider-prev]'),
+    next: root.querySelector('[data-slider-next]'),
+  };
+  if(!els.card || !els.imgBefore || !els.imgAfter || !els.wrap || !els.line || !els.handle) return null;
+  const state = { pairs: [], current: 0, demo: true, dragging: false };
+
+  function renderDots(){
+    if(!els.dots) return;
+    els.dots.innerHTML = state.pairs.map((_,i)=>`<button type="button" class="slider-dot" aria-label="مثال ${i+1}"></button>`).join('');
+    [...els.dots.children].forEach((d,i)=> d.onclick = ()=> renderPair(i));
+  }
+  function renderPair(index){
+    if(!state.pairs.length) return;
+    state.current = ((index % state.pairs.length) + state.pairs.length) % state.pairs.length;
+    const pair = state.pairs[state.current];
+    els.imgBefore.src = pair.before;
+    els.imgAfter.src = pair.after;
+    els.wrap.style.setProperty('--pos','50%'); els.line.style.setProperty('--posR','50%'); els.handle.style.setProperty('--posR','50%');
+    state.demo = true;
+    if(els.dots) [...els.dots.children].forEach((d,i)=> d.classList.toggle('active', i===state.current));
+  }
+  function setPos(clientX){
+    const rect = els.card.getBoundingClientRect();
+    let x = clientX - rect.left;
+    x = Math.max(0, Math.min(rect.width, x));
+    const pct = (x / rect.width) * 100;
+    els.wrap.style.setProperty('--pos', pct + '%');
+    els.line.style.setProperty('--posR', (100-pct) + '%');
+    els.handle.style.setProperty('--posR', (100-pct) + '%');
+  }
+  function start(e){ state.dragging = true; state.demo = false; move(e); }
+  function move(e){ if(!state.dragging) return; setPos(e.touches ? e.touches[0].clientX : e.clientX); }
+  function end(){ state.dragging = false; }
+
+  els.handle.addEventListener('mousedown', start);
+  window.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', end);
+  els.handle.addEventListener('touchstart', start, {passive:true});
+  window.addEventListener('touchmove', move, {passive:true});
+  window.addEventListener('touchend', end);
+  if(els.prev) els.prev.onclick = ()=> renderPair(state.current-1);
+  if(els.next) els.next.onclick = ()=> renderPair(state.current+1);
+
+  let angle = 0;
+  (function autoDemo(){
+    if(state.demo && !state.dragging && state.pairs.length){
+      angle += 0.014;
+      const pct = 50 + Math.sin(angle) * 24;
+      els.wrap.style.setProperty('--pos', pct + '%');
+      els.line.style.setProperty('--posR', (100-pct) + '%');
+      els.handle.style.setProperty('--posR', (100-pct) + '%');
+    }
+    requestAnimationFrame(autoDemo);
+  })();
+
+  return { setPairs(pairs){ state.pairs = pairs; renderDots(); renderPair(0); } };
+}
+
+// ---------- Hero showcase mode (circle vs slider), chosen per-design from
+// the admin panel's "تصميم الموقع" tab. Design MIGA 1 defaults to its
+// original circle if nothing has been chosen yet — fully backward-compatible. ----------
+async function applyHeroModeForThisDesign(){
+  let mode = 'circle';
+  try{
+    const res = await fetch(`${BACKEND_BASE}/site-config`);
+    const data = await res.json();
+    if(data && data.heroModes && data.heroModes.v1) mode = data.heroModes.v1;
+  }catch(e){ /* network hiccup — keep this design's original default */ }
+  const circleEl = document.getElementById('heroVariantCircle');
+  const sliderEl = document.getElementById('heroVariantSlider');
+  if(!circleEl || !sliderEl) return;
+  if(mode === 'slider'){
+    circleEl.hidden = true;
+    sliderEl.hidden = false;
+    const pairs = await loadSliderData();
+    const inst = initSliderInstance('bafSliderV1');
+    if(inst && pairs.length) inst.setPairs(pairs);
+  }else{
+    circleEl.hidden = false;
+    sliderEl.hidden = true;
+  }
+}
+
 // ---------- Init ----------
 (async function init(){
   logVisitOnce();
@@ -5191,6 +5342,7 @@ function showToast(msg){
   }
   applyChildrenVisibility();
   setInterval(updateCountdown, 60000);
+  await applyHeroModeForThisDesign();
 
   // Secret admin entry point: visit index.html#mega-admin-9k2x to open the admin login.
   // The button itself stays hidden from customers (see adminOpenBtn above).

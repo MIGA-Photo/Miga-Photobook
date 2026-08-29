@@ -13,7 +13,17 @@
      check resolves (or a 1.2s fallback fires) so there's still no flash of
      the wrong design, without hitting that spec restriction. MY_DESIGN_ID
      is the only line that differs between this file and each design's own
-     copy of this same script. -->
+     copy of this same script.
+
+     SECOND FIX: the secret admin entry point (visiting this exact root page
+     with #mega-admin-9k2x in the URL) lives ONLY here — Design MIGA 2/3
+     have no admin panel at all. But this redirect used to fire before that
+     hash was ever checked, so whenever a design other than MIGA 1 was
+     active, opening the admin link just bounced straight to that design's
+     visitor page (silently dropping the hash along the way) — the admin
+     became completely unreachable. The admin entry must always work from
+     this page regardless of which design is currently active for
+     customers, so it's now checked FIRST and skips the redirect entirely. -->
 <style id="__bootHide">html{visibility:hidden;}</style>
 <script>
 (function(){
@@ -24,6 +34,12 @@
     revealed = true;
     var s = document.getElementById('__bootHide');
     if(s) s.remove();
+  }
+  // Admin entry point — never redirect away from this, no matter which
+  // design is active for customers. The admin panel only exists here.
+  if(window.location.hash === '#mega-admin-9k2x'){
+    reveal();
+    return;
   }
   var fallback = setTimeout(reveal, 1200);
   fetch('https://miga-photobook-api.magdyfarouk380.workers.dev/site-config')
@@ -277,35 +293,94 @@
   .baf-item img{ width:100%; height:100%; object-fit:cover; object-position:center 15%; display:block; transition:transform 0.25s ease; }
   .baf-connector{ position:absolute; top:50%; left:50%; width:1px; height:1px; z-index:1; }
   .baf-connector::before{ content:''; position:absolute; top:0; left:0; width:2px; background:var(--line); opacity:0.35; height:var(--radius); transform-origin:top center; transform:rotate(var(--angle)); }
+
+  /* ---------- Slider variant (alternative to the circle, chosen per-design
+     from the admin panel — "لوحة التحكم → تصميم الموقع → وضع الهيرو") ---------- */
+  .slider-card{
+    position:relative; border-radius:16px; overflow:hidden;
+    border:1px solid var(--line); box-shadow:0 20px 60px rgba(0,0,0,0.45);
+    aspect-ratio:4/5; max-width:420px; margin:0 auto; touch-action:none; user-select:none;
+    background:var(--ink-2, #151317);
+  }
+  .slider-card img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
+  .slider-after-wrap{ position:absolute; inset:0; overflow:hidden; clip-path:inset(0 0 0 var(--pos,50%)); }
+  .slider-line{ position:absolute; top:0; bottom:0; right:var(--posR,50%); width:2px; background:var(--brass); pointer-events:none; }
+  .slider-handle{
+    position:absolute; top:50%; right:var(--posR,50%); transform:translate(50%,-50%);
+    width:44px; height:44px; border-radius:50%; background:var(--brass); color:var(--ink);
+    display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:800;
+    box-shadow:0 6px 18px rgba(0,0,0,0.5); cursor:ew-resize; border:none;
+  }
+  .slider-card .tag{ position:absolute; top:14px; font-size:12px; font-weight:800; padding:5px 12px; border-radius:999px; background:rgba(11,11,13,0.72); backdrop-filter:blur(4px); border:1px solid var(--line); }
+  .slider-card .tag-before{ left:14px; } .slider-card .tag-after{ right:14px; color:var(--brass); }
+  .slider-nav{
+    position:absolute; top:50%; transform:translateY(-50%); z-index:5;
+    width:36px; height:36px; border-radius:50%; border:1px solid var(--line);
+    background:rgba(11,11,13,0.55); backdrop-filter:blur(4px); color:var(--paper);
+    font-size:19px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .slider-nav:hover{ background:var(--brass); color:var(--ink); border-color:var(--brass); }
+  .slider-nav-prev{ left:8px; } .slider-nav-next{ right:8px; }
+  .slider-dots{ display:flex; justify-content:center; gap:8px; margin-top:12px; }
+  .slider-dot{ width:8px; height:8px; border-radius:50%; background:var(--line); border:none; cursor:pointer; padding:0; }
+  .slider-dot.active{ background:var(--brass); width:20px; border-radius:5px; }
+  .slider-hint{ text-align:center; font-size:12.5px; color:var(--paper-dim); margin-top:10px; }
+  .hero-showcase-variant[hidden]{ display:none !important; }
 </style>
 
 <section class="baf-section" id="beforeAfterShowcase">
   <h2 class="baf-title" data-i18n="bafTitle">صورة واحدة منك... نحولها لأجمل صورة من اختيارك من عندنا</h2>
   <p class="baf-sub" data-i18n="bafSub">دي نفس الصورة، بعد ما Miga-Photobook حوّلها لأكتر من ستايل. اختار اللي يعجبك وجرّبه على صورتك.</p>
-  <div class="baf-wrap">
-    <div class="baf-orbit">
-      <div class="baf-connector" style="--angle:0deg; --radius:clamp(120px,36vw,225px);"></div>
-      <div class="baf-connector" style="--angle:45deg; --radius:clamp(120px,36vw,225px);"></div>
-      <div class="baf-connector" style="--angle:90deg; --radius:clamp(120px,36vw,225px);"></div>
-      <div class="baf-connector" style="--angle:135deg; --radius:clamp(120px,36vw,225px);"></div>
-      <div class="baf-connector" style="--angle:180deg; --radius:clamp(120px,36vw,225px);"></div>
-      <div class="baf-connector" style="--angle:225deg; --radius:clamp(120px,36vw,225px);"></div>
-      <div class="baf-connector" style="--angle:270deg; --radius:clamp(120px,36vw,225px);"></div>
-      <div class="baf-connector" style="--angle:315deg; --radius:clamp(120px,36vw,225px);"></div>
-      <div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-1.jpg" alt="نتيجة 1" loading="eager" decoding="async"></div></div>
-      <div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-2.jpg" alt="نتيجة 2" loading="eager" decoding="async"></div></div>
-      <div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-3.jpg" alt="نتيجة 3" loading="eager" decoding="async"></div></div>
-      <div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-4.jpg" alt="نتيجة 4" loading="eager" decoding="async"></div></div>
-      <div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-5.jpg" alt="نتيجة 5" loading="eager" decoding="async"></div></div>
-      <div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-6.jpg" alt="نتيجة 6" loading="eager" decoding="async"></div></div>
-      <div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-7.jpg" alt="نتيجة 7" loading="eager" decoding="async"></div></div>
-      <div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-8.jpg" alt="نتيجة 8" loading="eager" decoding="async"></div></div>
-    </div>
-    <div class="baf-center">
-      <img src="before-after/before-after/before.jpg" alt="الصورة الأصلية">
-      <span class="baf-center-label" data-i18n="bafCenterLabel">صورتك الأصلية</span>
+
+  <!-- Circle variant — Design MIGA 1's original visual. Shown by default;
+       hidden via JS if the admin has chosen "slider" mode for this design. -->
+  <div class="hero-showcase-variant" id="heroVariantCircle">
+    <div class="baf-wrap">
+      <div class="baf-orbit">
+        <div class="baf-connector" style="--angle:0deg; --radius:clamp(120px,36vw,225px);"></div>
+        <div class="baf-connector" style="--angle:45deg; --radius:clamp(120px,36vw,225px);"></div>
+        <div class="baf-connector" style="--angle:90deg; --radius:clamp(120px,36vw,225px);"></div>
+        <div class="baf-connector" style="--angle:135deg; --radius:clamp(120px,36vw,225px);"></div>
+        <div class="baf-connector" style="--angle:180deg; --radius:clamp(120px,36vw,225px);"></div>
+        <div class="baf-connector" style="--angle:225deg; --radius:clamp(120px,36vw,225px);"></div>
+        <div class="baf-connector" style="--angle:270deg; --radius:clamp(120px,36vw,225px);"></div>
+        <div class="baf-connector" style="--angle:315deg; --radius:clamp(120px,36vw,225px);"></div>
+        <div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-1.jpg" alt="نتيجة 1" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-2.jpg" alt="نتيجة 2" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-3.jpg" alt="نتيجة 3" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-4.jpg" alt="نتيجة 4" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-5.jpg" alt="نتيجة 5" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-6.jpg" alt="نتيجة 6" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-7.jpg" alt="نتيجة 7" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-8.jpg" alt="نتيجة 8" loading="eager" decoding="async"></div></div>
+      </div>
+      <div class="baf-center">
+        <img src="before-after/before-after/before.jpg" alt="الصورة الأصلية">
+        <span class="baf-center-label" data-i18n="bafCenterLabel">صورتك الأصلية</span>
+      </div>
     </div>
   </div>
+
+  <!-- Slider variant — the interactive drag before/after, same as Design
+       MIGA 2/3. Hidden by default; shown via JS if the admin has chosen
+       "slider" mode for this design. -->
+  <div class="hero-showcase-variant" id="heroVariantSlider" hidden>
+    <div class="slider-wrap-instance" id="bafSliderV1">
+      <div class="slider-card" data-slider-card>
+        <img data-slider-before alt="قبل">
+        <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد"></div>
+        <div class="slider-line" data-slider-line></div>
+        <button type="button" class="slider-handle" data-slider-handle>↔</button>
+        <span class="tag tag-before">قبل</span>
+        <span class="tag tag-after">بعد</span>
+        <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق">‹</button>
+        <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي">›</button>
+      </div>
+      <div class="slider-dots" data-slider-dots></div>
+      <p class="slider-hint">اسحب يمين وشمال، ودوس ‹ › تتنقل بين أمثلة مختلفة</p>
+    </div>
+  </div>
+
   <div class="hero-ctas" style="margin-top:34px;">
     <a href="#children" class="btn-primary" data-i18n="bafCta">اعمل صورتك دلوقتي بـ25 جنيه</a>
   </div>
@@ -1391,6 +1466,13 @@
         </div>
         <div class="modal-actions">
           <button class="btn-primary" id="saveSiteDesignBtn" data-i18n="siteDesignSaveBtn">حفظ الاختيار</button>
+        </div>
+
+        <hr style="border:none; border-top:1px solid var(--line); margin:22px 0;">
+        <p class="sub" style="margin-bottom:14px;" data-i18n="heroModeIntro">لكل تصميم، اختار شكل عرض "قبل/بعد" في الصفحة الرئيسية — الدائرة الدوّارة الأصلية، أو السلايدر التفاعلي بالسحب. الاختيار هنا مستقل عن السلايدر الثابت الجديد في التصميم الثاني (ده فاضل سلايدر دايمًا مهما اخترت).</p>
+        <div id="heroModeRows"><!-- populated dynamically, one row per design in the registry --></div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="saveHeroModesBtn" data-i18n="heroModeSaveBtn">حفظ أوضاع الهيرو</button>
         </div>
       </div>
 
