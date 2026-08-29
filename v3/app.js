@@ -16,8 +16,14 @@ const VODAFONE_CASH_NUMBER = "01017877978";
 const PROMPT_PRICE = 10;
 const PROMPT_ORIGINAL_PRICE = 15;
 const PACKAGE_CATALOG = {
-  10: { price: 200, titleAr: 'باقة الاحترافي — 10 صور', titleEn: 'Professional Package — 10 photos' },
-  25: { price: 450, titleAr: 'باقة الوكالة — 25 صورة', titleEn: 'Agency Package — 25 photos' },
+  3:  { price: 59,  titleAr: 'باقة Starter — 3 صور',  titleEn: 'Starter Package — 3 photos' },
+  15: { price: 259, titleAr: 'باقة Pro — 15 صورة',    titleEn: 'Pro Package — 15 photos' },
+  30: { price: 419, titleAr: 'باقة Premium — 30 صورة', titleEn: 'Premium Package — 30 photos' },
+  // "Monthly" subscription-style packages — same underlying credits
+  // mechanism as the packages above (no auto-recurring billing exists),
+  // just marketed with a monthly framing to encourage repeat purchases.
+  10: { price: 149, titleAr: 'اشتراك شهري — 10 صور/شهريًا', titleEn: 'Monthly Subscription — 10 photos/month' },
+  20: { price: 299, titleAr: 'اشتراك شهري — 20 صورة/شهريًا', titleEn: 'Monthly Subscription — 20 photos/month' },
 };
 const CATEGORIES = [
   { id: 'all', ar: 'الكل', en: 'All' },
@@ -42,15 +48,19 @@ const I18N = {
     heroEyebrow:'نتيجة حقيقية — مش تصميم',
     heroTitle1:'صورتك العادية', heroTitleHi:' تحفة استوديو', heroTitle2:'تتحول لـ', heroTitle3:'قدام عينك دلوقتي',
     heroP:'مش هنقولك "صدقنا" — اسحب الدائرة وشوف الفرق بنفسك. نتيجة احترافية خلال دقائق.',
-    heroCtaPrimary:'جرّب بصورتك دلوقتي', heroCtaGhost:'شوف الأسعار',
+    heroCtaPrimary:'جرّب بصورتك <b class="brand-mega">ميجا</b> دلوقتي', heroCtaGhost:'شوف الأسعار',
     trust1:'نتيجة خلال دقائق', trust2:'دفع آمن InstaPay/فودافون كاش',
     step1Num:'1', step1:'اختار الستايل', step2Num:'2', step2:'ادفع وارفع صورتك', step3Num:'3', step3:'استلم نتيجتك',
     sliderHint:'اسحب يمين وشمال، ودوس ‹ › تتنقل بين أمثلة مختلفة',
     productsTitle:'اختار الستايل اللي يعجبك', productsSub:'فلتر واحد بس — من غير ما تفتح وتقفل أقسام.',
-    pricingTitle:'الأسعار والباقات', pricingSub:'مسار دفع واحد للكل — مفيش تحويل لواتساب.',
-    planSingleTitle:'صورة واحدة', planSingleFeat1:'أي ستايل من التصنيفات', planSingleFeat2:'نتيجة خلال دقائق', planSingleBtn:'اختار صورتك',
-    planProTitle:'باقة الاحترافي', planProFeat1:'وفّر 50 جنيه', planProFeat2:'اختيار حر من أي قسم', planBuyBtn:'اطلب الباقة',
-    planAgencyTitle:'باقة الوكالة', planAgencyFeat1:'18 جنيه للصورة', planAgencyFeat2:'مناسبة للاستوديوهات',
+    pricingTitle:'الأسعار والباقات', pricingSub:'اختار الباقة اللي تناسبك — كل باقة بتوفّرلك سعر أقل للصورة.',
+    planStarterTitle:'باقة Starter', planStarterFeat1:'تقريبًا 20 جنيه للصورة', planStarterFeat2:'اختيار حر من أي قسم',
+    planProTitle:'باقة Pro', planProFeat1:'أقل من 18 جنيه للصورة', planProFeat2:'اختيار حر من أي قسم', planBuyBtn:'اطلب الباقة',
+    planPremiumTitle:'باقة Premium', planPremiumFeat1:'أقل من 14 جنيه للصورة', planPremiumFeat2:'مناسبة للاستوديوهات',
+    subTitle:'اشترك شهريًا ووفّر أكتر', subSub:'أسلوب جديد كل شهر، ورصيد صور يتجدد — التجديد بنفس خطوات الدفع اليدوي (مش خصم تلقائي).',
+    subUnitMonthly:'/ شهريًا', subPlanFeatCommon:'أساليب جديدة تُضاف شهريًا', subPlanBuyBtn:'اشترك دلوقتي',
+    subPlan1Title:'اشتراك شهري — 10 صور', subPlan1Feat1:'10 صور كل شهر',
+    subPlan2Title:'اشتراك شهري — 20 صورة', subPlan2Feat1:'20 صورة كل شهر', subPlan2Feat2:'أفضل قيمة للاستخدام المستمر',
     whyTitle:'ليه Miga-Photobook؟', why1Title:'احترافية بدون استوديو', why1Body:'نتيجة بجودة استوديو تصوير حقيقي، من غير ما تحجز أو تسافر أو تستأجر معدات.',
     howTitle:'إزاي بيشتغل؟', howLi1:'اختار الستايل اللي عايزه', howLi2:'ادفع وارفع صورتك', howLi3:'استلم نتيجتك خلال دقائق',
     faqTitle:'أسئلة شائعة',
@@ -68,6 +78,7 @@ const I18N = {
     ownedLabel:'تم الشراء ✓', viewResultBtn:'شوف النتيجة', startTransformBtn:'ابدأ التحويل',
     moreExamplesTitle:'أمثلة تانية بنفس الستايل', noMoreExamples:'مفيش أمثلة تانية بنفس الستايل لسه',
     noProductsInCategory:'مفيش منتجات في القسم ده لسه',
+    businessHeading:'احصل على صورة LinkedIn تزيد احترافيتك خلال 5 دقائق',
     // ---------- Ported from Design MIGA 1: header controls, account modal, track order ----------
     viewDesktopLabel:'كمبيوتر', viewMobileLabel:'موبايل', trackBtn:'تتبع طلبي', loginBtn:'تسجيل الدخول',
     searchPlaceholder:'ابحث في الموقع...',
@@ -98,15 +109,19 @@ const I18N = {
     heroEyebrow:'A real result — not a mockup',
     heroTitle1:'Your ordinary photo', heroTitleHi:' a studio masterpiece', heroTitle2:'becomes', heroTitle3:'right before your eyes',
     heroP:'We won\'t just tell you — drag the slider and see the difference yourself. A professional result in minutes.',
-    heroCtaPrimary:'Try it with your photo', heroCtaGhost:'See pricing',
+    heroCtaPrimary:'Try your <b class="brand-mega">Mega</b> photo now', heroCtaGhost:'See pricing',
     trust1:'Result in minutes', trust2:'Secure payment via InstaPay/Vodafone Cash',
     step1Num:'1', step1:'Pick a style', step2Num:'2', step2:'Pay & upload your photo', step3Num:'3', step3:'Get your result',
     sliderHint:'Drag left and right, or use ‹ › to browse different examples',
     productsTitle:'Pick the style you like', productsSub:'One filter — no opening and closing sections.',
-    pricingTitle:'Pricing & Packages', pricingSub:'One checkout for everything — no WhatsApp detour.',
-    planSingleTitle:'Single Photo', planSingleFeat1:'Any style from any category', planSingleFeat2:'Result in minutes', planSingleBtn:'Pick your photo',
-    planProTitle:'Professional Package', planProFeat1:'Save 50 EGP', planProFeat2:'Free choice from any category', planBuyBtn:'Order this package',
-    planAgencyTitle:'Agency Package', planAgencyFeat1:'18 EGP per photo', planAgencyFeat2:'Great for studios',
+    pricingTitle:'Pricing & Packages', pricingSub:'Pick the package that fits — the more photos, the lower the price per photo.',
+    planStarterTitle:'Starter Package', planStarterFeat1:'About 20 EGP per photo', planStarterFeat2:'Free choice from any category',
+    planProTitle:'Pro Package', planProFeat1:'Under 18 EGP per photo', planProFeat2:'Free choice from any category', planBuyBtn:'Order this package',
+    planPremiumTitle:'Premium Package', planPremiumFeat1:'Under 14 EGP per photo', planPremiumFeat2:'Great for studios',
+    subTitle:'Subscribe monthly and save more', subSub:'A new style every month, and a credit balance that renews — renewal uses the same manual payment steps (not auto-billed).',
+    subUnitMonthly:'/ month', subPlanFeatCommon:'New styles added monthly', subPlanBuyBtn:'Subscribe now',
+    subPlan1Title:'Monthly Subscription — 10 photos', subPlan1Feat1:'10 photos every month',
+    subPlan2Title:'Monthly Subscription — 20 photos', subPlan2Feat1:'20 photos every month', subPlan2Feat2:'Best value for ongoing use',
     whyTitle:'Why Miga-Photobook?', why1Title:'Professional, no studio needed', why1Body:'Real studio-quality results without booking, traveling, or renting equipment.',
     howTitle:'How does it work?', howLi1:'Pick the style you want', howLi2:'Pay and upload your photo', howLi3:'Get your result in minutes',
     faqTitle:'Frequently Asked Questions',
@@ -124,6 +139,7 @@ const I18N = {
     ownedLabel:'Purchased ✓', viewResultBtn:'View result', startTransformBtn:'Start transform',
     moreExamplesTitle:'More examples of this style', noMoreExamples:'No other examples of this style yet',
     noProductsInCategory:'No products in this category yet',
+    businessHeading:'Get a LinkedIn photo that boosts your professionalism in 5 minutes',
     // ---------- Ported from Design MIGA 1: header controls, account modal, track order ----------
     viewDesktopLabel:'Desktop', viewMobileLabel:'Mobile', trackBtn:'Track my order', loginBtn:'Log in',
     searchPlaceholder:'Search the site...',
@@ -174,6 +190,13 @@ function applyLang(lang){
     const key = el.getAttribute('data-i18n-ph');
     const val = t(key);
     if(typeof val === 'string') el.placeholder = val;
+  });
+  // Supports embedded markup (e.g. a bold "ميجا"/"Mega") — data-i18n above
+  // only ever sets plain textContent, which would strip any HTML tags.
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{
+    const key = el.getAttribute('data-i18n-html');
+    const val = t(key);
+    if(typeof val === 'string') el.innerHTML = val;
   });
   document.querySelectorAll('#langToggle button').forEach(b=>{
     b.classList.toggle('active', b.dataset.lang === currentLang);
@@ -333,8 +356,17 @@ function renderChips(){
   });
 }
 
+const CATEGORY_HEADING_KEYS = { business: 'businessHeading' };
 function renderGrid(){
   const grid = document.getElementById('productGrid');
+  const heading = document.getElementById('categoryHeading');
+  const headingKey = CATEGORY_HEADING_KEYS[activeCategory];
+  if(headingKey){
+    heading.textContent = t(headingKey);
+    heading.style.display = '';
+  }else{
+    heading.style.display = 'none';
+  }
   const list = activeCategory === 'all' ? products : products.filter(p=>p.category===activeCategory);
   if(!list.length){
     grid.innerHTML = `<div class="empty-note">${escapeHtml(t('noProductsInCategory'))}</div>`;
@@ -1178,9 +1210,15 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   document.getElementById('buyCloseBtn').onclick = closeBuyModal;
   document.getElementById('transformCloseBtn').onclick = closeTransformModal;
 
-  let savedTheme = 'dark', savedView = 'desktop';
+  let savedTheme = 'dark', savedView = 'mobile';
   try{ savedTheme = localStorage.getItem('megaPromptThemeV3') === 'light' ? 'light' : 'dark'; }catch(e){}
-  try{ savedView = localStorage.getItem('megaPromptViewV3') === 'mobile' ? 'mobile' : 'desktop'; }catch(e){}
+  // Only overrides the 'mobile' default above if a preference was actually
+  // saved before (a first-time visitor has no key yet, so this correctly
+  // leaves savedView at 'mobile' instead of falling through to 'desktop').
+  try{
+    const rawView = localStorage.getItem('megaPromptViewV3');
+    if(rawView) savedView = rawView === 'mobile' ? 'mobile' : 'desktop';
+  }catch(e){}
   applyTheme(savedTheme);
   applyViewMode(savedView);
   await checkLoggedInUser();
