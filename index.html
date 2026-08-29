@@ -253,7 +253,29 @@
      exact spot, regardless of whichever mode (circle/slider) the admin has
      chosen for the hero's own toggle-able showcase further down. Framed in
      the site's brass gold to read as a distinct, deliberate feature. -->
-<section class="wrap fixed-slider-section">
+<section class="hero hero-with-slider">
+  <div>
+    <div class="eyebrow" data-i18n="heroEyebrow">Miga-Photobook</div>
+    <div class="tagline" data-i18n="heroSlogan">لقطتك... تتحول لتحفة فنية</div>
+    <h1 id="heroTitle" data-i18n-html="heroTitle">حوّل صورتك إلى بورتريه احترافي<br>بجودة استوديو باستخدام <span class="brand-mark">Miga-Photobook ميجا فوتوبوك</span><br>خلال دقائق.</h1>
+    <p data-i18n="heroP">ارفع صورتك الشخصية — لك أو لطفلك — واختار الأسلوب اللي يعجبك، وإحنا نحوّلها لك تلقائيًا بجودة استوديو خلال دقائق بعد تأكيد الدفع.</p>
+    <div class="trust-checks">
+      <span data-i18n="trustCheck1">✅ نتيجة خلال دقائق</span>
+      <span data-i18n="trustCheck2">✅ دفع آمن</span>
+      <span data-i18n="trustCheck3">✅ دعم فني مباشر</span>
+      <span data-i18n="trustCheck4">✅ تحديثات مستمرة</span>
+    </div>
+    <div class="hero-ctas">
+      <a href="#children" class="btn-primary" id="heroCta1Link" data-i18n-html="heroCta1">اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي بـ25 جنيه</a>
+      <a href="#pricing" class="btn-ghost" id="heroCta2Link" data-i18n="heroCta2">الأسعار والعروض</a>
+    </div>
+  </div>
+
+  <!-- Permanent showcase slider — always the interactive drag slider here,
+       right beside the hero text in the same row (per explicit request:
+       side-by-side even on mobile, each shrinking to fit), regardless of
+       whichever mode (circle/slider) the admin has chosen for the
+       toggle-able showcase further down the page. -->
   <div class="fixed-slider-frame">
     <div class="slider-wrap-instance" id="bafSliderFixed">
       <div class="slider-card slider-card-compact" data-slider-card>
@@ -271,23 +293,7 @@
   </div>
 </section>
 
-<section class="hero">
-  <div>
-    <div class="eyebrow" data-i18n="heroEyebrow">Miga-Photobook</div>
-    <div class="tagline" data-i18n="heroSlogan">لقطتك... تتحول لتحفة فنية</div>
-    <h1 id="heroTitle" data-i18n-html="heroTitle">حوّل صورتك إلى بورتريه احترافي<br>بجودة استوديو باستخدام <span class="brand-mark">Miga-Photobook ميجا فوتوبوك</span><br>خلال دقائق.</h1>
-    <p data-i18n="heroP">ارفع صورتك الشخصية — لك أو لطفلك — واختار الأسلوب اللي يعجبك، وإحنا نحوّلها لك تلقائيًا بجودة استوديو خلال دقائق بعد تأكيد الدفع.</p>
-    <div class="trust-checks">
-      <span data-i18n="trustCheck1">✅ نتيجة خلال دقائق</span>
-      <span data-i18n="trustCheck2">✅ دفع آمن</span>
-      <span data-i18n="trustCheck3">✅ دعم فني مباشر</span>
-      <span data-i18n="trustCheck4">✅ تحديثات مستمرة</span>
-    </div>
-    <div class="hero-ctas">
-      <a href="#children" class="btn-primary" id="heroCta1Link" data-i18n="heroCta1">اعمل صورتك دلوقتي بـ25 جنيه</a>
-      <a href="#pricing" class="btn-ghost" id="heroCta2Link" data-i18n="heroCta2">الأسعار والعروض</a>
-    </div>
-  </div>
+<section class="wrap">
   <div class="contact-sheet">
     <div class="strip-track" id="heroStrip"></div>
   </div>
@@ -348,17 +354,53 @@
   .slider-dot.active{ background:var(--brass); width:20px; border-radius:5px; }
   .slider-hint{ text-align:center; font-size:12.5px; color:var(--paper-dim); margin-top:10px; }
 
-  /* ---------- Permanent showcase slider frame (fixed spot right below the
-     nav, always the interactive slider) ---------- */
-  .fixed-slider-section{ padding:22px 16px 4px; }
+  /* ---------- Permanent showcase slider frame — now lives inside the hero
+     row itself (second grid column), right beside the hero text, instead
+     of being a separate full-width strip above it. Sized to shrink and
+     stay usable even at narrow widths, per explicit request that it stays
+     side-by-side with the hero text rather than stacking on mobile. ---------- */
+  .hero-with-slider{
+    grid-template-columns:1.3fr 1fr !important;
+    gap:14px !important;
+    align-items:center;
+  }
+  /* CSS Grid items default to min-width:auto, refusing to shrink below
+     their content's natural width — exactly what was pushing the row past
+     the viewport edge once the columns got this narrow. This is the fix. */
+  .hero-with-slider > *{ min-width:0; }
+  .hero-with-slider h1, .hero-with-slider p{ overflow-wrap:break-word; }
+  /* Decisive, unambiguous sizing for the hero text now that it shares its
+     row with the slider instead of having the full width to itself —
+     overrides win with !important since several older, narrower-purpose
+     rules already target .hero h1 at various breakpoints/view-modes. */
+  .hero-with-slider h1{ font-size:clamp(15px,4.8vw,28px) !important; margin-bottom:10px !important; line-height:1.3 !important; }
+  .hero-with-slider .eyebrow{ font-size:11px !important; margin-bottom:8px !important; }
+  .hero-with-slider .tagline{ font-size:12px !important; }
+  .hero-with-slider p{ font-size:clamp(11px,2.6vw,14.5px) !important; margin-bottom:12px !important; }
+  .hero-with-slider .trust-checks{ font-size:10.5px !important; gap:6px !important; margin-bottom:14px !important; }
+  .hero-with-slider .hero-ctas{ gap:8px !important; flex-wrap:wrap; }
+  .hero-with-slider .hero-ctas a{ font-size:12.5px !important; padding:10px 14px !important; }
+  @media(max-width:480px){
+    .hero-with-slider h1{ font-size:clamp(13px,4.2vw,20px) !important; }
+    .hero-with-slider .trust-checks{ display:none; } /* first to go when truly tight on space */
+  }
   .fixed-slider-frame{
-    max-width:360px; margin:0 auto; padding:10px;
-    border:2px solid var(--brass); border-radius:26px;
-    box-shadow:0 0 0 4px rgba(255,201,77,0.12), 0 20px 50px rgba(0,0,0,0.5);
+    padding:6px; border:2px solid var(--brass); border-radius:18px;
+    box-shadow:0 0 0 3px rgba(255,201,77,0.12), 0 12px 30px rgba(0,0,0,0.5);
     background:linear-gradient(180deg, rgba(255,201,77,0.06), transparent 60%);
+    width:100%; max-width:220px; margin-inline-start:auto;
   }
   .slider-card-compact{ aspect-ratio:4/5; max-width:none; }
-  @media(min-width:860px){ .fixed-slider-frame{ max-width:300px; } }
+  .hero-with-slider .slider-handle{ width:30px; height:30px; font-size:12px; }
+  .hero-with-slider .slider-nav{ width:24px; height:24px; font-size:13px; }
+  .hero-with-slider .slider-card .tag{ font-size:9px; padding:3px 7px; top:6px; }
+  .hero-with-slider .slider-dots{ margin-top:6px; gap:5px; }
+  .hero-with-slider .slider-dot{ width:6px; height:6px; }
+  @media(min-width:860px){ .fixed-slider-frame{ max-width:280px; } }
+  @media(max-width:480px){
+    .fixed-slider-frame{ max-width:130px; padding:4px; border-radius:14px; }
+    .hero-with-slider{ gap:8px !important; }
+  }
   .hero-showcase-variant[hidden]{ display:none !important; }
 </style>
 
@@ -416,7 +458,7 @@
   </div>
 
   <div class="hero-ctas" style="margin-top:34px;">
-    <a href="#children" class="btn-primary" data-i18n="bafCta">اعمل صورتك دلوقتي بـ25 جنيه</a>
+    <a href="#children" class="btn-primary" data-i18n-html="bafCta">اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي بـ25 جنيه</a>
   </div>
 </section>
 
@@ -467,6 +509,7 @@
 
 <section class="cat-section collapsible" id="business">
   <div class="cs-body">
+  <h2 class="cat-section-heading" data-i18n="businessHeading">احصل على صورة LinkedIn تزيد احترافيتك خلال 5 دقائق</h2>
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-business"></div>
   </div>
@@ -514,41 +557,68 @@
   <div class="section-head" style="border:none; margin-bottom:6px;">
     <h2 data-i18n="pricingTitle">الأسعار والعروض</h2>
   </div>
-  <p style="color:var(--paper-dim); max-width:560px;" data-i18n="pricingSub">اطلب تحويل صورك منفردة، أو وفّر أكثر مع الباقات. كل باقة تُطبّق كخصم عند طلب العدد المطابق من الصور ضمن أي قسم.</p>
+  <p style="color:var(--paper-dim); max-width:560px;" data-i18n="pricingSub">اختار الباقة اللي تناسبك — كل باقة بتوفّرلك سعر أقل للصورة كل ما زاد العدد.</p>
   <div class="pricing-grid">
     <div class="plan">
-      <h3 data-i18n="plan1Title">الباقة الفردية</h3>
-      <div class="price" data-i18n="plan1Price">25 جنيه فقط</div>
+      <h3 data-i18n="plan1Title">باقة Starter</h3>
+      <div class="price">59 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="plan1Unit">/ 3 صور</span></div>
       <ul>
-        <li data-i18n="plan1Li1">تحويل صورة واحدة بالسعر المعروض</li>
-        <li data-i18n="plan1Li2">تنفيذ خلال دقائق بعد الدفع</li>
-        <li data-i18n="plan1Li3">مناسبة للتجربة</li>
+        <li data-i18n="plan1Li1">تقريبًا 20 جنيه للصورة</li>
+        <li data-i18n="plan1Li2">اختيار حر من أي قسم</li>
+        <li data-i18n="plan1Li3">مناسبة للتجربة الأولى</li>
       </ul>
-      <a href="#children" class="btn-ghost" data-i18n="plan1Cta">تصفح الآن</a>
+      <button type="button" class="btn-ghost" onclick="openPackageBuyModal(3)" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
     </div>
     <div class="plan featured">
-      <h3 data-i18n="plan2Title">باقة الاحترافي</h3>
-      <div class="price">200 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="plan2Unit">/ 10 صور</span></div>
+      <h3 data-i18n="plan2Title">باقة Pro</h3>
+      <div class="price">259 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="plan2Unit">/ 15 صورة</span></div>
       <ul>
-        <li data-i18n="plan2Li1">وفّر 50 جنيه عن السعر الفردي</li>
+        <li data-i18n="plan2Li1">أقل من 18 جنيه للصورة</li>
         <li data-i18n="plan2Li2">اختيار حر من أي قسم</li>
         <li data-i18n="plan2Li3">دعم فني بالأولوية</li>
       </ul>
-      <button type="button" class="btn-primary" onclick="openPackageBuyModal(10)" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
+      <button type="button" class="btn-primary" onclick="openPackageBuyModal(15)" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
     </div>
     <div class="plan">
-      <h3 data-i18n="plan3Title">باقة الوكالة</h3>
-      <div class="price">450 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="plan3Unit">/ 25 صورة</span></div>
+      <h3 data-i18n="plan3Title">باقة Premium</h3>
+      <div class="price">419 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="plan3Unit">/ 30 صورة</span></div>
       <ul>
-        <li data-i18n="plan3Li1">18 جنيه للصورة — وفّر 175 جنيه</li>
+        <li data-i18n="plan3Li1">أقل من 14 جنيه للصورة</li>
         <li data-i18n="plan3Li2">تحديثات مجانية للأساليب المتاحة</li>
         <li data-i18n="plan3Li3">مناسبة للاستوديوهات والوكالات</li>
       </ul>
-      <button type="button" class="btn-ghost" onclick="openPackageBuyModal(25)" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
+      <button type="button" class="btn-ghost" onclick="openPackageBuyModal(30)" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
     </div>
   </div>
   <div class="pricing-guarantee">
     <span data-i18n="pricingGuaranteeNote">❤️ مش عاجباك النتيجة؟ نعيد توليدها ببرومبت مختلف مجانًا.</span>
+  </div>
+
+  <div class="section-head" style="border:none; margin:44px 0 6px;">
+    <h2 data-i18n="subTitle">اشترك شهريًا ووفّر أكتر</h2>
+  </div>
+  <p style="color:var(--paper-dim); max-width:560px;" data-i18n="subSub">أسلوب جديد كل شهر، ورصيد صور يتجدد — الاشتراك بيتجدد بنفس خطوات الدفع اليدوي (مش خصم تلقائي)، وبنفكّرك قبل الموعد.</p>
+  <div class="pricing-grid">
+    <div class="plan">
+      <h3 data-i18n="subPlan1Title">اشتراك شهري — 10 صور</h3>
+      <div class="price">149 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="subPlan1Unit">/ شهريًا</span></div>
+      <ul>
+        <li data-i18n="subPlan1Li1">10 صور كل شهر</li>
+        <li data-i18n="subPlan1Li2">أساليب جديدة تُضاف شهريًا</li>
+        <li data-i18n="subPlan1Li3">تجديد يدوي بسيط كل شهر</li>
+      </ul>
+      <button type="button" class="btn-ghost" onclick="openPackageBuyModal(10)" data-i18n="subPlanBuyBtn">اشترك دلوقتي</button>
+    </div>
+    <div class="plan featured">
+      <h3 data-i18n="subPlan2Title">اشتراك شهري — 20 صورة</h3>
+      <div class="price">299 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="subPlan2Unit">/ شهريًا</span></div>
+      <ul>
+        <li data-i18n="subPlan2Li1">20 صورة كل شهر</li>
+        <li data-i18n="subPlan2Li2">أساليب جديدة تُضاف شهريًا</li>
+        <li data-i18n="subPlan2Li3">أفضل قيمة للاستخدام المستمر</li>
+      </ul>
+      <button type="button" class="btn-primary" onclick="openPackageBuyModal(20)" data-i18n="subPlanBuyBtn">اشترك دلوقتي</button>
+    </div>
   </div>
 </section>
 

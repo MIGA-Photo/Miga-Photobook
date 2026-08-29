@@ -51,8 +51,14 @@ let currentPackageSize = null; // 10 | 25 — only set when currentBuyType === '
  * client-sent package price — see createOrder). Kept here just so the
  * checkout UI has a title/price to show without waiting on a network call. */
 const PACKAGE_CATALOG = {
-  10: { price: 200, title: 'باقة الاحترافي — 10 صور', titleEn: 'Professional Package — 10 photos' },
-  25: { price: 450, title: 'باقة الوكالة — 25 صورة', titleEn: 'Agency Package — 25 photos' },
+  3:  { price: 59,  title: 'باقة Starter — 3 صور',  titleEn: 'Starter Package — 3 photos' },
+  15: { price: 259, title: 'باقة Pro — 15 صورة',    titleEn: 'Pro Package — 15 photos' },
+  30: { price: 419, title: 'باقة Premium — 30 صورة', titleEn: 'Premium Package — 30 photos' },
+  // "Monthly" subscription-style packages — same underlying credits
+  // mechanism as the packages above (no auto-recurring billing exists),
+  // just marketed with a monthly framing to encourage repeat purchases.
+  10: { price: 149, title: 'اشتراك شهري — 10 صور/شهريًا', titleEn: 'Monthly Subscription — 10 photos/month' },
+  20: { price: 299, title: 'اشتراك شهري — 20 صورة/شهريًا', titleEn: 'Monthly Subscription — 20 photos/month' },
 };
 
 /** Returns whatever is currently being purchased — a real product, or (for
@@ -76,6 +82,7 @@ const translations = {
     searchResultsLabel:'نتائج البحث', searchNoResults:'لا توجد نتائج', searchSectionsLabel:'أقسام الموقع',
     navAll:'الكل', navChildren:'أطفال', navMale:'رجالي', navFemale:'نسائي',
     navBusiness:'أعمال', navCinematic:'سينمائي', navLuxury:'فاخر', navArtistic:'فني', navMagazine:'مجلات',
+    businessHeading:'احصل على صورة LinkedIn تزيد احترافيتك خلال 5 دقائق',
     trackBtn:'تتبع طلبي', adminBtn:'لوحة الإدارة', adminQuickLabel:'لوحة التحكم',
     accountBtnGuest:'تسجيل الدخول', loginTab:'تسجيل الدخول', registerTab:'حساب جديد',
     continueGoogle:'المتابعة بحساب جوجل', continueApple:'المتابعة بحساب Apple', continueFacebook:'المتابعة بحساب فيسبوك',
@@ -173,23 +180,29 @@ const translations = {
     faqQ7:'هل أقدر أختار أكثر من ستايل؟', faqA7:'أكيد! تقدر تطلب أكتر من ستايل لنفس الصورة أو لصور مختلفة — كل ستايل بيتحسب طلب منفصل، أو استخدم إحدى الباقات (10 أو 25 صورة) عشان توفر لو محتاج أكتر من نتيجة.',
     heroTitle:'حوّل صورتك إلى بورتريه احترافي<br>بجودة استوديو باستخدام <span class="brand-mark">Miga-Photobook ميجا فوتوبوك</span><br>خلال دقائق.',
     heroP:'ارفع صورتك الشخصية — لك أو لطفلك — واختار الأسلوب اللي يعجبك، وإحنا نحوّلها لك تلقائيًا بجودة استوديو خلال دقائق بعد تأكيد الدفع.',
-    heroCta1:'اعمل صورتك دلوقتي بـ25 جنيه', heroCta2:'الأسعار والعروض',
+    heroCta1:'اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي بـ25 جنيه', heroCta2:'الأسعار والعروض',
     bafTitle:'صورة واحدة منك... نحولها لأجمل صورة من اختيارك من عندنا',
     bafSub:'دي نفس الصورة، بعد ما Miga-Photobook حوّلها لأكتر من ستايل. اختار اللي يعجبك وجرّبه على صورتك.',
     bafCenterLabel:'صورتك الأصلية',
-    bafCta:'اعمل صورتك دلوقتي بـ25 جنيه',
+    bafCta:'اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي بـ25 جنيه',
     secChildrenTitle:'قسم الأطفال', secMaleTitle:'القسم الرجالي', secFemaleTitle:'القسم النسائي',
     secBusinessTitle:'قسم الأعمال', secCinematicTitle:'القسم السينمائي', secLuxuryTitle:'القسم الفاخر',
     secArtisticTitle:'القسم الفني', secMagazineTitle:'قسم المجلات والملصقات',
     pricingTitle:'الأسعار والعروض',
-    pricingSub:'اطلب تحويل صورك منفردة، أو وفّر أكثر مع الباقات. كل باقة تُطبّق كخصم عند طلب العدد المطابق من الصور ضمن أي قسم.', pricingGuaranteeNote:'❤️ مش عاجباك النتيجة؟ نعيد توليدها ببرومبت مختلف مجانًا.',
-    plan1Title:'الباقة الفردية', plan1Price:'25 جنيه فقط', currencyLabel:'جنيه',
-    plan1Li1:'تحويل صورة واحدة بالسعر المعروض', plan1Li2:'تنفيذ خلال دقائق بعد الدفع', plan1Li3:'مناسبة للتجربة', plan1Cta:'تصفح الآن',
-    plan2Title:'باقة الاحترافي', plan2Unit:'/ 10 صور',
-    plan2Li1:'وفّر 50 جنيه عن السعر الفردي', plan2Li2:'اختيار حر من أي قسم', plan2Li3:'دعم فني بالأولوية',
+    pricingSub:'اختار الباقة اللي تناسبك — كل باقة بتوفّرلك سعر أقل للصورة كل ما زاد العدد.', pricingGuaranteeNote:'❤️ مش عاجباك النتيجة؟ نعيد توليدها ببرومبت مختلف مجانًا.',
+    plan1Title:'باقة Starter', plan1Unit:'/ 3 صور', currencyLabel:'جنيه',
+    plan1Li1:'تقريبًا 20 جنيه للصورة', plan1Li2:'اختيار حر من أي قسم', plan1Li3:'مناسبة للتجربة الأولى',
+    plan2Title:'باقة Pro', plan2Unit:'/ 15 صورة',
+    plan2Li1:'أقل من 18 جنيه للصورة', plan2Li2:'اختيار حر من أي قسم', plan2Li3:'دعم فني بالأولوية',
     planBuyBtn:'اطلب الباقة دلوقتي', planWhatsBtn:'اطلب الباقة عبر واتساب',
-    plan3Title:'باقة الوكالة', plan3Unit:'/ 25 صورة',
-    plan3Li1:'18 جنيه للصورة — وفّر 175 جنيه', plan3Li2:'تحديثات مجانية للأساليب المتاحة', plan3Li3:'مناسبة للاستوديوهات والوكالات',
+    plan3Title:'باقة Premium', plan3Unit:'/ 30 صورة',
+    plan3Li1:'أقل من 14 جنيه للصورة', plan3Li2:'تحديثات مجانية للأساليب المتاحة', plan3Li3:'مناسبة للاستوديوهات والوكالات',
+    subTitle:'اشترك شهريًا ووفّر أكتر', subSub:'أسلوب جديد كل شهر، ورصيد صور يتجدد — الاشتراك بيتجدد بنفس خطوات الدفع اليدوي (مش خصم تلقائي)، وبنفكّرك قبل الموعد.',
+    subPlan1Title:'اشتراك شهري — 10 صور', subPlan1Unit:'/ شهريًا',
+    subPlan1Li1:'10 صور كل شهر', subPlan1Li2:'أساليب جديدة تُضاف شهريًا', subPlan1Li3:'تجديد يدوي بسيط كل شهر',
+    subPlan2Title:'اشتراك شهري — 20 صورة', subPlan2Unit:'/ شهريًا',
+    subPlan2Li1:'20 صورة كل شهر', subPlan2Li2:'أساليب جديدة تُضاف شهريًا', subPlan2Li3:'أفضل قيمة للاستخدام المستمر',
+    subPlanBuyBtn:'اشترك دلوقتي',
     buyModalTitle:'الدفع عبر إنستاباي',
     ipLabel:'حوّل المبلغ عبر إنستاباي (من أي بنك أو محفظة تدعم التحويل عبر إنستاباي) إلى الرقم التالي',
     vodafoneLabel:'حوّل المبلغ عبر فودافون كاش إلى الرقم التالي',
@@ -308,7 +321,7 @@ const translations = {
     toastPassChanged:'تم تغيير كلمة المرور بنجاح', toastPassMismatch:'كلمة المرور الجديدة وتأكيدها غير متطابقين', toastPassTooShort:'كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل', toastCurrentPassWrong:'كلمة المرور الحالية غير صحيحة', toastFillPassFields:'يرجى إدخال كل الحقول',
     toastProductAdded:'تم إضافة المنتج بنجاح',
     uploadingImage:'جاري رفع الصورة...', toastImageUploadFailed:'تعذّر رفع الصورة، تأكد من اتصالك وحاول تاني',
-    toastContactPro:'للاشتراك في باقة الاحترافي، يرجى التواصل معنا', toastContactAgency:'للاشتراك في باقة الوكالة، يرجى التواصل معنا',
+    toastContactPro:'للاشتراك في باقة Pro، يرجى التواصل معنا', toastContactAgency:'للاشتراك في باقة Premium، يرجى التواصل معنا',
     ordersEmptyNote:'لا توجد طلبات بعد.',
     orderLabelProduct:'المنتج', orderLabelPhone:'الموبايل', orderLabelPayApp:'وسيلة الدفع', orderLabelRef:'المرجع',
     orderLabelCode:'الكود', orderLabelStatus:'الحالة', orderStatusApproved:'تمت الموافقة', orderStatusPending:'قيد المراجعة',
@@ -356,6 +369,7 @@ const translations = {
     searchResultsLabel:'Results', searchNoResults:'No results found', searchSectionsLabel:'Site Sections',
     navAll:'All', navChildren:'Children', navMale:'Men', navFemale:'Women',
     navBusiness:'Business', navCinematic:'Cinematic', navLuxury:'Luxury', navArtistic:'Artistic', navMagazine:'Magazine',
+    businessHeading:'Get a LinkedIn photo that boosts your professionalism in 5 minutes',
     trackBtn:'Track Order', adminBtn:'Admin Panel', adminQuickLabel:'Dashboard',
     accountBtnGuest:'Log In', loginTab:'Log In', registerTab:'New Account',
     continueGoogle:'Continue with Google', continueApple:'Continue with Apple', continueFacebook:'Continue with Facebook',
@@ -453,23 +467,29 @@ const translations = {
     faqQ7:'Can I choose more than one style?', faqA7:'Of course! You can order more than one style for the same photo or for different photos — each style counts as a separate order, or use one of the bundles (10 or 25 photos) to save if you need more than one result.',
     heroTitle:'Turn your photo into a professional,<br>studio-quality portrait with <span class="brand-mark">Miga-Photobook</span><br>in minutes.',
     heroP:'A library of professional, ready-to-use prompts for transforming personal photos — for children, men, and women — carefully written and tested. Buy, unlock instantly, and use right away.',
-    heroCta1:'Make Your Photo Now — 25 EGP', heroCta2:'Pricing & Offers',
+    heroCta1:'Make Your <b class="brand-mega">Mega</b> Photo Now — 25 EGP', heroCta2:'Pricing & Offers',
     bafTitle:'One Photo From You... Turned Into Your Favorite Style',
     bafSub:'This is the same photo, after Miga-Photobook transformed it into different styles. Pick one you like and try it on your own photo.',
     bafCenterLabel:'Your Original Photo',
-    bafCta:'Make Your Photo Now — 25 EGP',
+    bafCta:'Make Your <b class="brand-mega">Mega</b> Photo Now — 25 EGP',
     secChildrenTitle:"Children's Section", secMaleTitle:"Men's Section", secFemaleTitle:"Women's Section",
     secBusinessTitle:'Business Section', secCinematicTitle:'Cinematic Section', secLuxuryTitle:'Luxury Section',
     secArtisticTitle:'Artistic Section', secMagazineTitle:'Magazine / Poster Section',
     pricingTitle:'Pricing & Offers',
-    pricingSub:'Order photo transformations individually, or save more with bundles. Each bundle applies as a discount for the matching number of photos from any section.', pricingGuaranteeNote:'❤️ Not happy with the result? We will regenerate it with a different prompt for free.',
-    plan1Title:'Single Transformation', plan1Price:'Only 25 EGP', currencyLabel:'EGP',
-    plan1Li1:'One photo transformation at its listed price', plan1Li2:'Instant processing after payment', plan1Li3:'Good for trying it out', plan1Cta:'Browse Now',
-    plan2Title:'Pro Bundle', plan2Unit:'/ 10 photos',
-    plan2Li1:'Save 50 EGP off individual price', plan2Li2:'Free choice from any section', plan2Li3:'Priority support',
+    pricingSub:'Pick the package that fits — the more photos, the lower the price per photo.', pricingGuaranteeNote:'❤️ Not happy with the result? We will regenerate it with a different prompt for free.',
+    plan1Title:'Starter Package', plan1Unit:'/ 3 photos', currencyLabel:'EGP',
+    plan1Li1:'About 20 EGP per photo', plan1Li2:'Free choice from any section', plan1Li3:'Good for a first try',
+    plan2Title:'Pro Package', plan2Unit:'/ 15 photos',
+    plan2Li1:'Under 18 EGP per photo', plan2Li2:'Free choice from any section', plan2Li3:'Priority support',
     planBuyBtn:'Order this package now', planWhatsBtn:'Order via WhatsApp',
-    plan3Title:'Agency Bundle', plan3Unit:'/ 25 photos',
-    plan3Li1:'18 EGP per photo — save 175 EGP', plan3Li2:'Free style library updates', plan3Li3:'Great for studios and agencies',
+    plan3Title:'Premium Package', plan3Unit:'/ 30 photos',
+    plan3Li1:'Under 14 EGP per photo', plan3Li2:'Free style library updates', plan3Li3:'Great for studios and agencies',
+    subTitle:'Subscribe monthly and save more', subSub:'A new style every month, and a credit balance that renews — the subscription renews via the same manual payment steps (not auto-billed), and we\'ll remind you before it\'s due.',
+    subPlan1Title:'Monthly Subscription — 10 photos', subPlan1Unit:'/ month',
+    subPlan1Li1:'10 photos every month', subPlan1Li2:'New styles added monthly', subPlan1Li3:'Simple manual renewal each month',
+    subPlan2Title:'Monthly Subscription — 20 photos', subPlan2Unit:'/ month',
+    subPlan2Li1:'20 photos every month', subPlan2Li2:'New styles added monthly', subPlan2Li3:'Best value for ongoing use',
+    subPlanBuyBtn:'Subscribe now',
     buyModalTitle:'Pay via InstaPay',
     ipLabel:'Transfer the amount via InstaPay (from any bank or wallet that supports InstaPay transfers) to the following number',
     vodafoneLabel:'Transfer the amount via Vodafone Cash to the following number',
@@ -588,7 +608,7 @@ const translations = {
     toastPassChanged:'Password changed successfully', toastPassMismatch:'New password and confirmation do not match', toastPassTooShort:'New password must be at least 8 characters', toastCurrentPassWrong:'Current password is incorrect', toastFillPassFields:'Please fill in all fields',
     toastProductAdded:'Product added successfully',
     uploadingImage:'Uploading image...', toastImageUploadFailed:'Could not upload the image, check your connection and try again',
-    toastContactPro:'To subscribe to the Pro Bundle, please contact us', toastContactAgency:'To subscribe to the Agency Bundle, please contact us',
+    toastContactPro:'To subscribe to the Pro Package, please contact us', toastContactAgency:'To subscribe to the Premium Package, please contact us',
     ordersEmptyNote:'No orders yet.',
     orderLabelProduct:'Product', orderLabelPhone:'Mobile', orderLabelPayApp:'Payment Method', orderLabelRef:'Reference',
     orderLabelCode:'Code', orderLabelStatus:'Status', orderStatusApproved:'Approved', orderStatusPending:'Under Review',
@@ -1050,7 +1070,6 @@ function renderHeroStrip(){
   track.innerHTML = doubled.map((p,i) => `
     <div class="frame">
       <img src="${p.image}" alt="" loading="lazy" decoding="async">
-      <span class="fno">NO. ${String((i % list.length)+1).padStart(3,'0')}</span>
     </div>`).join('');
 }
 
@@ -5332,7 +5351,10 @@ async function applyHeroModeForThisDesign(){
 
   applyTheme(prefs?.theme || 'dark');
   applyLanguage(prefs?.lang || 'ar');
-  applyViewMode(prefs?.view || 'desktop');
+  // Defaults to 'mobile' for a first-time visitor with no saved preference —
+  // most customers land here from their phones, and the mobile layout is
+  // now the intended default first impression (per explicit request).
+  applyViewMode(prefs?.view || 'mobile');
   await checkLoggedInUser();
   await renderTestimonials();
   checkBiometricAvailability();
