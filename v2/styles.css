@@ -101,7 +101,7 @@ h1 .display{ color:var(--brass); }
    (second grid column), right beside the hero text, side-by-side even on
    mobile (both shrink to fit) per explicit request. ---------- */
 .hero-with-slider{
-  grid-template-columns:1.3fr 1fr !important;
+  grid-template-columns:1fr 1fr !important;
   gap:14px !important;
   align-items:center;
   padding-left:16px !important; padding-right:16px !important;
@@ -123,7 +123,7 @@ h1 .display{ color:var(--brass); }
 .hero-with-slider .slider-card .tag{ font-size:9px; padding:3px 7px; top:6px; }
 .hero-with-slider .slider-dots{ margin-top:6px; gap:5px; }
 .hero-with-slider .slider-dot{ width:6px; height:6px; }
-.hero-with-slider h1{ font-size:clamp(15px,4.8vw,26px) !important; margin-bottom:10px !important; }
+.hero-with-slider h1{ font-size:clamp(13px,4vw,20px) !important; margin-bottom:8px !important; }
 .hero-with-slider .eyebrow{ font-size:11px !important; margin-bottom:8px !important; }
 .hero-with-slider .hero-p{ font-size:clamp(11px,2.6vw,14px) !important; margin-bottom:12px !important; }
 .hero-with-slider .trust-row{ font-size:10.5px !important; gap:6px !important; }
