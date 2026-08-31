@@ -455,6 +455,11 @@
   .hero h1{font-size:52px; line-height:1.25; color:var(--paper); margin-bottom:20px;}
   .hero h1 em{font-style:normal; color:var(--brass);}
   .hero h1 .brand-mark{font-style:normal; color:var(--brass); font-family:'Georgia','Times New Roman',serif; letter-spacing:0.3px; text-shadow:0 0 14px rgba(227,164,41,0.35);}
+  /* Every standalone mention of "ميجا"/"Mega" gets this same bold,
+     brand-colored treatment, wherever it appears in copy across the site —
+     a small, consistent visual cue that reinforces the brand name itself
+     rather than just the generic offer around it. */
+  .brand-mega{ font-weight:800; color:var(--brass); }
   .hero p{color:var(--paper-dim); font-size:16.5px; max-width:480px; margin-bottom:28px;}
   .hero-ctas{display:flex; gap:12px;}
   .trust-checks{
@@ -674,6 +679,11 @@
     border-image:linear-gradient(90deg, var(--line), transparent) 1;
   }
   .section-head h2{font-size:32px; font-weight:800; letter-spacing:0.2px;}
+  .cat-section-heading{
+    font-size:clamp(18px,4vw,26px); font-weight:800; text-align:center;
+    color:var(--paper); margin-bottom:22px; padding-top:6px;
+  }
+  .cat-section-heading .brand-mega{ color:var(--brass); }
   .section-head .tag{
     font-size:13px; padding:6px 13px; border-radius:100px; font-weight:800;
     letter-spacing:0.5px;
@@ -1519,3 +1529,34 @@
     color:var(--brass); background:rgba(255,201,77,0.08); border:1px solid var(--brass-dim);
     border-radius:10px; padding:10px 16px;
   }
+
+  /* ---------- 3D button treatment — a solid "edge" shadow beneath each
+     button plus a soft ambient shadow gives a subtle raised/pressable look;
+     pressing it flattens the edge and nudges the button down, like a real
+     button being pushed in. color-mix() derives the edge shade FROM each
+     button's own background/border color, so this stays correct regardless
+     of a design's exact brass/paper hex values — no new colors introduced. ---------- */
+  .btn-primary, .btn-ghost, .admin-btn, .plan button, .buy-btn, .nav-cta,
+  .modal-actions button, .account-tab, .social-btn{
+    transition:transform .12s ease, box-shadow .12s ease, background .22s ease, border-color .22s ease;
+  }
+  .btn-primary{
+    box-shadow:0 4px 0 color-mix(in srgb, var(--brass) 60%, black), 0 6px 14px rgba(0,0,0,0.32);
+  }
+  .btn-primary:hover{ box-shadow:0 5px 0 color-mix(in srgb, var(--brass) 60%, black), 0 8px 18px rgba(0,0,0,0.36); }
+  .btn-primary:active{ transform:translateY(3px); box-shadow:0 1px 0 color-mix(in srgb, var(--brass) 60%, black), 0 2px 6px rgba(0,0,0,0.22); }
+
+  .btn-ghost{
+    box-shadow:0 3px 0 color-mix(in srgb, var(--line) 100%, var(--paper) 15%), 0 5px 12px rgba(0,0,0,0.22);
+  }
+  .btn-ghost:active{ transform:translateY(2px); box-shadow:0 1px 0 color-mix(in srgb, var(--line) 100%, var(--paper) 15%), 0 2px 5px rgba(0,0,0,0.16); }
+
+  .admin-btn{
+    box-shadow:0 3px 0 color-mix(in srgb, var(--brass) 55%, black), 0 5px 12px rgba(0,0,0,0.26);
+  }
+  .admin-btn:active{ transform:translateY(2px); box-shadow:0 1px 0 color-mix(in srgb, var(--brass) 55%, black), 0 2px 5px rgba(0,0,0,0.18); }
+
+  .buy-btn{
+    box-shadow:0 3px 0 color-mix(in srgb, var(--brass) 55%, black), 0 5px 10px rgba(0,0,0,0.24);
+  }
+  .buy-btn:active{ transform:translateY(2px); box-shadow:0 1px 0 color-mix(in srgb, var(--brass) 55%, black), 0 2px 5px rgba(0,0,0,0.16); }
