@@ -1094,16 +1094,50 @@ function applyChildrenVisibility(){
   });
 }
 
+// The strip is a decorative "recent work" ticker, not a full catalog
+// browser — showing all ~236+ products doubled (472+ DOM nodes, each an
+// image) is what was making it stutter, especially on mobile. A rotating
+// sample of a fixed size keeps it light regardless of how large the catalog
+// grows, while still feeling varied (a fresh cross-section each page load).
+const HERO_STRIP_MAX_ITEMS = 24;
+
 function renderHeroStrip(){
   const track = document.getElementById('heroStrip');
   const list = (products.length ? products : seedProducts())
     .filter(p => p.image !== PLACEHOLDER_IMG)
     .sort((a,b) => (b.order ?? 9999) - (a.order ?? 9999));
-  const doubled = [...list, ...list];
+
+  // Take an evenly-spaced sample across the full (sorted) list rather than
+  // just the first N, so the strip still reflects variety across
+  // categories/ages instead of only ever showing the most recent uploads.
+  let sample = list;
+  if(list.length > HERO_STRIP_MAX_ITEMS){
+    const step = list.length / HERO_STRIP_MAX_ITEMS;
+    sample = Array.from({length: HERO_STRIP_MAX_ITEMS}, (_, i) => list[Math.floor(i * step)]);
+  }
+
+  const doubled = [...sample, ...sample];
   track.innerHTML = doubled.map((p,i) => `
     <div class="frame">
       <img src="${p.image}" alt="" loading="lazy" decoding="async">
     </div>`).join('');
+
+  // ---- Constant on-screen speed regardless of catalog size ----
+  // The animation moves the track exactly 50% of its own width every cycle
+  // (see @keyframes scrollStrip: translateX(-50%)) — i.e. exactly one full
+  // "sample" length, since the track is the sample doubled. A FIXED
+  // animation-duration meant that as more products got added over time, the
+  // track got physically wider but still had to cover that growing distance
+  // in the same fixed time, so the strip visibly sped up. Deriving the
+  // duration from the track's actual rendered width keeps pixels-per-second
+  // constant instead, so the strip always glides at the same pace whether
+  // there are 20 products or 2,000.
+  requestAnimationFrame(() => {
+    const halfWidth = track.scrollWidth / 2;
+    const PIXELS_PER_SECOND = 42; // tuned for a calm, easy-to-read glide
+    const duration = Math.max(18, halfWidth / PIXELS_PER_SECOND); // floor so a tiny catalog doesn't zip past too quickly
+    track.style.animationDuration = `${duration}s`;
+  });
 }
 
 /** "الأكثر طلبا" — top products by confirmed order count, from the public
