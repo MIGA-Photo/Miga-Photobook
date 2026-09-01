@@ -951,6 +951,11 @@
         <div class="field">
           <label data-i18n="payerRefLabel">رقم عملية التحويل (من رسالة أو إشعار التحويل)</label>
           <input type="text" id="payerRef" inputmode="latin" data-i18n-ph="payerRefPh" placeholder="مثال: 4821960573">
+          <button type="button" class="ref-help-toggle" id="refHelpToggle" data-i18n="refHelpToggle">مش لاقي رقم العملية؟ دوس هنا</button>
+          <div class="ref-help-box" id="refHelpBox" hidden>
+            <p data-i18n-html="refHelpInstapay">📱 <b>إنستاباي:</b> افتح تطبيق البنك أو المحفظة → "سجل العمليات" → دوس على عملية التحويل اللي عملتها دلوقتي → هتلاقي رقم مرجعي (Reference Number) غالبًا 10 أرقام.</p>
+            <p data-i18n-html="refHelpVodafone">📱 <b>فودافون كاش:</b> هيوصلك رسالة SMS فور التحويل فيها "رقم العملية" — انسخه من الرسالة.</p>
+          </div>
         </div>
         <div class="pay-warning" data-i18n="payWarning">🔐 لضمان سرعة تنفيذ طلبك، تأكد من إدخال رقم عملية التحويل الصحيح.</div>
         <label class="pay-confirm-row" for="payConfirmChk">

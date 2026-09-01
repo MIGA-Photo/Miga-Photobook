@@ -985,6 +985,25 @@
     padding:11px; border-radius:8px; transition:.2s;
   }
   .buy-btn:hover{background:#ffd873; transform:translateY(-1px);}
+  /* The "professional prompt" add-on used to share the exact same solid-gold
+     treatment as the primary "buy this photo" button — two equally loud
+     CTAs on one card meant a shopper's eye had no clear place to land first.
+     Keeping it a quiet outline instead of a competing fill makes the main
+     purchase read as THE action, with the prompt as a secondary option
+     someone can still easily find and take, just not fighting for the same
+     attention. */
+  .prompt-btn{
+    background:transparent !important; color:var(--paper-dim) !important;
+    border:1px solid var(--line); font-weight:600 !important; font-size:12.5px !important;
+    box-shadow:none !important;
+  }
+  .prompt-btn:hover{
+    background:rgba(255,201,77,0.06) !important; border-color:var(--brass);
+    color:var(--paper) !important; transform:none !important;
+  }
+  .prompt-btn:active{ transform:none !important; box-shadow:none !important; }
+  .prompt-btn .price-old{ color:var(--paper-dim); opacity:0.7; }
+  .prompt-btn .price-new{ color:var(--brass); font-weight:700; }
   .copy-btn{
     flex:1; background:transparent; border:1px solid var(--line); color:var(--paper);
     padding:11px; border-radius:8px; font-size:13.5px; transition:.2s;
@@ -1122,6 +1141,26 @@
     font-size:12.8px; line-height:1.65; color:#f0b9ae;
   }
   #buyConfirmBtn[disabled]{opacity:0.45; cursor:not-allowed;}
+
+  /* A quiet, easy-to-miss-if-not-needed link that opens a short explainer
+     for exactly where to find the transaction reference number — the one
+     field in this form most likely to make a first-time buyer stall or
+     abandon, since "رقم عملية التحويل" isn't self-explanatory the first
+     time someone sees it. */
+  .ref-help-toggle{
+    background:none; border:none; padding:6px 0 0; margin:0;
+    font-size:12.5px; color:var(--brass); text-decoration:underline;
+    text-decoration-color:rgba(255,201,77,0.4); cursor:pointer;
+  }
+  .ref-help-toggle:hover{ text-decoration-color:var(--brass); }
+  .ref-help-box{
+    margin-top:8px; padding:11px 13px; border-radius:9px;
+    background:var(--ink-2); border:1px solid var(--line);
+    font-size:12.5px; line-height:1.6; color:var(--paper-dim);
+  }
+  .ref-help-box p{ margin:0 0 8px; }
+  .ref-help-box p:last-child{ margin-bottom:0; }
+  .ref-help-box b{ color:var(--paper); }
 
   /* Shown once the customer's photo is actually ready. Thanks them at the one
      moment they are most pleased, and puts sharing and reviewing right there

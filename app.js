@@ -250,6 +250,9 @@ const translations = {
     payerRefLabel:'رقم عملية التحويل (من رسالة أو إشعار التحويل)',
     payerRefPh:'مثال: 4821960573',
     payWarning:'🔐 لضمان سرعة تنفيذ طلبك، تأكد من إدخال رقم عملية التحويل الصحيح.',
+    refHelpToggle:'مش لاقي رقم العملية؟ دوس هنا',
+    refHelpInstapay:'📱 <b>إنستاباي:</b> افتح تطبيق البنك أو المحفظة → "سجل العمليات" → دوس على عملية التحويل اللي عملتها دلوقتي → هتلاقي رقم مرجعي (Reference Number) غالبًا 10 أرقام.',
+    refHelpVodafone:'📱 <b>فودافون كاش:</b> هيوصلك رسالة SMS فور التحويل فيها "رقم العملية" — انسخه من الرسالة.',
     payConfirmLabel:'أؤكد إني حوّلت المبلغ فعلًا، وإن رقم العملية المكتوب فوق صحيح.',
     toastEnterRef:'اكتب رقم عملية التحويل الصحيح من إشعار التحويل.',
     toastConfirmPaymentFirst:'علّم على خانة التأكيد إنك حوّلت المبلغ فعلًا.',
@@ -538,6 +541,9 @@ const translations = {
     payerRefLabel:'Transfer reference number (from your transfer receipt)',
     payerRefPh:'e.g. 4821960573',
     payWarning:'🔐 To make sure your order is processed quickly, double-check the transfer reference number.',
+    refHelpToggle:"Can't find the transaction number? Tap here",
+    refHelpInstapay:'📱 <b>InstaPay:</b> open your bank or wallet app → "Transaction History" → tap the transfer you just made → you\'ll see a reference number, usually 10 digits.',
+    refHelpVodafone:'📱 <b>Vodafone Cash:</b> you\'ll get an SMS right after the transfer with the transaction number in it — copy it from there.',
     payConfirmLabel:'I confirm I have actually transferred the amount, and the reference above is correct.',
     toastEnterRef:'Enter the correct transfer reference from your receipt.',
     toastConfirmPaymentFirst:'Please tick the box confirming you have transferred the amount.',
@@ -661,9 +667,34 @@ function t(key){
 // Product titles are admin-entered free text, not part of the translations
 // dictionary — this uses the optional English title (titleEn) an admin can set
 // per product, falling back to the Arabic title if none was entered yet.
+//
+// The bulk-renamed catalog (Sep 2026) follows a strict admin-facing pattern —
+// "ميجا - {category} {descriptor} {number}" / "Miga - {Category} {Descriptor}
+// {number}" — chosen specifically so 200+ products stay organized and
+// searchable in the admin panel. That same fully-qualified name read aloud
+// to a CUSTOMER ("ميجا - رجالي كلاسيك أبيض أسود 01") is redundant, though —
+// they're already looking at a ميجا product in the رجالي section, so the
+// only new information in that string is the descriptor itself. This strips
+// the "ميجا - {category}" prefix and the trailing sequence number and shows
+// just the descriptor to shoppers; the admin panel's own product-list view
+// reads p.title directly (not through this function) and keeps showing the
+// full name unchanged, since that's exactly the context where the fuller
+// name pulls its weight. Anything that doesn't match the pattern (packages,
+// subscriptions, or any older/manually-named product) just falls through to
+// the title as-is — this only ever shortens, never breaks, a name.
+const PRODUCT_NAME_PATTERN_AR = /^ميجا\s*-\s*\S+\s+(.+?)\s+\d+$/;
+const PRODUCT_NAME_PATTERN_EN = /^Miga\s*-\s*\S+\s+(.+?)\s+\d+$/i;
+function shortenProductTitle(title, isEnglish){
+  if(!title) return title;
+  const pattern = isEnglish ? PRODUCT_NAME_PATTERN_EN : PRODUCT_NAME_PATTERN_AR;
+  const match = title.match(pattern);
+  return match ? match[1] : title;
+}
 function productTitle(p){
   if(!p) return '';
-  return (currentLang === 'en' && p.titleEn) ? p.titleEn : p.title;
+  const isEnglish = currentLang === 'en' && p.titleEn;
+  const full = isEnglish ? p.titleEn : p.title;
+  return shortenProductTitle(full, isEnglish);
 }
 
 async function saveUiPrefs(){
@@ -1779,6 +1810,14 @@ document.getElementById('payCardFawryBtn').onclick = async ()=>{
 document.getElementById('ipCopyBtn').onclick = ()=>{
   const shownNumber = document.getElementById('ipNumber').textContent;
   navigator.clipboard?.writeText(shownNumber).then(()=> showToast(t('toastCopiedNumber'))).catch(()=>{});
+};
+
+// Quiet expand/collapse for "where do I find the transaction number?" —
+// stays hidden by default so it doesn't add clutter for buyers who already
+// know, but one tap away for anyone stuck on this specific field.
+document.getElementById('refHelpToggle').onclick = ()=>{
+  const box = document.getElementById('refHelpBox');
+  box.hidden = !box.hidden;
 };
 
 document.getElementById('buyConfirmBtn').onclick = async ()=>{
