@@ -138,13 +138,13 @@
   <div class="wm-logo-layer" id="wmLogoLayer"></div>
 </div>
 <div id="appRoot">
-<div class="sticky-top-group">
 <div class="promo-marquee" aria-hidden="true">
   <div class="promo-marquee-track">
     <span data-i18n="promoMarqueeText">حوّل أي صورة عادية إلى بورتريه استوديو احترافي بالذكاء الاصطناعي خلال دقائق — عرض الافتتاح: كل صورة بـ 25 جنيه بدلاً من 50 جنيه لفترة محدودة.</span>
     <span data-i18n="promoMarqueeText" aria-hidden="true">حوّل أي صورة عادية إلى بورتريه استوديو احترافي بالذكاء الاصطناعي خلال دقائق — عرض الافتتاح: كل صورة بـ 25 جنيه بدلاً من 50 جنيه لفترة محدودة.</span>
   </div>
 </div>
+<div class="sticky-top-group">
 <header>
   <div class="header-utility">
     <div class="ctrl-group ctrl-group-sm" id="langToggle">
@@ -266,7 +266,6 @@
       <span data-i18n="trustCheck4">✅ تحديثات مستمرة</span>
     </div>
     <div class="hero-ctas">
-      <a href="#children" class="btn-primary" id="heroCta1Link" data-i18n-html="heroCta1">اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي بـ25 جنيه</a>
       <a href="#pricing" class="btn-ghost" id="heroCta2Link" data-i18n="heroCta2">الأسعار والعروض</a>
     </div>
   </div>
@@ -303,7 +302,7 @@
   .baf-section{ padding:36px 16px 44px; text-align:center; }
   .baf-title{ font-size:clamp(20px,4.5vw,28px); margin:0 0 6px; }
   .baf-sub{ color:var(--paper-dim); max-width:520px; margin:0 auto 28px; font-size:14.5px; }
-  .baf-wrap{ position:relative; width:min(94vw,560px); aspect-ratio:1/1; margin:0 auto; }
+  .baf-wrap{ position:relative; width:min(94%,560px); aspect-ratio:1/1; margin:0 auto; }
   /* Slowed from 22s to 90s — the circle stays as the site's one distinctive
      visual, but no longer spins fast enough to compete for attention with
      everything else on the page. A near-static circle still reads as "alive"
@@ -362,7 +361,7 @@
   .hero-with-slider{
     grid-template-columns:1fr 1fr !important;
     gap:14px !important;
-    align-items:center;
+    align-items:start;
   }
   /* CSS Grid items default to min-width:auto, refusing to shrink below
      their content's natural width — exactly what was pushing the row past
@@ -388,7 +387,7 @@
     padding:6px; border:2px solid var(--brass); border-radius:18px;
     box-shadow:0 0 0 3px rgba(255,201,77,0.12), 0 12px 30px rgba(0,0,0,0.5);
     background:linear-gradient(180deg, rgba(255,201,77,0.06), transparent 60%);
-    width:100%; max-width:220px; margin-inline-start:auto;
+    width:100%; max-width:250px; margin-inline-start:auto;
   }
   .slider-card-compact{ aspect-ratio:4/5; max-width:none; }
   .hero-with-slider .slider-handle{ width:30px; height:30px; font-size:12px; }
@@ -457,7 +456,7 @@
     </div>
   </div>
 
-  <div class="hero-ctas" style="margin-top:34px;">
+  <div class="hero-ctas" style="margin-top:34px; justify-content:center;">
     <a href="#children" class="btn-primary" data-i18n-html="bafCta">اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي بـ25 جنيه</a>
   </div>
 </section>

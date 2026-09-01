@@ -73,14 +73,14 @@
   }
 
   *{box-sizing:border-box; margin:0; padding:0;}
-  html{scroll-behavior:smooth; overflow-x:hidden;}
+  html{scroll-behavior:smooth; overflow-x:clip;}
   body{
     background:var(--ink);
     color:var(--paper);
     font-family:'IBM Plex Sans Arabic', sans-serif;
     line-height:1.7;
     min-height:100vh;
-    overflow-x:hidden;
+    overflow-x:clip;
     /* Clips any element that overflows the viewport horizontally (even by a
        sub-pixel rounding amount from a grid/gap combination) so the page can
        never shift sideways off-center — the exact symptom reported: the
@@ -171,16 +171,16 @@
      an always-visible horizontal-scroll strip instead of a hidden panel.
      The trigger button stays in the DOM (hidden) so nothing in the existing
      dropdown-open/close JS needs to change. */
-  .cat-dropdown.cat-pills-mode{max-width:1180px; margin:0 auto; padding:0 24px 16px;}
+  .cat-dropdown.cat-pills-mode{max-width:1180px; margin:0 auto; padding:0 24px 10px;}
   .cat-dropdown.cat-pills-mode .cat-dropdown-menu{
     position:static; display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch;
-    background:transparent; border:none; padding:2px 0 12px; box-shadow:none; min-width:auto;
+    background:transparent; border:none; padding:2px 0 6px; box-shadow:none; min-width:auto;
     overscroll-behavior-x:contain;
   }
   .cat-dropdown.cat-pills-mode .cat-dropdown-menu button{
     display:inline-block; width:auto; white-space:nowrap; flex-shrink:0;
     background:transparent; color:var(--paper-dim); border:1px solid var(--line);
-    padding:8px 16px; border-radius:100px; font-size:13.5px; font-weight:600;
+    padding:6px 14px; border-radius:100px; font-size:13px; font-weight:600;
   }
   .cat-dropdown.cat-pills-mode .cat-dropdown-menu button:hover,
   .cat-dropdown.cat-pills-mode .cat-dropdown-menu button.active{
@@ -211,8 +211,8 @@
   }
 
   header{
-    background:rgba(12,12,16,0.92);
-    backdrop-filter:blur(8px);
+    background:rgba(12,12,16,0.94);
+    backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
   }
   /* ===== Utility strip — the quiet, secondary controls (language, theme,
@@ -220,24 +220,27 @@
      navigation, instead of competing for attention with categories/search/
      login in one crowded row. This is what turns "random-looking buttons"
      into a deliberate two-tier hierarchy: main row = what most visitors do
-     every visit, utility strip = preferences most visitors never touch. */
+     every visit, utility strip = preferences most visitors never touch.
+     Padding here is deliberately tight — with the whole header now sticky,
+     every extra pixel of height here is permanently-visible screen real
+     estate on mobile, not just a one-time cost at the top of the page. */
   .header-utility{
-    max-width:1180px; margin:0 auto; padding:6px 24px;
-    display:flex; align-items:center; justify-content:flex-end; gap:10px;
+    max-width:1180px; margin:0 auto; padding:4px 24px;
+    display:flex; align-items:center; justify-content:flex-end; gap:8px;
     border-bottom:1px solid var(--line);
   }
   .util-link{
-    background:transparent; border:none; color:var(--paper-dim); font-size:12.5px;
-    padding:6px 4px; text-decoration:underline; text-decoration-color:transparent;
+    background:transparent; border:none; color:var(--paper-dim); font-size:12px;
+    padding:4px 4px; text-decoration:underline; text-decoration-color:transparent;
     transition:color .18s ease, text-decoration-color .18s ease;
   }
   .util-link:hover{color:var(--brass); text-decoration-color:var(--brass);}
   .nav-wrap{
-    max-width:1180px; margin:0 auto; padding:16px 24px;
+    max-width:1180px; margin:0 auto; padding:10px 24px;
     display:flex; align-items:center; justify-content:space-between; gap:20px;
   }
   .logo{
-    font-size:22px; letter-spacing:0.5px; color:var(--paper); font-weight:600;
+    font-size:20px; letter-spacing:0.5px; color:var(--paper); font-weight:600;
     display:flex; align-items:center; gap:10px;
   }
   .logo-mark{flex-shrink:0;}
@@ -414,9 +417,9 @@
     padding:4px 9px; border-radius:100px; backdrop-filter:blur(2px);
   }
   .admin-btn{
-    display:inline-flex; align-items:center; gap:8px; height:44px; box-sizing:border-box;
+    display:inline-flex; align-items:center; gap:8px; height:38px; box-sizing:border-box;
     background:transparent; border:1.5px solid var(--brass); color:var(--paper-dim);
-    padding:0 16px; border-radius:10px; font-size:13px;
+    padding:0 14px; border-radius:10px; font-size:12.5px;
   }
   .admin-btn:hover{background:rgba(255,201,77,0.08); color:var(--brass);}
   /* The one filled, high-contrast control in the header — everything else
@@ -460,6 +463,14 @@
      a small, consistent visual cue that reinforces the brand name itself
      rather than just the generic offer around it. */
   .brand-mega{ font-weight:800; color:var(--brass); }
+  /* Inside gold/brass-background buttons, the button's own text is already
+     dark ink — using the SAME gold as the background made "ميجا" nearly
+     invisible there. White (with a soft shadow for definition) stays bold
+     and reads as clearly different from the surrounding dark button text,
+     while every other (dark-background) use of .brand-mega keeps its gold. */
+  .btn-primary .brand-mega, .nav-cta .brand-mega, .admin-btn .brand-mega, .buy-btn .brand-mega{
+    color:#ffffff; text-shadow:0 1px 2px rgba(0,0,0,0.3);
+  }
   .hero p{color:var(--paper-dim); font-size:16.5px; max-width:480px; margin-bottom:28px;}
   .hero-ctas{display:flex; gap:12px;}
   .trust-checks{
@@ -1235,9 +1246,9 @@
   }
   .search-box input{
     width:220px; background:var(--ink-2); border:1.5px solid var(--brass); color:var(--paper);
-    border-radius:10px; padding:10px 14px 10px 36px; font-size:14px; transition:box-shadow .2s ease;
+    border-radius:10px; padding:8px 14px 8px 36px; font-size:13.5px; transition:box-shadow .2s ease;
   }
-  html[dir="rtl"] .search-box input{padding:10px 36px 10px 14px;}
+  html[dir="rtl"] .search-box input{padding:8px 36px 8px 14px;}
   html[dir="rtl"] .search-box .search-icon-btn{inset-inline-start:auto; inset-inline-end:10px;}
   .search-box input:focus{outline:none; border-color:var(--brass); box-shadow:0 0 0 3px rgba(255,201,77,0.18);}
   .search-dropdown{
@@ -1463,12 +1474,22 @@
   body.view-mode-mobile{background:#120a22; display:flex; justify-content:center; padding:22px 0;}
   body.view-mode-mobile #appRoot{
     max-width:412px; width:100%; border:1px solid var(--line); border-radius:26px;
-    overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,0.6);
-    /* No opaque background here on purpose — an opaque fill would sit on top of
+    box-shadow:0 30px 80px rgba(0,0,0,0.6);
+    /* overflow:hidden used to live here for the rounded-corner "phone frame"
+       clipping effect, but overflow anything-other-than-visible on an
+       ancestor makes IT (not the page's real scroll container) the
+       reference box for position:sticky — since this wrapper itself never
+       scrolls (the page does), that silently broke the sticky header below.
+       Rounding is reproduced on the header itself instead (its first child)
+       so the frame still reads as rounded without reintroducing that bug.
+       No opaque background here on purpose — an opaque fill would sit on top of
        the fixed, full-viewport .site-watermark-bg layer and block it from
        showing through the phone-frame preview, which is why it looked
        "not working" in mobile mode. Letting it stay transparent lets the
        watermark (and its animation) show through exactly like on desktop. */
+  }
+  body.view-mode-mobile #appRoot > header{
+    border-top-left-radius:26px; border-top-right-radius:26px; overflow:hidden;
   }
   body.view-mode-mobile .header-utility{justify-content:center; flex-wrap:wrap; padding:6px 16px;}
   body.view-mode-mobile .nav-wrap{flex-wrap:wrap; gap:10px; padding:14px 16px;}
