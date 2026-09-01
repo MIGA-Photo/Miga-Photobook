@@ -5360,10 +5360,15 @@ async function applyHeroModeForThisDesign(){
   checkBiometricAvailability();
 
   if(LAUNCH_PROMO){
-    document.getElementById('pricing').style.display = 'none';
-    document.getElementById('heroCta2Link').style.display = 'none';
+    const pricingSection = document.getElementById('pricing');
+    if(pricingSection) pricingSection.style.display = 'none';
+    // heroCta2Link (the hero's own "الأسعار والعروض" link) was removed from
+    // the hero-with-slider column to reclaim vertical space there — pricing
+    // is still reachable from the nav bar, so there's nothing left to hide
+    // here during the launch promo.
   }else{
-    document.getElementById('softLaunchBanner').style.display = 'none';
+    const softLaunchBanner = document.getElementById('softLaunchBanner');
+    if(softLaunchBanner) softLaunchBanner.style.display = 'none';
   }
   applyChildrenVisibility();
   setInterval(updateCountdown, 60000);

@@ -142,7 +142,7 @@
     padding:7px 0; white-space:nowrap;
   }
   .promo-marquee-track{
-    display:inline-flex; gap:64px; animation:marqueeScroll 52s linear infinite;
+    display:inline-flex; gap:64px; animation:marqueeScroll 22s linear infinite;
     will-change:transform;
   }
   .promo-marquee-track span{
@@ -462,15 +462,19 @@
      brand-colored treatment, wherever it appears in copy across the site —
      a small, consistent visual cue that reinforces the brand name itself
      rather than just the generic offer around it. */
-  .brand-mega{ font-weight:800; color:var(--brass); }
-  /* Inside gold/brass-background buttons, the button's own text is already
-     dark ink — using the SAME gold as the background made "ميجا" nearly
-     invisible there. White (with a soft shadow for definition) stays bold
-     and reads as clearly different from the surrounding dark button text,
-     while every other (dark-background) use of .brand-mega keeps its gold. */
-  .btn-primary .brand-mega, .nav-cta .brand-mega, .admin-btn .brand-mega, .buy-btn .brand-mega{
-    color:#ffffff; text-shadow:0 1px 2px rgba(0,0,0,0.3);
+  /* Strong red + a fast blink makes "ميجا" impossible to miss, and red
+     reads clearly against BOTH the dark page background and the gold
+     buttons alike — no separate per-context override needed anymore. */
+  .brand-mega{
+    font-weight:800; color:#e21c1c;
+    animation:megaBlink 1.5s ease-in-out infinite;
   }
+  @keyframes megaBlink{
+    0%, 45%{ opacity:1; }
+    55%, 95%{ opacity:0.15; }
+    100%{ opacity:1; }
+  }
+  @media(prefers-reduced-motion: reduce){ .brand-mega{ animation:none; } }
   .hero p{color:var(--paper-dim); font-size:16.5px; max-width:480px; margin-bottom:28px;}
   .hero-ctas{display:flex; gap:12px;}
   .trust-checks{
@@ -670,7 +674,7 @@
   .contact-sheet{overflow:hidden; border:1px solid var(--line); border-radius:4px; direction:ltr;}
   .strip-track{
     display:flex; gap:2px; width:max-content; direction:ltr;
-    animation:scrollStrip 110s linear infinite;
+    animation:scrollStrip 38s linear infinite;
   }
   .strip-track:hover{animation-play-state:paused;}
   @keyframes scrollStrip{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
@@ -685,7 +689,7 @@
   section.cat-section{max-width:1180px; margin:0 auto; padding:52px 24px 16px;}
   .section-head{
     display:flex; align-items:center; justify-content:flex-start; gap:12px;
-    margin-bottom:32px; padding-bottom:20px;
+    margin-bottom:18px; padding-bottom:12px;
     border-bottom:1px solid transparent;
     border-image:linear-gradient(90deg, var(--line), transparent) 1;
   }
@@ -694,7 +698,8 @@
     font-size:clamp(18px,4vw,26px); font-weight:800; text-align:center;
     color:var(--paper); margin-bottom:22px; padding-top:6px;
   }
-  .cat-section-heading .brand-mega{ color:var(--brass); }
+  /* (brand-mega no longer needs a per-context color override — the red
+     blink above already reads clearly in every context on the page) */
   .section-head .tag{
     font-size:13px; padding:6px 13px; border-radius:100px; font-weight:800;
     letter-spacing:0.5px;
@@ -1464,7 +1469,7 @@
   }
   .header-controls{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
   @media(max-width:700px){
-    .header-utility{justify-content:center; flex-wrap:wrap; padding:6px 16px; gap:8px;}
+    .header-utility{justify-content:center; flex-wrap:wrap; padding:4px 16px; gap:6px;}
   }
 
   /* ===== Forced view modes ===== */
@@ -1491,15 +1496,15 @@
   body.view-mode-mobile #appRoot > header{
     border-top-left-radius:26px; border-top-right-radius:26px; overflow:hidden;
   }
-  body.view-mode-mobile .header-utility{justify-content:center; flex-wrap:wrap; padding:6px 16px;}
-  body.view-mode-mobile .nav-wrap{flex-wrap:wrap; gap:10px; padding:14px 16px;}
+  body.view-mode-mobile .header-utility{justify-content:center; flex-wrap:wrap; padding:4px 16px;}
+  body.view-mode-mobile .nav-wrap{flex-wrap:wrap; gap:6px; padding:8px 16px;}
   body.view-mode-mobile nav.cats{width:100%; order:3; overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain;}
   body.view-mode-mobile .hero{grid-template-columns:1fr; padding:28px 18px 24px; gap:24px;}
   body.view-mode-mobile .hero::before{width:320px; height:320px; top:-80px; left:-80px; filter:blur(50px);}
   body.view-mode-mobile .hero h1{font-size:26px;}
   body.view-mode-mobile .hero p{font-size:14.5px;}
   body.view-mode-mobile .eyebrow{font-size:11px;}
-  body.view-mode-mobile .cat-section{padding:36px 16px 10px;}
+  body.view-mode-mobile .cat-section{padding:22px 16px 10px;}
   body.view-mode-mobile .section-head h2{font-size:22px;}
   body.view-mode-mobile .grid > .card{flex-basis:100%;}
   body.view-mode-mobile .cat-tiles-grid{grid-template-columns:repeat(2, 1fr); gap:14px;}
