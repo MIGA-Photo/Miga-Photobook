@@ -328,11 +328,43 @@
   </div>
 </section>
 
+<div class="visitor-counter" id="visitorCounter" style="display:none;">
+  <span class="vc-dot"></span>
+  <span data-i18n="visitorCounterPrefix">انضم إلينا</span>
+  <span class="vc-number" id="visitorCounterNumber">0</span>
+  <span data-i18n="visitorCounterSuffix">زائر لحد دلوقتي</span>
+</div>
+
 <section class="wrap">
   <div class="contact-sheet">
     <div class="strip-track" id="heroStrip"></div>
   </div>
 </section>
+
+<style>
+  .visitor-counter{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    max-width:fit-content; margin:0 auto 28px; padding:10px 22px;
+    background:var(--ink-2); border:1px solid var(--brass-dim);
+    border-radius:100px; font-size:14px; color:var(--paper-dim);
+  }
+  .visitor-counter .vc-number{ color:var(--brass); font-weight:800; font-size:15px; }
+  .vc-dot{
+    width:8px; height:8px; border-radius:50%; background:#3ddc84;
+    box-shadow:0 0 0 0 rgba(61,220,132,0.6);
+    animation:vcPulse 2s ease-out infinite;
+  }
+  @keyframes vcPulse{
+    0%{ box-shadow:0 0 0 0 rgba(61,220,132,0.55); }
+    70%{ box-shadow:0 0 0 7px rgba(61,220,132,0); }
+    100%{ box-shadow:0 0 0 0 rgba(61,220,132,0); }
+  }
+  @media(prefers-reduced-motion: reduce){ .vc-dot{ animation:none; } }
+  @media(max-width:480px){
+    .visitor-counter{ font-size:12.5px; padding:8px 16px; gap:6px; margin-bottom:20px; }
+    .visitor-counter .vc-number{ font-size:13.5px; }
+  }
+</style>
 
 <style>
   .baf-section{ padding:36px 16px 44px; text-align:center; }
