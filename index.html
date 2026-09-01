@@ -106,7 +106,7 @@
 </script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rakkas&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rakkas&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 
 <!-- Google Analytics 4 -->
@@ -133,6 +133,33 @@
 </script>
 </head>
 <body>
+<script>
+/* Early theme/view-mode bootstrap — runs synchronously as the very first
+   thing in the page body, before any header/nav content is parsed or
+   painted. Without this, the page always rendered with its bare defaults
+   (light theme, desktop-style header) for a brief instant, then visibly
+   snapped to the visitor's actual saved dark/mobile preference once the
+   full app.js file finished loading and ran its own (much later) init
+   logic — a classic flash-of-wrong-content. Reading the same localStorage
+   key here and applying the same classes/attribute the real
+   applyTheme()/applyViewMode() functions use later means the correct look
+   is already in place on the very first paint; app.js's own calls to
+   those functions further down simply confirm/no-op on what's already
+   correct. */
+(function(){
+  try{
+    var raw = localStorage.getItem('megaPromptUiPrefs');
+    var prefs = raw ? JSON.parse(raw) : null;
+    var theme = (prefs && prefs.theme === 'light') ? 'light' : 'dark';
+    var view = (prefs && prefs.view === 'desktop') ? 'desktop' : 'mobile';
+    document.documentElement.setAttribute('data-theme', theme);
+    document.body.className = 'view-mode-' + view;
+  }catch(e){
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.body.className = 'view-mode-mobile';
+  }
+})();
+</script>
 <div class="site-watermark-bg" id="siteWatermarkBg" aria-hidden="true">
   <div class="wm-photos" id="wmPhotos"></div>
   <div class="wm-logo-layer" id="wmLogoLayer"></div>
