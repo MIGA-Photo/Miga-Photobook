@@ -2557,6 +2557,36 @@ const backToTopBtn = document.getElementById('backToTopBtn');
 const scrollRulerThumb = document.getElementById('scrollRulerThumb');
 const scrollRulerTrack = document.getElementById('scrollRulerTrack');
 
+// ---------- Collapsing sticky header on scroll ----------
+// The full header (utility strip + logo/login row + promo banner + category
+// pills) is close to a third of a phone screen — fine at the very top, but
+// once someone has scrolled down to actually browse products, that much
+// permanently-pinned chrome leaves too little room to see a product card
+// without extra scrolling. Collapsing it down to just the essentials (a
+// slim brand row + the category pills, i.e. two lines) once they've
+// scrolled past a small threshold keeps navigation reachable without
+// costing them the screen. Scrolling back up near the top restores it, so
+// it never feels like something disappeared for good — it's just out of
+// the way while they're mid-browse.
+const stickyTopGroup = document.querySelector('.sticky-top-group');
+const HEADER_COLLAPSE_THRESHOLD = 72;
+let lastHeaderScrollY = window.scrollY || 0;
+function updateHeaderCollapse(){
+  if(!stickyTopGroup) return;
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  if(scrollTop <= HEADER_COLLAPSE_THRESHOLD){
+    stickyTopGroup.classList.remove('hdr-collapsed');
+  }else if(scrollTop > lastHeaderScrollY){
+    // scrolling down past the threshold
+    stickyTopGroup.classList.add('hdr-collapsed');
+  }else if(scrollTop < lastHeaderScrollY - 4){
+    // scrolling up (small buffer so tiny jitter doesn't flicker it)
+    stickyTopGroup.classList.remove('hdr-collapsed');
+  }
+  lastHeaderScrollY = scrollTop;
+}
+window.addEventListener('scroll', updateHeaderCollapse, { passive:true });
+
 function updateScrollChrome(){
   const scrollTop = window.scrollY || document.documentElement.scrollTop;
   const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;

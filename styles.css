@@ -166,6 +166,31 @@
     position:sticky; top:0; z-index:55;
     display:flex; flex-direction:column;
   }
+  /* Collapsed state — hides the utility strip (lang/theme/view toggles,
+     "track order") and the promo banner entirely, and shrinks the
+     logo/login row's padding, leaving just: a slim brand row + the category
+     pills row. transitions are on the specific properties that change
+     (max-height/opacity/padding) rather than `all`, so this stays smooth
+     without accidentally animating unrelated hover states elsewhere in the
+     header. */
+  .hdr-collapsed .header-utility,
+  .hdr-collapsed #softLaunchBanner,
+  .hdr-collapsed .search-box{
+    max-height:0; opacity:0; padding-top:0; padding-bottom:0;
+    margin:0; border:0; overflow:hidden;
+    transition:max-height .28s ease, opacity .2s ease, padding .28s ease;
+  }
+  .header-utility, #softLaunchBanner, .search-box{
+    max-height:200px; overflow:hidden;
+    transition:max-height .28s ease, opacity .22s ease .05s, padding .28s ease;
+  }
+  .hdr-collapsed .nav-wrap{
+    padding-top:6px; padding-bottom:6px;
+    transition:padding .28s ease;
+  }
+  .nav-wrap{ transition:padding .28s ease; }
+  .hdr-collapsed .logo{ font-size:17px; }
+  .hdr-collapsed .logo-mark{ width:24px; height:24px; }
   /* ===== Category pills row (Option 1 + visible pills) — same #catNav
      element and click logic as the dropdown version, restyled to render as
      an always-visible horizontal-scroll strip instead of a hidden panel.
@@ -467,6 +492,7 @@
      buttons alike — no separate per-context override needed anymore. */
   .brand-mega{
     font-weight:800; color:#e21c1c;
+    font-size:1.32em; line-height:1;
     animation:megaBlink 1.5s ease-in-out infinite;
   }
   @keyframes megaBlink{
@@ -885,15 +911,16 @@
   @media(max-width:700px){ .grid{gap:14px;} .grid > .card{flex-basis:calc((100% - 14px) / 2);} }
   @media(max-width:560px){
     .grid > .card{
-      flex-basis:100%;
-      /* On mobile, exactly one card is meant to fill the view. "start"
-         snapping aligns the card's RIGHT edge (the RTL inline-start) to the
-         container's edge — but flex-basis:100% combined with the row's
-         gap leaves a few sub-pixels of rounding error per card, so that
-         "exact" right-edge alignment consistently left a stray sliver of
-         empty space bleeding through on the left instead of being split
-         evenly. Centering the snap point removes the dependency on either
-         edge being pixel-perfect, so the card sits centered regardless. */
+      flex-basis:82%;
+      /* On mobile, one card mostly fills the view with a peek of its
+         neighbor. "start" snapping aligns the card's RIGHT edge (the RTL
+         inline-start) to the container's edge — but flex-basis:82%
+         combined with the row's gap leaves a few sub-pixels of rounding
+         error per card, so that "exact" right-edge alignment consistently
+         left a stray sliver of empty space bleeding through on the left
+         instead of being split evenly. Centering the snap point removes
+         the dependency on either edge being pixel-perfect, so the card
+         sits centered regardless. */
       scroll-snap-align:center;
     }
   }
@@ -1575,7 +1602,13 @@
   body.view-mode-mobile .eyebrow{font-size:11px;}
   body.view-mode-mobile .cat-section{padding:22px 16px 10px;}
   body.view-mode-mobile .section-head h2{font-size:22px;}
-  body.view-mode-mobile .grid > .card{flex-basis:100%;}
+  /* Was 100% — a card exactly as wide as the screen reads as "the whole
+     screen", with no visual hint that swiping reveals another one. Sizing
+     it at 82% leaves a deliberate sliver of the next/previous card peeking
+     in from the edge, so the horizontal browsing between products in a
+     category is obvious at a glance instead of needing to be discovered by
+     accident. */
+  body.view-mode-mobile .grid > .card{flex-basis:82%;}
   body.view-mode-mobile .cat-tiles-grid{grid-template-columns:repeat(2, 1fr); gap:14px;}
   body.view-mode-mobile .pricing{padding:40px 16px;}
   body.view-mode-mobile .pricing-grid{grid-template-columns:1fr;}
@@ -1655,3 +1688,49 @@
     box-shadow:0 3px 0 color-mix(in srgb, var(--brass) 55%, black), 0 5px 10px rgba(0,0,0,0.24);
   }
   .buy-btn:active{ transform:translateY(2px); box-shadow:0 1px 0 color-mix(in srgb, var(--brass) 55%, black), 0 2px 5px rgba(0,0,0,0.16); }
+
+  /* ---------- Extending the same embossed-graphic treatment to the rest of
+     the site's buttons — category pills, the admin quick-access dropdown
+     trigger, and the language/view toggle switches — so every clickable
+     control reads as one consistent, deliberately-designed button family
+     rather than a mix of flat chips and a few standout 3D ones. Same recipe
+     throughout: a solid color-mix "edge" for depth + a soft ambient shadow,
+     flattening and nudging down on press like a physical button. ---------- */
+  .cat-dropdown.cat-pills-mode .cat-dropdown-menu button,
+  .cat-dropdown-btn,
+  .ctrl-group button{
+    transition:transform .12s ease, box-shadow .12s ease, background .22s ease, border-color .22s ease;
+  }
+
+  /* Category pills — inactive state gets a quiet dark-edge depth so it
+     doesn't compete with the gold active pill; active/hovered gold pills
+     get the same warm brass edge as the site's other gold buttons. */
+  .cat-dropdown.cat-pills-mode .cat-dropdown-menu button{
+    box-shadow:0 2px 0 color-mix(in srgb, var(--line) 100%, var(--paper) 15%), 0 3px 8px rgba(0,0,0,0.18);
+  }
+  .cat-dropdown.cat-pills-mode .cat-dropdown-menu button:hover,
+  .cat-dropdown.cat-pills-mode .cat-dropdown-menu button.active{
+    box-shadow:0 2px 0 color-mix(in srgb, var(--brass) 55%, black), 0 4px 10px rgba(0,0,0,0.22);
+  }
+  .cat-dropdown.cat-pills-mode .cat-dropdown-menu button:active{
+    transform:translateY(2px); box-shadow:0 0px 0 color-mix(in srgb, var(--brass) 55%, black), 0 1px 4px rgba(0,0,0,0.16);
+  }
+
+  /* Admin quick-access trigger ("لوحة التحكم") — gold-outlined like
+     .admin-btn, so it gets the same warm brass edge. */
+  .cat-dropdown-btn{
+    box-shadow:0 3px 0 color-mix(in srgb, var(--brass) 55%, black), 0 5px 12px rgba(0,0,0,0.24);
+  }
+  .cat-dropdown-btn:active{
+    transform:translateY(2px); box-shadow:0 1px 0 color-mix(in srgb, var(--brass) 55%, black), 0 2px 5px rgba(0,0,0,0.16);
+  }
+
+  /* Language/view toggle buttons — subtle depth on the active pill only
+     (the inactive one stays flat/transparent by design, matching how
+     .ctrl-group already only fills the active side gold). */
+  .ctrl-group button.active{
+    box-shadow:0 2px 0 color-mix(in srgb, var(--brass) 55%, black), 0 3px 8px rgba(0,0,0,0.2);
+  }
+  .ctrl-group button.active:active{
+    transform:translateY(1px); box-shadow:0 1px 0 color-mix(in srgb, var(--brass) 55%, black), 0 1px 4px rgba(0,0,0,0.16);
+  }
