@@ -2,6 +2,18 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<!-- Favicon — the same open-book-with-camera mark used in the header logo,
+     baked out as standalone image files with fixed colors (the header's
+     own SVG uses var(--brass)/var(--ink) CSS variables, which aren't
+     available to a favicon loaded as a bare image file outside the page).
+     Multiple formats/sizes cover browser tabs, bookmarks, bookmarklets,
+     and "Add to Home Screen" on iOS/Android — including what Google shows
+     next to search results instead of the generic globe icon. -->
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <!-- Design-switch bootstrap. IMPORTANT FIX: an earlier version of this used
      a synchronous XHR with `.timeout` set — browsers throw an
      InvalidAccessError the instant that combination runs (timeout is
@@ -62,7 +74,7 @@
 })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Miga-Photobook — حوّل صورك لتحف فنية بالذكاء الاصطناعي | AI Photo Transformation</title>
+<title>Miga-Photobook — حوّل صورتك العادية لتحفة فنية في دقائق</title>
 <meta name="description" content="ارفع صورتك واختر المكان والأسلوب اللي عايزه، ونحوّلها لك تلقائيًا بجودة استوديو باستخدام الذكاء الاصطناعي — خلال دقائق.">
 <meta name="keywords" content="تحويل الصور بالذكاء الاصطناعي, AI Photo Transformation, صور شخصية احترافية, تعديل صور بالذكاء الاصطناعي">
 <meta property="og:site_name" content="Miga-Photobook">
@@ -73,7 +85,7 @@
 
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://miga-photobook.com/">
-<meta property="og:title" content="Miga-Photobook — حوّل صورك لتحف فنية بالذكاء الاصطناعي">
+<meta property="og:title" content="Miga-Photobook — حوّل صورتك العادية لتحفة فنية في دقائق">
 <meta property="og:description" content="ارفع صورتك واختر المكان والأسلوب، ونحوّلها لك تلقائيًا بجودة استوديو خلال دقائق.">
 <meta property="og:locale" content="ar_AR">
 <meta property="og:image" content="https://miga-photobook.com/og-image.png">
