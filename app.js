@@ -2015,7 +2015,7 @@ document.getElementById('payStatusCloseBtn').onclick = ()=>{
   stopOrderStatusPolling();
   document.getElementById('buyModalBg').classList.remove('show');
   const p = getBuyItem();
-  if(p && p.category) openCatSection(p.category)?.scrollIntoView({behavior:'smooth'});
+  if(p && p.category) scrollToSectionBelowHeader(openCatSection(p.category));
 };
 
 // ---------- Photo transform (client-side style preview) ----------
@@ -2485,7 +2485,7 @@ document.getElementById('trackCheckBtn').onclick = async ()=>{
     renderGrids();
     trackModalBg.classList.remove('show');
     showToast(t('toastReadyToTransform'));
-    openCatSection(order.productId ? getCategoryOf(order.productId) : 'children')?.scrollIntoView({behavior:'smooth'});
+    scrollToSectionBelowHeader(openCatSection(order.productId ? getCategoryOf(order.productId) : 'children'));
   }else{
     showToast(t('toastOrderPending'));
   }
@@ -2569,6 +2569,21 @@ const scrollRulerTrack = document.getElementById('scrollRulerTrack');
 // it never feels like something disappeared for good — it's just out of
 // the way while they're mid-browse.
 const stickyTopGroup = document.querySelector('.sticky-top-group');
+
+/** Scrolls an element into view while accounting for the CURRENT height of
+ * the sticky header — plain scrollIntoView({block:'start'}) aligns the
+ * target's top edge with the viewport's top edge, but since the header sits
+ * pinned on top of that same viewport region, the target's top portion
+ * (e.g. the top of a product photo) ends up scrolled underneath/behind it
+ * instead of actually visible. Reading stickyTopGroup's real height at
+ * click-time (rather than a fixed offset) keeps this correct whether the
+ * header happens to be expanded or already collapsed from scrolling. */
+function scrollToSectionBelowHeader(el){
+  if(!el) return;
+  const headerHeight = stickyTopGroup ? stickyTopGroup.getBoundingClientRect().height : 0;
+  const targetTop = el.getBoundingClientRect().top + window.scrollY;
+  window.scrollTo({ top: targetTop - headerHeight - 12, behavior:'smooth' });
+}
 const HEADER_COLLAPSE_THRESHOLD = 72;
 let lastHeaderScrollY = window.scrollY || 0;
 function updateHeaderCollapse(){
@@ -2866,8 +2881,8 @@ document.getElementById('catNav').addEventListener('click', (e)=>{
   catDropdownLabel.textContent = btn.dataset.cat === 'all' ? t('categoriesLabel') : btn.textContent;
   closeCatDropdown();
   const cat = btn.dataset.cat;
-  if(cat==='all'){ document.getElementById('categoryTiles')?.scrollIntoView({behavior:'smooth'}); }
-  else{ openCatSection(cat)?.scrollIntoView({behavior:'smooth'}); }
+  if(cat==='all'){ scrollToSectionBelowHeader(document.getElementById('categoryTiles')); }
+  else{ scrollToSectionBelowHeader(openCatSection(cat)); }
 });
 
 // ---------- Admin quick-access bell (top of page, before categories) ----------
