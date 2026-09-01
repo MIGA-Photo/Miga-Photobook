@@ -149,6 +149,7 @@ const translations = {
     heroSlogan:'لقطتك... تتحول لتحفة فنية',
     promoVideoTitle:'شوف Miga-Photobook وهو شغال', promoVideoSub:'دقائق معدودة، وصورتك العادية بتتحول لتحفة فنية احترافية.',
     trustCheck1:'✅ نتيجة خلال دقائق', trustCheck2:'✅ دفع آمن', trustCheck3:'✅ دعم فني مباشر', trustCheck4:'✅ تحديثات مستمرة',
+    visitorCounterPrefix:'انضم إلينا', visitorCounterSuffix:'زائر لحد دلوقتي',
     whyUsTitle:'لماذا Miga-Photobook؟',
     rowPrevLabel:'الصور السابقة', rowNextLabel:'الصور التالية',
     whyEdgeTitle:'وأدوات الذكاء الاصطناعي المتاحة للكل؟',
@@ -436,6 +437,7 @@ const translations = {
     heroSlogan:'Your shot... becomes a masterpiece',
     promoVideoTitle:'See Miga-Photobook in action', promoVideoSub:'A few minutes, and your ordinary photo becomes a professional work of art.',
     trustCheck1:'✅ Result within minutes', trustCheck2:'✅ Secure payment', trustCheck3:'✅ Direct support', trustCheck4:'✅ Ongoing updates',
+    visitorCounterPrefix:'Join', visitorCounterSuffix:'visitors so far',
     whyUsTitle:'Why Miga-Photobook?',
     rowPrevLabel:'Previous photos', rowNextLabel:'Next photos',
     whyEdgeTitle:'What about the AI tools everyone can use?',
@@ -3153,6 +3155,37 @@ async function checkBiometricAvailability(){
   }catch(e){ /* no platform authenticator on this device/browser — buttons just stay hidden */ }
 }
 
+/** Public visitor-count badge shown on the storefront itself (not the admin
+ * panel) — a lightweight, no-auth read of the same underlying visits table
+ * the admin "Total visitors" stat already uses. Refreshes on a timer so it
+ * reads as continuously live without the visitor needing to reload the
+ * page, and fails silently (badge just stays hidden) if the backend isn't
+ * reachable or the visits table isn't set up yet, so it can never break
+ * the rest of the page. */
+let visitorCounterTimer = null;
+async function loadVisitorCount(){
+  if(!BACKEND_BASE) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/visits/public-count`);
+    if(!res.ok) return;
+    const data = await res.json();
+    const total = typeof data.total === 'number' ? data.total : 0;
+    if(total <= 0) return; // nothing meaningful to show yet
+    const el = document.getElementById('visitorCounterNumber');
+    const wrap = document.getElementById('visitorCounter');
+    if(el) el.textContent = total.toLocaleString('en-US'); // Western digits with
+      // thousand separators, matching how prices/discounts are written
+      // everywhere else on the site (e.g. "25 جنيه") rather than switching
+      // to Arabic-Indic numerals just for this one badge.
+    if(wrap) wrap.style.display = 'flex';
+  }catch(e){ /* offline or backend hiccup — badge just stays hidden, page unaffected */ }
+}
+function initVisitorCounter(){
+  loadVisitorCount();
+  if(visitorCounterTimer) clearInterval(visitorCounterTimer);
+  visitorCounterTimer = setInterval(loadVisitorCount, 60000); // refresh every minute
+}
+
 document.getElementById('biometricLoginBtn').onclick = async ()=>{
   if(!BACKEND_BASE) return;
   try{
@@ -5358,6 +5391,7 @@ async function applyHeroModeForThisDesign(){
   await checkLoggedInUser();
   await renderTestimonials();
   checkBiometricAvailability();
+  initVisitorCounter();
 
   if(LAUNCH_PROMO){
     const pricingSection = document.getElementById('pricing');
