@@ -19,7 +19,7 @@
      commission. manifest.json and service-worker.js live once at the repo
      root (same reasoning as the favicon files) and are shared by all three
      design folders via this root-absolute link + registration script. -->
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" id="__pwaManifestLink" href="/manifest.json">
 <meta name="theme-color" content="#0c0c10">
 <!-- Design-switch bootstrap. IMPORTANT FIX: an earlier version of this used
      a synchronous XHR with `.timeout` set — browsers throw an
@@ -57,6 +57,14 @@
   // Admin entry point — never redirect away from this, no matter which
   // design is active for customers. The admin panel only exists here.
   if(window.location.hash === '#mega-admin-9k2x'){
+    // Swap the page's manifest to the admin one BEFORE reveal(), so that if
+    // the owner taps "Add to Home Screen" while on this admin URL, the
+    // installed icon launches straight back into the admin panel
+    // (start_url "/#mega-admin-9k2x") instead of the customer homepage.
+    // Swapping the existing <link rel="manifest"> element's href like this
+    // is picked up by the browser's install flow same as a static manifest.
+    var manifestLink = document.getElementById('__pwaManifestLink');
+    if(manifestLink) manifestLink.setAttribute('href', '/admin-manifest.json');
     reveal();
     return;
   }
