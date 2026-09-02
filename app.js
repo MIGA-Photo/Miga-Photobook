@@ -2744,11 +2744,30 @@ function scrollToSectionBelowHeader(el){
     // one synchronous reflow) is what actually makes the collapsed height
     // available to measure immediately, with the same net visual effect
     // once everything is restored right after.
+    const wasCollapsed = stickyTopGroup.classList.contains('hdr-collapsed');
     const innerAnimated = stickyTopGroup.querySelectorAll('.header-utility, #softLaunchBanner, .search-box');
     innerAnimated.forEach(elm => { elm.style.transition = 'none'; });
     stickyTopGroup.classList.add('hdr-collapsed');
     void stickyTopGroup.offsetHeight; // force layout recalculation
     headerHeight = stickyTopGroup.getBoundingClientRect().height;
+    // BUG FIX: forcing hdr-collapsed above was only to measure the header's
+    // collapsed height — it must not leak into the real header state. Left
+    // stuck on (as it was before this fix), it permanently hides the search
+    // box — and the utility strip/promo banner — since all three collapse
+    // to max-height:0/overflow:hidden under .hdr-collapsed. It only got
+    // released again by a later native 'scroll' event reaching the
+    // threshold logic in updateHeaderCollapse() below; clicking a category
+    // or search result whose target is already near the current scroll
+    // position (a common case — e.g. right after landing on the page)
+    // produces a scroll animation with little or no actual scrollY change,
+    // so that correcting 'scroll' event may never fire, leaving the header
+    // — and the search box inside it — stuck invisible and unusable from
+    // then on, for the rest of the visit. Restoring the pre-measurement
+    // state here (before transitions are re-enabled, so there's no visible
+    // flash) removes that side effect entirely; the real scroll below (and
+    // updateHeaderCollapse acting on it) is what decides the true collapsed
+    // state from this point on, exactly as it does everywhere else.
+    stickyTopGroup.classList.toggle('hdr-collapsed', wasCollapsed);
     innerAnimated.forEach(elm => { elm.style.transition = ''; });
   }
   const targetTop = el.getBoundingClientRect().top + window.scrollY - headerHeight - 12;
