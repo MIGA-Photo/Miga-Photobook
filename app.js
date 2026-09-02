@@ -1119,7 +1119,7 @@ function renderHeroStrip(){
   const doubled = [...sample, ...sample];
   track.innerHTML = doubled.map((p,i) => `
     <div class="frame">
-      <img src="${p.image}" alt="" loading="lazy" decoding="async">
+      <img src="${p.image}" alt="" decoding="async">
     </div>`).join('');
 
   // ---- Constant on-screen speed regardless of catalog size ----
@@ -1343,7 +1343,7 @@ function renderProductCard(p){
   return `
   <div class="card">
     <div class="card-media">
-      <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" loading="lazy" decoding="async" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
+      <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" decoding="async" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
       <span class="card-badge">${escapeHtml(productTitle(p))}</span>
       ${requestCount > 0 ? `<span class="request-count-overlay" title="${t('popularityCountTitle')}">🔥 ${requestCount}</span>` : ''}
     </div>
