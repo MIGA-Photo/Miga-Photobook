@@ -4,7 +4,7 @@
   "description": "دخول مباشر لوحة إدارة ميجا فوتوبوك — إضافة/تعديل منتجات، إعدادات الموقع، وإدارة الطلبات.",
   "lang": "ar",
   "dir": "rtl",
-  "start_url": "/#mega-admin-9k2x",
+  "start_url": "/admin-9k2x.html",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",

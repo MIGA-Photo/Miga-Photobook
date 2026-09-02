@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<!-- This file exists ONLY to fix iOS "Add to Home Screen" for the admin
+     shortcut. Root cause: iOS Safari resolves the <link rel="manifest">
+     for a page at initial HTML parse time. On the root index.html, that
+     link starts out pointed at the customer manifest.json, and a JS
+     bootstrap script was swapping its href to admin-manifest.json when the
+     #mega-admin-9k2x hash was present — but iOS's Add-to-Home-Screen keeps
+     using whatever manifest it resolved at initial parse, ignoring the
+     later JS mutation. Result: an installed "admin" icon still carried the
+     customer manifest's name and start_url ("/"), so it opened the visitor
+     page — confirmed by both home-screen icons showing the customer
+     short_name "ميجا فوتوبوك" instead of "إدارة ميجا".
+
+     Fix: give the admin shortcut its own real, static file with the admin
+     manifest link already baked into the initial HTML source (never
+     mutated by JS), plus its own apple-mobile-web-app-title. Filename kept
+     as an unguessable slug (matching the existing #mega-admin-9k2x secret)
+     since, unlike a hash fragment, this is a real crawlable path. -->
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+<link rel="manifest" href="/admin-manifest.json">
+<meta name="apple-mobile-web-app-title" content="إدارة ميجا">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0c0c10">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Miga-Photobook — لوحة الإدارة</title>
+<style>
+  html,body{margin:0;height:100%;background:#0c0c10;color:#fff8ec;
+    font-family:-apple-system,system-ui,sans-serif;
+    display:flex;align-items:center;justify-content:center;text-align:center;}
+</style>
+<script>
+  // Real navigation (not just a hash change on this page) so the existing
+  // admin-detection logic in the root index.html runs from scratch.
+  location.replace('/#mega-admin-9k2x');
+</script>
+</head>
+<body>
+  <noscript>
+    <p>افتح <a href="/#mega-admin-9k2x" style="color:#fff8ec;">لوحة الإدارة</a> يدويًا (محتاج JavaScript شغال).</p>
+  </noscript>
+  <p>...جاري الدخول للوحة الإدارة</p>
+</body>
+</html>
