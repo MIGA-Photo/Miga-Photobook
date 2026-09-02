@@ -2422,8 +2422,22 @@ document.getElementById('transformGenerateBtn').onclick = async ()=>{
       const resultImg = new Image();
       resultImg.crossOrigin = 'anonymous';
       resultImg.onload = ()=>{
-        ctx.clearRect(0,0,w,h);
-        ctx.drawImage(resultImg, 0, 0, w, h);
+        // THE core quality bug: this used to be
+        //   ctx.drawImage(resultImg, 0, 0, w, h)
+        // where w/h were the 360px PREVIEW canvas dimensions — so the real
+        // 4K image fal.ai returned was immediately downscaled to 360px and
+        // everything past that point (what the customer sees, and what the
+        // download button saved) came from that destroyed copy. The 4K was
+        // paid for and generated, but never actually reached anyone.
+        // Resizing the canvas to the returned image's OWN dimensions first
+        // means the full-resolution result is what gets displayed and
+        // downloaded; CSS still scales it down visually to fit the layout,
+        // which is what a preview is supposed to do.
+        outCanvas.width = resultImg.naturalWidth;
+        outCanvas.height = resultImg.naturalHeight;
+        const fullCtx = outCanvas.getContext('2d');
+        fullCtx.clearRect(0, 0, outCanvas.width, outCanvas.height);
+        fullCtx.drawImage(resultImg, 0, 0);
         document.getElementById('transformDownloadBtn').style.display = 'inline-block';
         document.getElementById('transformShareBtn').style.display = 'inline-block';
         document.getElementById('thanksPanel').classList.add('show');
@@ -2493,11 +2507,36 @@ document.getElementById('transformShareBtn').onclick = async ()=>{
   copyToClipboard(`${shareText} ${shareUrl}`, 'toastShareCopied');
 };
 
-document.getElementById('transformDownloadBtn').onclick = ()=>{
+document.getElementById('transformDownloadBtn').onclick = async ()=>{
+  // Prefer downloading the ORIGINAL file straight from the generation
+  // service. Re-encoding via canvas.toDataURL() re-compresses the image a
+  // second time and, more importantly, only ever captures whatever the
+  // canvas currently holds — so any canvas sizing issue silently becomes a
+  // permanently degraded download. Fetching the source URL hands the
+  // customer the exact 4K PNG that was generated and paid for.
+  const originalUrl = transformedResults[currentTransformId];
+  if(originalUrl){
+    try{
+      const res = await fetch(originalUrl);
+      if(res.ok){
+        const blob = await res.blob();
+        const objUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = 'miga-photobook-result.png';
+        link.href = objUrl;
+        link.click();
+        setTimeout(()=> URL.revokeObjectURL(objUrl), 10000);
+        return;
+      }
+    }catch(e){ /* fall through to the canvas copy below */ }
+  }
+  // Fallback: the canvas copy (now full-resolution too, since the result is
+  // drawn at its native size), used if the direct fetch is blocked by CORS
+  // or the customer is offline at the moment they tap download.
   const outCanvas = document.getElementById('transformOutCanvas');
   try{
     const link = document.createElement('a');
-    link.download = 'mega-prompt-result.png';
+    link.download = 'miga-photobook-result.png';
     link.href = outCanvas.toDataURL('image/png');
     link.click();
   }catch(e){
