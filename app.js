@@ -1303,28 +1303,48 @@ function scrollRow(key, direction){
   const current = currentRowIndex(rowEl, cards, rtl);
   const maxIndex = Math.max(0, cards.length - perView);
   const target = Math.max(0, Math.min(maxIndex, current + direction * perView));
-  // 'center' (not 'start') so the arrow buttons land on exactly the same
-  // snap point the CSS scroll-snap now uses — 'start' means the RTL
-  // inline-start (right) edge, which combined with flex-basis:100% + gap's
-  // sub-pixel rounding was what left a stray gap bleeding through on the
-  // left on mobile. Centering removes that edge dependency entirely.
-  cards[target].scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
-  // scrollIntoView's block:'nearest' only checks whether the card
-  // geometrically intersects the viewport — it has no idea the sticky
-  // header visually sits on top of part of that same viewport, so a card
-  // that's "technically in view" by raw coordinates can still have its top
-  // portion hidden behind the header. Since this fires on every single
-  // arrow tap across every category, that same sliver-of-crop compounds
-  // into "every product's photo looks slightly cut off at the top" — this
-  // follow-up nudges the page down by exactly however much the header is
-  // still covering, once the horizontal scroll settles.
-  setTimeout(() => {
-    const headerH = stickyTopGroup ? stickyTopGroup.getBoundingClientRect().height : 0;
-    const cardTop = cards[target].getBoundingClientRect().top;
-    if(cardTop < headerH){
-      window.scrollBy({ top: cardTop - headerH - 10, behavior:'smooth' });
-    }
-  }, 380); // after the scrollIntoView's own smooth-scroll has settled
+  const targetCard = cards[target];
+
+  // ---------------------------------------------------------------------
+  // Rewritten from scratch — the previous version used the browser's own
+  // scrollIntoView() plus a delayed follow-up correction, timed to run
+  // after scrollIntoView's animation was assumed to have settled. Testing
+  // across all 8 categories showed that assumption was unreliable: the
+  // site's global html{scroll-behavior:smooth} hijacks scrollIntoView into
+  // an unpredictable browser-driven transition whose duration depends on
+  // distance/device, so a fixed delay sometimes fired too early (landing
+  // wherever the still-mid-flight transition happened to be — anywhere
+  // from a small gap to hundreds of pixels off) and sometimes too late.
+  // Rather than continuing to chase that timing, this computes BOTH the
+  // horizontal (which card is centered in its row) and vertical (how far
+  // below the sticky header the card should sit) target positions directly
+  // from geometry, and drives both with our own eased animation using
+  // behavior:'instant' at each step — never handing control to the
+  // browser's own smooth-scroll, so nothing here can race against it.
+  // ---------------------------------------------------------------------
+  const rowRect = rowEl.getBoundingClientRect();
+  const cardRect = targetCard.getBoundingClientRect();
+  const targetScrollLeft = rowEl.scrollLeft + (cardRect.left + cardRect.width/2) - (rowRect.left + rowRect.width/2);
+
+  const headerH = stickyTopGroup ? stickyTopGroup.getBoundingClientRect().height : 0;
+  const GAP = 10;
+  const targetScrollTop = window.scrollY + cardRect.top - headerH - GAP;
+
+  const startLeft = rowEl.scrollLeft;
+  const startTop = window.scrollY;
+  const deltaLeft = targetScrollLeft - startLeft;
+  const deltaTop = targetScrollTop - startTop;
+  const duration = 320;
+  const startTime = performance.now();
+
+  function step(now){
+    const t = Math.min(1, (now - startTime) / duration);
+    const ease = t*t*(3-2*t); // smoothstep — matches the feel scrollIntoView('smooth') gave, without delegating to it
+    rowEl.scrollTo({ left: startLeft + deltaLeft*ease, behavior:'instant' });
+    window.scrollTo({ top: startTop + deltaTop*ease, behavior:'instant' });
+    if(t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
 }
 
 function updateRowArrows(key){
