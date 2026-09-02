@@ -56,11 +56,24 @@
   }
   // Admin entry point — never redirect away from this, no matter which
   // design is active for customers. The admin panel only exists here.
-  if(window.location.hash === '#mega-admin-9k2x'){
+  //
+  // THIRD FIX (Sep 2026): iOS "Add to Home Screen" was found to drop the
+  // URL fragment entirely from the installed icon's launch URL — an
+  // icon installed while on "/#mega-admin-9k2x" actually launched to
+  // plain "/" (confirmed live: the install sheet showed
+  // "https://miga-photobook.com/", no hash, and the installed icon opened
+  // the customer homepage). Hash-based routing can never survive iOS's
+  // install flow. Query strings are part of the real URL (sent to the
+  // server, not a client-only fragment) and are preserved by iOS install,
+  // so "?admin=9k2x" is now accepted as an equivalent, install-safe way in
+  // — the old hash form still works too for any existing bookmarks/links.
+  var isAdminEntry = (window.location.hash === '#mega-admin-9k2x') ||
+    /(^|&)admin=9k2x(&|$)/.test(window.location.search.replace(/^\?/, ''));
+  if(isAdminEntry){
     // Swap the page's manifest to the admin one BEFORE reveal(), so that if
     // the owner taps "Add to Home Screen" while on this admin URL, the
     // installed icon launches straight back into the admin panel
-    // (start_url "/#mega-admin-9k2x") instead of the customer homepage.
+    // (start_url "/?admin=9k2x") instead of the customer homepage.
     // Swapping the existing <link rel="manifest"> element's href like this
     // is picked up by the browser's install flow same as a static manifest.
     var manifestLink = document.getElementById('__pwaManifestLink');

@@ -2,23 +2,33 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<!-- This file exists ONLY to fix iOS "Add to Home Screen" for the admin
-     shortcut. Root cause: iOS Safari resolves the <link rel="manifest">
-     for a page at initial HTML parse time. On the root index.html, that
-     link starts out pointed at the customer manifest.json, and a JS
-     bootstrap script was swapping its href to admin-manifest.json when the
-     #mega-admin-9k2x hash was present — but iOS's Add-to-Home-Screen keeps
-     using whatever manifest it resolved at initial parse, ignoring the
-     later JS mutation. Result: an installed "admin" icon still carried the
-     customer manifest's name and start_url ("/"), so it opened the visitor
-     page — confirmed by both home-screen icons showing the customer
-     short_name "ميجا فوتوبوك" instead of "إدارة ميجا".
+<!-- This file exists to fix iOS "Add to Home Screen" for the admin
+     shortcut. Two separate bugs found and fixed here:
 
-     Fix: give the admin shortcut its own real, static file with the admin
-     manifest link already baked into the initial HTML source (never
-     mutated by JS), plus its own apple-mobile-web-app-title. Filename kept
-     as an unguessable slug (matching the existing #mega-admin-9k2x secret)
-     since, unlike a hash fragment, this is a real crawlable path. -->
+     BUG 1 (manifest not picked up): iOS Safari resolves the
+     <link rel="manifest"> for a page at initial HTML parse time. On the
+     root index.html, that link starts out pointed at the customer
+     manifest.json, and a JS bootstrap script was swapping its href to
+     admin-manifest.json when the admin hash was present — but iOS's
+     Add-to-Home-Screen keeps using whatever manifest it resolved at
+     initial parse, ignoring the later JS mutation. Fixed by giving this
+     shortcut its own real, static file with the admin manifest link
+     already baked into the initial HTML source (never mutated by JS).
+
+     BUG 2 (hash fragment dropped) — found on real-device retest AFTER bug 1
+     was fixed: this page used to redirect to "/#mega-admin-9k2x" so the
+     existing hash-based admin logic in index.html/app.js would pick it up.
+     But the iOS "Add to Home Screen" sheet, when tapped from that resulting
+     URL, showed plain "https://miga-photobook.com/" — no hash at all — and
+     the installed icon opened the customer homepage. iOS's install flow
+     drops URL fragments entirely; they never had a chance of surviving.
+     Fixed by redirecting to "/?admin=9k2x" (a real query string, sent to
+     the server, not a client-only fragment) instead — index.html and
+     app.js now both accept this form as equivalent to the old hash.
+
+     Filename kept as an unguessable slug (matching the original
+     #mega-admin-9k2x secret) since, unlike a hash fragment, this is a real
+     crawlable path — see the noindex tag below. -->
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -39,12 +49,13 @@
 <script>
   // Real navigation (not just a hash change on this page) so the existing
   // admin-detection logic in the root index.html runs from scratch.
-  location.replace('/#mega-admin-9k2x');
+  // Query string, not a hash — see the head comment for why.
+  location.replace('/?admin=9k2x');
 </script>
 </head>
 <body>
   <noscript>
-    <p>افتح <a href="/#mega-admin-9k2x" style="color:#fff8ec;">لوحة الإدارة</a> يدويًا (محتاج JavaScript شغال).</p>
+    <p>افتح <a href="/?admin=9k2x" style="color:#fff8ec;">لوحة الإدارة</a> يدويًا (محتاج JavaScript شغال).</p>
   </noscript>
   <p>...جاري الدخول للوحة الإدارة</p>
 </body>
