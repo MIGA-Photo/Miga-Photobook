@@ -10,6 +10,11 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+<!-- PWA — same manifest.json/service-worker.js as the root design (they
+     only exist once, at the repo root); see the comment in root index.html
+     for the full reasoning. -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0c0c10">
 <!-- Design-switch bootstrap. IMPORTANT FIX: an earlier version of this used
      a synchronous XHR with `.timeout` set — browsers throw an
      InvalidAccessError the instant that combination runs (timeout is
@@ -466,5 +471,12 @@
 <div class="toast" id="toast"></div>
 
 <script src="app.js"></script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('/service-worker.js').catch(function(){});
+  });
+}
+</script>
 </body>
 </html>
