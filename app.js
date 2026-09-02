@@ -5748,13 +5748,15 @@ async function applyHeroModeForThisDesign(){
   setInterval(updateCountdown, 60000);
   await applyHeroModeForThisDesign();
 
-  // Secret admin entry point: visit index.html#mega-admin-9k2x (or the
-  // install-safe ?admin=9k2x query form — see the matching comment in
-  // index.html's bootstrap script for why both exist) to open the admin
-  // login. The button itself stays hidden from customers (see adminOpenBtn
-  // above).
+  // Secret admin entry point: visit index.html#mega-admin-9k2x, the
+  // install-safe ?admin=9k2x query form, or the dedicated standalone
+  // admin-9k2x.html page (added so "Add to Home Screen" on iOS has a real,
+  // static, never-redirected URL+manifest to capture — see the head
+  // comment in admin-9k2x.html for the full history). The button itself
+  // stays hidden from customers (see adminOpenBtn above).
   if(window.location.hash === '#mega-admin-9k2x' ||
-     /(^|&)admin=9k2x(&|$)/.test(window.location.search.replace(/^\?/, ''))){
+     /(^|&)admin=9k2x(&|$)/.test(window.location.search.replace(/^\?/, '')) ||
+     /\/admin-9k2x\.html$/.test(window.location.pathname)){
     adminModalBg.classList.add('show');
   }
   openProductFromHash();

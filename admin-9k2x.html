@@ -2,61 +2,1665 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<!-- This file exists to fix iOS "Add to Home Screen" for the admin
-     shortcut. Two separate bugs found and fixed here:
-
-     BUG 1 (manifest not picked up): iOS Safari resolves the
-     <link rel="manifest"> for a page at initial HTML parse time. On the
-     root index.html, that link starts out pointed at the customer
-     manifest.json, and a JS bootstrap script was swapping its href to
-     admin-manifest.json when the admin hash was present — but iOS's
-     Add-to-Home-Screen keeps using whatever manifest it resolved at
-     initial parse, ignoring the later JS mutation. Fixed by giving this
-     shortcut its own real, static file with the admin manifest link
-     already baked into the initial HTML source (never mutated by JS).
-
-     BUG 2 (hash fragment dropped) — found on real-device retest AFTER bug 1
-     was fixed: this page used to redirect to "/#mega-admin-9k2x" so the
-     existing hash-based admin logic in index.html/app.js would pick it up.
-     But the iOS "Add to Home Screen" sheet, when tapped from that resulting
-     URL, showed plain "https://miga-photobook.com/" — no hash at all — and
-     the installed icon opened the customer homepage. iOS's install flow
-     drops URL fragments entirely; they never had a chance of surviving.
-     Fixed by redirecting to "/?admin=9k2x" (a real query string, sent to
-     the server, not a client-only fragment) instead — index.html and
-     app.js now both accept this form as equivalent to the old hash.
-
-     Filename kept as an unguessable slug (matching the original
-     #mega-admin-9k2x secret) since, unlike a hash fragment, this is a real
-     crawlable path — see the noindex tag below. -->
+<!-- Favicon — the same open-book-with-camera mark used in the header logo,
+     baked out as standalone image files with fixed colors (the header's
+     own SVG uses var(--brass)/var(--ink) CSS variables, which aren't
+     available to a favicon loaded as a bare image file outside the page).
+     Multiple formats/sizes cover browser tabs, bookmarks, bookmarklets,
+     and "Add to Home Screen" on iOS/Android — including what Google shows
+     next to search results instead of the generic globe icon. -->
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
+<!-- PWA — this is the dedicated, standalone admin entry page (not a redirect
+     to the root page). Two earlier attempts at the admin PWA shortcut both
+     failed on real-device iOS testing:
+       1) A JS-swapped manifest link on the root page (swap href to
+          admin-manifest.json only when an admin hash was present) — iOS
+          resolves <link rel="manifest"> at initial parse and ignores later
+          JS mutation, so the installed icon kept the customer manifest's
+          name/start_url regardless.
+       2) A thin redirector file at this same URL that navigated to
+          "/#mega-admin-9k2x" (then "/?admin=9k2x") — but "Add to Home
+          Screen" was tapped from a Safari address bar that had already
+          settled on that later URL AND had already re-resolved the root
+          page's manifest link, still the customer one (fix #1's problem,
+          one page removed).
+     Fix: this page is the entire site, byte-identical to the customer
+     index.html, EXCEPT its <link rel="manifest"> is hardcoded to
+     admin-manifest.json from the raw HTML source (never touched by JS) and
+     it never navigates anywhere — "Add to Home Screen" from here always
+     sees the correct manifest and the correct URL because both are fixed,
+     static, and already true at parse time, with zero redirects in
+     between. The page shows the admin login as soon as app.js finishes its
+     normal init (see the matching pathname check added to app.js's
+     existing hash/query admin check), the same way the root page's
+     #mega-admin-9k2x / ?admin=9k2x entry does. -->
 <link rel="manifest" href="/admin-manifest.json">
 <meta name="apple-mobile-web-app-title" content="إدارة ميجا">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0c0c10">
+<style id="__bootHide">html{visibility:hidden;}</style>
+<script>
+(function(){
+  var s = document.getElementById('__bootHide');
+  if(s) s.remove();
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Miga-Photobook — لوحة الإدارة</title>
-<style>
-  html,body{margin:0;height:100%;background:#0c0c10;color:#fff8ec;
-    font-family:-apple-system,system-ui,sans-serif;
-    display:flex;align-items:center;justify-content:center;text-align:center;}
-</style>
+<meta name="description" content="ارفع صورتك واختر المكان والأسلوب اللي عايزه، ونحوّلها لك تلقائيًا بجودة استوديو باستخدام الذكاء الاصطناعي — خلال دقائق.">
+<meta name="keywords" content="تحويل الصور بالذكاء الاصطناعي, AI Photo Transformation, صور شخصية احترافية, تعديل صور بالذكاء الاصطناعي">
+<meta property="og:site_name" content="Miga-Photobook">
+
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://miga-photobook.com/">
+<meta property="og:title" content="Miga-Photobook — حوّل صورتك العادية لتحفة فنية في دقائق">
+<meta property="og:description" content="ارفع صورتك واختر المكان والأسلوب، ونحوّلها لك تلقائيًا بجودة استوديو خلال دقائق.">
+<meta property="og:locale" content="ar_AR">
+<meta property="og:image" content="https://miga-photobook.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Miga-Photobook — حوّل صورك لتحف فنية بالذكاء الاصطناعي">
+<meta name="twitter:description" content="ارفع صورتك واختر المكان والأسلوب — بنحوّلها لك تلقائيًا بالذكاء الاصطناعي.">
+<meta name="twitter:image" content="https://miga-photobook.com/og-image.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Miga-Photobook",
+  "alternateName": ["ميجا فوتوبوك", "Miga Photobook"],
+  "url": "https://miga-photobook.com/"
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Miga-Photobook",
+  "description": "نحوّل صورتك الشخصية تلقائيًا لتحفة فنية احترافية باستخدام الذكاء الاصطناعي — ارفع صورتك واختر المكان والأسلوب.",
+  "url": "https://miga-photobook.com/"
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rakkas&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
 <script>
-  // Real navigation (not just a hash change on this page) so the existing
-  // admin-detection logic in the root index.html runs from scratch.
-  // Query string, not a hash — see the head comment for why.
-  location.replace('/?admin=9k2x');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-98HS77F9E9');
+</script>
+
+<!-- Meta Pixel — live Pixel ID (dataset "Magdy Farouk's Pixel" in Meta
+     Events Manager). -->
+<script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+  document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '317880457219719');
+  fbq('track', 'PageView');
 </script>
 </head>
 <body>
-  <noscript>
-    <p>افتح <a href="/?admin=9k2x" style="color:#fff8ec;">لوحة الإدارة</a> يدويًا (محتاج JavaScript شغال).</p>
-  </noscript>
-  <p>...جاري الدخول للوحة الإدارة</p>
+<script>
+/* Early theme/view-mode bootstrap — runs synchronously as the very first
+   thing in the page body, before any header/nav content is parsed or
+   painted. Without this, the page always rendered with its bare defaults
+   (light theme, desktop-style header) for a brief instant, then visibly
+   snapped to the visitor's actual saved dark/mobile preference once the
+   full app.js file finished loading and ran its own (much later) init
+   logic — a classic flash-of-wrong-content. Reading the same localStorage
+   key here and applying the same classes/attribute the real
+   applyTheme()/applyViewMode() functions use later means the correct look
+   is already in place on the very first paint; app.js's own calls to
+   those functions further down simply confirm/no-op on what's already
+   correct. */
+(function(){
+  try{
+    var raw = localStorage.getItem('megaPromptUiPrefs');
+    var prefs = raw ? JSON.parse(raw) : null;
+    var theme = (prefs && prefs.theme === 'light') ? 'light' : 'dark';
+    var view = (prefs && prefs.view === 'desktop') ? 'desktop' : 'mobile';
+    document.documentElement.setAttribute('data-theme', theme);
+    document.body.className = 'view-mode-' + view;
+  }catch(e){
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.body.className = 'view-mode-mobile';
+  }
+})();
+</script>
+<div class="site-watermark-bg" id="siteWatermarkBg" aria-hidden="true">
+  <div class="wm-photos" id="wmPhotos"></div>
+  <div class="wm-logo-layer" id="wmLogoLayer"></div>
+</div>
+<div id="appRoot">
+<div class="promo-marquee" aria-hidden="true">
+  <div class="promo-marquee-track">
+    <span data-i18n="promoMarqueeText">حوّل أي صورة عادية إلى بورتريه استوديو احترافي بالذكاء الاصطناعي خلال دقائق — عرض الافتتاح: كل صورة بـ 25 جنيه بدلاً من 50 جنيه لفترة محدودة.</span>
+    <span data-i18n="promoMarqueeText" aria-hidden="true">حوّل أي صورة عادية إلى بورتريه استوديو احترافي بالذكاء الاصطناعي خلال دقائق — عرض الافتتاح: كل صورة بـ 25 جنيه بدلاً من 50 جنيه لفترة محدودة.</span>
+  </div>
+</div>
+<div class="sticky-top-group">
+<header>
+  <div class="header-utility">
+    <div class="ctrl-group ctrl-group-sm" id="langToggle">
+      <button data-lang="ar" class="active">عربي</button>
+      <button data-lang="en">English</button>
+    </div>
+    <button type="button" class="theme-toggle theme-toggle-sm" aria-pressed="true">
+      <span class="tt-stars" aria-hidden="true">
+        <span class="tt-star" style="inset-inline-start:8px; top:6px;"></span>
+        <span class="tt-star" style="inset-inline-start:16px; top:14px;"></span>
+        <span class="tt-star" style="inset-inline-start:24px; top:5px;"></span>
+      </span>
+      <span class="tt-icon tt-sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"/></svg></span>
+      <span class="tt-icon tt-moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg></span>
+      <span class="tt-knob" aria-hidden="true">
+        <span class="tt-knob-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"/></svg></span>
+        <span class="tt-knob-moon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg></span>
+      </span>
+    </button>
+    <div class="ctrl-group ctrl-group-sm" id="viewToggle">
+      <button data-view="desktop" class="active" id="viewBtnDesktop">
+        <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16.5V20"/></svg></span>
+        <span data-i18n="viewDesktopLabel">كمبيوتر</span>
+      </button>
+      <button data-view="mobile" id="viewBtnMobile">
+        <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M11 18.5h2"/></svg></span>
+        <span data-i18n="viewMobileLabel">موبايل</span>
+      </button>
+    </div>
+    <button type="button" class="util-link" id="trackOpenBtn" data-i18n="trackBtn">تتبع طلبي</button>
+  </div>
+  <div class="nav-wrap">
+    <div class="logo">
+      <svg class="logo-mark" viewBox="0 0 48 48" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+        <!-- open book -->
+        <path d="M24 14 C19 10 10 9 5 11 V37 C10 35 19 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M24 14 C29 10 38 9 43 11 V37 C38 35 29 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M24 14 V40" stroke="var(--brass)" stroke-width="1.5" opacity="0.5"/>
+        <!-- camera resting on the book -->
+        <rect x="14" y="18" width="20" height="14" rx="3" fill="var(--ink)" stroke="var(--brass)" stroke-width="2"/>
+        <rect x="20" y="14" width="8" height="5" rx="1.5" fill="var(--ink)" stroke="var(--brass)" stroke-width="2"/>
+        <circle cx="24" cy="25" r="4.5" fill="none" stroke="var(--brass)" stroke-width="2"/>
+        <circle cx="24" cy="25" r="1.6" fill="var(--brass)"/>
+      </svg>
+      <span>Miga<span class="logo-accent">-Photobook</span></span>
+    </div>
+    <div class="cat-dropdown" id="adminQuickAccess" style="display:none;">
+      <button type="button" class="cat-dropdown-btn admin-bell-btn" id="adminBellBtn" aria-haspopup="true" aria-expanded="false">
+        <span class="cdi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9.5a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 13.5 6 9.5z"/><path d="M10.3 18.5a1.9 1.9 0 0 0 3.4 0"/></svg></span>
+        <span data-i18n="adminQuickLabel">لوحة التحكم</span>
+        <span class="admin-bell-badge" id="adminBellBadge" style="display:none;">0</span>
+        <span class="cdc" aria-hidden="true">&#9660;</span>
+      </button>
+      <div class="cat-dropdown-menu" id="adminQuickMenu" role="menu">
+        <button type="button" data-admin-tab="orders" role="menuitem">
+          <span data-i18n="tabOrders">الطلبات</span> <span id="adminQuickPendingLabel"></span>
+        </button>
+        <button type="button" data-admin-tab="products" data-i18n="tabProducts" role="menuitem">إضافة منتج</button>
+        <button type="button" data-admin-tab="reviews" data-i18n="tabReviews" role="menuitem">التقييمات</button>
+        <button type="button" data-admin-tab="visitors" data-i18n="tabVisitors" role="menuitem">الزوار</button>
+        <button type="button" data-admin-tab="showcase" data-i18n="tabShowcase" role="menuitem">الدائرة</button>
+        <button type="button" data-admin-tab="promoimages" data-i18n="tabPromoImages" role="menuitem">صور العرض</button>
+        <button type="button" id="adminQuickLogout" data-i18n="adminLogoutBtn" role="menuitem" style="color:#e07a7a;">خروج</button>
+      </div>
+    </div>
+
+    <div class="search-box" id="searchBox">
+      <button type="button" class="search-icon-btn" id="searchIconBtn" aria-label="بحث" title="بحث">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><circle cx="10.3" cy="10.3" r="6.6" stroke-width="2.1"/><path d="M8 6.6a4 4 0 0 0-2.7 3.9" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/><line x1="15.2" y1="15.2" x2="21" y2="21" stroke-width="2.6" stroke-linecap="round"/></svg>
+      </button>
+      <input type="text" id="searchInput" data-i18n-ph="searchPlaceholder" placeholder="ابحث في الموقع...">
+      <div class="search-dropdown" id="searchDropdown"></div>
+    </div>
+
+    <button class="admin-btn admin-btn-primary" id="accountOpenBtn">تسجيل الدخول</button>
+    <button class="admin-btn" id="adminOpenBtn" data-i18n="adminBtn" style="display:none;">لوحة الإدارة</button>
+  </div>
+
+  <div class="cat-dropdown cat-pills-mode" id="catDropdown">
+    <button type="button" class="cat-dropdown-btn" id="catDropdownBtn" aria-haspopup="true" aria-expanded="false" style="display:none;">
+      <span class="cdi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg></span>
+      <span id="catDropdownLabel" data-i18n="categoriesLabel">الأقسام</span>
+      <span class="cdc" aria-hidden="true">&#9660;</span>
+    </button>
+    <div class="cat-dropdown-menu" id="catNav" role="menu">
+      <button data-cat="all" class="active" data-i18n="navAll" role="menuitem">الكل</button>
+      <button data-cat="children" data-i18n="navChildren" role="menuitem">أطفال</button>
+      <button data-cat="male" data-i18n="navMale" role="menuitem">رجالي</button>
+      <button data-cat="female" data-i18n="navFemale" role="menuitem">نسائي</button>
+      <button data-cat="business" data-i18n="navBusiness" role="menuitem">أعمال</button>
+      <button data-cat="cinematic" data-i18n="navCinematic" role="menuitem">سينمائي</button>
+      <button data-cat="luxury" data-i18n="navLuxury" role="menuitem">فاخر</button>
+      <button data-cat="artistic" data-i18n="navArtistic" role="menuitem">فني</button>
+      <button data-cat="magazine" data-i18n="navMagazine" role="menuitem">مجلات</button>
+    </div>
+  </div>
+</header>
+
+<div id="softLaunchBanner" class="soft-launch-banner">
+  <span data-i18n="launchPromoBannerText">🎉 عرض افتتاح الموقع — كل صورة بـ 25 جنيه فقط!</span>
+  <span id="promoCountdown" class="promo-countdown"></span>
+</div>
+</div><!-- /.sticky-top-group -->
+
+<!-- Permanent showcase slider — always the interactive drag slider, in this
+     exact spot, regardless of whichever mode (circle/slider) the admin has
+     chosen for the hero's own toggle-able showcase further down. Framed in
+     the site's brass gold to read as a distinct, deliberate feature. -->
+<section class="hero hero-with-slider">
+  <div>
+    <div class="eyebrow" data-i18n="heroEyebrow">Miga-Photobook</div>
+    <div class="tagline" data-i18n="heroSlogan">لقطتك... تتحول لتحفة فنية</div>
+    <h1 id="heroTitle" data-i18n-html="heroTitle">حوّل صورتك إلى بورتريه احترافي<br>بجودة استوديو باستخدام <span class="brand-mark">Miga-Photobook ميجا فوتوبوك</span><br>خلال دقائق.</h1>
+    <p data-i18n="heroP">ارفع صورتك الشخصية — لك أو لطفلك — واختار الأسلوب اللي يعجبك، وإحنا نحوّلها لك تلقائيًا بجودة استوديو خلال دقائق بعد تأكيد الدفع.</p>
+    <div class="trust-checks">
+      <span data-i18n="trustCheck1">✅ نتيجة خلال دقائق</span>
+      <span data-i18n="trustCheck2">✅ دفع آمن</span>
+      <span data-i18n="trustCheck3">✅ دعم فني مباشر</span>
+      <span data-i18n="trustCheck4">✅ تحديثات مستمرة</span>
+    </div>
+  </div>
+
+  <!-- Permanent showcase slider — always the interactive drag slider here,
+       right beside the hero text in the same row (per explicit request:
+       side-by-side even on mobile, each shrinking to fit), regardless of
+       whichever mode (circle/slider) the admin has chosen for the
+       toggle-able showcase further down the page. -->
+  <div class="fixed-slider-frame">
+    <div class="slider-wrap-instance" id="bafSliderFixed">
+      <div class="slider-card slider-card-compact" data-slider-card>
+        <img data-slider-before alt="قبل">
+        <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد"></div>
+        <div class="slider-line" data-slider-line></div>
+        <button type="button" class="slider-handle" data-slider-handle>↔</button>
+        <span class="tag tag-before">قبل</span>
+        <span class="tag tag-after">بعد</span>
+        <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق">‹</button>
+        <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي">›</button>
+      </div>
+      <div class="slider-dots" data-slider-dots></div>
+    </div>
+  </div>
+</section>
+
+<div class="visitor-counter" id="visitorCounter" style="display:none;">
+  <span class="vc-dot"></span>
+  <span data-i18n="visitorCounterPrefix">انضم إلينا</span>
+  <span class="vc-number" id="visitorCounterNumber">0</span>
+  <span data-i18n="visitorCounterSuffix">زائر لحد دلوقتي</span>
+</div>
+
+<section class="wrap">
+  <div class="contact-sheet">
+    <div class="strip-track" id="heroStrip"></div>
+  </div>
+</section>
+
+<style>
+  .visitor-counter{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    max-width:fit-content; margin:0 auto 28px; padding:10px 22px;
+    background:var(--ink-2); border:1px solid var(--brass-dim);
+    border-radius:100px; font-size:14px; color:var(--paper-dim);
+  }
+  .visitor-counter .vc-number{ color:var(--brass); font-weight:800; font-size:15px; }
+  .vc-dot{
+    width:8px; height:8px; border-radius:50%; background:#3ddc84;
+    box-shadow:0 0 0 0 rgba(61,220,132,0.6);
+    animation:vcPulse 2s ease-out infinite;
+  }
+  @keyframes vcPulse{
+    0%{ box-shadow:0 0 0 0 rgba(61,220,132,0.55); }
+    70%{ box-shadow:0 0 0 7px rgba(61,220,132,0); }
+    100%{ box-shadow:0 0 0 0 rgba(61,220,132,0); }
+  }
+  @media(prefers-reduced-motion: reduce){ .vc-dot{ animation:none; } }
+  @media(max-width:480px){
+    .visitor-counter{ font-size:12.5px; padding:8px 16px; gap:6px; margin-bottom:20px; }
+    .visitor-counter .vc-number{ font-size:13.5px; }
+  }
+</style>
+
+<style>
+  .baf-section{ padding:36px 16px 44px; text-align:center; }
+  .baf-title{ font-size:clamp(20px,4.5vw,28px); margin:0 0 6px; }
+  .baf-sub{ color:var(--paper-dim); max-width:520px; margin:0 auto 28px; font-size:14.5px; }
+  .baf-wrap{ position:relative; width:min(94%,560px); aspect-ratio:1/1; margin:0 auto; }
+  /* Slowed from 22s to 90s — the circle stays as the site's one distinctive
+     visual, but no longer spins fast enough to compete for attention with
+     everything else on the page. A near-static circle still reads as "alive"
+     without feeling busy. */
+  .baf-orbit{ position:absolute; inset:0; animation:bafOrbitSpin 32s linear infinite; }
+  @keyframes bafOrbitSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+  .baf-item-spin{ width:100%; height:100%; animation:bafOrbitCounterSpin 32s linear infinite; }
+  @keyframes bafOrbitCounterSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(-360deg); } }
+  @media(prefers-reduced-motion:reduce){ .baf-orbit, .baf-item-spin{ animation:none; } }
+  .baf-center{ position:absolute; top:50%; left:50%; width:clamp(120px,32vw,190px); height:clamp(120px,32vw,190px); transform:translate(-50%,-50%); border-radius:50%; overflow:hidden; border:2px solid #3b8ef0; box-shadow:0 0 0 6px var(--ink), 0 0 18px rgba(59,142,240,0.4), 0 8px 24px rgba(0,0,0,0.4); z-index:5; }
+  .baf-center img{ width:100%; height:100%; object-fit:cover; object-position:center 18%; display:block; }
+  .baf-center-label{ position:absolute; bottom:-14px; left:50%; transform:translateX(-50%); background:var(--brass); color:var(--ink); font-size:11px; font-weight:700; padding:3px 12px; border-radius:20px; white-space:nowrap; z-index:6; }
+  .baf-item{ --radius:clamp(120px,36vw,225px); position:absolute; top:50%; left:50%; width:clamp(70px,21vw,112px); height:clamp(70px,21vw,112px); margin-top:calc(clamp(70px,21vw,112px) / -2); margin-left:calc(clamp(70px,21vw,112px) / -2); transform:rotate(var(--angle)) translate(0, calc(-1 * var(--radius))) rotate(calc(-1 * var(--angle))); border-radius:50%; overflow:hidden; border:2.5px solid var(--brass); box-shadow:0 4px 14px rgba(0,0,0,0.35); transition:transform 0.25s ease, border-color 0.25s ease; }
+  .baf-item:active img, .baf-item:hover img{ transform:scale(1.08); }
+  .baf-item img{ width:100%; height:100%; object-fit:cover; object-position:center 15%; display:block; transition:transform 0.25s ease; }
+  .baf-connector{ position:absolute; top:50%; left:50%; width:1px; height:1px; z-index:1; }
+  .baf-connector::before{ content:''; position:absolute; top:0; left:0; width:2px; background:var(--line); opacity:0.35; height:var(--radius); transform-origin:top center; transform:rotate(var(--angle)); }
+
+  /* ---------- Slider variant (alternative to the circle, chosen per-design
+     from the admin panel — "لوحة التحكم → تصميم الموقع → وضع الهيرو") ---------- */
+  .slider-card{
+    position:relative; border-radius:16px; overflow:hidden;
+    border:1px solid var(--line); box-shadow:0 20px 60px rgba(0,0,0,0.45);
+    aspect-ratio:4/5; max-width:420px; margin:0 auto; touch-action:none; user-select:none;
+    background:var(--ink-2, #151317);
+  }
+  .slider-card img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
+  .slider-after-wrap{ position:absolute; inset:0; overflow:hidden; clip-path:inset(0 0 0 var(--pos,50%)); }
+  .slider-line{ position:absolute; top:0; bottom:0; right:var(--posR,50%); width:2px; background:var(--brass); pointer-events:none; }
+  .slider-handle{
+    position:absolute; top:50%; right:var(--posR,50%); transform:translate(50%,-50%);
+    width:44px; height:44px; border-radius:50%; background:var(--brass); color:var(--ink);
+    display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:800;
+    box-shadow:0 6px 18px rgba(0,0,0,0.5); cursor:ew-resize; border:none;
+  }
+  .slider-card .tag{ position:absolute; top:14px; font-size:12px; font-weight:800; padding:5px 12px; border-radius:999px; background:rgba(11,11,13,0.72); backdrop-filter:blur(4px); border:1px solid var(--line); }
+  .slider-card .tag-before{ left:14px; } .slider-card .tag-after{ right:14px; color:var(--brass); }
+  .slider-nav{
+    position:absolute; top:50%; transform:translateY(-50%); z-index:5;
+    width:36px; height:36px; border-radius:50%; border:1px solid var(--line);
+    background:rgba(11,11,13,0.55); backdrop-filter:blur(4px); color:var(--paper);
+    font-size:19px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .slider-nav:hover{ background:var(--brass); color:var(--ink); border-color:var(--brass); }
+  .slider-nav-prev{ left:8px; } .slider-nav-next{ right:8px; }
+  .slider-dots{ display:flex; justify-content:center; gap:8px; margin-top:12px; }
+  .slider-dot{ width:8px; height:8px; border-radius:50%; background:var(--line); border:none; cursor:pointer; padding:0; }
+  .slider-dot.active{ background:var(--brass); width:20px; border-radius:5px; }
+  .slider-hint{ text-align:center; font-size:12.5px; color:var(--paper-dim); margin-top:10px; }
+
+  /* ---------- Permanent showcase slider frame — now lives inside the hero
+     row itself (second grid column), right beside the hero text, instead
+     of being a separate full-width strip above it. Sized to shrink and
+     stay usable even at narrow widths, per explicit request that it stays
+     side-by-side with the hero text rather than stacking on mobile. ---------- */
+  .hero-with-slider{
+    grid-template-columns:1fr 1fr !important;
+    gap:14px !important;
+    align-items:start;
+  }
+  /* The slider's own column is centered independently — the hero copy is
+     naturally taller than the slider frame at most screen widths, and a
+     lone block of empty space below a top-aligned slider read as "something
+     is missing" more than the same leftover space split evenly above and
+     below it does. */
+  .hero-with-slider .fixed-slider-frame{ align-self:center; }
+  /* CSS Grid items default to min-width:auto, refusing to shrink below
+     their content's natural width — exactly what was pushing the row past
+     the viewport edge once the columns got this narrow. This is the fix. */
+  .hero-with-slider > *{ min-width:0; }
+  .hero-with-slider h1, .hero-with-slider p{ overflow-wrap:break-word; }
+  /* Decisive, unambiguous sizing for the hero text now that it shares its
+     row with the slider instead of having the full width to itself —
+     overrides win with !important since several older, narrower-purpose
+     rules already target .hero h1 at various breakpoints/view-modes. */
+  .hero-with-slider h1{ font-size:clamp(13px,4vw,22px) !important; margin-bottom:6px !important; line-height:1.22 !important; }
+  .hero-with-slider .eyebrow{ font-size:11px !important; margin-bottom:6px !important; }
+  .hero-with-slider .tagline{ font-size:12px !important; }
+  .hero-with-slider p{ font-size:clamp(11px,2.6vw,14.5px) !important; margin-bottom:0 !important; }
+  .hero-with-slider .trust-checks{ font-size:10.5px !important; gap:6px !important; margin-bottom:14px !important; }
+  .hero-with-slider .hero-ctas{ gap:8px !important; flex-wrap:wrap; }
+  .hero-with-slider .hero-ctas a{ font-size:12.5px !important; padding:10px 14px !important; }
+  @media(max-width:480px){
+    .hero-with-slider h1{ font-size:clamp(11px,3.6vw,16px) !important; }
+    .hero-with-slider .trust-checks{ display:none; } /* first to go when truly tight on space */
+  }
+  .fixed-slider-frame{
+    padding:6px; border:2px solid var(--brass); border-radius:18px;
+    box-shadow:0 0 0 3px rgba(255,201,77,0.12), 0 12px 30px rgba(0,0,0,0.5);
+    background:linear-gradient(180deg, rgba(255,201,77,0.06), transparent 60%);
+    width:100%; max-width:250px; margin-inline-start:auto;
+  }
+  .slider-card-compact{ aspect-ratio:4/5; max-width:none; }
+  .hero-with-slider .slider-handle{ width:30px; height:30px; font-size:12px; }
+  .hero-with-slider .slider-nav{ width:24px; height:24px; font-size:13px; }
+  .hero-with-slider .slider-card .tag{ font-size:9px; padding:3px 7px; top:6px; }
+  .hero-with-slider .slider-dots{ margin-top:6px; gap:5px; }
+  .hero-with-slider .slider-dot{ width:6px; height:6px; }
+  @media(min-width:860px){ .fixed-slider-frame{ max-width:280px; } }
+  @media(max-width:480px){
+    .fixed-slider-frame{ max-width:130px; padding:4px; border-radius:14px; }
+    .hero-with-slider{ gap:8px !important; }
+  }
+  .hero-showcase-variant[hidden]{ display:none !important; }
+</style>
+
+<section class="baf-section" id="beforeAfterShowcase">
+  <h2 class="baf-title" data-i18n="bafTitle">صورة واحدة منك... نحولها لأجمل صورة من اختيارك من عندنا</h2>
+  <p class="baf-sub" data-i18n="bafSub">دي نفس الصورة، بعد ما Miga-Photobook حوّلها لأكتر من ستايل. اختار اللي يعجبك وجرّبه على صورتك.</p>
+
+  <!-- Circle variant — Design MIGA 1's original visual. Shown by default;
+       hidden via JS if the admin has chosen "slider" mode for this design. -->
+  <div class="hero-showcase-variant" id="heroVariantCircle">
+    <div class="baf-wrap">
+      <div class="baf-orbit">
+        <div class="baf-connector" style="--angle:0deg; --radius:clamp(120px,36vw,225px);"></div>
+        <div class="baf-connector" style="--angle:45deg; --radius:clamp(120px,36vw,225px);"></div>
+        <div class="baf-connector" style="--angle:90deg; --radius:clamp(120px,36vw,225px);"></div>
+        <div class="baf-connector" style="--angle:135deg; --radius:clamp(120px,36vw,225px);"></div>
+        <div class="baf-connector" style="--angle:180deg; --radius:clamp(120px,36vw,225px);"></div>
+        <div class="baf-connector" style="--angle:225deg; --radius:clamp(120px,36vw,225px);"></div>
+        <div class="baf-connector" style="--angle:270deg; --radius:clamp(120px,36vw,225px);"></div>
+        <div class="baf-connector" style="--angle:315deg; --radius:clamp(120px,36vw,225px);"></div>
+        <div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-1.jpg" alt="نتيجة 1" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-2.jpg" alt="نتيجة 2" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-3.jpg" alt="نتيجة 3" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-4.jpg" alt="نتيجة 4" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-5.jpg" alt="نتيجة 5" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-6.jpg" alt="نتيجة 6" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-7.jpg" alt="نتيجة 7" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-8.jpg" alt="نتيجة 8" loading="eager" decoding="async"></div></div>
+      </div>
+      <div class="baf-center">
+        <img src="before-after/before-after/before.jpg" alt="الصورة الأصلية">
+        <span class="baf-center-label" data-i18n="bafCenterLabel">صورتك الأصلية</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slider variant — the interactive drag before/after, same as Design
+       MIGA 2/3. Hidden by default; shown via JS if the admin has chosen
+       "slider" mode for this design. -->
+  <div class="hero-showcase-variant" id="heroVariantSlider" hidden>
+    <div class="slider-wrap-instance" id="bafSliderV1">
+      <div class="slider-card" data-slider-card>
+        <img data-slider-before alt="قبل">
+        <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد"></div>
+        <div class="slider-line" data-slider-line></div>
+        <button type="button" class="slider-handle" data-slider-handle>↔</button>
+        <span class="tag tag-before">قبل</span>
+        <span class="tag tag-after">بعد</span>
+        <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق">‹</button>
+        <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي">›</button>
+      </div>
+      <div class="slider-dots" data-slider-dots></div>
+      <p class="slider-hint">اسحب يمين وشمال، ودوس ‹ › تتنقل بين أمثلة مختلفة</p>
+    </div>
+  </div>
+
+  <div class="hero-ctas" style="margin-top:34px; justify-content:center;">
+    <a href="#children" class="btn-primary" data-i18n-html="bafCta">اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي بـ25 جنيه</a>
+  </div>
+</section>
+
+<section class="sprockets"></section>
+
+
+<section class="cat-section" id="categoryTiles">
+  <div class="section-head">
+    <h2 data-i18n="categoriesLabel">الأقسام</h2>
+  </div>
+  <div class="cat-tiles-grid" id="categoryTilesGrid"></div>
+</section>
+
+<section class="cat-section" id="mostRequested" style="display:none;">
+  <div class="section-head">
+    <h2 data-i18n="mostRequestedTitle">الأكثر طلبا</h2>
+  </div>
+  <div class="grid" id="mostRequestedGrid"></div>
+  <div class="grid-page-dots" id="gridDots-mostRequested"></div>
+</section>
+
+<section class="cat-section collapsible" id="children">
+  <div class="cs-body">
+  <div class="grid-nav-wrap">
+    <div class="grid" id="grid-children"></div>
+  </div>
+  <div class="grid-page-dots" id="gridDots-children"></div>
+  </div>
+</section>
+
+<section class="cat-section collapsible" id="male">
+  <div class="cs-body">
+  <div class="grid-nav-wrap">
+    <div class="grid" id="grid-male"></div>
+  </div>
+  <div class="grid-page-dots" id="gridDots-male"></div>
+  </div>
+</section>
+
+<section class="cat-section collapsible" id="female">
+  <div class="cs-body">
+  <div class="grid-nav-wrap">
+    <div class="grid" id="grid-female"></div>
+  </div>
+  <div class="grid-page-dots" id="gridDots-female"></div>
+  </div>
+</section>
+
+<section class="cat-section collapsible" id="business">
+  <div class="cs-body">
+  <h2 class="cat-section-heading" data-i18n="businessHeading">احصل على صورة LinkedIn تزيد احترافيتك خلال 5 دقائق</h2>
+  <div class="grid-nav-wrap">
+    <div class="grid" id="grid-business"></div>
+  </div>
+  <div class="grid-page-dots" id="gridDots-business"></div>
+  </div>
+</section>
+
+<section class="cat-section collapsible" id="cinematic">
+  <div class="cs-body">
+  <div class="grid-nav-wrap">
+    <div class="grid" id="grid-cinematic"></div>
+  </div>
+  <div class="grid-page-dots" id="gridDots-cinematic"></div>
+  </div>
+</section>
+
+<section class="cat-section collapsible" id="luxury">
+  <div class="cs-body">
+  <div class="grid-nav-wrap">
+    <div class="grid" id="grid-luxury"></div>
+  </div>
+  <div class="grid-page-dots" id="gridDots-luxury"></div>
+  </div>
+</section>
+
+<section class="cat-section collapsible" id="artistic">
+  <div class="cs-body">
+  <div class="grid-nav-wrap">
+    <div class="grid" id="grid-artistic"></div>
+  </div>
+  <div class="grid-page-dots" id="gridDots-artistic"></div>
+  </div>
+</section>
+
+<section class="cat-section collapsible" id="magazine">
+  <div class="cs-body">
+  <div class="grid-nav-wrap">
+    <div class="grid" id="grid-magazine"></div>
+  </div>
+  <div class="grid-page-dots" id="gridDots-magazine"></div>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="section-head" style="border:none; margin-bottom:6px;">
+    <h2 data-i18n="pricingTitle">الأسعار والعروض</h2>
+  </div>
+  <p style="color:var(--paper-dim); max-width:560px;" data-i18n="pricingSub">اختار الباقة اللي تناسبك — كل باقة بتوفّرلك سعر أقل للصورة كل ما زاد العدد.</p>
+  <div class="pricing-grid">
+    <div class="plan">
+      <h3 data-i18n="plan1Title">باقة Starter</h3>
+      <div class="price">59 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="plan1Unit">/ 3 صور</span></div>
+      <ul>
+        <li data-i18n="plan1Li1">تقريبًا 20 جنيه للصورة</li>
+        <li data-i18n="plan1Li2">اختيار حر من أي قسم</li>
+        <li data-i18n="plan1Li3">مناسبة للتجربة الأولى</li>
+      </ul>
+      <button type="button" class="btn-ghost" onclick="openPackageBuyModal(3)" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
+    </div>
+    <div class="plan featured">
+      <h3 data-i18n="plan2Title">باقة Pro</h3>
+      <div class="price">259 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="plan2Unit">/ 15 صورة</span></div>
+      <ul>
+        <li data-i18n="plan2Li1">أقل من 18 جنيه للصورة</li>
+        <li data-i18n="plan2Li2">اختيار حر من أي قسم</li>
+        <li data-i18n="plan2Li3">دعم فني بالأولوية</li>
+      </ul>
+      <button type="button" class="btn-primary" onclick="openPackageBuyModal(15)" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
+    </div>
+    <div class="plan">
+      <h3 data-i18n="plan3Title">باقة Premium</h3>
+      <div class="price">419 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="plan3Unit">/ 30 صورة</span></div>
+      <ul>
+        <li data-i18n="plan3Li1">أقل من 14 جنيه للصورة</li>
+        <li data-i18n="plan3Li2">تحديثات مجانية للأساليب المتاحة</li>
+        <li data-i18n="plan3Li3">مناسبة للاستوديوهات والوكالات</li>
+      </ul>
+      <button type="button" class="btn-ghost" onclick="openPackageBuyModal(30)" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
+    </div>
+  </div>
+  <div class="pricing-guarantee">
+    <span data-i18n="pricingGuaranteeNote">❤️ مش عاجباك النتيجة؟ نعيد توليدها ببرومبت مختلف مجانًا.</span>
+  </div>
+
+  <div class="section-head" style="border:none; margin:44px 0 6px;">
+    <h2 data-i18n="subTitle">اشترك شهريًا ووفّر أكتر</h2>
+  </div>
+  <p style="color:var(--paper-dim); max-width:560px;" data-i18n="subSub">أسلوب جديد كل شهر، ورصيد صور يتجدد — الاشتراك بيتجدد بنفس خطوات الدفع اليدوي (مش خصم تلقائي)، وبنفكّرك قبل الموعد.</p>
+  <div class="pricing-grid">
+    <div class="plan">
+      <h3 data-i18n="subPlan1Title">اشتراك شهري — 10 صور</h3>
+      <div class="price">149 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="subPlan1Unit">/ شهريًا</span></div>
+      <ul>
+        <li data-i18n="subPlan1Li1">10 صور كل شهر</li>
+        <li data-i18n="subPlan1Li2">أساليب جديدة تُضاف شهريًا</li>
+        <li data-i18n="subPlan1Li3">تجديد يدوي بسيط كل شهر</li>
+      </ul>
+      <button type="button" class="btn-ghost" onclick="openPackageBuyModal(10)" data-i18n="subPlanBuyBtn">اشترك دلوقتي</button>
+    </div>
+    <div class="plan featured">
+      <h3 data-i18n="subPlan2Title">اشتراك شهري — 20 صورة</h3>
+      <div class="price">299 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="subPlan2Unit">/ شهريًا</span></div>
+      <ul>
+        <li data-i18n="subPlan2Li1">20 صورة كل شهر</li>
+        <li data-i18n="subPlan2Li2">أساليب جديدة تُضاف شهريًا</li>
+        <li data-i18n="subPlan2Li3">أفضل قيمة للاستخدام المستمر</li>
+      </ul>
+      <button type="button" class="btn-primary" onclick="openPackageBuyModal(20)" data-i18n="subPlanBuyBtn">اشترك دلوقتي</button>
+    </div>
+  </div>
+</section>
+
+<div class="section-tabs" id="sectionTabsRow">
+  <button type="button" class="section-tab-btn" data-target="whyUs">
+    <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.3l2.6 2.6 5.4-6"/></svg></span>
+    <span data-i18n="whyUsTitle">لماذا Miga-Photobook؟</span>
+  </button>
+  <button type="button" class="section-tab-btn" data-target="howItWorks">
+    <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6.5" r="1.6"/><circle cx="6" cy="12" r="1.6"/><circle cx="6" cy="17.5" r="1.6"/><path d="M10.5 6.5h9M10.5 12h9M10.5 17.5h9"/></svg></span>
+    <span data-i18n="howItWorksTitle">كيف يعمل؟</span>
+  </button>
+  <button type="button" class="section-tab-btn" data-target="testimonials">
+    <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 3.5l2.2 4.9 5.3.5-4 3.6 1.3 5.3L12 15.1l-4.8 2.7 1.3-5.3-4-3.6 5.3-.5L12 3.5z"/></svg></span>
+    <span data-i18n="testimonialsTitle">تقييمات وآراء عملائنا</span>
+  </button>
+  <button type="button" class="section-tab-btn" data-target="aboutUs">
+    <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8" r="2.6"/><path d="M3.5 18a5 5 0 0 1 10 0"/><circle cx="16.5" cy="9" r="2.2"/><path d="M14.8 12.3a4 4 0 0 1 5.7 3.6"/></svg></span>
+    <span data-i18n="aboutUsTitle">من نحن</span>
+  </button>
+  <button type="button" class="section-tab-btn" data-target="faq">
+    <span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.5 2.5 0 1 1 3.2 2.4c-.7.25-1.2.85-1.2 1.6v.3"/><circle cx="11.9" cy="16.7" r="0.9" fill="currentColor" stroke="none"/></svg></span>
+    <span data-i18n="faqTitle">أسئلة شائعة</span>
+  </button>
+</div>
+
+<!-- Tab-panel switcher: one fixed content area right below the tab row.
+     Clicking a tab instantly swaps which of these four shows here — no
+     scrolling, no animated accordion expand, just a plain visible/hidden
+     swap, so the content always appears in the same spot as the buttons. -->
+<div id="sectionTabPanel">
+<section class="cat-section tab-panel" id="whyUs">
+  <div class="why-us-grid">
+    <div class="why-item">✅ <span data-i18n="whyUs1">نتائج احترافية</span></div>
+    <div class="why-item">✅ <span data-i18n="whyUs2">تحويل تلقائي بالكامل</span></div>
+    <div class="why-item">✅ <span data-i18n="whyUs3">جاهزة خلال دقائق</span></div>
+    <div class="why-item">✅ <span data-i18n="whyUs4">بدون أي خبرة تقنية</span></div>
+    <div class="why-item">✅ <span data-i18n="whyUs5">خصوصيتك محفوظة بالكامل</span></div>
+  </div>
+</section>
+
+<section class="cat-section tab-panel" id="howItWorks">
+  <div class="how-grid">
+    <div class="how-step">
+      <div class="how-step-num">1</div>
+      <h3 data-i18n="how1Title">اختار الستايل</h3>
+      <p data-i18n="how1Desc">تصفح المكتبة واختر الأسلوب اللي يعجبك من أي قسم.</p>
+      <span class="how-arrow">➜</span>
+    </div>
+    <div class="how-step">
+      <div class="how-step-num">2</div>
+      <h3 data-i18n="how2Title">ادفع</h3>
+      <p data-i18n="how2Desc">حوّل قيمة الطلب عن طريق InstaPay أو فودافون كاش، وسجّل رقم العملية.</p>
+      <span class="how-arrow">➜</span>
+    </div>
+    <div class="how-step">
+      <div class="how-step-num">3</div>
+      <h3 data-i18n="how3Title">ارفع صورتك</h3>
+      <p data-i18n="how3Desc">بعد تأكيد التحويل (عادةً خلال دقائق)، ارفع صورتك بجودة واضحة.</p>
+      <span class="how-arrow">➜</span>
+    </div>
+    <div class="how-step">
+      <div class="how-step-num">4</div>
+      <h3 data-i18n="how4Title">استلم النتيجة</h3>
+      <p data-i18n="how4Desc">هنطبّق الأسلوب اللي اخترته بالذكاء الاصطناعي، وتستلم صورتك الاحترافية خلال دقايق.</p>
+    </div>
+  </div>
+  <div class="hero-ctas" style="margin-top:22px; justify-content:center;">
+    <a href="#children" class="btn-primary" data-i18n="howItWorksCta">ابدأ دلوقتي</a>
+  </div>
+</section>
+
+<section class="cat-section tab-panel" id="aboutUs">
+  <p class="sub" style="max-width:680px; font-size:15px;" data-i18n="aboutUsText">Miga-Photobook مشروع مصري بدأ بفكرة بسيطة: خلي جلسة التصوير الاحترافية متاحة لأي حد وبسعر معقول. بنحوّل صورتك الشخصية لتحفة فنية بجودة استوديو باستخدام الذكاء الاصطناعي — ارفع صورتك واختار الأسلوب، وإحنا نتولى الباقي بعناية عشان تضمن نتيجة تستحق اسمك.</p>
+</section>
+
+<section class="cat-section tab-panel" id="faq">
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary data-i18n="faqQ1">إزاي تتم عملية التحويل؟</summary>
+      <p data-i18n="faqA1">بعد الدفع، بترفع صورتك، وإحنا نحوّلها تلقائيًا بالأسلوب اللي اخترته، وتستلم النتيجة جاهزة على الموقع مباشرة.</p>
+    </details>
+    <details class="faq-item">
+      <summary data-i18n="faqQ2">قد إيه بتاخد وقت؟</summary>
+      <p data-i18n="faqA2">في خطوتين: تأكيد التحويل البنكي بياخد عادةً دقائق (بنراجعه بنفسنا)، وبعد التأكيد، التحويل بالذكاء الاصطناعي نفسه بياخد دقائق وهتشوف النتيجة على نفس الصفحة.</p>
+    </details>
+    <details class="faq-item">
+      <summary data-i18n="faqQ6">لو النتيجة معجبتنيش؟</summary>
+      <p data-i18n="faqA6">تواصل معانا فورًا وهنعيد توليد صورتك ببرومبت مختلف من غير أي تكلفة إضافية، لحد ما توصل لنتيجة تعجبك.</p>
+    </details>
+    <details class="faq-item">
+      <summary data-i18n="faqQ3">هل أحتاج خبرة؟</summary>
+      <p data-i18n="faqA3">لأ خالص، بس بترفع صورتك وتختار الأسلوب، وإحنا بنعمل الباقي بالكامل.</p>
+    </details>
+    <details class="faq-item">
+      <summary data-i18n="faqQ4">هل أستطيع استخدامه تجاريًا؟</summary>
+      <p data-i18n="faqA4">الصورة الناتجة مرخّصة للاستخدام الشخصي. للاستخدام التجاري (إعادة بيع أو مشاريع عملاء)، تواصل معنا أولاً لترخيص مناسب.</p>
+    </details>
+    <details class="faq-item">
+      <summary data-i18n="faqQ5">كيف أستلم النتيجة؟</summary>
+      <p data-i18n="faqA5">فور تأكيد الدفع، بترفع صورتك على الموقع وتستلم النتيجة المُحوّلة مباشرة، وتقدر تحمّلها في أي وقت.</p>
+    </details>
+    <details class="faq-item">
+      <summary data-i18n="faqQ7">هل أقدر أختار أكثر من ستايل؟</summary>
+      <p data-i18n="faqA7">أكيد! تقدر تطلب أكتر من ستايل لنفس الصورة أو لصور مختلفة — كل ستايل بيتحسب طلب منفصل، أو استخدم إحدى الباقات (10 أو 25 صورة) عشان توفر لو محتاج أكتر من نتيجة.</p>
+    </details>
+  </div>
+</section>
+</div>
+
+<!-- These two stay always-visible below the tab panel, unaffected by which
+     tab is selected above — per explicit request. -->
+<section class="cat-section" id="whyEdge">
+  <div class="why-edge">
+    <h3 data-i18n="whyEdgeTitle">وأدوات الذكاء الاصطناعي المتاحة للكل؟</h3>
+    <p class="lead" data-i18n="whyEdgeP1">الأداة مش هي المشكلة — البرومبت هو المشكلة.</p>
+    <p data-i18n="whyEdgeP3">كل صورة في المعرض هنا نتيجة برومبت اتظبط قبل كده عشرات المرات، فبتوصلك من أول مرة من غير تخمين.</p>
+    <p data-i18n-html="whyEdgeP4">إحنا اختصرنا عليك كل التجربة والتعديل — تدفع وتستلم صورتك جاهزة على طول. حابب تجرب بنفسك في المرات الجاية؟ تقدر تشتري البرومبت وحده بـ10 جنيه (اختياري). <a href="#children" class="why-edge-link">تصفّح الصور واختار البرومبت ←</a></p>
+  </div>
+</section>
+
+<section class="cat-section" id="testimonials">
+  <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+    <button class="btn-ghost" id="writeReviewBtn" data-i18n="writeReviewBtn">ضع تقييمك هنا</button>
+  </div>
+  <div class="testimonials-grid" id="testimonialsGrid">
+    <div class="proof-results-grid" style="grid-column:1/-1;" id="testimonialsProofGrid">
+      <div class="proof-tile"><img src="before-after/before-after/after-1.jpg" alt="نتيجة حقيقية 1" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-2.jpg" alt="نتيجة حقيقية 2" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-3.jpg" alt="نتيجة حقيقية 3" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-4.jpg" alt="نتيجة حقيقية 4" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-5.jpg" alt="نتيجة حقيقية 5" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-6.jpg" alt="نتيجة حقيقية 6" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-7.jpg" alt="نتيجة حقيقية 7" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-8.jpg" alt="نتيجة حقيقية 8" loading="lazy"></div>
+    </div>
+  </div>
+  <p class="sub" style="margin-top:16px; opacity:0.7; font-size:12.5px;" id="testimonialsNoteEl" data-i18n="testimonialsNote">* نماذج حقيقية من نتائج Miga-Photobook الفعلية.</p>
+</section>
+
+
+<section class="cat-section promo-video-section" id="promoVideo">
+  <div class="promo-video-outer">
+  <div class="promo-video-wrap">
+    <div class="promo-video-copy">
+      <h2 data-i18n="promoVideoTitle">شوف Miga-Photobook وهو شغال</h2>
+      <p class="sub" data-i18n="promoVideoSub">دقائق معدودة، وصورتك العادية بتتحول لتحفة فنية احترافية.</p>
+    </div>
+    <div class="promo-video-frame">
+      <video class="promo-video" id="promoVideoEl" poster="promo-video-poster.jpg" data-src="promo-video.mp4" preload="none" muted loop playsinline controls></video>
+    </div>
+  </div>
+  </div>
+</section>
+
+<section class="cat-section" id="trustStrip">
+  <div class="trust-badges">
+    <div class="trust-badge">🏆 <span data-i18n="trustBadge1">جودة احترافية في كل صورة</span></div>
+    <div class="trust-badge">🔄 <span data-i18n="trustBadge2">تحديث مستمر للأساليب الفنية المتاحة</span></div>
+    <div class="trust-badge">💬 <span data-i18n="trustBadge3">دعم فني سريع ومباشر</span></div>
+    <div class="trust-badge">🔒 <span data-i18n="trustBadge4">أمان وخصوصية في كل عملية</span></div>
+  </div>
+</section>
+
+<footer>
+  <div id="footerText" data-i18n="footerText">© 2026 Miga-Photobook — كل التحويلات تتم بعد إتمام الدفع فقط.</div>
+  <div class="footer-links">
+    <a href="terms.html" data-i18n="footerTerms">شروط الاستخدام</a>
+    <a href="privacy.html" data-i18n="footerPrivacy">سياسة الخصوصية</a>
+    <a href="refund.html" data-i18n="footerRefund">سياسة الاسترجاع</a>
+  </div>
+</footer>
+
+<div class="lightbox" id="lightboxBg" onclick="closeLightbox()">
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<div class="contact-widget" id="contactWidget">
+  <div class="contact-menu" id="contactMenu">
+    <a href="https://wa.me/201202530308" target="_blank" rel="noopener" class="contact-item" title="WhatsApp" aria-label="WhatsApp">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.8 1.1-.1.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.6-1.9-.1-.3 0-.4.1-.5l.4-.5c.1-.1.2-.3.2-.4.1-.1 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.3-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.5 4 3.5.6.2 1 .4 1.3.5.6.2 1.1.1 1.5-.1.5-.1 1.4-.6 1.6-1.1.2-.5.2-1 .1-1.1-.1-.1-.2-.2-.5-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.4c1.4.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.1.8.8-3-.2-.3C4 14.8 3.8 13.4 3.8 12c0-4.5 3.7-8.2 8.2-8.2s8.2 3.7 8.2 8.2-3.7 8.2-8.2 8.2z"/></svg>
+    </a>
+    <a href="https://www.facebook.com/share/197QM3vWaE/?mibextid=wwXIfr" target="_blank" rel="noopener" class="contact-item" title="Messenger" aria-label="Messenger">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2C6.48 2 2 6.15 2 11.25c0 2.9 1.44 5.49 3.7 7.19V22l3.38-1.86c.9.25 1.87.38 2.92.38 5.52 0 10-4.15 10-9.27S17.52 2 12 2zm1.02 12.48l-2.55-2.72-4.98 2.72 5.48-5.82 2.6 2.72 4.93-2.72-5.48 5.82z"/></svg>
+    </a>
+    <a href="https://www.instagram.com/miiigaaaaaaa?igsh=MWI4MzI5MGZ4cnJpag%3D%3D&utm_source=qr" target="_blank" rel="noopener" class="contact-item" title="Instagram" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2.2c3.2 0 3.6 0 4.9.07 3.3.15 4.8 1.7 5 5 .06 1.3.07 1.6.07 4.8s0 3.6-.07 4.8c-.15 3.3-1.7 4.8-5 5-1.3.06-1.6.07-4.9.07s-3.6 0-4.9-.07c-3.3-.15-4.8-1.7-5-5C2 15.6 2 15.3 2 12s0-3.6.07-4.8c.15-3.3 1.7-4.8 5-5C8.4 2.2 8.7 2.2 12 2.2zm0 1.8c-3.15 0-3.5 0-4.8.07-2.4.1-3.5 1.2-3.6 3.6C3.5 8.5 3.5 8.85 3.5 12s0 3.5.06 4.8c.1 2.4 1.2 3.5 3.6 3.6 1.3.06 1.65.06 4.8.06s3.5 0 4.8-.06c2.4-.1 3.5-1.2 3.6-3.6.06-1.3.06-1.65.06-4.8s0-3.5-.06-4.8c-.1-2.4-1.2-3.5-3.6-3.6-1.3-.06-1.65-.07-4.8-.07zm0 3.5a5 5 0 110 10 5 5 0 010-10zm0 1.8a3.2 3.2 0 100 6.4 3.2 3.2 0 000-6.4zm5.2-2.1a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"/></svg>
+    </a>
+    <a href="https://t.me/+201202530308" target="_blank" rel="noopener" class="contact-item" title="Telegram" aria-label="Telegram">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M21.5 3.5L2.7 10.8c-1.2.5-1.2 1.2-.2 1.5l4.8 1.5 1.8 5.7c.2.6.4.8.9.8s.7-.2 1-.5l2.4-2.3 4.9 3.6c.9.5 1.5.2 1.8-.9l3.2-15c.3-1.4-.4-1.9-1.5-1.4zM8.5 14.3L18 8.1c.4-.3.8-.1.5.2l-8.1 7.3-.3 3.2-1.6-4.5z"/></svg>
+    </a>
+  </div>
+  <button class="contact-fab" id="contactFabBtn" aria-label="تواصل معنا" title="تواصل معنا">
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M12 2C6.5 2 2 6 2 11c0 2.6 1.2 4.9 3.1 6.6L4 22l4.6-1.5c1.1.3 2.2.5 3.4.5 5.5 0 10-4 10-9S17.5 2 12 2z"/></svg>
+  </button>
+</div>
+
+<button class="back-to-top-fab" id="backToTopBtn" aria-label="العودة لأعلى الصفحة" title="العودة لأعلى الصفحة" style="display:none;">
+  <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 5l-7 7h4v7h6v-7h4z"/></svg>
+</button>
+
+<div class="scroll-ruler" id="scrollRuler" aria-hidden="true">
+  <button class="scroll-ruler-arrow" id="scrollRulerUp" aria-label="لأعلى" title="لأعلى">▲</button>
+  <div class="scroll-ruler-track" id="scrollRulerTrack">
+    <div class="scroll-ruler-thumb" id="scrollRulerThumb"></div>
+  </div>
+  <button class="scroll-ruler-arrow" id="scrollRulerDown" aria-label="لأسفل" title="لأسفل">▼</button>
+</div>
+
+</div><!-- /appRoot -->
+
+<!-- Product detail (quick view) modal -->
+<div class="modal-bg" id="detailModalBg">
+  <div class="modal" style="max-width:480px;">
+    <button class="close-x" id="detailModalClose">×</button>
+    <img id="detailImg" src="" alt="" style="width:100%; aspect-ratio:4/5; object-fit:cover; border-radius:10px; border:1px solid var(--line); margin-bottom:14px;">
+    <h3 id="detailTitle" style="margin-bottom:8px;"></h3>
+    <div class="card-price" id="detailPrice" style="margin-bottom:14px;"></div>
+    <ul style="list-style:none; display:flex; flex-direction:column; gap:8px; font-size:14px; color:var(--paper-dim); margin-bottom:18px;">
+      <li data-i18n="detailValue1">✓ نحوّل صورتك تلقائيًا فور تأكيد الدفع</li>
+      <li data-i18n="detailValue2">✓ جودة استوديو احترافية مضمونة</li>
+      <li data-i18n="detailValue3">✓ النتيجة جاهزة للتحميل مباشرة</li>
+      <li data-i18n="detailValue4">✓ دعم فني مباشر لو احتجت مساعدة</li>
+    </ul>
+    <div class="modal-actions">
+      <button class="btn-primary" id="detailBuyBtn" data-i18n="detailBuyBtn">احصل عليها الآن</button>
+      <button class="btn-ghost" id="detailCancelBtn" data-i18n="cancelBtn">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Purchase modal -->
+<div class="modal-bg" id="buyModalBg">
+  <div class="modal">
+    <button class="close-x" id="buyModalClose">×</button>
+    <h3 data-i18n="buyModalTitle">الدفع عبر إنستاباي</h3>
+    <p class="sub" id="buyModalText"></p>
+
+    <div class="account-tabs" id="paymentMethodTabs">
+      <button class="account-tab active" data-method="instapay">💳 <span data-i18n="payMethodInstapay">إنستاباي</span></button>
+      <button class="account-tab" data-method="vodafone">📱 <span data-i18n="payMethodVodafone">فودافون كاش</span></button>
+      <button class="account-tab" data-method="card">💠 <span data-i18n="payMethodCard">بطاقة ائتمان</span></button>
+      <button class="account-tab" data-method="fawry">🧾 <span data-i18n="payMethodFawry">فوري</span></button>
+    </div>
+
+    <div id="payViewInstapay">
+      <div class="instapay-box">
+        <div class="ip-label" id="ipLabelEl" data-i18n="ipLabel">حوّل المبلغ عبر إنستاباي (من أي بنك أو محفظة تدعم التحويل عبر إنستاباي) إلى الرقم التالي</div>
+        <div class="ip-number" id="ipNumber">01202530308</div>
+        <button class="ip-copy" id="ipCopyBtn" type="button" data-i18n="ipCopyBtn">نسخ الرقم</button>
+      </div>
+      <div id="payFormFields">
+        <div class="field">
+          <label data-i18n="buyerPhoneLabel">رقم الموبايل الذي حوّلت منه</label>
+          <input type="tel" id="buyerPhone" placeholder="01xxxxxxxxx">
+        </div>
+        <div class="field">
+          <label data-i18n="payerRefLabel">رقم عملية التحويل (من رسالة أو إشعار التحويل)</label>
+          <input type="text" id="payerRef" inputmode="latin" data-i18n-ph="payerRefPh" placeholder="مثال: 4821960573">
+          <button type="button" class="ref-help-toggle" id="refHelpToggle" data-i18n="refHelpToggle">مش لاقي رقم العملية؟ دوس هنا</button>
+          <div class="ref-help-box" id="refHelpBox" hidden>
+            <p data-i18n-html="refHelpInstapay">📱 <b>إنستاباي:</b> افتح تطبيق البنك أو المحفظة → "سجل العمليات" → دوس على عملية التحويل اللي عملتها دلوقتي → هتلاقي رقم مرجعي (Reference Number) غالبًا 10 أرقام.</p>
+            <p data-i18n-html="refHelpVodafone">📱 <b>فودافون كاش:</b> هيوصلك رسالة SMS فور التحويل فيها "رقم العملية" — انسخه من الرسالة.</p>
+          </div>
+        </div>
+        <div class="pay-warning" data-i18n="payWarning">🔐 لضمان سرعة تنفيذ طلبك، تأكد من إدخال رقم عملية التحويل الصحيح.</div>
+        <label class="pay-confirm-row" for="payConfirmChk">
+          <input type="checkbox" id="payConfirmChk">
+          <span data-i18n="payConfirmLabel">أؤكد إني حوّلت المبلغ فعلًا، وإن رقم العملية المكتوب فوق صحيح.</span>
+        </label>
+        <p class="sub" style="margin-bottom:10px;" data-i18n="buyModalNote">هنراجع تحويلك بنفسنا فور ما يوصلنا — الصفحة هتفضل فاتحة قدامك وهتقولك أول ما يتأكد، من غير ما تدوّر على كود في مكان تاني.</p>
+        <div class="modal-actions">
+          <button class="btn-primary" id="buyConfirmBtn" disabled data-i18n="buyConfirmBtn">تم الدفع</button>
+          <button class="btn-ghost" id="buyCancelBtn" data-i18n="cancelBtn">إلغاء</button>
+        </div>
+      </div>
+      <div id="payStatusPanel" style="display:none; text-align:center; padding:10px 0;">
+        <div class="order-status-spinner" aria-hidden="true"></div>
+        <p class="sub" id="payStatusText" style="font-size:15px; margin:14px 0 4px;" data-i18n="statusPendingText">بنراجع تحويلك... الصفحة هتتحدّث لوحدها أول ما نأكده.</p>
+        <p class="sub" style="font-size:12.5px; opacity:0.7;" data-i18n="statusCodeNote">كود طلبك (احتفظ بيه احتياطيًا):</p>
+        <div class="ip-number" id="payStatusCode" style="font-size:18px; margin:4px 0 16px;"></div>
+        <p class="sub" style="font-size:12.5px; opacity:0.8;" data-i18n="statusSafeCloseNote">تقدر تقفل الصفحة دلوقتي براحتك — هنراجع طلبك ونبعتلك تحديث بمجرد ما يتأكد.</p>
+        <div class="modal-actions">
+          <button class="btn-ghost" id="payStatusCloseBtn" data-i18n="closeBtn">إغلاق</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="payViewCardFawry" style="display:none;">
+      <div class="field">
+        <label data-i18n="payerNameLabel">الاسم</label>
+        <input type="text" id="payerName">
+      </div>
+      <div class="field">
+        <label data-i18n="payerPhoneLabel">رقم الموبايل</label>
+        <input type="tel" id="payerPhone" placeholder="01xxxxxxxxx">
+      </div>
+      <div class="field">
+        <label data-i18n="payerEmailLabel">البريد الإلكتروني (اختياري)</label>
+        <input type="email" id="payerEmail">
+      </div>
+      <div id="fawryRefResult" style="display:none; text-align:center; margin:14px 0;">
+        <p class="sub" data-i18n="fawryRefNote">اذهب لأقرب منفذ فوري وادفع بالكود ده:</p>
+        <div class="ip-number" id="fawryRefNumber"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-primary" id="payCardFawryBtn" data-i18n="payNowBtn">ادفع الآن</button>
+        <button class="btn-ghost" id="payCardFawryCancelBtn" data-i18n="cancelBtn">إلغاء</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Photo transform modal -->
+<div class="modal-bg" id="transformModalBg">
+  <div class="modal" style="max-width:520px;">
+    <button class="close-x" id="transformModalClose">×</button>
+    <h3 data-i18n="transformModalTitle">حوّل صورتك</h3>
+    <p class="sub" id="transformModalText"></p>
+
+    <div class="field" id="transformUploadField">
+      <label data-i18n="uploadPhotoLabel">اختر صورتك</label>
+      <input type="file" id="transformFileInput" accept="image/*">
+    </div>
+    <p class="sub" id="transformAlreadyDoneNote" style="display:none;" data-i18n="transformAlreadyDoneNote">تم تحويل صورتك قبل كده باستخدام هذا الطلب — دي نتيجتك المحفوظة.</p>
+
+
+    <div id="transformPreviewWrap" style="display:none; margin:14px 0;">
+      <div id="transformPreviewGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div id="transformBeforeCol">
+          <div class="sub" style="margin-bottom:6px;" data-i18n="beforeLabel">قبل</div>
+          <canvas id="transformSrcCanvas" style="width:100%; border-radius:10px; border:1px solid var(--line);"></canvas>
+        </div>
+        <div>
+          <div class="sub" style="margin-bottom:6px;" data-i18n="afterLabel">بعد</div>
+          <canvas id="transformOutCanvas" style="width:100%; border-radius:10px; border:1px solid var(--line);"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div id="transformFreshFlowControls">
+      <label style="display:flex; align-items:flex-start; gap:8px; margin:12px 0; font-size:13px; color:var(--paper-dim); cursor:pointer;">
+        <input type="checkbox" id="transformConsent" style="margin-top:3px;">
+        <span data-i18n="consentLabel">أؤكد إني صاحب هذه الصورة أو الوصي الشرعي عليها، وأوافق على استخدامها لتوليد النتيجة الفنية المطلوبة.</span>
+      </label>
+
+      <p class="sub" style="margin-bottom:10px;" id="transformPrivacyNoteEl" data-i18n="transformPrivacyNote">صورتك بتُستخدم فقط لتنفيذ طلبك، ومتُشاركش مع أي جهة تانية.</p>
+      <p class="sub" style="margin-bottom:10px; opacity:0.85;" id="transformLikenessNoteEl" data-i18n="transformLikenessNote">بنحافظ على ملامحك الأساسية قدر الإمكان، لكن جودة النتيجة بتعتمد على وضوح الصورة الأصلية.</p>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-primary" id="transformGenerateBtn" data-i18n="generateBtn">حوّل الصورة</button>
+      <button class="btn-ghost" id="transformDownloadBtn" style="display:none;" data-i18n="downloadResultBtn">تحميل النتيجة</button>
+      <button class="btn-ghost" id="transformShareBtn" style="display:none;" data-i18n="shareResultBtn">شارك النتيجة</button>
+      <div class="thanks-panel" id="thanksPanel">
+        <h4 data-i18n="thanksTitle">شكراً إنك جربتنا 🙏</h4>
+        <p data-i18n="thanksBody">لو الصورة عجبتك، مشاركتها مع صحابك أو تقييم سريع بيساعدنا كتير.</p>
+        <div class="thanks-actions">
+          <button class="btn-primary" id="thanksShareBtn" data-i18n="thanksShareBtn">شارك صورتك</button>
+          <button class="btn-ghost" id="thanksReviewBtn" data-i18n="thanksReviewBtn">اكتب تقييمك</button>
+        </div>
+      </div>
+      <button class="btn-ghost" id="transformCancelBtn" data-i18n="cancelBtn">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-bg" id="cropModalBg">
+  <div class="modal">
+    <button class="close-x" id="cropModalClose">×</button>
+    <h3 data-i18n="cropModalTitle">اضبط إطار الصورة</h3>
+    <p class="sub" data-i18n="cropModalSub">حرّك الصورة واستخدم شريط التكبير عشان تظبط الإطار — كل صور المنتجات هتخرج بنفس المقاس بالظبط بعد كده.</p>
+    <div class="crop-stage" id="cropStage">
+      <canvas id="cropCanvas" width="400" height="500"></canvas>
+    </div>
+    <div class="crop-zoom-row">
+      <span aria-hidden="true">🔍</span>
+      <input type="range" id="cropZoomSlider" min="1" max="3" step="0.01" value="1">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" id="cropConfirmBtn" data-i18n="cropConfirmBtn">تأكيد القص</button>
+      <button class="btn-ghost" id="cropCancelBtn" data-i18n="cancelBtn">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="dailyReportModalBg">
+  <div class="modal" style="max-width:460px;">
+    <button class="close-x" id="dailyReportModalClose">×</button>
+    <h3 data-i18n="dailyReportTitle">📊 تقرير الأداء</h3>
+    <p class="sub" id="dailyReportSubtitle" style="font-size:12.5px; margin-top:-6px;"></p>
+    <div class="report-period-tabs" id="reportPeriodTabs">
+      <button type="button" class="report-period-btn active" data-period="daily" data-i18n="periodDailyBtn">اليوم</button>
+      <button type="button" class="report-period-btn" data-period="weekly" data-i18n="periodWeeklyBtn">آخر 7 أيام</button>
+      <button type="button" class="report-period-btn" data-period="custom" data-i18n="periodCustomBtn">فترة مخصصة</button>
+    </div>
+    <div class="report-custom-range" id="reportCustomRange" style="display:none;">
+      <input type="date" id="reportFromDate">
+      <input type="date" id="reportToDate">
+      <button type="button" class="btn-ghost" id="reportApplyRangeBtn" data-i18n="periodApplyBtn">تطبيق</button>
+    </div>
+    <div id="dailyReportBody" style="display:flex; flex-direction:column; gap:14px; margin-top:10px;"></div>
+    <div class="modal-actions">
+      <button class="btn-primary" id="dailyReportDownloadBtn" data-i18n="dailyReportDownloadBtn">⬇️ تصدير Excel</button>
+      <button class="btn-ghost" id="reportDownloadChartBtn" data-i18n="reportDownloadChartBtn">⬇️ صورة الرسم البياني</button>
+      <button class="btn-ghost" id="dailyReportCloseBtn" data-i18n="cancelBtn">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="trackModalBg">
+  <div class="modal">
+    <button class="close-x" id="trackModalClose">×</button>
+    <h3 data-i18n="trackModalTitle">تتبع طلبك</h3>
+
+    <div id="myOrdersHistory" style="display:none; margin-bottom:18px;">
+      <div class="sub" style="margin-bottom:8px; font-weight:700;" data-i18n="myOrdersTitle">طلباتك السابقة</div>
+      <div id="myOrdersHistoryList"></div>
+    </div>
+
+    <p class="sub" data-i18n="trackModalSub">أدخل كود المتابعة الذي حصلت عليه بعد إرسال طلب الشراء.</p>
+    <div class="field">
+      <label data-i18n="trackCodeLabel">كود المتابعة</label>
+      <input type="text" id="trackCode" placeholder="مثال: A1B2C3" style="text-transform:uppercase;">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" id="trackCheckBtn" data-i18n="trackCheckBtn">تحقّق من الحالة</button>
+      <button class="btn-ghost" id="trackCancelBtn" data-i18n="closeBtn">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- Account modal (login/register) -->
+<div class="modal-bg" id="accountModalBg">
+  <div class="modal" style="max-width:420px;">
+    <button class="close-x" id="accountModalClose">×</button>
+
+    <div id="accountLoggedOutView">
+      <button class="btn-ghost social-btn" id="biometricLoginBtn" style="display:none; width:100%; margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:8px; border-color:var(--brass-dim);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.8"><path d="M12 2a5 5 0 0 0-5 5v2a5 5 0 0 0 .4 2M7 15c0 2 1 4 5 5M17 9v2c0 1.5-.3 2.7-.8 3.6M12 7a2 2 0 0 1 2 2v3a6 6 0 0 1-1 3.4M9 9v2c0 3 1.5 5 4 6"/></svg>
+        <span data-i18n="biometricLoginBtn">الدخول ببصمة الوجه / الإصبع</span>
+      </button>
+      <div class="social-login-row" style="display:none; flex-direction:column; gap:8px; margin-bottom:16px;">
+        <button class="btn-ghost social-btn" id="googleLoginBtn" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+          <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.5 5.1 29.5 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.4-.1-2.5-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.5 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l6-6C34.5 5.1 29.5 3 24 3c-7.6 0-14.1 4.3-17.4 10.7z"/><path fill="#4CAF50" d="M24 45c5.3 0 10.1-2 13.7-5.4l-6.3-5.3C29.4 35.9 26.9 37 24 37c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.8 40.6 16.3 45 24 45z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.3 5.3C39.5 37.1 43 31 43 24c0-1.4-.1-2.5-.4-3.5z"/></svg>
+          <span data-i18n="continueGoogle">المتابعة بحساب جوجل</span>
+        </button>
+        <button class="btn-ghost social-btn" id="appleLoginBtn" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16.365 1.43c0 1.14-.446 2.06-1.13 2.79-.75.79-1.94 1.4-2.95 1.32-.13-1.1.44-2.24 1.11-2.95.75-.8 2.03-1.4 2.97-1.16zm4.05 16.53c-.4.93-.87 1.83-1.53 2.7-.9 1.19-1.83 2.38-3.28 2.4-1.42.03-1.88-.83-3.5-.83-1.63 0-2.14.8-3.48.86-1.4.05-2.47-1.28-3.38-2.47-1.85-2.42-3.26-6.84-1.37-9.83.94-1.48 2.61-2.42 4.43-2.44 1.4-.03 2.71.94 3.56.94.84 0 2.44-1.16 4.12-.99.7.03 2.67.28 3.93 2.13-.1.06-2.35 1.37-2.32 4.08.03 3.24 2.84 4.32 2.87 4.33-.02.08-.45 1.54-1.05 3.02z"/></svg>
+          <span data-i18n="continueApple">المتابعة بحساب Apple</span>
+        </button>
+        <button class="btn-ghost social-btn" id="facebookLoginBtn" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+          <span data-i18n="continueFacebook">المتابعة بحساب فيسبوك</span>
+        </button>
+      </div>
+      <div class="account-tabs-divider" style="display:none; text-align:center; font-size:12px; color:var(--paper-dim); margin-bottom:14px;" data-i18n="orDivider">أو بالبريد الإلكتروني</div>
+      <div class="account-tabs">
+        <button class="account-tab active" id="tabLoginBtn" data-i18n="loginTab">تسجيل الدخول</button>
+        <button class="account-tab" id="tabRegisterBtn" data-i18n="registerTab">حساب جديد</button>
+      </div>
+
+      <div id="loginFormView">
+        <div class="field">
+          <label data-i18n="emailLabel">البريد الإلكتروني</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label data-i18n="passwordLabel">كلمة المرور</label>
+          <input type="password" id="loginPassword">
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="loginSubmitBtn" data-i18n="loginBtn">دخول</button>
+        </div>
+      </div>
+
+      <div id="registerFormView" style="display:none;">
+        <div class="field">
+          <label data-i18n="nameLabel">الاسم</label>
+          <input type="text" id="registerName">
+        </div>
+        <div class="field">
+          <label data-i18n="emailLabel">البريد الإلكتروني</label>
+          <input type="email" id="registerEmail" placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label data-i18n="passwordLabel">كلمة المرور</label>
+          <input type="password" id="registerPassword" placeholder="6 أحرف على الأقل">
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="registerSubmitBtn" data-i18n="registerBtn">إنشاء الحساب</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="accountLoggedInView" style="display:none;">
+      <h3 data-i18n="accountWelcome">أهلاً بيك!</h3>
+      <p class="sub" id="accountUserInfo"></p>
+      <button class="btn-ghost social-btn" id="registerBiometricBtn" style="display:none; width:100%; margin-bottom:14px; display:flex; align-items:center; justify-content:center; gap:8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a5 5 0 0 0-5 5v2a5 5 0 0 0 .4 2M7 15c0 2 1 4 5 5M17 9v2c0 1.5-.3 2.7-.8 3.6M12 7a2 2 0 0 1 2 2v3a6 6 0 0 1-1 3.4M9 9v2c0 3 1.5 5 4 6"/></svg>
+        <span data-i18n="registerBiometricBtn">تفعيل الدخول ببصمة الوجه/الإصبع لهذا الجهاز</span>
+      </button>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="accountLogoutBtn" data-i18n="logoutBtn">تسجيل الخروج</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Review submission modal -->
+<div class="modal-bg" id="reviewModalBg">
+  <div class="modal" style="max-width:420px;">
+    <button class="close-x" id="reviewModalClose">×</button>
+    <h3 data-i18n="writeReviewTitle">شاركنا رأيك</h3>
+    <div class="field">
+      <label data-i18n="ratingLabel">تقييمك</label>
+      <select id="reviewRating">
+        <option value="5">⭐⭐⭐⭐⭐</option>
+        <option value="4">⭐⭐⭐⭐</option>
+        <option value="3">⭐⭐⭐</option>
+        <option value="2">⭐⭐</option>
+        <option value="1">⭐</option>
+      </select>
+    </div>
+    <div class="field">
+      <label data-i18n="commentLabel">تعليقك</label>
+      <textarea id="reviewComment"></textarea>
+    </div>
+    <div class="field" id="reviewPhotoField" style="display:none;">
+      <label class="review-photo-consent" for="reviewPhotoConsent">
+        <input type="checkbox" id="reviewPhotoConsent">
+        <span data-i18n="reviewPhotoConsentLabel">انشر صورة نتيجتي مع التقييم</span>
+      </label>
+      <div id="reviewPhotoPicker" style="display:none; gap:10px; flex-wrap:wrap; margin-top:10px;"></div>
+    </div>
+    <p class="sub" style="font-size:12px;" data-i18n="reviewModerationNote">سيظهر تقييمك بعد مراجعته من فريقنا.</p>
+    <div class="modal-actions">
+      <button class="btn-primary" id="reviewSubmitBtn" data-i18n="submitReviewBtn">إرسال التقييم</button>
+      <button class="btn-ghost" id="reviewCancelBtn" data-i18n="cancelBtn">إلغاء</button>
+    </div>
+  </div>
+</div>
+<div class="stay-nudge" id="stayNudge" role="dialog" aria-live="polite">
+  <button type="button" class="stay-nudge-close" id="stayNudgeClose" aria-label="إغلاق">&times;</button>
+  <h4 data-i18n="nudgeTitle">لسه مستني إيه؟</h4>
+  <p data-i18n="nudgeBody">عرض الافتتاح لسه شغال — صورتك بـ 25 جنيه بدل 50. لو محتار في الاختيار، ابعتلنا واتساب ونساعدك تختار الأنسب لك.</p>
+  <div class="stay-nudge-actions">
+    <a class="btn-primary" href="#children" id="nudgeBrowseBtn" data-i18n="nudgeBrowseBtn">تصفّح الصور</a>
+    <a class="btn-ghost" href="https://wa.me/201202530308?text=%D9%85%D8%AD%D8%AA%D8%A7%D8%B1%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D8%AE%D8%AA%D9%8A%D8%A7%D8%B1%D8%8C%20%D9%85%D9%85%D9%83%D9%86%20%D9%85%D8%B3%D8%A7%D8%B9%D8%AF%D8%A9%D8%9F" target="_blank" rel="noopener" data-i18n="nudgeAskBtn">اسألنا واتساب</a>
+  </div>
+</div>
+
+<button type="button" class="admin-fab" id="adminFab" aria-label="لوحة الإدارة">
+  <span class="af-icon" aria-hidden="true">&#9881;</span>
+  <span data-i18n="adminFabLabel">لوحة الإدارة</span>
+  <span class="af-badge" id="adminFabBadge"></span>
+</button>
+
+<div class="modal-bg" id="adminModalBg">
+  <div class="modal admin-modal" id="adminModal">
+    <div class="admin-head">
+      <h3 id="adminTitle" data-i18n="adminTitle">دخول لوحة الإدارة</h3>
+      <div class="admin-head-actions">
+        <button type="button" class="theme-toggle theme-toggle-sm" aria-pressed="true">
+          <span class="tt-stars" aria-hidden="true">
+            <span class="tt-star" style="inset-inline-start:8px; top:6px;"></span>
+            <span class="tt-star" style="inset-inline-start:16px; top:14px;"></span>
+            <span class="tt-star" style="inset-inline-start:24px; top:5px;"></span>
+          </span>
+          <span class="tt-icon tt-sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"/></svg></span>
+          <span class="tt-icon tt-moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg></span>
+          <span class="tt-knob" aria-hidden="true">
+            <span class="tt-knob-sun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"/></svg></span>
+            <span class="tt-knob-moon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"/></svg></span>
+          </span>
+        </button>
+        <button type="button" class="admin-icon-btn" id="dailyReportBtn" title="تقرير يومي" aria-label="تقرير يومي" onclick="openDailyReport()">📊</button>
+        <button type="button" class="admin-icon-btn" id="adminAlertsBtn" title="تنبيهات الطلبات" aria-label="تنبيهات الطلبات">&#128276;</button>
+        <button type="button" class="admin-icon-btn" id="adminCollapseBtn" title="طي اللوحة" aria-label="طي اللوحة">&#8211;</button>
+        <button type="button" class="admin-icon-btn" id="adminModalClose" title="إغلاق" aria-label="إغلاق">&times;</button>
+      </div>
+    </div>
+    <p class="sub" data-i18n="adminSub">لوحة إدارة المنتجات والطلبات.</p>
+    <div id="adminLoginView">
+      <div class="field">
+        <label data-i18n="adminPassLabel">كلمة المرور</label>
+        <input type="password" id="adminPass" placeholder="••••••••">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-primary" id="adminLoginBtn" data-i18n="adminLoginBtn">دخول</button>
+      </div>
+    </div>
+    <div id="adminFormView" style="display:none;">
+      <div class="admin-tabs">
+        <button data-tab="products" class="active" id="tabBtnProducts" data-i18n="tabProducts">إضافة منتج</button>
+        <button data-tab="orders" id="tabBtnOrders"><span data-i18n="tabOrders">الطلبات</span> <span id="pendingCount"></span></button>
+        <button data-tab="reviews" id="tabBtnReviews"><span data-i18n="tabReviews">التقييمات</span> <span id="pendingReviewCount"></span></button>
+        <button data-tab="visitors" id="tabBtnVisitors" data-i18n="tabVisitors">الزوار</button>
+        <button data-tab="showcase" id="tabBtnShowcase" data-i18n="tabShowcase">الدائرة</button>
+        <button data-tab="promoimages" id="tabBtnPromoImages" data-i18n="tabPromoImages">صور العرض</button>
+        <button data-tab="changepassword" id="tabBtnChangePassword" data-i18n="tabChangePassword">تغيير كلمة المرور</button>
+        <button data-tab="sitedesign" id="tabBtnSiteDesign" data-i18n="tabSiteDesign">تصميم الموقع</button>
+      </div>
+
+      <div id="adminTabProducts">
+        <div class="field-grid-2">
+          <div class="field">
+            <label data-i18n="pCatLabel">القسم</label>
+            <select id="pCat">
+              <option value="children" data-i18n="optChildren">أطفال</option>
+              <option value="male" data-i18n="optMale">رجالي</option>
+              <option value="female" data-i18n="optFemale">نسائي</option>
+              <option value="business" data-i18n="optBusiness">أعمال</option>
+              <option value="cinematic" data-i18n="optCinematic">سينمائي</option>
+              <option value="luxury" data-i18n="optLuxury">فاخر</option>
+              <option value="artistic" data-i18n="optArtistic">فني</option>
+              <option value="magazine" data-i18n="optMagazine">مجلات وملصقات</option>
+            </select>
+          </div>
+          <div class="field">
+            <label data-i18n="pPriceLabel">السعر (جنيه)</label>
+            <input type="number" id="pPrice" value="25" placeholder="25" min="0">
+          </div>
+        </div>
+        <div class="field-grid-2">
+          <div class="field">
+            <label data-i18n="pTitleLabel">عنوان المنتج</label>
+            <input type="text" id="pTitle" value="Miga-photobook" placeholder="مثال: بورتريه إضاءة سينمائية" data-i18n-ph="pTitlePh">
+          </div>
+          <div class="field">
+            <label data-i18n="pTitleEnLabel">العنوان بالإنجليزي (اختياري — يظهر للعميل لما يبدّل للإنجليزي)</label>
+            <input type="text" id="pTitleEn" value="Miga-photobook" placeholder="e.g. Cinematic Lighting Portrait" data-i18n-ph="pTitleEnPh">
+          </div>
+        </div>
+        <div class="field" id="pShareLinkField" style="display:none;">
+          <label data-i18n="pShareLinkLabel">رابط المنتج (للإعلانات) — انسخه وضعه في منشور المنصة</label>
+          <div style="display:flex; gap:8px; align-items:stretch;">
+            <input type="text" id="pShareLink" readonly onclick="this.select()" style="flex:1; direction:ltr; text-align:left;">
+            <button type="button" class="admin-icon-btn" id="pShareLinkCopy" title="نسخ الرابط" aria-label="نسخ الرابط">&#128203;</button>
+          </div>
+        </div>
+        <div class="field" id="pImageLinkField" style="display:none;">
+          <label data-i18n="pImageLinkLabel">رابط الصورة الأصلية — لرفعها في الإعلان</label>
+          <div style="display:flex; gap:8px; align-items:stretch;">
+            <input type="text" id="pImageLink" readonly onclick="this.select()" style="flex:1; direction:ltr; text-align:left;">
+            <button type="button" class="admin-icon-btn" id="pImageLinkCopy" title="نسخ رابط الصورة" aria-label="نسخ رابط الصورة">&#128203;</button>
+          </div>
+        </div>
+        <div class="field">
+          <label data-i18n="pImageLabel">صورة المنتج</label>
+          <input type="file" id="pImage" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="pPromptLabel">تعليمات التحويل بالذكاء الاصطناعي (للإدارة فقط — لا تظهر للعميل إطلاقًا)</label>
+          <textarea id="pPrompt" placeholder="اكتب تعليمات التحويل الدقيقة هنا..." data-i18n-ph="pPromptPh"></textarea>
+        </div>
+        <div id="editingBanner" style="display:none; background:rgba(227,164,41,0.14); border:1px solid var(--brass-dim); border-radius:8px; padding:10px 14px; font-size:13.5px; color:var(--brass); margin-bottom:12px;">
+          <span data-i18n="editingBannerText">وضع التعديل: أي حفظ الآن هيغيّر المنتج ده — مش هيضيف منتج جديد.</span>
+        </div>
+        <input type="file" id="adminQuickImageInput" accept="image/*" style="display:none;">
+        <div class="modal-actions">
+          <button class="btn-primary" id="pSaveBtn" data-i18n="pSaveBtn">إضافة المنتج</button>
+          <button class="btn-ghost" id="pCancelEditBtn" style="display:none;" data-i18n="pCancelEditBtn">إلغاء التعديل / منتج جديد</button>
+        </div>
+        <div style="margin-top:20px; display:flex; justify-content:flex-end;">
+          <button type="button" class="btn-ghost" id="archiveAllBtn" onclick="downloadAllArchive()" data-i18n="downloadAllArchiveBtn">⬇️ تحميل أرشيف كل المنتجات</button>
+        </div>
+        <div id="adminProductsList" style="margin-top:12px;"></div>
+      </div>
+
+      <div id="adminTabOrders" style="display:none;">
+        <div class="order-stats-bar" id="orderStatsBar" role="button" tabindex="0" aria-expanded="false">
+          <div class="order-stat"><span class="order-stat-num" id="statTotal">0</span><span class="order-stat-label" data-i18n="statTotalLabel">إجمالي الطلبات</span></div>
+          <div class="order-stat"><span class="order-stat-num" id="statApproved">0</span><span class="order-stat-label" data-i18n="statApprovedLabel">تم تنفيذها</span></div>
+          <div class="order-stat"><span class="order-stat-num" id="statPending">0</span><span class="order-stat-label" data-i18n="statPendingLabel">قيد المراجعة</span></div>
+          <div class="order-stat"><span class="order-stat-num" id="statRevenue">0</span><span class="order-stat-label" data-i18n="statRevenueLabel">إجمالي المبلغ المحصّل</span></div>
+          <span class="order-stats-chevron" aria-hidden="true">&#9660;</span>
+        </div>
+        <div id="orderStatsTable" style="display:none;"></div>
+        <div style="display:flex; justify-content:flex-end; margin:10px 0;">
+          <button type="button" class="btn-ghost" id="exportOrdersBtn" data-i18n="exportOrdersBtn">⬇️ تصدير كل الطلبات Excel</button>
+        </div>
+        <div id="ordersList"></div>
+      </div>
+
+      <div id="adminTabReviews" style="display:none;">
+        <div class="order-stats-bar" id="reviewStatsBar" role="button" tabindex="0" aria-expanded="false">
+          <div class="order-stat"><span class="order-stat-num" id="reviewStatTotal">0</span><span class="order-stat-label" data-i18n="reviewStatTotalLabel">إجمالي التقييمات</span></div>
+          <div class="order-stat"><span class="order-stat-num" id="reviewStatApproved">0</span><span class="order-stat-label" data-i18n="reviewStatApprovedLabel">تمت الموافقة</span></div>
+          <div class="order-stat"><span class="order-stat-num" id="reviewStatPending">0</span><span class="order-stat-label" data-i18n="reviewStatPendingLabel">قيد المراجعة</span></div>
+          <span class="order-stats-chevron" aria-hidden="true">&#9660;</span>
+        </div>
+        <div id="reviewStatsTable" style="display:none;"></div>
+        <div id="pendingReviewsList"></div>
+      </div>
+
+      <div id="adminTabVisitors" style="display:none;">
+        <div class="order-stats-bar" id="visitorStatsBar" role="button" tabindex="0" aria-expanded="false">
+          <div class="order-stat"><span class="order-stat-num" id="visitorsTotalStat">0</span><span class="order-stat-label" data-i18n="visitorsTotalLabel">إجمالي الزيارات</span></div>
+          <div class="order-stat"><span class="order-stat-num" id="visitorsTodayStat">0</span><span class="order-stat-label" data-i18n="visitorsTodayLabel">زيارات اليوم</span></div>
+          <div class="order-stat"><span class="order-stat-num" id="visitorsUniqueTotalStat">0</span><span class="order-stat-label" data-i18n="visitorsUniqueTotalLabel">زوار فريدون</span></div>
+          <div class="order-stat"><span class="order-stat-num" id="visitorsUniqueTodayStat">0</span><span class="order-stat-label" data-i18n="visitorsUniqueTodayLabel">فريدون اليوم</span></div>
+          <span class="order-stats-chevron" aria-hidden="true">&#9660;</span>
+        </div>
+        <div id="visitorsLogList" style="display:none; max-height:360px; overflow-y:auto;"></div>
+      </div>
+
+      <div id="adminTabShowcase" style="display:none;">
+        <p class="sub" style="margin-bottom:14px;" data-i18n="scIntro">ارفع الصورة الأصلية اللي هتظهر في نص الدائرة في الصفحة الرئيسية، والنتايج الثمانية اللي هتلف حواليها.</p>
+        <div class="field">
+          <label data-i18n="scCenterLabel">الصورة الأصلية (المنتصف)</label>
+          <img id="scPreview-center" style="display:none; width:90px; height:90px; object-fit:cover; border-radius:50%; border:2px solid #3b8ef0; margin-bottom:8px;">
+          <input type="file" id="scInput-center" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="scItemLabel1">نتيجة 1</label>
+          <img id="scPreview-1" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="scInput-1" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="scItemLabel2">نتيجة 2</label>
+          <img id="scPreview-2" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="scInput-2" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="scItemLabel3">نتيجة 3</label>
+          <img id="scPreview-3" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="scInput-3" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="scItemLabel4">نتيجة 4</label>
+          <img id="scPreview-4" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="scInput-4" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="scItemLabel5">نتيجة 5</label>
+          <img id="scPreview-5" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="scInput-5" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="scItemLabel6">نتيجة 6</label>
+          <img id="scPreview-6" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="scInput-6" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="scItemLabel7">نتيجة 7</label>
+          <img id="scPreview-7" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="scInput-7" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="scItemLabel8">نتيجة 8</label>
+          <img id="scPreview-8" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;">
+          <input type="file" id="scInput-8" accept="image/*">
+        </div>
+        <div class="modal-actions" style="margin-top:14px;">
+          <button class="btn-primary" id="scSaveBtn" data-i18n="scSaveBtn">حفظ صور الدائرة</button>
+        </div>
+      </div>
+
+      <div id="adminTabPromoImages" style="display:none;">
+        <p class="sub" style="margin-bottom:14px;" data-i18n="piIntro">ارفع لحد 20 صورة نتيجة، وهتظهر بدل الفيديو كعرض متحرك بنفس شكل وإطار قسم "شوف Miga-Photobook وهو شغال".</p>
+        <div class="field">
+          <label data-i18n="piItemLabel1">صورة 1</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-1" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-1" data-slot="1" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-1" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel2">صورة 2</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-2" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-2" data-slot="2" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-2" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel3">صورة 3</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-3" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-3" data-slot="3" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-3" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel4">صورة 4</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-4" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-4" data-slot="4" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-4" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel5">صورة 5</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-5" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-5" data-slot="5" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-5" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel6">صورة 6</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-6" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-6" data-slot="6" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-6" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel7">صورة 7</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-7" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-7" data-slot="7" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-7" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel8">صورة 8</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-8" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-8" data-slot="8" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-8" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel9">صورة 9</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-9" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-9" data-slot="9" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-9" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel10">صورة 10</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-10" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-10" data-slot="10" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-10" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel11">صورة 11</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-11" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-11" data-slot="11" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-11" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel12">صورة 12</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-12" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-12" data-slot="12" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-12" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel13">صورة 13</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-13" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-13" data-slot="13" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-13" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel14">صورة 14</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-14" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-14" data-slot="14" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-14" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel15">صورة 15</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-15" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-15" data-slot="15" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-15" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel16">صورة 16</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-16" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-16" data-slot="16" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-16" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel17">صورة 17</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-17" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-17" data-slot="17" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-17" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel18">صورة 18</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-18" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-18" data-slot="18" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-18" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel19">صورة 19</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-19" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-19" data-slot="19" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-19" accept="image/*">
+        </div>
+        <div class="field">
+          <label data-i18n="piItemLabel20">صورة 20</label>
+          <span style="position:relative; display:inline-block;">
+            <img id="piPreview-20" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;">
+            <button type="button" id="piRemove-20" data-slot="20" class="pi-remove-btn" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة">×</button>
+          </span>
+          <input type="file" id="piInput-20" accept="image/*">
+        </div>
+        <div class="modal-actions" style="margin-top:14px;">
+          <button class="btn-primary" id="piSaveBtn" data-i18n="piSaveBtn">حفظ صور العرض</button>
+        </div>
+      </div>
+
+      <div id="adminTabChangePassword" style="display:none;">
+        <p class="sub" style="margin-bottom:14px;" data-i18n="changePassIntro">غيّر كلمة مرور دخول لوحة الإدارة. لازم تعرف الكلمة الحالية عشان تقدر تغيّرها.</p>
+        <div class="field">
+          <label data-i18n="currentPassLabel">كلمة المرور الحالية</label>
+          <input type="password" id="currentAdminPass" placeholder="••••••••" autocomplete="off">
+        </div>
+        <div class="field-grid-2">
+          <div class="field">
+            <label data-i18n="newPassLabel">كلمة المرور الجديدة</label>
+            <input type="password" id="newAdminPass" placeholder="••••••••" autocomplete="off">
+          </div>
+          <div class="field">
+            <label data-i18n="confirmNewPassLabel">تأكيد كلمة المرور الجديدة</label>
+            <input type="password" id="confirmNewAdminPass" placeholder="••••••••" autocomplete="off">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="changeAdminPassBtn" data-i18n="changePassBtn">تغيير كلمة المرور</button>
+        </div>
+      </div>
+
+      <div id="adminTabSiteDesign" style="display:none;">
+        <p class="sub" style="margin-bottom:14px;" data-i18n="siteDesignIntro">اختار الشكل اللي هيشوفه العميل لما يفتح الموقع. لوحة الإدارة نفسها بتفضل زي ما هي دايمًا مهما كان اختيارك هنا.</p>
+        <div class="field">
+          <label data-i18n="siteDesignLabel">التصميم الفعّال</label>
+          <select id="siteDesignSelect"><!-- populated dynamically from /site-config so a future Design MIGA 3/4 appears automatically once added to the backend registry --></select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="saveSiteDesignBtn" data-i18n="siteDesignSaveBtn">حفظ الاختيار</button>
+        </div>
+
+        <hr style="border:none; border-top:1px solid var(--line); margin:22px 0;">
+        <p class="sub" style="margin-bottom:14px;" data-i18n="heroModeIntro">لكل تصميم، اختار شكل عرض "قبل/بعد" في الصفحة الرئيسية — الدائرة الدوّارة الأصلية، أو السلايدر التفاعلي بالسحب. الاختيار هنا مستقل عن السلايدر الثابت الجديد في التصميم الثاني (ده فاضل سلايدر دايمًا مهما اخترت).</p>
+        <div id="heroModeRows"><!-- populated dynamically, one row per design in the registry --></div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="saveHeroModesBtn" data-i18n="heroModeSaveBtn">حفظ أوضاع الهيرو</button>
+        </div>
+
+        <hr style="border:none; border-top:1px solid var(--line); margin:22px 0;">
+        <h4 style="margin:0 0 8px;" data-i18n="resolutionTitle">دقة الصور الناتجة</h4>
+        <p class="sub" style="margin-bottom:14px;" data-i18n="resolutionIntro">اختار دقة الصورة اللي الذكاء الاصطناعي بينتجها. 4K أعلى دقة وأغلى في التكلفة، و2K أرخص والفرق بينهم تقريبًا مش محسوس على شاشة الموبايل. جرّب الاتنين وقارن بنفسك.</p>
+        <div class="field">
+          <select id="outputResolutionSelect">
+            <option value="2K" data-i18n="resolution2K">2K — أرخص (موصى به)</option>
+            <option value="4K" data-i18n="resolution4K">4K — أعلى دقة (أغلى)</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="saveResolutionBtn" data-i18n="resolutionSaveBtn">حفظ الدقة</button>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top:14px;">
+        <button class="btn-ghost" id="adminLogoutBtn" data-i18n="adminLogoutBtn">خروج</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="app.js"></script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('/service-worker.js').catch(function(){});
+  });
+}
+</script>
 </body>
 </html>
