@@ -1309,6 +1309,22 @@ function scrollRow(key, direction){
   // sub-pixel rounding was what left a stray gap bleeding through on the
   // left on mobile. Centering removes that edge dependency entirely.
   cards[target].scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+  // scrollIntoView's block:'nearest' only checks whether the card
+  // geometrically intersects the viewport — it has no idea the sticky
+  // header visually sits on top of part of that same viewport, so a card
+  // that's "technically in view" by raw coordinates can still have its top
+  // portion hidden behind the header. Since this fires on every single
+  // arrow tap across every category, that same sliver-of-crop compounds
+  // into "every product's photo looks slightly cut off at the top" — this
+  // follow-up nudges the page down by exactly however much the header is
+  // still covering, once the horizontal scroll settles.
+  setTimeout(() => {
+    const headerH = stickyTopGroup ? stickyTopGroup.getBoundingClientRect().height : 0;
+    const cardTop = cards[target].getBoundingClientRect().top;
+    if(cardTop < headerH){
+      window.scrollBy({ top: cardTop - headerH - 10, behavior:'smooth' });
+    }
+  }, 380); // after the scrollIntoView's own smooth-scroll has settled
 }
 
 function updateRowArrows(key){
