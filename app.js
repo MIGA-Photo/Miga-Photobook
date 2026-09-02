@@ -1571,10 +1571,37 @@ document.getElementById('categoryTilesGrid')?.addEventListener('click', (e)=>{
 function openCatSection(id){
   const sec = document.getElementById(id);
   if(!sec) return null;
+  // Opening a collapsible section transitions its padding-top from 0 to
+  // ~52px over 250ms (see .cat-section.collapsible.open in the CSS) — the
+  // exact same category of bug as the header collapse: any code measuring
+  // this section's position right after adding .open (as
+  // scrollToSectionBelowHeader immediately does, to calculate where to
+  // scroll) was reading a mid-transition position, landing short of where
+  // the section — and the product card inside it — actually settles once
+  // that padding finishes expanding. Forcing the transition off for one
+  // synchronous instant makes the "open" padding apply immediately so
+  // anything measuring this section right away gets its true final layout.
+  sec.style.transition = 'none';
   sec.classList.add('open');
+  void sec.offsetHeight;
+  sec.style.transition = '';
   const tile = document.querySelector(`.cat-tile[data-cat="${id}"]`);
   if(tile){ tile.classList.add('open'); tile.setAttribute('aria-expanded', 'true'); }
   return sec;
+}
+
+/** The section element itself is a poor scroll target: opening it adds
+ * ~52px of its own padding-top (see .cat-section.collapsible.open), which
+ * is spacing INSIDE the section that its own top edge knows nothing about
+ * — scrolling so the section's top clears the header still leaves the
+ * first actual product card that same ~52px further down, still partly
+ * behind the header. The first card (or the grid wrapping it) reflects
+ * that internal spacing already baked into its own position, so scrolling
+ * relative to IT lands exactly where a shopper needs the photo to be:
+ * fully visible right below the header. */
+function firstCardOrSelf(sec){
+  if(!sec) return sec;
+  return sec.querySelector('.grid > .card') || sec.querySelector('.grid') || sec;
 }
 
 function catLabel(c){
@@ -2051,7 +2078,7 @@ document.getElementById('payStatusCloseBtn').onclick = ()=>{
   stopOrderStatusPolling();
   document.getElementById('buyModalBg').classList.remove('show');
   const p = getBuyItem();
-  if(p && p.category) scrollToSectionBelowHeader(openCatSection(p.category));
+  if(p && p.category) scrollToSectionBelowHeader(firstCardOrSelf(openCatSection(p.category)));
 };
 
 // ---------- Photo transform (client-side style preview) ----------
@@ -2521,7 +2548,7 @@ document.getElementById('trackCheckBtn').onclick = async ()=>{
     renderGrids();
     trackModalBg.classList.remove('show');
     showToast(t('toastReadyToTransform'));
-    scrollToSectionBelowHeader(openCatSection(order.productId ? getCategoryOf(order.productId) : 'children'));
+    scrollToSectionBelowHeader(firstCardOrSelf(openCatSection(order.productId ? getCategoryOf(order.productId) : 'children')));
   }else{
     showToast(t('toastOrderPending'));
   }
@@ -2616,9 +2643,48 @@ const stickyTopGroup = document.querySelector('.sticky-top-group');
  * header happens to be expanded or already collapsed from scrolling. */
 function scrollToSectionBelowHeader(el){
   if(!el) return;
-  const headerHeight = stickyTopGroup ? stickyTopGroup.getBoundingClientRect().height : 0;
-  const targetTop = el.getBoundingClientRect().top + window.scrollY;
-  window.scrollTo({ top: targetTop - headerHeight - 12, behavior:'smooth' });
+  // Force the collapsed header state BEFORE reading its height. Scrolling
+  // to any product section always lands well past HEADER_COLLAPSE_THRESHOLD
+  // (72px), so the header WILL end up collapsed by the time this animation
+  // finishes regardless — the bug was reading its height while it still
+  // happened to be in the (taller) expanded state at the START of the
+  // click, baking that taller number into the target, and then the header
+  // shrinking mid-flight left the card resting exactly that much too far
+  // down once the shorter final header revealed more of the page above it.
+  // Committing to the collapsed state upfront makes the calculation match
+  // the header height that will actually still be true when this settles.
+  let headerHeight = 0;
+  if(stickyTopGroup){
+    // The collapse itself (max-height/opacity/padding going to 0) is
+    // defined on the INNER elements — .header-utility, #softLaunchBanner,
+    // .search-box — each with its own independent 280ms transition. Killing
+    // stickyTopGroup's own transition wasn't enough, since none of these
+    // children inherit that — their layout still animated on its own
+    // schedule, so the parent's measured height kept reflecting whatever
+    // point that separate transition happened to be at. Disabling the
+    // transition on each of those inner elements directly (then forcing
+    // one synchronous reflow) is what actually makes the collapsed height
+    // available to measure immediately, with the same net visual effect
+    // once everything is restored right after.
+    const innerAnimated = stickyTopGroup.querySelectorAll('.header-utility, #softLaunchBanner, .search-box');
+    innerAnimated.forEach(elm => { elm.style.transition = 'none'; });
+    stickyTopGroup.classList.add('hdr-collapsed');
+    void stickyTopGroup.offsetHeight; // force layout recalculation
+    headerHeight = stickyTopGroup.getBoundingClientRect().height;
+    innerAnimated.forEach(elm => { elm.style.transition = ''; });
+  }
+  const targetTop = el.getBoundingClientRect().top + window.scrollY - headerHeight - 12;
+  const startTop = window.scrollY;
+  const delta = targetTop - startTop;
+  const duration = 380;
+  const startTime = performance.now();
+  function step(now){
+    const t = Math.min(1, (now - startTime) / duration);
+    const ease = t*t*(3-2*t);
+    window.scrollTo({ top: startTop + delta*ease, behavior:'instant' });
+    if(t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
 }
 const HEADER_COLLAPSE_THRESHOLD = 72;
 let lastHeaderScrollY = window.scrollY || 0;
@@ -2918,7 +2984,7 @@ document.getElementById('catNav').addEventListener('click', (e)=>{
   closeCatDropdown();
   const cat = btn.dataset.cat;
   if(cat==='all'){ scrollToSectionBelowHeader(document.getElementById('categoryTiles')); }
-  else{ scrollToSectionBelowHeader(openCatSection(cat)); }
+  else{ scrollToSectionBelowHeader(firstCardOrSelf(openCatSection(cat))); }
 });
 
 // ---------- Admin quick-access bell (top of page, before categories) ----------
