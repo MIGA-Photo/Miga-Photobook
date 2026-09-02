@@ -2316,6 +2316,14 @@ document.getElementById('transformFileInput').addEventListener('change', (e)=>{
       transformImg = img;
       const srcCanvas = document.getElementById('transformSrcCanvas');
       const outCanvas = document.getElementById('transformOutCanvas');
+      // 360px is a PREVIEW size — deliberately small so the on-screen
+      // before/after canvases stay light. It must NOT be what gets sent to
+      // the AI: a 360px-wide source has already thrown away the facial
+      // detail (skin texture, hair, eyes) the model needs, so asking for a
+      // 4K result from it just upscales a mushy thumbnail — the output is
+      // 4K in dimensions but visibly soft, which is exactly the quality
+      // complaint customers were making. buildFullResSource() below
+      // re-renders the ORIGINAL image at high resolution at send time.
       const maxW = 360;
       const scale = Math.min(1, maxW / img.width);
       const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
@@ -2331,6 +2339,33 @@ document.getElementById('transformFileInput').addEventListener('change', (e)=>{
   };
   reader.readAsDataURL(file);
 });
+
+/** Renders the user's ORIGINAL uploaded image (not the shrunken preview)
+ * into an off-screen canvas at up to 1600px on its long edge, and returns
+ * it as a high-quality JPEG data URI for the AI request.
+ *
+ * Why 1600 and not the raw original: phone photos can be 4000px+, and a
+ * base64 data URI of that inflates the request body enormously (base64 adds
+ * ~33%), which risks hitting request-size limits and makes uploads slow on
+ * Egyptian mobile data. 1600px keeps every facial detail the model actually
+ * uses while staying a reasonable payload. Quality 0.95 (vs the old 0.9)
+ * avoids visible JPEG artifacts around edges and skin that the model would
+ * otherwise faithfully reproduce — and amplify — in the 4K output. */
+function buildFullResSource(img){
+  const MAX_EDGE = 1600;
+  const scale = Math.min(1, MAX_EDGE / Math.max(img.width, img.height));
+  const w = Math.round(img.width * scale);
+  const h = Math.round(img.height * scale);
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  // Best available downscaling quality — the browser default can alias
+  // fine detail (hair, eyelashes) when shrinking by a large factor.
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, 0, 0, w, h);
+  return canvas.toDataURL('image/jpeg', 0.95);
+}
 
 document.getElementById('transformGenerateBtn').onclick = async ()=>{
   if(!transformImg){ showToast(t('toastSelectPhoto')); return; }
@@ -2354,7 +2389,9 @@ document.getElementById('transformGenerateBtn').onclick = async ()=>{
     genBtn.disabled = true;
     showToast(t('toastGenerating'));
     try{
-      const dataUri = document.getElementById('transformSrcCanvas').toDataURL('image/jpeg', 0.9);
+      // Send the high-resolution render of the original upload — NOT the
+      // 360px preview canvas, which is only for on-screen display.
+      const dataUri = buildFullResSource(transformImg);
       // The server looks up the real transformation instructions itself using productId +
       // orderCode as proof of purchase — this browser never holds or sends that text.
       const res = await fetch(`${BACKEND_BASE}/transform`, {
