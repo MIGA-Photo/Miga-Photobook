@@ -894,6 +894,9 @@
     scroll-snap-type:x mandatory; scroll-behavior:smooth;
     scrollbar-width:none; -ms-overflow-style:none;
     padding-bottom:4px;
+    /* Same header-clearance reservation as .card — some scroll paths
+       target the row container rather than an individual card inside it. */
+    scroll-margin-top:300px;
     /* Without this, dragging past the first (or last) card triggers iOS
        Safari's native elastic "rubber-band" overscroll bounce — which
        briefly reveals whatever sits behind the carousel's edge instead of
@@ -984,6 +987,19 @@
     overflow:hidden; display:flex; flex-direction:column;
     transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease;
     box-shadow:0 2px 10px rgba(0,0,0,0.25);
+    /* Reserve room for the sticky header on ANY scroll that targets this
+       card. Every JS-side attempt to compute this offset by hand kept
+       breaking, because the numbers involved (header height, section
+       padding) are mid-transition at the moment the calculation runs, and
+       because manual finger-swipes and CSS scroll-snap never went through
+       that JS path at all. scroll-margin-top is the browser's own native
+       mechanism for exactly this problem: it tells the browser "when
+       scrolling to this element, treat its top edge as being this much
+       higher than it is", and it's honoured uniformly by scrollIntoView,
+       programmatic scrolling, scroll-snap, and anchor jumps alike — no
+       measurement, no timing, no code path to miss. 300px comfortably
+       clears the header in its tallest (expanded) state. */
+    scroll-margin-top:300px;
   }
   .card:hover{
     transform:translateY(-4px);
