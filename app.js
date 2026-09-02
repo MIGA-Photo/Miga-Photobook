@@ -322,6 +322,7 @@ const translations = {
     changePassTitle:'تغيير كلمة مرور الأدمن', tabChangePassword:'تغيير كلمة المرور', changePassIntro:'غيّر كلمة مرور دخول لوحة الإدارة. لازم تعرف الكلمة الحالية عشان تقدر تغيّرها.', currentPassLabel:'كلمة المرور الحالية', newPassLabel:'كلمة المرور الجديدة', confirmNewPassLabel:'تأكيد كلمة المرور الجديدة', changePassBtn:'تغيير كلمة المرور',
     tabSiteDesign:'تصميم الموقع', siteDesignIntro:'اختار الشكل اللي هيشوفه العميل لما يفتح الموقع. لوحة الإدارة نفسها بتفضل زي ما هي دايمًا مهما كان اختيارك هنا.', siteDesignLabel:'التصميم الفعّال', siteDesignV1Option:'التصميم الأول (الحالي)', siteDesignV2Option:'التصميم الثاني (الجديد)', siteDesignSaveBtn:'حفظ الاختيار', toastSiteDesignSaved:'تم حفظ التصميم — هيظهر للعملاء من زيارتهم الجاية',
     heroModeIntro:'لكل تصميم، اختار شكل عرض "قبل/بعد" في الصفحة الرئيسية — الدائرة الدوّارة الأصلية، أو السلايدر التفاعلي بالسحب. الاختيار هنا مستقل عن السلايدر الثابت الجديد في التصميم الثاني (ده فاضل سلايدر دايمًا مهما اخترت).', heroModeSaveBtn:'حفظ أوضاع الهيرو', heroModeCircle:'دائرة دوّارة', heroModeSlider:'سلايدر تفاعلي', toastHeroModesSaved:'تم حفظ أوضاع الهيرو لكل التصاميم',
+    resolutionTitle:'دقة الصور الناتجة', resolutionIntro:'اختار دقة الصورة اللي الذكاء الاصطناعي بينتجها. 4K أعلى دقة وأغلى في التكلفة، و2K أرخص والفرق بينهم تقريبًا مش محسوس على شاشة الموبايل. جرّب الاتنين وقارن بنفسك.', resolutionSaveBtn:'حفظ الدقة', resolution2K:'2K — أرخص (موصى به)', resolution4K:'4K — أعلى دقة (أغلى)', toastResolutionSaved:'تم حفظ دقة الصور',
     toastPassChanged:'تم تغيير كلمة المرور بنجاح', toastPassMismatch:'كلمة المرور الجديدة وتأكيدها غير متطابقين', toastPassTooShort:'كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل', toastCurrentPassWrong:'كلمة المرور الحالية غير صحيحة', toastFillPassFields:'يرجى إدخال كل الحقول',
     toastProductAdded:'تم إضافة المنتج بنجاح',
     uploadingImage:'جاري رفع الصورة...', toastImageUploadFailed:'تعذّر رفع الصورة، تأكد من اتصالك وحاول تاني',
@@ -613,6 +614,7 @@ const translations = {
     changePassTitle:'Change admin password', tabChangePassword:'Change password', changePassIntro:'Change the password used to log in to the admin panel. You need to know the current one to change it.', currentPassLabel:'Current password', newPassLabel:'New password', confirmNewPassLabel:'Confirm new password', changePassBtn:'Change password',
     tabSiteDesign:'Site Design', siteDesignIntro:'Choose which look customers see when they open the site. The admin panel itself always stays the same regardless of your choice here.', siteDesignLabel:'Active design', siteDesignV1Option:'Design 1 (current)', siteDesignV2Option:'Design 2 (new)', siteDesignSaveBtn:'Save choice', toastSiteDesignSaved:'Design saved — customers will see it on their next visit',
     heroModeIntro:'For each design, choose the "before/after" showcase style on the homepage — the original orbiting circle, or the interactive drag slider. This choice is independent of Design 2\'s new fixed slider (that one always stays a slider regardless).', heroModeSaveBtn:'Save hero modes', heroModeCircle:'Orbiting circle', heroModeSlider:'Interactive slider', toastHeroModesSaved:'Hero modes saved for every design',
+    resolutionTitle:'Output image resolution', resolutionIntro:'Choose the resolution the AI generates. 4K is higher detail and costs more per image; 2K is cheaper and the difference is essentially invisible on a phone screen. Try both and compare.', resolutionSaveBtn:'Save resolution', resolution2K:'2K — cheaper (recommended)', resolution4K:'4K — highest detail (pricier)', toastResolutionSaved:'Output resolution saved',
     toastPassChanged:'Password changed successfully', toastPassMismatch:'New password and confirmation do not match', toastPassTooShort:'New password must be at least 8 characters', toastCurrentPassWrong:'Current password is incorrect', toastFillPassFields:'Please fill in all fields',
     toastProductAdded:'Product added successfully',
     uploadingImage:'Uploading image...', toastImageUploadFailed:'Could not upload the image, check your connection and try again',
@@ -3884,6 +3886,10 @@ async function loadSiteDesignIntoAdmin(){
           </select>
         </div>`).join('');
     }
+    const resSelect = document.getElementById('outputResolutionSelect');
+    if(resSelect && data.outputResolution){
+      resSelect.value = data.outputResolution;
+    }
   }catch(e){ /* leave the dropdown empty on a network hiccup */ }
 }
 document.getElementById('saveSiteDesignBtn').onclick = async ()=>{
@@ -3919,6 +3925,25 @@ document.getElementById('saveHeroModesBtn').onclick = async ()=>{
     });
     const data = await res.json().catch(()=>({}));
     showToast((res.ok && data.ok) ? t('toastHeroModesSaved') : t('toastAdminServerError'));
+  }catch(e){
+    showToast(t('toastAdminServerError'));
+  }
+};
+
+/** Saves the AI output resolution (2K/4K). Kept as its own small control
+ * rather than folded into another save button so the admin can flip it,
+ * generate one test image, and compare — the whole point is being able to
+ * evaluate the cost/quality tradeoff against real results quickly. */
+document.getElementById('saveResolutionBtn').onclick = async ()=>{
+  if(!BACKEND_BASE || !adminSessionToken) return;
+  const resolution = document.getElementById('outputResolutionSelect').value;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/set-resolution?token=${encodeURIComponent(adminSessionToken)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ resolution })
+    });
+    const data = await res.json().catch(()=>({}));
+    showToast((res.ok && data.ok) ? t('toastResolutionSaved') : t('toastAdminServerError'));
   }catch(e){
     showToast(t('toastAdminServerError'));
   }

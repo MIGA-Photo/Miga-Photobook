@@ -1656,6 +1656,19 @@
         <div class="modal-actions">
           <button class="btn-primary" id="saveHeroModesBtn" data-i18n="heroModeSaveBtn">حفظ أوضاع الهيرو</button>
         </div>
+
+        <hr style="border:none; border-top:1px solid var(--line); margin:22px 0;">
+        <h4 style="margin:0 0 8px;" data-i18n="resolutionTitle">دقة الصور الناتجة</h4>
+        <p class="sub" style="margin-bottom:14px;" data-i18n="resolutionIntro">اختار دقة الصورة اللي الذكاء الاصطناعي بينتجها. 4K أعلى دقة وأغلى في التكلفة، و2K أرخص والفرق بينهم تقريبًا مش محسوس على شاشة الموبايل. جرّب الاتنين وقارن بنفسك.</p>
+        <div class="field">
+          <select id="outputResolutionSelect">
+            <option value="2K" data-i18n="resolution2K">2K — أرخص (موصى به)</option>
+            <option value="4K" data-i18n="resolution4K">4K — أعلى دقة (أغلى)</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="saveResolutionBtn" data-i18n="resolutionSaveBtn">حفظ الدقة</button>
+        </div>
       </div>
 
       <div class="modal-actions" style="margin-top:14px;">
