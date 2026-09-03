@@ -325,7 +325,7 @@ const translations = {
     resolutionTitle:'دقة الصور الناتجة', resolutionIntro:'اختار دقة الصورة اللي الذكاء الاصطناعي بينتجها. 4K أعلى دقة وأغلى في التكلفة، و2K أرخص والفرق بينهم تقريبًا مش محسوس على شاشة الموبايل. جرّب الاتنين وقارن بنفسك.', resolutionSaveBtn:'حفظ الدقة', resolution2K:'2K — أرخص (موصى به)', resolution4K:'4K — أعلى دقة (أغلى)', toastResolutionSaved:'تم حفظ دقة الصور',
     colorThemeTitle:'لون الهيدر والخلفية تحت الصور', colorThemeIntro:'اختار درجة اللون الغامق اللي تظهر في شريط الهيدر والمساحة خلف صور المنتجات. باقي ألوان الموقع (الدهبي، الخط) بتفضل زي ما هي في كل الاختيارات.', colorThemeLabel:'لون الهيدر', colorThemeBlack:'أسود (الحالي)', colorThemeBrown:'بني قهوة فخم', colorThemeEmerald:'أخضر زمردي غامق', colorThemeWine:'نبيتي غامق', colorThemeNavy:'كحلي ملكي', colorThemeRed:'أحمر / وردي غامق', colorThemeSaveBtn:'حفظ اللون', toastColorThemeSaved:'تم حفظ اللون — هيظهر للعملاء من زيارتهم الجاية',
     headerModeTitle:'شكل الهيدر', headerModeIntro:'"الشكل الحالي" يعرض كل أزرار الهيدر (اللغة، الوضع الليلي، عرض الموبايل/الكمبيوتر، تتبع الطلب) في شريط دايمًا ظاهر. "قائمة مطوية" بينقلهم جوه قائمة (☰) بتتفتح عند الضغط، وده بيقلل ارتفاع الهيدر.', headerModeLabel:'وضع الهيدر', headerModeClassicOption:'الشكل الحالي', headerModeCompactOption:'قائمة مطوية (☰)', headerModeSaveBtn:'حفظ شكل الهيدر', toastHeaderModeSaved:'تم حفظ شكل الهيدر — هيظهر للعملاء من زيارتهم الجاية',
-    menuTitle:'القائمة',
+    menuTitle:'القائمة', drawerLangLabel:'اللغة', drawerThemeLabel:'المظهر', drawerViewLabel:'طريقة العرض', drawerOrderLabel:'الطلبات', drawerGuestHint:'لحفظ اسمك وتليفونك وصورتك',
     toastPassChanged:'تم تغيير كلمة المرور بنجاح', toastPassMismatch:'كلمة المرور الجديدة وتأكيدها غير متطابقين', toastPassTooShort:'كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل', toastCurrentPassWrong:'كلمة المرور الحالية غير صحيحة', toastFillPassFields:'يرجى إدخال كل الحقول',
     toastProductAdded:'تم إضافة المنتج بنجاح',
     uploadingImage:'جاري رفع الصورة...', toastImageUploadFailed:'تعذّر رفع الصورة، تأكد من اتصالك وحاول تاني',
@@ -620,7 +620,7 @@ const translations = {
     resolutionTitle:'Output image resolution', resolutionIntro:'Choose the resolution the AI generates. 4K is higher detail and costs more per image; 2K is cheaper and the difference is essentially invisible on a phone screen. Try both and compare.', resolutionSaveBtn:'Save resolution', resolution2K:'2K — cheaper (recommended)', resolution4K:'4K — highest detail (pricier)', toastResolutionSaved:'Output resolution saved',
     colorThemeTitle:'Header and image-background color', colorThemeIntro:'Choose the dark shade used for the header bar and the space behind product images. The rest of the site colors (gold, text) stay the same across every option.', colorThemeLabel:'Header color', colorThemeBlack:'Black (current)', colorThemeBrown:'Warm coffee brown', colorThemeEmerald:'Deep emerald green', colorThemeWine:'Deep wine', colorThemeNavy:'Royal navy', colorThemeRed:'Deep red / rose', colorThemeSaveBtn:'Save color', toastColorThemeSaved:'Color saved — customers will see it on their next visit',
     headerModeTitle:'Header layout', headerModeIntro:'"Current layout" shows every header button (language, dark mode, mobile/desktop preview, track order) in an always-visible strip. "Collapsed menu" moves them into a (☰) menu that opens on tap, which shortens the header.', headerModeLabel:'Header layout', headerModeClassicOption:'Current layout', headerModeCompactOption:'Collapsed menu (☰)', headerModeSaveBtn:'Save header layout', toastHeaderModeSaved:'Header layout saved — customers will see it on their next visit',
-    menuTitle:'Menu',
+    menuTitle:'Menu', drawerLangLabel:'Language', drawerThemeLabel:'Appearance', drawerViewLabel:'View mode', drawerOrderLabel:'Orders', drawerGuestHint:'To save your name, phone, and photo',
     toastPassChanged:'Password changed successfully', toastPassMismatch:'New password and confirmation do not match', toastPassTooShort:'New password must be at least 8 characters', toastCurrentPassWrong:'Current password is incorrect', toastFillPassFields:'Please fill in all fields',
     toastProductAdded:'Product added successfully',
     uploadingImage:'Uploading image...', toastImageUploadFailed:'Could not upload the image, check your connection and try again',
@@ -3308,7 +3308,22 @@ function initSideDrawer(){
   if(document.documentElement.getAttribute('data-header-mode') === 'compact'){
     const utility = document.querySelector('.header-utility');
     const slot = document.getElementById('sideDrawerBody');
-    if(utility && slot) slot.appendChild(utility);
+    if(utility && slot){
+      const labelBefore = (selector, key)=>{
+        const el = utility.querySelector(selector);
+        if(!el) return;
+        const label = document.createElement('div');
+        label.className = 'side-drawer-section-label';
+        label.setAttribute('data-i18n', key);
+        label.textContent = t(key);
+        utility.insertBefore(label, el);
+      };
+      labelBefore('#langToggle', 'drawerLangLabel');
+      labelBefore('.theme-toggle', 'drawerThemeLabel');
+      labelBefore('#viewToggle', 'drawerViewLabel');
+      labelBefore('#trackOpenBtn', 'drawerOrderLabel');
+      slot.appendChild(utility);
+    }
   }
 
   function openDrawer(){
@@ -3384,7 +3399,7 @@ function updateDrawerAccountSummary(){
     subEl.textContent = currentUser.phone || currentUser.email || '';
   }else{
     nameEl.textContent = t('accountBtnGuest');
-    subEl.textContent = '';
+    subEl.textContent = t('drawerGuestHint');
   }
   if(currentUser && currentUser.avatarUrl){
     img.src = currentUser.avatarUrl;
