@@ -3302,6 +3302,7 @@ function initSideDrawer(){
   const backdrop = document.getElementById('sideDrawerBackdrop');
   const closeBtn = document.getElementById('sideDrawerClose');
   const drawerAccountBtn = document.getElementById('drawerAccountBtn');
+  const drawerAvatarBtn = document.getElementById('drawerAvatarBtn');
   if(!hamburgerBtn || !drawer || !backdrop) return;
 
   if(document.documentElement.getAttribute('data-header-mode') === 'compact'){
@@ -3331,6 +3332,44 @@ function initSideDrawer(){
       document.getElementById('accountOpenBtn').click();
     };
   }
+  if(drawerAvatarBtn){
+    drawerAvatarBtn.onclick = ()=>{
+      if(currentUser){
+        // Already signed in — tapping the avatar picks a new photo directly,
+        // no need to open the full account modal just to change a picture.
+        document.getElementById('accountAvatarFile').click();
+      }else{
+        // Guest — nothing to attach a photo to yet, send them to log in.
+        closeDrawer();
+        document.getElementById('accountOpenBtn').click();
+      }
+    };
+  }
+
+  // Swipe left or right anywhere on the open drawer to close it — a
+  // horizontal drag past a small threshold closes it in either direction,
+  // so it works the same regardless of which edge the drawer is anchored to.
+  let touchStartX = null;
+  let touchStartY = null;
+  drawer.addEventListener('touchstart', (e)=>{
+    if(!e.touches || !e.touches.length) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  drawer.addEventListener('touchend', (e)=>{
+    if(touchStartX === null) return;
+    const touch = (e.changedTouches && e.changedTouches[0]) || null;
+    if(touch){
+      const dx = touch.clientX - touchStartX;
+      const dy = touch.clientY - touchStartY;
+      if(Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)){
+        closeDrawer();
+      }
+    }
+    touchStartX = null;
+    touchStartY = null;
+  }, { passive: true });
+
   updateDrawerAccountSummary();
 }
 
@@ -3436,7 +3475,9 @@ document.getElementById('accountLogoutBtn').onclick = ()=>{
 
 // Avatar upload: resized to a small square client-side (a profile photo never
 // needs to be more than a couple hundred pixels across) before sending, so
-// this stays fast on a phone connection and light on R2 storage.
+// this stays fast on a phone connection and light on R2 storage. Both the
+// account modal's avatar button and the drawer's avatar button trigger the
+// same hidden file input — the change handler below updates both places.
 document.getElementById('accountAvatarBtn').onclick = ()=>{
   document.getElementById('accountAvatarFile').click();
 };

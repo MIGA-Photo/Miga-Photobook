@@ -1168,16 +1168,20 @@
     <button type="button" class="close-x" id="sideDrawerClose" aria-label="إغلاق">×</button>
   </div>
   <div class="side-drawer-account" id="sideDrawerAccount">
-    <button type="button" id="drawerAccountBtn" class="side-drawer-account-btn">
-      <span class="side-drawer-avatar" id="drawerAvatarWrap">
-        <img id="drawerAvatarImg" src="" alt="" style="display:none;">
-        <svg id="drawerAvatarPlaceholder" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"/></svg>
-      </span>
-      <span class="side-drawer-account-text">
-        <span id="drawerAccountName" data-i18n="accountBtnGuest">تسجيل الدخول</span>
-        <span class="side-drawer-account-sub" id="drawerAccountSub"></span>
-      </span>
-    </button>
+    <div class="side-drawer-account-row">
+      <button type="button" id="drawerAvatarBtn" class="side-drawer-avatar" aria-label="تغيير صورة البروفايل">
+        <span id="drawerAvatarWrap">
+          <img id="drawerAvatarImg" src="" alt="" style="display:none;">
+          <svg id="drawerAvatarPlaceholder" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"/></svg>
+        </span>
+      </button>
+      <button type="button" id="drawerAccountBtn" class="side-drawer-account-text-btn">
+        <span class="side-drawer-account-text">
+          <span id="drawerAccountName" data-i18n="accountBtnGuest">تسجيل الدخول</span>
+          <span class="side-drawer-account-sub" id="drawerAccountSub"></span>
+        </span>
+      </button>
+    </div>
   </div>
   <div class="side-drawer-body" id="sideDrawerBody"><!-- .header-utility is moved here by app.js when header mode is compact --></div>
 </aside>

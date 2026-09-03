@@ -308,6 +308,7 @@
   }
   html[data-header-mode="compact"] .hamburger-btn{ display:flex; }
   html[data-header-mode="compact"] .header-utility{ display:none !important; }
+  html[data-header-mode="compact"] .side-drawer-body .header-utility{ display:flex !important; }
   .side-drawer-backdrop{
     position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:98;
     opacity:0; visibility:hidden; transition:opacity .22s ease;
@@ -327,14 +328,16 @@
     padding:16px 18px; border-bottom:1px solid var(--line); font-weight:700; color:var(--paper);
   }
   .side-drawer-account{ padding:14px 18px; border-bottom:1px solid var(--line); }
-  .side-drawer-account-btn{
-    display:flex; align-items:center; gap:12px; width:100%; background:transparent; border:none; padding:0;
-  }
+  .side-drawer-account-row{ display:flex; align-items:center; gap:12px; }
   .side-drawer-avatar{
     width:40px; height:40px; border-radius:50%; border:1.5px solid var(--brass); overflow:hidden;
     display:flex; align-items:center; justify-content:center; color:var(--brass); flex-shrink:0;
+    background:transparent; padding:0;
   }
   .side-drawer-avatar img{ width:100%; height:100%; object-fit:cover; }
+  .side-drawer-account-text-btn{
+    display:flex; align-items:center; flex:1; background:transparent; border:none; padding:0; text-align:start;
+  }
   .side-drawer-account-text{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; text-align:start; }
   .side-drawer-account-sub{ font-size:12px; color:var(--paper-dim); }
   .side-drawer-body{ padding:14px 18px; display:flex; flex-direction:column; gap:4px; }
