@@ -45,12 +45,22 @@
      customers, so it's now checked FIRST and skips the redirect entirely. -->
 <style id="__bootHide">html{visibility:hidden;}</style>
 <script>
+window.__migaDebugT0 = performance.now();
+window.__migaDebugLog = [];
+function __migaDebugMark(label){
+  window.__migaDebugLog.push(label + ': ' + Math.round(performance.now() - window.__migaDebugT0) + 'ms');
+}
+__migaDebugMark('script start');
+document.addEventListener('DOMContentLoaded', function(){ __migaDebugMark('DOMContentLoaded'); });
+</script>
+<script>
 (function(){
   var MY_DESIGN_ID = 'v1';
   var revealed = false;
   function reveal(){
     if(revealed) return;
     revealed = true;
+    __migaDebugMark('reveal() called');
     var s = document.getElementById('__bootHide');
     if(s) s.remove();
   }
@@ -1850,8 +1860,19 @@
 
 <div class="toast" id="toast"></div>
 
+<div id="__migaDebugOverlay" style="position:fixed; bottom:0; inset-inline-start:0; z-index:999999; background:rgba(0,0,0,0.92); color:#0f0; font-family:monospace; font-size:11px; padding:8px; max-height:45vh; overflow:auto; width:100%; box-sizing:border-box; direction:ltr; text-align:left; white-space:pre-wrap;"></div>
+
+<script>__migaDebugMark('before app.js tag');</script>
 <script src="app.js"></script>
 <script>
+__migaDebugMark('after app.js executed');
+window.addEventListener('load', function(){
+  __migaDebugMark('window load event');
+  setTimeout(function(){
+    var el = document.getElementById('__migaDebugOverlay');
+    if(el) el.textContent = 'DEBUG TIMING\n' + window.__migaDebugLog.join('\n');
+  }, 500);
+});
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('/service-worker.js').catch(function(){});
