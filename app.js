@@ -3306,6 +3306,18 @@ function updateAccountButton(){
 }
 
 let pendingAvatarFile = null; // a photo picked before the guest has an account yet
+let pendingAvatarPreviewUrl = null; // cached blob URL for that photo — created once, not on every drawer open
+
+function setPendingAvatarFile(file){
+  if(pendingAvatarPreviewUrl){ URL.revokeObjectURL(pendingAvatarPreviewUrl); }
+  pendingAvatarFile = file;
+  pendingAvatarPreviewUrl = file ? URL.createObjectURL(file) : null;
+}
+function clearPendingAvatarFile(){
+  if(pendingAvatarPreviewUrl){ URL.revokeObjectURL(pendingAvatarPreviewUrl); }
+  pendingAvatarFile = null;
+  pendingAvatarPreviewUrl = null;
+}
 
 function initSideDrawer(){
   const hamburgerBtn = document.getElementById('hamburgerBtn');
@@ -3435,7 +3447,7 @@ function populateDrawerProfileFields(){
   nameInput.value = currentUser ? currentUser.name : '';
   phoneInput.value = currentUser ? (currentUser.phone || '') : '';
 
-  const avatarSrc = (currentUser && currentUser.avatarUrl) || (pendingAvatarFile ? URL.createObjectURL(pendingAvatarFile) : '');
+  const avatarSrc = (currentUser && currentUser.avatarUrl) || pendingAvatarPreviewUrl || '';
   if(avatarSrc){
     img.src = avatarSrc;
     img.style.display = 'block';
@@ -3563,12 +3575,12 @@ document.getElementById('accountAvatarFile').onchange = async (e)=>{
     // Guest — nothing to attach this to yet. Keep it in memory and show a
     // local preview; it uploads automatically once they finish registering
     // (see handleSocialAuthSuccess).
-    pendingAvatarFile = file;
+    setPendingAvatarFile(file);
     populateDrawerProfileFields();
     const modalImg = document.getElementById('accountAvatarImg');
     const modalPlaceholder = document.getElementById('accountAvatarPlaceholder');
     if(modalImg && modalPlaceholder){
-      modalImg.src = URL.createObjectURL(file);
+      modalImg.src = pendingAvatarPreviewUrl;
       modalImg.style.display = 'block';
       modalPlaceholder.style.display = 'none';
     }
@@ -3644,7 +3656,7 @@ function handleSocialAuthSuccess(data, successToastKey){
 async function uploadPendingAvatarIfAny(){
   if(!pendingAvatarFile || !currentUser) return;
   const file = pendingAvatarFile;
-  pendingAvatarFile = null;
+  clearPendingAvatarFile();
   const token = localStorage.getItem('megaPromptAuthToken');
   if(!token || !BACKEND_BASE) return;
   try{
@@ -4805,7 +4817,9 @@ function renderOrdersList(){
  * SheetJS instance already loaded for the performance report, so this adds
  * no extra dependency. Exports every order currently loaded client-side
  * (same `orders` array the list above already renders from). */
-function exportOrdersExcel(){
+async function exportOrdersExcel(){
+  try{ await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', 'xlsxLibScript'); }
+  catch(e){ showToast(t('toastExcelLibFailed')); return; }
   if(typeof XLSX === 'undefined'){ showToast(t('toastExcelLibFailed')); return; }
   if(!orders.length){ showToast(t('ordersEmptyNote')); return; }
   const header = [
@@ -5400,6 +5414,8 @@ function triggerBlobDownload(blob, filename){
   setTimeout(()=> URL.revokeObjectURL(url), 4000);
 }
 async function downloadCategoryArchive(cat){
+  try{ await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js', 'jszipLibScript'); }
+  catch(e){ showToast(t('toastArchiveFailed')); return; }
   if(typeof JSZip === 'undefined'){ showToast(t('toastArchiveFailed')); return; }
   const btn = document.getElementById('archiveBtn-' + cat);
   const items = products.filter(p => p.category === cat && p.image && p.image !== PLACEHOLDER_IMG);
@@ -5426,6 +5442,8 @@ async function downloadCategoryArchive(cat){
   }
 }
 async function downloadAllArchive(){
+  try{ await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js', 'jszipLibScript'); }
+  catch(e){ showToast(t('toastArchiveFailed')); return; }
   if(typeof JSZip === 'undefined'){ showToast(t('toastArchiveFailed')); return; }
   const btn = document.getElementById('archiveAllBtn');
   const cats = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
@@ -5722,7 +5740,9 @@ async function openDailyReport(){
  * (Summary sheet + a per-bucket breakdown sheet) via SheetJS. Degrades
  * gracefully with a toast — never a silent failure or a broken button —
  * if the CDN script hasn't finished loading yet. */
-function exportReportExcel(){
+async function exportReportExcel(){
+  try{ await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', 'xlsxLibScript'); }
+  catch(e){ showToast(t('toastExcelLibFailed')); return; }
   if(typeof XLSX === 'undefined'){ showToast(t('toastExcelLibFailed')); return; }
   if(!lastReportSnapshot) return;
   const { range, buckets, totals, reviews, visitorsLabel, narrative } = lastReportSnapshot;
