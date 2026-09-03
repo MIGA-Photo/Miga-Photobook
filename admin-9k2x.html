@@ -46,8 +46,27 @@
 <style id="__bootHide">html{visibility:hidden;}</style>
 <script>
 (function(){
-  var s = document.getElementById('__bootHide');
-  if(s) s.remove();
+  var revealed = false;
+  function reveal(){
+    if(revealed) return;
+    revealed = true;
+    var s = document.getElementById('__bootHide');
+    if(s) s.remove();
+  }
+  var fallback = setTimeout(reveal, 1200);
+  fetch('https://miga-photobook-api.magdyfarouk380.workers.dev/site-config')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      clearTimeout(fallback);
+      if(data && data.colorTheme && data.colorTheme !== 'black'){
+        document.documentElement.setAttribute('data-accent', data.colorTheme);
+      }
+      if(data && data.headerMode === 'compact'){
+        document.documentElement.setAttribute('data-header-mode', 'compact');
+      }
+      reveal();
+    })
+    .catch(function(){ clearTimeout(fallback); reveal(); });
 })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
