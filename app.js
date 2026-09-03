@@ -325,7 +325,7 @@ const translations = {
     resolutionTitle:'دقة الصور الناتجة', resolutionIntro:'اختار دقة الصورة اللي الذكاء الاصطناعي بينتجها. 4K أعلى دقة وأغلى في التكلفة، و2K أرخص والفرق بينهم تقريبًا مش محسوس على شاشة الموبايل. جرّب الاتنين وقارن بنفسك.', resolutionSaveBtn:'حفظ الدقة', resolution2K:'2K — أرخص (موصى به)', resolution4K:'4K — أعلى دقة (أغلى)', toastResolutionSaved:'تم حفظ دقة الصور',
     colorThemeTitle:'لون الهيدر والخلفية تحت الصور', colorThemeIntro:'اختار درجة اللون الغامق اللي تظهر في شريط الهيدر والمساحة خلف صور المنتجات. باقي ألوان الموقع (الدهبي، الخط) بتفضل زي ما هي في كل الاختيارات.', colorThemeLabel:'لون الهيدر', colorThemeBlack:'أسود (الحالي)', colorThemeBrown:'بني قهوة فخم', colorThemeEmerald:'أخضر زمردي غامق', colorThemeWine:'نبيتي غامق', colorThemeNavy:'كحلي ملكي', colorThemeRed:'أحمر / وردي غامق', colorThemeSaveBtn:'حفظ اللون', toastColorThemeSaved:'تم حفظ اللون — هيظهر للعملاء من زيارتهم الجاية',
     headerModeTitle:'شكل الهيدر', headerModeIntro:'"الشكل الحالي" يعرض كل أزرار الهيدر (اللغة، الوضع الليلي، عرض الموبايل/الكمبيوتر، تتبع الطلب) في شريط دايمًا ظاهر. "قائمة مطوية" بينقلهم جوه قائمة (☰) بتتفتح عند الضغط، وده بيقلل ارتفاع الهيدر.', headerModeLabel:'وضع الهيدر', headerModeClassicOption:'الشكل الحالي', headerModeCompactOption:'قائمة مطوية (☰)', headerModeSaveBtn:'حفظ شكل الهيدر', toastHeaderModeSaved:'تم حفظ شكل الهيدر — هيظهر للعملاء من زيارتهم الجاية',
-    menuTitle:'القائمة', drawerLangLabel:'اللغة', drawerThemeLabel:'المظهر', drawerViewLabel:'طريقة العرض', drawerOrderLabel:'الطلبات', drawerGuestHint:'لحفظ اسمك وتليفونك وصورتك',
+    menuTitle:'القائمة', drawerLangLabel:'اللغة', drawerThemeLabel:'المظهر', drawerViewLabel:'طريقة العرض', drawerOrderLabel:'الطلبات', drawerGuestHint:'لحفظ اسمك وتليفونك وصورتك', drawerHaveAccount:'عندك حساب؟ سجّل دخول',
     toastPassChanged:'تم تغيير كلمة المرور بنجاح', toastPassMismatch:'كلمة المرور الجديدة وتأكيدها غير متطابقين', toastPassTooShort:'كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل', toastCurrentPassWrong:'كلمة المرور الحالية غير صحيحة', toastFillPassFields:'يرجى إدخال كل الحقول',
     toastProductAdded:'تم إضافة المنتج بنجاح',
     uploadingImage:'جاري رفع الصورة...', toastImageUploadFailed:'تعذّر رفع الصورة، تأكد من اتصالك وحاول تاني',
@@ -620,7 +620,7 @@ const translations = {
     resolutionTitle:'Output image resolution', resolutionIntro:'Choose the resolution the AI generates. 4K is higher detail and costs more per image; 2K is cheaper and the difference is essentially invisible on a phone screen. Try both and compare.', resolutionSaveBtn:'Save resolution', resolution2K:'2K — cheaper (recommended)', resolution4K:'4K — highest detail (pricier)', toastResolutionSaved:'Output resolution saved',
     colorThemeTitle:'Header and image-background color', colorThemeIntro:'Choose the dark shade used for the header bar and the space behind product images. The rest of the site colors (gold, text) stay the same across every option.', colorThemeLabel:'Header color', colorThemeBlack:'Black (current)', colorThemeBrown:'Warm coffee brown', colorThemeEmerald:'Deep emerald green', colorThemeWine:'Deep wine', colorThemeNavy:'Royal navy', colorThemeRed:'Deep red / rose', colorThemeSaveBtn:'Save color', toastColorThemeSaved:'Color saved — customers will see it on their next visit',
     headerModeTitle:'Header layout', headerModeIntro:'"Current layout" shows every header button (language, dark mode, mobile/desktop preview, track order) in an always-visible strip. "Collapsed menu" moves them into a (☰) menu that opens on tap, which shortens the header.', headerModeLabel:'Header layout', headerModeClassicOption:'Current layout', headerModeCompactOption:'Collapsed menu (☰)', headerModeSaveBtn:'Save header layout', toastHeaderModeSaved:'Header layout saved — customers will see it on their next visit',
-    menuTitle:'Menu', drawerLangLabel:'Language', drawerThemeLabel:'Appearance', drawerViewLabel:'View mode', drawerOrderLabel:'Orders', drawerGuestHint:'To save your name, phone, and photo',
+    menuTitle:'Menu', drawerLangLabel:'Language', drawerThemeLabel:'Appearance', drawerViewLabel:'View mode', drawerOrderLabel:'Orders', drawerGuestHint:'To save your name, phone, and photo', drawerHaveAccount:'Already have an account? Log in',
     toastPassChanged:'Password changed successfully', toastPassMismatch:'New password and confirmation do not match', toastPassTooShort:'New password must be at least 8 characters', toastCurrentPassWrong:'Current password is incorrect', toastFillPassFields:'Please fill in all fields',
     toastProductAdded:'Product added successfully',
     uploadingImage:'Uploading image...', toastImageUploadFailed:'Could not upload the image, check your connection and try again',
@@ -744,6 +744,9 @@ function applyLanguage(lang){
   document.querySelectorAll('#langToggle button').forEach(b=>{
     b.classList.toggle('active', b.dataset.lang === currentLang);
   });
+  document.querySelectorAll('#drawerLangPill button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.proxyLang === currentLang);
+  });
   refreshThemeToggleLabels();
   updateAccountButton();
 
@@ -775,6 +778,9 @@ function applyViewMode(mode){
   document.querySelectorAll('#viewToggle button').forEach(b=>{
     b.classList.toggle('active', b.dataset.view === currentViewMode);
   });
+  document.querySelectorAll('#drawerViewPill button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.proxyView === currentViewMode);
+  });
   saveUiPrefs();
 }
 
@@ -792,6 +798,11 @@ function refreshThemeToggleLabels(){
     btn.title = t('themeToggleTitle');
     btn.setAttribute('aria-pressed', String(isNight));
   });
+  const drawerSwitch = document.getElementById('drawerThemeSwitch');
+  if(drawerSwitch){
+    drawerSwitch.classList.toggle('is-night', isNight);
+    drawerSwitch.setAttribute('aria-pressed', String(isNight));
+  }
 }
 function applyTheme(theme){
   currentTheme = (theme === 'light') ? 'light' : 'dark';
@@ -3293,40 +3304,28 @@ function updateAccountButton(){
   if(!btn) return;
   const personIcon = '<span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"/></svg></span>';
   btn.innerHTML = personIcon + `<span>${currentUser ? escapeHtml(currentUser.name) : t('accountBtnGuest')}</span>`;
-  updateDrawerAccountSummary();
+  populateDrawerProfileFields();
 }
+
+let pendingAvatarFile = null; // a photo picked before the guest has an account yet
 
 function initSideDrawer(){
   const hamburgerBtn = document.getElementById('hamburgerBtn');
   const drawer = document.getElementById('sideDrawer');
   const backdrop = document.getElementById('sideDrawerBackdrop');
   const closeBtn = document.getElementById('sideDrawerClose');
-  const drawerAccountBtn = document.getElementById('drawerAccountBtn');
   const drawerAvatarBtn = document.getElementById('drawerAvatarBtn');
+  const drawerLoginLink = document.getElementById('drawerLoginLink');
+  const drawerLogoutLink = document.getElementById('drawerLogoutLink');
+  const drawerSaveBtn = document.getElementById('drawerSaveBtn');
+  const drawerLangPill = document.getElementById('drawerLangPill');
+  const drawerThemeSwitch = document.getElementById('drawerThemeSwitch');
+  const drawerViewPill = document.getElementById('drawerViewPill');
+  const drawerTrackBtn = document.getElementById('drawerTrackBtn');
   if(!hamburgerBtn || !drawer || !backdrop) return;
 
-  if(document.documentElement.getAttribute('data-header-mode') === 'compact'){
-    const utility = document.querySelector('.header-utility');
-    const slot = document.getElementById('sideDrawerBody');
-    if(utility && slot){
-      const labelBefore = (selector, key)=>{
-        const el = utility.querySelector(selector);
-        if(!el) return;
-        const label = document.createElement('div');
-        label.className = 'side-drawer-section-label';
-        label.setAttribute('data-i18n', key);
-        label.textContent = t(key);
-        utility.insertBefore(label, el);
-      };
-      labelBefore('#langToggle', 'drawerLangLabel');
-      labelBefore('.theme-toggle', 'drawerThemeLabel');
-      labelBefore('#viewToggle', 'drawerViewLabel');
-      labelBefore('#trackOpenBtn', 'drawerOrderLabel');
-      slot.appendChild(utility);
-    }
-  }
-
   function openDrawer(){
+    populateDrawerProfileFields();
     drawer.classList.add('open');
     backdrop.classList.add('open');
     drawer.setAttribute('aria-hidden', 'false');
@@ -3341,23 +3340,67 @@ function initSideDrawer(){
   hamburgerBtn.onclick = openDrawer;
   backdrop.onclick = closeDrawer;
   if(closeBtn) closeBtn.onclick = closeDrawer;
-  if(drawerAccountBtn){
-    drawerAccountBtn.onclick = ()=>{
-      closeDrawer();
-      document.getElementById('accountOpenBtn').click();
-    };
-  }
+
   if(drawerAvatarBtn){
     drawerAvatarBtn.onclick = ()=>{
+      // Works the same whether signed in or a guest — logged-in taps upload
+      // right away, guest taps just preview locally until they finish
+      // creating an account (see the shared file-input handler below).
+      document.getElementById('accountAvatarFile').click();
+    };
+  }
+  if(drawerLoginLink){
+    drawerLoginLink.onclick = ()=>{
+      closeDrawer();
+      document.getElementById('accountOpenBtn').click();
+      document.getElementById('tabLoginBtn').click();
+    };
+  }
+  if(drawerLogoutLink){
+    drawerLogoutLink.onclick = ()=>{
+      document.getElementById('accountLogoutBtn').click();
+      closeDrawer();
+    };
+  }
+  if(drawerSaveBtn){
+    drawerSaveBtn.onclick = async ()=>{
+      const name = document.getElementById('drawerNameInput').value.trim();
+      const phone = document.getElementById('drawerPhoneInput').value.trim();
+      if(!name){ showToast(t('toastFillFields')); return; }
       if(currentUser){
-        // Already signed in — tapping the avatar picks a new photo directly,
-        // no need to open the full account modal just to change a picture.
-        document.getElementById('accountAvatarFile').click();
+        await saveProfileDetails(name, phone);
       }else{
-        // Guest — nothing to attach a photo to yet, send them to log in.
+        // No account yet — hand the name/phone off to the registration form
+        // and open it, so the guest only has to add an email + password to
+        // finish. Any photo they already picked uploads automatically right
+        // after the account is created (see handleSocialAuthSuccess).
+        document.getElementById('registerName').value = name;
+        document.getElementById('registerPhone').value = phone;
         closeDrawer();
         document.getElementById('accountOpenBtn').click();
+        document.getElementById('tabRegisterBtn').click();
       }
+    };
+  }
+  if(drawerLangPill){
+    drawerLangPill.addEventListener('click', (e)=>{
+      const btn = e.target.closest('button[data-proxy-lang]');
+      if(btn) applyLanguage(btn.dataset.proxyLang);
+    });
+  }
+  if(drawerThemeSwitch){
+    drawerThemeSwitch.onclick = toggleTheme;
+  }
+  if(drawerViewPill){
+    drawerViewPill.addEventListener('click', (e)=>{
+      const btn = e.target.closest('button[data-proxy-view]');
+      if(btn) applyViewMode(btn.dataset.proxyView);
+    });
+  }
+  if(drawerTrackBtn){
+    drawerTrackBtn.onclick = ()=>{
+      closeDrawer();
+      document.getElementById('trackOpenBtn').click();
     };
   }
 
@@ -3385,29 +3428,53 @@ function initSideDrawer(){
     touchStartY = null;
   }, { passive: true });
 
-  updateDrawerAccountSummary();
+  populateDrawerProfileFields();
 }
 
-function updateDrawerAccountSummary(){
-  const nameEl = document.getElementById('drawerAccountName');
-  const subEl = document.getElementById('drawerAccountSub');
+function populateDrawerProfileFields(){
+  const nameInput = document.getElementById('drawerNameInput');
+  const phoneInput = document.getElementById('drawerPhoneInput');
   const img = document.getElementById('drawerAvatarImg');
   const placeholder = document.getElementById('drawerAvatarPlaceholder');
-  if(!nameEl || !subEl || !img || !placeholder) return;
-  if(currentUser){
-    nameEl.textContent = currentUser.name;
-    subEl.textContent = currentUser.phone || currentUser.email || '';
-  }else{
-    nameEl.textContent = t('accountBtnGuest');
-    subEl.textContent = t('drawerGuestHint');
-  }
-  if(currentUser && currentUser.avatarUrl){
-    img.src = currentUser.avatarUrl;
+  const loginLink = document.getElementById('drawerLoginLink');
+  const logoutLink = document.getElementById('drawerLogoutLink');
+  if(!nameInput || !phoneInput || !img || !placeholder) return;
+
+  nameInput.value = currentUser ? currentUser.name : '';
+  phoneInput.value = currentUser ? (currentUser.phone || '') : '';
+
+  const avatarSrc = (currentUser && currentUser.avatarUrl) || (pendingAvatarFile ? URL.createObjectURL(pendingAvatarFile) : '');
+  if(avatarSrc){
+    img.src = avatarSrc;
     img.style.display = 'block';
     placeholder.style.display = 'none';
   }else{
     img.style.display = 'none';
-    placeholder.style.display = 'block';
+    placeholder.style.display = 'flex';
+  }
+
+  if(loginLink) loginLink.style.display = currentUser ? 'none' : 'block';
+  if(logoutLink) logoutLink.style.display = currentUser ? 'block' : 'none';
+}
+
+// Shared by the drawer's save button and the account modal's save button —
+// updates the real account (name + phone) for a signed-in customer.
+async function saveProfileDetails(name, phone){
+  const token = localStorage.getItem('megaPromptAuthToken');
+  if(!token || !BACKEND_BASE) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/account/update-profile`, {
+      method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ name, phone })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){ showToast(data.error || t('toastAdminServerError')); return; }
+    currentUser.name = name;
+    currentUser.phone = phone;
+    updateAccountButton();
+    showToast(t('toastProfileSaved'));
+  }catch(e){
+    showToast(t('toastAdminServerError'));
   }
 }
 
@@ -3499,7 +3566,22 @@ document.getElementById('accountAvatarBtn').onclick = ()=>{
 document.getElementById('accountAvatarFile').onchange = async (e)=>{
   const file = e.target.files && e.target.files[0];
   e.target.value = '';
-  if(!file || !currentUser) return;
+  if(!file) return;
+  if(!currentUser){
+    // Guest — nothing to attach this to yet. Keep it in memory and show a
+    // local preview; it uploads automatically once they finish registering
+    // (see handleSocialAuthSuccess).
+    pendingAvatarFile = file;
+    populateDrawerProfileFields();
+    const modalImg = document.getElementById('accountAvatarImg');
+    const modalPlaceholder = document.getElementById('accountAvatarPlaceholder');
+    if(modalImg && modalPlaceholder){
+      modalImg.src = URL.createObjectURL(file);
+      modalImg.style.display = 'block';
+      modalPlaceholder.style.display = 'none';
+    }
+    return;
+  }
   const token = localStorage.getItem('megaPromptAuthToken');
   if(!token || !BACKEND_BASE) return;
   try{
@@ -3515,7 +3597,7 @@ document.getElementById('accountAvatarFile').onchange = async (e)=>{
     document.getElementById('accountAvatarImg').src = data.avatarUrl;
     document.getElementById('accountAvatarImg').style.display = 'block';
     document.getElementById('accountAvatarPlaceholder').style.display = 'none';
-    updateDrawerAccountSummary();
+    populateDrawerProfileFields();
   }catch(e){ showToast(t('toastAdminServerError')); }
 };
 
@@ -3545,20 +3627,7 @@ document.getElementById('saveAccountProfileBtn').onclick = async ()=>{
   const name = document.getElementById('accountProfileName').value.trim();
   const phone = document.getElementById('accountProfilePhone').value.trim();
   if(!name){ showToast(t('toastFillFields')); return; }
-  const token = localStorage.getItem('megaPromptAuthToken');
-  if(!token || !BACKEND_BASE) return;
-  try{
-    const res = await fetch(`${BACKEND_BASE}/account/update-profile`, {
-      method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` },
-      body: JSON.stringify({ name, phone })
-    });
-    const data = await res.json().catch(()=>({}));
-    if(!res.ok){ showToast(data.error || t('toastAdminServerError')); return; }
-    currentUser.name = name;
-    currentUser.phone = phone;
-    updateAccountButton();
-    showToast(t('toastProfileSaved'));
-  }catch(e){ showToast(t('toastAdminServerError')); }
+  await saveProfileDetails(name, phone);
 };
 
 // ---------- Social login (Google / Apple / Facebook) ----------
@@ -3574,6 +3643,32 @@ function handleSocialAuthSuccess(data, successToastKey){
   showToast(t(successToastKey));
   checkBiometricAvailability();
   logVisitAsLoggedInUser();
+  uploadPendingAvatarIfAny();
+}
+
+// If the person picked a profile photo while still a guest (in the drawer
+// or the register form), it was only kept in memory — send it now that a
+// real account (and auth token) exists to attach it to.
+async function uploadPendingAvatarIfAny(){
+  if(!pendingAvatarFile || !currentUser) return;
+  const file = pendingAvatarFile;
+  pendingAvatarFile = null;
+  const token = localStorage.getItem('megaPromptAuthToken');
+  if(!token || !BACKEND_BASE) return;
+  try{
+    const resizedBlob = await resizeImageToBlob(file, 320, 0.85);
+    const form = new FormData();
+    form.append('avatar', resizedBlob, 'avatar.jpg');
+    const res = await fetch(`${BACKEND_BASE}/account/upload-avatar`, {
+      method:'POST', headers:{ 'Authorization': `Bearer ${token}` }, body: form
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok || !data.avatarUrl) return;
+    currentUser.avatarUrl = data.avatarUrl;
+    populateDrawerProfileFields();
+    const modalImg = document.getElementById('accountAvatarImg');
+    if(modalImg){ modalImg.src = data.avatarUrl; }
+  }catch(e){ /* the account itself is created fine either way; the photo can be re-added later */ }
 }
 function loadScriptOnce(src, id){
   return new Promise((resolve, reject)=>{

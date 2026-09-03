@@ -1167,23 +1167,48 @@
     <span data-i18n="menuTitle">القائمة</span>
     <button type="button" class="close-x" id="sideDrawerClose" aria-label="إغلاق">×</button>
   </div>
-  <div class="side-drawer-account" id="sideDrawerAccount">
-    <div class="side-drawer-account-row">
-      <button type="button" id="drawerAvatarBtn" class="side-drawer-avatar" aria-label="تغيير صورة البروفايل">
-        <span id="drawerAvatarWrap">
-          <img id="drawerAvatarImg" src="" alt="" style="display:none;">
-          <svg id="drawerAvatarPlaceholder" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"/></svg>
-        </span>
-      </button>
-      <button type="button" id="drawerAccountBtn" class="side-drawer-account-text-btn">
-        <span class="side-drawer-account-text">
-          <span id="drawerAccountName" data-i18n="accountBtnGuest">تسجيل الدخول</span>
-          <span class="side-drawer-account-sub" id="drawerAccountSub"></span>
-        </span>
+
+  <div class="side-drawer-profile">
+    <button type="button" id="drawerAvatarBtn" class="drawer-avatar" aria-label="تغيير صورة البروفايل">
+      <img id="drawerAvatarImg" src="" alt="" style="display:none;">
+      <svg id="drawerAvatarPlaceholder" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"/></svg>
+      <span class="drawer-avatar-edit-badge" aria-hidden="true">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 7h3l1.5-2h7L17 7h3v12H4z"/><circle cx="12" cy="13" r="3.2"/></svg>
+      </span>
+    </button>
+    <input type="text" id="drawerNameInput" class="drawer-input" data-i18n-ph="nameLabel" placeholder="الاسم">
+    <input type="tel" id="drawerPhoneInput" class="drawer-input" dir="ltr" data-i18n-ph="phoneLabel" placeholder="رقم التليفون">
+    <button type="button" class="btn-primary" id="drawerSaveBtn" style="width:100%;" data-i18n="saveProfileBtn">حفظ البيانات</button>
+    <button type="button" class="drawer-text-link" id="drawerLoginLink" data-i18n="drawerHaveAccount">عندك حساب؟ سجّل دخول</button>
+    <button type="button" class="drawer-text-link" id="drawerLogoutLink" style="display:none;" data-i18n="logoutBtn">تسجيل الخروج</button>
+  </div>
+
+  <div class="side-drawer-body" id="sideDrawerBody">
+    <div class="side-drawer-row">
+      <span class="side-drawer-row-label" data-i18n="drawerLangLabel">اللغة</span>
+      <div class="side-drawer-pill" id="drawerLangPill">
+        <button type="button" data-proxy-lang="ar" class="active">عربي</button>
+        <button type="button" data-proxy-lang="en">English</button>
+      </div>
+    </div>
+    <div class="side-drawer-row">
+      <span class="side-drawer-row-label" data-i18n="drawerThemeLabel">المظهر</span>
+      <button type="button" class="drawer-switch" id="drawerThemeSwitch" aria-pressed="true">
+        <span class="drawer-switch-knob"></span>
       </button>
     </div>
+    <div class="side-drawer-row">
+      <span class="side-drawer-row-label" data-i18n="drawerViewLabel">طريقة العرض</span>
+      <div class="side-drawer-pill" id="drawerViewPill">
+        <button type="button" data-proxy-view="desktop" class="active" data-i18n="viewDesktopLabel">كمبيوتر</button>
+        <button type="button" data-proxy-view="mobile" data-i18n="viewMobileLabel">موبايل</button>
+      </div>
+    </div>
+    <button type="button" class="drawer-link-row" id="drawerTrackBtn">
+      <span data-i18n="trackBtn">تتبع طلبي</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+    </button>
   </div>
-  <div class="side-drawer-body" id="sideDrawerBody"><!-- .header-utility is moved here by app.js when header mode is compact --></div>
 </aside>
 
 <div class="modal-bg" id="accountModalBg">

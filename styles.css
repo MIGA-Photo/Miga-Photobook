@@ -308,7 +308,6 @@
   }
   html[data-header-mode="compact"] .hamburger-btn{ display:flex; }
   html[data-header-mode="compact"] .header-utility{ display:none !important; }
-  html[data-header-mode="compact"] .side-drawer-body .header-utility{ display:flex !important; }
   .side-drawer-backdrop{
     position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:98;
     opacity:0; visibility:hidden; transition:opacity .22s ease;
@@ -318,7 +317,7 @@
     position:fixed; top:0; bottom:0; inset-inline-end:0; width:300px; max-width:86vw;
     background:var(--header-bg); border-inline-start:1px solid var(--line); z-index:99;
     transform:translateX(100%); transition:transform .26s ease;
-    display:flex; flex-direction:column; overflow-y:auto;
+    display:flex; flex-direction:column; overflow-y:auto; overflow-x:hidden;
   }
   html[dir="rtl"] .side-drawer{ transform:translateX(-100%); }
   .side-drawer.open{ transform:translateX(0); }
@@ -327,34 +326,68 @@
     display:flex; align-items:center; justify-content:space-between;
     padding:16px 18px; border-bottom:1px solid var(--line); font-weight:700; color:var(--paper);
   }
-  .side-drawer-account{ padding:14px 18px; border-bottom:1px solid var(--line); }
-  .side-drawer-account-row{ display:flex; align-items:center; gap:12px; }
-  .side-drawer-avatar{
-    width:40px; height:40px; border-radius:50%; border:1.5px solid var(--brass); overflow:hidden;
-    display:flex; align-items:center; justify-content:center; color:var(--brass); flex-shrink:0;
-    background:transparent; padding:0;
+  .side-drawer-head .close-x{ background:transparent; border:none; color:var(--paper); font-size:22px; line-height:1; padding:4px 8px; }
+
+  /* ---- Profile section: always visible, works for guests and signed-in
+     customers alike. Purpose-built for this 300px column — nothing here is
+     shared with the wide desktop header bar, so there's nothing else to
+     conflict with. ---- */
+  .side-drawer-profile{
+    display:flex; flex-direction:column; align-items:stretch; gap:10px;
+    padding:20px 18px; border-bottom:1px solid var(--line);
   }
-  .side-drawer-avatar img{ width:100%; height:100%; object-fit:cover; }
-  .side-drawer-account-text-btn{
-    display:flex; align-items:center; flex:1; background:transparent; border:none; padding:0; text-align:start;
+  .drawer-avatar{
+    position:relative; width:64px; height:64px; border-radius:50%;
+    border:1.5px solid var(--brass); background:var(--ink-2); overflow:visible;
+    display:flex; align-items:center; justify-content:center; color:var(--brass);
+    padding:0; align-self:center; margin-bottom:4px; flex-shrink:0;
   }
-  .side-drawer-account-text{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; text-align:start; }
-  .side-drawer-account-sub{ font-size:12px; color:var(--paper-dim); }
-  .side-drawer-body{ padding:10px 18px 18px; display:flex; flex-direction:column; }
-  .side-drawer-section-label{
-    font-size:11px; color:var(--paper-dim); text-transform:uppercase; letter-spacing:0.5px;
-    margin:16px 0 8px;
+  .drawer-avatar img{ width:100%; height:100%; object-fit:cover; border-radius:50%; }
+  .drawer-avatar-edit-badge{
+    position:absolute; inset-inline-end:-2px; bottom:-2px; width:22px; height:22px; border-radius:50%;
+    background:var(--brass); color:var(--ink); display:flex; align-items:center; justify-content:center;
+    border:2px solid var(--header-bg);
   }
-  .side-drawer-body .header-utility{
-    flex-direction:column; align-items:stretch; max-width:none; margin:0; padding:0;
-    border-bottom:none; gap:14px;
+  .drawer-input{
+    width:100%; box-sizing:border-box; background:var(--ink); border:1px solid var(--line);
+    border-radius:10px; padding:11px 14px; color:var(--paper); font-size:14px; font-family:inherit;
   }
-  .side-drawer-body .util-link{
-    display:block; text-align:start; color:var(--paper); text-decoration:none;
+  .drawer-input:focus{ outline:none; border-color:var(--brass); }
+  .drawer-input::placeholder{ color:var(--paper-dim); }
+  .drawer-text-link{
+    background:transparent; border:none; color:var(--brass); font-size:13px; text-align:center;
+    padding:4px; width:100%;
+  }
+
+  /* ---- Settings rows: language / appearance / view mode / orders ---- */
+  .side-drawer-body{ padding:14px 18px 22px; display:flex; flex-direction:column; gap:16px; }
+  .side-drawer-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .side-drawer-row-label{ font-size:14px; color:var(--paper); }
+  .drawer-pill{
+    display:flex; border:1px solid var(--line); border-radius:9px; overflow:hidden; flex-shrink:0;
+  }
+  .drawer-pill button{
+    background:transparent; color:var(--paper-dim); border:none; padding:7px 12px; font-size:12px;
+    white-space:nowrap;
+  }
+  .drawer-pill button.active{ background:var(--brass); color:var(--ink); font-weight:700; }
+  .drawer-switch{
+    position:relative; width:46px; height:26px; border-radius:99px; background:var(--ink);
+    border:1px solid var(--line); padding:0; flex-shrink:0;
+  }
+  .drawer-switch-knob{
+    position:absolute; top:2px; inset-inline-start:2px; width:20px; height:20px; border-radius:50%;
+    background:var(--paper-dim); transition:inset-inline-start .18s ease, background .18s ease;
+  }
+  .drawer-switch.is-night .drawer-switch-knob{ inset-inline-start:22px; background:var(--brass); }
+  .drawer-link-row{
+    display:flex; align-items:center; justify-content:space-between; width:100%;
     background:var(--ink); border:1px solid var(--line); border-radius:10px;
-    padding:12px 14px; font-size:14px;
+    padding:12px 14px; font-size:14px; color:var(--paper);
   }
-  .side-drawer-body .util-link:hover{ border-color:var(--brass); color:var(--brass); }
+  .drawer-link-row:hover{ border-color:var(--brass); color:var(--brass); }
+  .drawer-link-row svg{ flex-shrink:0; }
+  html[dir="rtl"] .drawer-link-row svg{ transform:scaleX(-1); }
   .logo{
     font-size:20px; letter-spacing:0.5px; color:var(--paper); font-weight:600;
     display:flex; align-items:center; gap:10px;
