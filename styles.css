@@ -321,6 +321,7 @@
   }
   html[dir="rtl"] .side-drawer{ transform:translateX(-100%); }
   .side-drawer.open{ transform:translateX(0); }
+  html[dir="rtl"] .side-drawer.open{ transform:translateX(0); }
   .side-drawer-head{
     display:flex; align-items:center; justify-content:space-between;
     padding:16px 18px; border-bottom:1px solid var(--line); font-weight:700; color:var(--paper);
