@@ -6002,10 +6002,10 @@ function initSliderInstance(rootId){
   function move(e){ if(!state.dragging) return; setPos(e.touches ? e.touches[0].clientX : e.clientX); }
   function end(){ state.dragging = false; }
 
-  els.handle.addEventListener('mousedown', start);
+  els.card.addEventListener('mousedown', start);
   window.addEventListener('mousemove', move);
   window.addEventListener('mouseup', end);
-  els.handle.addEventListener('touchstart', start, {passive:true});
+  els.card.addEventListener('touchstart', start, {passive:true});
   window.addEventListener('touchmove', move, {passive:true});
   window.addEventListener('touchend', end);
   if(els.prev) els.prev.onclick = ()=> renderPair(state.current-1);
