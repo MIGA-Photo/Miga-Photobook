@@ -744,9 +744,8 @@ function applyLanguage(lang){
   document.querySelectorAll('#langToggle button').forEach(b=>{
     b.classList.toggle('active', b.dataset.lang === currentLang);
   });
-  document.querySelectorAll('#drawerLangPill button').forEach(b=>{
-    b.classList.toggle('active', b.dataset.proxyLang === currentLang);
-  });
+  const drawerLangSelect = document.getElementById('drawerLangSelect');
+  if(drawerLangSelect) drawerLangSelect.value = currentLang;
   refreshThemeToggleLabels();
   updateAccountButton();
 
@@ -778,9 +777,8 @@ function applyViewMode(mode){
   document.querySelectorAll('#viewToggle button').forEach(b=>{
     b.classList.toggle('active', b.dataset.view === currentViewMode);
   });
-  document.querySelectorAll('#drawerViewPill button').forEach(b=>{
-    b.classList.toggle('active', b.dataset.proxyView === currentViewMode);
-  });
+  const drawerViewSelect = document.getElementById('drawerViewSelect');
+  if(drawerViewSelect) drawerViewSelect.value = currentViewMode;
   saveUiPrefs();
 }
 
@@ -3318,9 +3316,9 @@ function initSideDrawer(){
   const drawerLoginLink = document.getElementById('drawerLoginLink');
   const drawerLogoutLink = document.getElementById('drawerLogoutLink');
   const drawerSaveBtn = document.getElementById('drawerSaveBtn');
-  const drawerLangPill = document.getElementById('drawerLangPill');
+  const drawerLangSelect = document.getElementById('drawerLangSelect');
   const drawerThemeSwitch = document.getElementById('drawerThemeSwitch');
-  const drawerViewPill = document.getElementById('drawerViewPill');
+  const drawerViewSelect = document.getElementById('drawerViewSelect');
   const drawerTrackBtn = document.getElementById('drawerTrackBtn');
   if(!hamburgerBtn || !drawer || !backdrop) return;
 
@@ -3382,20 +3380,14 @@ function initSideDrawer(){
       }
     };
   }
-  if(drawerLangPill){
-    drawerLangPill.addEventListener('click', (e)=>{
-      const btn = e.target.closest('button[data-proxy-lang]');
-      if(btn) applyLanguage(btn.dataset.proxyLang);
-    });
+  if(drawerLangSelect){
+    drawerLangSelect.addEventListener('change', ()=>{ applyLanguage(drawerLangSelect.value); });
   }
   if(drawerThemeSwitch){
     drawerThemeSwitch.onclick = toggleTheme;
   }
-  if(drawerViewPill){
-    drawerViewPill.addEventListener('click', (e)=>{
-      const btn = e.target.closest('button[data-proxy-view]');
-      if(btn) applyViewMode(btn.dataset.proxyView);
-    });
+  if(drawerViewSelect){
+    drawerViewSelect.addEventListener('change', ()=>{ applyViewMode(drawerViewSelect.value); });
   }
   if(drawerTrackBtn){
     drawerTrackBtn.onclick = ()=>{

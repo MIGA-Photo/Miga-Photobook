@@ -1164,7 +1164,20 @@
 <div class="side-drawer-backdrop" id="sideDrawerBackdrop"></div>
 <aside class="side-drawer" id="sideDrawer" aria-hidden="true">
   <div class="side-drawer-head">
-    <span data-i18n="menuTitle">القائمة</span>
+    <div class="side-drawer-logo">
+      <svg class="logo-mark" viewBox="0 0 48 48" width="28" height="28" xmlns="http://www.w3.org/2000/svg">
+        <!-- open book -->
+        <path d="M24 14 C19 10 10 9 5 11 V37 C10 35 19 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M24 14 C29 10 38 9 43 11 V37 C38 35 29 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M24 14 V40" stroke="var(--brass)" stroke-width="1.5" opacity="0.5"/>
+        <!-- camera resting on the book -->
+        <rect x="14" y="18" width="20" height="14" rx="3" fill="var(--ink)" stroke="var(--brass)" stroke-width="2"/>
+        <rect x="20" y="14" width="8" height="5" rx="1.5" fill="var(--ink)" stroke="var(--brass)" stroke-width="2"/>
+        <circle cx="24" cy="25" r="4.5" fill="none" stroke="var(--brass)" stroke-width="2"/>
+        <circle cx="24" cy="25" r="1.6" fill="var(--brass)"/>
+      </svg>
+      <span>Miga<span class="logo-accent">-Photobook</span></span>
+    </div>
     <button type="button" class="close-x" id="sideDrawerClose" aria-label="إغلاق">×</button>
   </div>
 
@@ -1186,10 +1199,10 @@
   <div class="side-drawer-body" id="sideDrawerBody">
     <div class="side-drawer-row">
       <span class="side-drawer-row-label" data-i18n="drawerLangLabel">اللغة</span>
-      <div class="side-drawer-pill" id="drawerLangPill">
-        <button type="button" data-proxy-lang="ar" class="active">عربي</button>
-        <button type="button" data-proxy-lang="en">English</button>
-      </div>
+      <select class="drawer-select" id="drawerLangSelect">
+        <option value="ar">عربي</option>
+        <option value="en">English</option>
+      </select>
     </div>
     <div class="side-drawer-row">
       <span class="side-drawer-row-label" data-i18n="drawerThemeLabel">المظهر</span>
@@ -1199,16 +1212,29 @@
     </div>
     <div class="side-drawer-row">
       <span class="side-drawer-row-label" data-i18n="drawerViewLabel">طريقة العرض</span>
-      <div class="side-drawer-pill" id="drawerViewPill">
-        <button type="button" data-proxy-view="desktop" class="active" data-i18n="viewDesktopLabel">كمبيوتر</button>
-        <button type="button" data-proxy-view="mobile" data-i18n="viewMobileLabel">موبايل</button>
-      </div>
+      <select class="drawer-select" id="drawerViewSelect">
+        <option value="desktop" data-i18n="viewDesktopLabel">كمبيوتر</option>
+        <option value="mobile" data-i18n="viewMobileLabel">موبايل</option>
+      </select>
     </div>
     <button type="button" class="drawer-link-row" id="drawerTrackBtn">
       <span data-i18n="trackBtn">تتبع طلبي</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
     </button>
   </div>
+
+  <a href="https://miga-photobook.com/" class="side-drawer-footer">
+    <svg class="logo-mark" viewBox="0 0 48 48" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+      <path d="M24 14 C19 10 10 9 5 11 V37 C10 35 19 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M24 14 C29 10 38 9 43 11 V37 C38 35 29 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M24 14 V40" stroke="var(--brass)" stroke-width="1.5" opacity="0.5"/>
+      <rect x="14" y="18" width="20" height="14" rx="3" fill="var(--ink)" stroke="var(--brass)" stroke-width="2"/>
+      <rect x="20" y="14" width="8" height="5" rx="1.5" fill="var(--ink)" stroke="var(--brass)" stroke-width="2"/>
+      <circle cx="24" cy="25" r="4.5" fill="none" stroke="var(--brass)" stroke-width="2"/>
+      <circle cx="24" cy="25" r="1.6" fill="var(--brass)"/>
+    </svg>
+    <span>miga-photobook.com</span>
+  </a>
 </aside>
 
 <div class="modal-bg" id="accountModalBg">
