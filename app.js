@@ -89,7 +89,7 @@ const translations = {
     orDivider:'أو بالبريد الإلكتروني', toastSocialNotConfigured:'تسجيل الدخول بهذه الطريقة غير مُفعّل بعد',
     biometricLoginBtn:'الدخول ببصمة الوجه / الإصبع', registerBiometricBtn:'تفعيل الدخول ببصمة الوجه/الإصبع لهذا الجهاز',
     toastBiometricRegistered:'تم تفعيل الدخول ببصمة الوجه/الإصبع لهذا الجهاز',
-    emailLabel:'البريد الإلكتروني', passwordLabel:'كلمة المرور', nameLabel:'الاسم',
+    emailLabel:'البريد الإلكتروني', passwordLabel:'كلمة المرور', nameLabel:'الاسم', phoneLabel:'رقم التليفون', saveProfileBtn:'حفظ البيانات', toastProfileSaved:'تم حفظ بياناتك',
     loginBtn:'دخول', registerBtn:'إنشاء الحساب', logoutBtn:'تسجيل الخروج',
     accountWelcome:'أهلاً بيك!',
     writeReviewBtn:'ضع تقييمك هنا', writeReviewTitle:'شاركنا رأيك', reviewPhotoLabel:'أرفق صورة نتيجتك (اختياري)',
@@ -323,6 +323,9 @@ const translations = {
     tabSiteDesign:'تصميم الموقع', siteDesignIntro:'اختار الشكل اللي هيشوفه العميل لما يفتح الموقع. لوحة الإدارة نفسها بتفضل زي ما هي دايمًا مهما كان اختيارك هنا.', siteDesignLabel:'التصميم الفعّال', siteDesignV1Option:'التصميم الأول (الحالي)', siteDesignV2Option:'التصميم الثاني (الجديد)', siteDesignSaveBtn:'حفظ الاختيار', toastSiteDesignSaved:'تم حفظ التصميم — هيظهر للعملاء من زيارتهم الجاية',
     heroModeIntro:'لكل تصميم، اختار شكل عرض "قبل/بعد" في الصفحة الرئيسية — الدائرة الدوّارة الأصلية، أو السلايدر التفاعلي بالسحب. الاختيار هنا مستقل عن السلايدر الثابت الجديد في التصميم الثاني (ده فاضل سلايدر دايمًا مهما اخترت).', heroModeSaveBtn:'حفظ أوضاع الهيرو', heroModeCircle:'دائرة دوّارة', heroModeSlider:'سلايدر تفاعلي', toastHeroModesSaved:'تم حفظ أوضاع الهيرو لكل التصاميم',
     resolutionTitle:'دقة الصور الناتجة', resolutionIntro:'اختار دقة الصورة اللي الذكاء الاصطناعي بينتجها. 4K أعلى دقة وأغلى في التكلفة، و2K أرخص والفرق بينهم تقريبًا مش محسوس على شاشة الموبايل. جرّب الاتنين وقارن بنفسك.', resolutionSaveBtn:'حفظ الدقة', resolution2K:'2K — أرخص (موصى به)', resolution4K:'4K — أعلى دقة (أغلى)', toastResolutionSaved:'تم حفظ دقة الصور',
+    colorThemeTitle:'لون الهيدر والخلفية تحت الصور', colorThemeIntro:'اختار درجة اللون الغامق اللي تظهر في شريط الهيدر والمساحة خلف صور المنتجات. باقي ألوان الموقع (الدهبي، الخط) بتفضل زي ما هي في كل الاختيارات.', colorThemeLabel:'لون الهيدر', colorThemeBlack:'أسود (الحالي)', colorThemeBrown:'بني قهوة فخم', colorThemeEmerald:'أخضر زمردي غامق', colorThemeWine:'نبيتي غامق', colorThemeNavy:'كحلي ملكي', colorThemeRed:'أحمر / وردي غامق', colorThemeSaveBtn:'حفظ اللون', toastColorThemeSaved:'تم حفظ اللون — هيظهر للعملاء من زيارتهم الجاية',
+    headerModeTitle:'شكل الهيدر', headerModeIntro:'"الشكل الحالي" يعرض كل أزرار الهيدر (اللغة، الوضع الليلي، عرض الموبايل/الكمبيوتر، تتبع الطلب) في شريط دايمًا ظاهر. "قائمة مطوية" بينقلهم جوه قائمة (☰) بتتفتح عند الضغط، وده بيقلل ارتفاع الهيدر.', headerModeLabel:'وضع الهيدر', headerModeClassicOption:'الشكل الحالي', headerModeCompactOption:'قائمة مطوية (☰)', headerModeSaveBtn:'حفظ شكل الهيدر', toastHeaderModeSaved:'تم حفظ شكل الهيدر — هيظهر للعملاء من زيارتهم الجاية',
+    menuTitle:'القائمة',
     toastPassChanged:'تم تغيير كلمة المرور بنجاح', toastPassMismatch:'كلمة المرور الجديدة وتأكيدها غير متطابقين', toastPassTooShort:'كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل', toastCurrentPassWrong:'كلمة المرور الحالية غير صحيحة', toastFillPassFields:'يرجى إدخال كل الحقول',
     toastProductAdded:'تم إضافة المنتج بنجاح',
     uploadingImage:'جاري رفع الصورة...', toastImageUploadFailed:'تعذّر رفع الصورة، تأكد من اتصالك وحاول تاني',
@@ -381,7 +384,7 @@ const translations = {
     orDivider:'Or with email', toastSocialNotConfigured:'This sign-in method is not set up yet',
     biometricLoginBtn:'Sign in with Face ID / fingerprint', registerBiometricBtn:'Enable Face ID/fingerprint sign-in on this device',
     toastBiometricRegistered:'Face ID/fingerprint sign-in enabled for this device',
-    emailLabel:'Email', passwordLabel:'Password', nameLabel:'Name',
+    emailLabel:'Email', passwordLabel:'Password', nameLabel:'Name', phoneLabel:'Phone number', saveProfileBtn:'Save details', toastProfileSaved:'Your details were saved',
     loginBtn:'Log In', registerBtn:'Create Account', logoutBtn:'Log Out',
     accountWelcome:'Welcome!',
     writeReviewBtn:'Add Your Review Here', writeReviewTitle:'Share Your Feedback', reviewPhotoLabel:'Attach your result photo (optional)',
@@ -615,6 +618,9 @@ const translations = {
     tabSiteDesign:'Site Design', siteDesignIntro:'Choose which look customers see when they open the site. The admin panel itself always stays the same regardless of your choice here.', siteDesignLabel:'Active design', siteDesignV1Option:'Design 1 (current)', siteDesignV2Option:'Design 2 (new)', siteDesignSaveBtn:'Save choice', toastSiteDesignSaved:'Design saved — customers will see it on their next visit',
     heroModeIntro:'For each design, choose the "before/after" showcase style on the homepage — the original orbiting circle, or the interactive drag slider. This choice is independent of Design 2\'s new fixed slider (that one always stays a slider regardless).', heroModeSaveBtn:'Save hero modes', heroModeCircle:'Orbiting circle', heroModeSlider:'Interactive slider', toastHeroModesSaved:'Hero modes saved for every design',
     resolutionTitle:'Output image resolution', resolutionIntro:'Choose the resolution the AI generates. 4K is higher detail and costs more per image; 2K is cheaper and the difference is essentially invisible on a phone screen. Try both and compare.', resolutionSaveBtn:'Save resolution', resolution2K:'2K — cheaper (recommended)', resolution4K:'4K — highest detail (pricier)', toastResolutionSaved:'Output resolution saved',
+    colorThemeTitle:'Header and image-background color', colorThemeIntro:'Choose the dark shade used for the header bar and the space behind product images. The rest of the site colors (gold, text) stay the same across every option.', colorThemeLabel:'Header color', colorThemeBlack:'Black (current)', colorThemeBrown:'Warm coffee brown', colorThemeEmerald:'Deep emerald green', colorThemeWine:'Deep wine', colorThemeNavy:'Royal navy', colorThemeRed:'Deep red / rose', colorThemeSaveBtn:'Save color', toastColorThemeSaved:'Color saved — customers will see it on their next visit',
+    headerModeTitle:'Header layout', headerModeIntro:'"Current layout" shows every header button (language, dark mode, mobile/desktop preview, track order) in an always-visible strip. "Collapsed menu" moves them into a (☰) menu that opens on tap, which shortens the header.', headerModeLabel:'Header layout', headerModeClassicOption:'Current layout', headerModeCompactOption:'Collapsed menu (☰)', headerModeSaveBtn:'Save header layout', toastHeaderModeSaved:'Header layout saved — customers will see it on their next visit',
+    menuTitle:'Menu',
     toastPassChanged:'Password changed successfully', toastPassMismatch:'New password and confirmation do not match', toastPassTooShort:'New password must be at least 8 characters', toastCurrentPassWrong:'Current password is incorrect', toastFillPassFields:'Please fill in all fields',
     toastProductAdded:'Product added successfully',
     uploadingImage:'Uploading image...', toastImageUploadFailed:'Could not upload the image, check your connection and try again',
@@ -3265,7 +3271,7 @@ function hideAdminQuickAccess(){
 }
 
 // ---------- Customer accounts (real, D1-backed via the Worker) ----------
-let currentUser = null; // { name, email }
+let currentUser = null; // { name, email, phone, avatarUrl }
 
 async function checkLoggedInUser(){
   const token = localStorage.getItem('megaPromptAuthToken');
@@ -3287,6 +3293,68 @@ function updateAccountButton(){
   if(!btn) return;
   const personIcon = '<span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"/></svg></span>';
   btn.innerHTML = personIcon + `<span>${currentUser ? escapeHtml(currentUser.name) : t('accountBtnGuest')}</span>`;
+  updateDrawerAccountSummary();
+}
+
+function initSideDrawer(){
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const drawer = document.getElementById('sideDrawer');
+  const backdrop = document.getElementById('sideDrawerBackdrop');
+  const closeBtn = document.getElementById('sideDrawerClose');
+  const drawerAccountBtn = document.getElementById('drawerAccountBtn');
+  if(!hamburgerBtn || !drawer || !backdrop) return;
+
+  if(document.documentElement.getAttribute('data-header-mode') === 'compact'){
+    const utility = document.querySelector('.header-utility');
+    const slot = document.getElementById('sideDrawerBody');
+    if(utility && slot) slot.appendChild(utility);
+  }
+
+  function openDrawer(){
+    drawer.classList.add('open');
+    backdrop.classList.add('open');
+    drawer.setAttribute('aria-hidden', 'false');
+    hamburgerBtn.setAttribute('aria-expanded', 'true');
+  }
+  function closeDrawer(){
+    drawer.classList.remove('open');
+    backdrop.classList.remove('open');
+    drawer.setAttribute('aria-hidden', 'true');
+    hamburgerBtn.setAttribute('aria-expanded', 'false');
+  }
+  hamburgerBtn.onclick = openDrawer;
+  backdrop.onclick = closeDrawer;
+  if(closeBtn) closeBtn.onclick = closeDrawer;
+  if(drawerAccountBtn){
+    drawerAccountBtn.onclick = ()=>{
+      closeDrawer();
+      document.getElementById('accountOpenBtn').click();
+    };
+  }
+  updateDrawerAccountSummary();
+}
+
+function updateDrawerAccountSummary(){
+  const nameEl = document.getElementById('drawerAccountName');
+  const subEl = document.getElementById('drawerAccountSub');
+  const img = document.getElementById('drawerAvatarImg');
+  const placeholder = document.getElementById('drawerAvatarPlaceholder');
+  if(!nameEl || !subEl || !img || !placeholder) return;
+  if(currentUser){
+    nameEl.textContent = currentUser.name;
+    subEl.textContent = currentUser.phone || currentUser.email || '';
+  }else{
+    nameEl.textContent = t('accountBtnGuest');
+    subEl.textContent = '';
+  }
+  if(currentUser && currentUser.avatarUrl){
+    img.src = currentUser.avatarUrl;
+    img.style.display = 'block';
+    placeholder.style.display = 'none';
+  }else{
+    img.style.display = 'none';
+    placeholder.style.display = 'block';
+  }
 }
 
 const accountModalBg = document.getElementById('accountModalBg');
@@ -3295,7 +3363,19 @@ document.getElementById('accountOpenBtn').onclick = ()=>{
   document.getElementById('accountLoggedOutView').style.display = currentUser ? 'none' : 'block';
   document.getElementById('accountLoggedInView').style.display = currentUser ? 'block' : 'none';
   if(currentUser){
-    document.getElementById('accountUserInfo').textContent = `${currentUser.name} — ${currentUser.email}`;
+    document.getElementById('accountUserInfo').textContent = currentUser.email || '';
+    document.getElementById('accountProfileName').value = currentUser.name || '';
+    document.getElementById('accountProfilePhone').value = currentUser.phone || '';
+    const avatarImg = document.getElementById('accountAvatarImg');
+    const avatarPlaceholder = document.getElementById('accountAvatarPlaceholder');
+    if(currentUser.avatarUrl){
+      avatarImg.src = currentUser.avatarUrl;
+      avatarImg.style.display = 'block';
+      avatarPlaceholder.style.display = 'none';
+    }else{
+      avatarImg.style.display = 'none';
+      avatarPlaceholder.style.display = 'flex';
+    }
   }
   checkBiometricAvailability();
 };
@@ -3331,13 +3411,14 @@ document.getElementById('loginSubmitBtn').onclick = async ()=>{
 
 document.getElementById('registerSubmitBtn').onclick = async ()=>{
   const name = document.getElementById('registerName').value.trim();
+  const phone = document.getElementById('registerPhone').value.trim();
   const email = document.getElementById('registerEmail').value.trim();
   const password = document.getElementById('registerPassword').value;
   if(!name || !email || !password){ showToast(t('toastFillFields')); return; }
   try{
     const res = await fetch(`${BACKEND_BASE}/auth/register`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ name, email, password })
+      body: JSON.stringify({ name, email, password, phone })
     });
     const data = await res.json();
     if(!res.ok){ showToast(data.error || t('toastAuthFailed')); return; }
@@ -3353,6 +3434,77 @@ document.getElementById('accountLogoutBtn').onclick = ()=>{
   accountModalBg.classList.remove('show');
 };
 
+// Avatar upload: resized to a small square client-side (a profile photo never
+// needs to be more than a couple hundred pixels across) before sending, so
+// this stays fast on a phone connection and light on R2 storage.
+document.getElementById('accountAvatarBtn').onclick = ()=>{
+  document.getElementById('accountAvatarFile').click();
+};
+document.getElementById('accountAvatarFile').onchange = async (e)=>{
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if(!file || !currentUser) return;
+  const token = localStorage.getItem('megaPromptAuthToken');
+  if(!token || !BACKEND_BASE) return;
+  try{
+    const resizedBlob = await resizeImageToBlob(file, 320, 0.85);
+    const form = new FormData();
+    form.append('avatar', resizedBlob, 'avatar.jpg');
+    const res = await fetch(`${BACKEND_BASE}/account/upload-avatar`, {
+      method:'POST', headers:{ 'Authorization': `Bearer ${token}` }, body: form
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok || !data.avatarUrl){ showToast(t('toastAdminServerError')); return; }
+    currentUser.avatarUrl = data.avatarUrl;
+    document.getElementById('accountAvatarImg').src = data.avatarUrl;
+    document.getElementById('accountAvatarImg').style.display = 'block';
+    document.getElementById('accountAvatarPlaceholder').style.display = 'none';
+    updateDrawerAccountSummary();
+  }catch(e){ showToast(t('toastAdminServerError')); }
+};
+
+// Shared helper: downscale+re-encode an arbitrary uploaded image file to a
+// square JPEG blob no larger than maxSize on a side, centered-cropped.
+function resizeImageToBlob(file, maxSize, quality){
+  return new Promise((resolve, reject)=>{
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = ()=>{
+      const side = Math.min(img.width, img.height);
+      const sx = (img.width - side) / 2;
+      const sy = (img.height - side) / 2;
+      const canvas = document.createElement('canvas');
+      canvas.width = maxSize; canvas.height = maxSize;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, sx, sy, side, side, 0, 0, maxSize, maxSize);
+      URL.revokeObjectURL(url);
+      canvas.toBlob((blob)=> blob ? resolve(blob) : reject(new Error('canvas toBlob failed')), 'image/jpeg', quality);
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+document.getElementById('saveAccountProfileBtn').onclick = async ()=>{
+  const name = document.getElementById('accountProfileName').value.trim();
+  const phone = document.getElementById('accountProfilePhone').value.trim();
+  if(!name){ showToast(t('toastFillFields')); return; }
+  const token = localStorage.getItem('megaPromptAuthToken');
+  if(!token || !BACKEND_BASE) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/account/update-profile`, {
+      method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ name, phone })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){ showToast(data.error || t('toastAdminServerError')); return; }
+    currentUser.name = name;
+    currentUser.phone = phone;
+    updateAccountButton();
+    showToast(t('toastProfileSaved'));
+  }catch(e){ showToast(t('toastAdminServerError')); }
+};
+
 // ---------- Social login (Google / Apple / Facebook) ----------
 // Each provider's SDK is loaded on demand (only when its button is clicked) so the
 // page doesn't pay for three extra third-party scripts nobody may ever use.
@@ -3360,7 +3512,7 @@ document.getElementById('accountLogoutBtn').onclick = ()=>{
 // the button says so honestly instead of attempting (and silently failing) a real flow.
 function handleSocialAuthSuccess(data, successToastKey){
   localStorage.setItem('megaPromptAuthToken', data.token);
-  currentUser = { name: data.name, email: data.email };
+  currentUser = { name: data.name, email: data.email, phone: data.phone || '', avatarUrl: data.avatarUrl || '' };
   updateAccountButton();
   accountModalBg.classList.remove('show');
   showToast(t(successToastKey));
@@ -3909,8 +4061,46 @@ async function loadSiteDesignIntoAdmin(){
     if(resSelect && data.outputResolution){
       resSelect.value = data.outputResolution;
     }
+    const colorThemeSelect = document.getElementById('colorThemeSelect');
+    if(colorThemeSelect){
+      colorThemeSelect.value = data.colorTheme || 'black';
+    }
+    const headerModeSelect = document.getElementById('headerModeSelect');
+    if(headerModeSelect){
+      headerModeSelect.value = data.headerMode === 'compact' ? 'compact' : 'classic';
+    }
   }catch(e){ /* leave the dropdown empty on a network hiccup */ }
 }
+document.getElementById('saveColorThemeBtn').onclick = async ()=>{
+  const theme = document.getElementById('colorThemeSelect').value;
+  if(!BACKEND_BASE || !adminSessionToken) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/set-color-theme?token=${encodeURIComponent(adminSessionToken)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ theme })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(res.ok && data.ok) showToast(t('toastColorThemeSaved'));
+    else showToast(t('toastAdminServerError'));
+  }catch(e){
+    showToast(t('toastAdminServerError'));
+  }
+};
+document.getElementById('saveHeaderModeBtn').onclick = async ()=>{
+  const mode = document.getElementById('headerModeSelect').value;
+  if(!BACKEND_BASE || !adminSessionToken) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/set-header-mode?token=${encodeURIComponent(adminSessionToken)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ mode })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(res.ok && data.ok) showToast(t('toastHeaderModeSaved'));
+    else showToast(t('toastAdminServerError'));
+  }catch(e){
+    showToast(t('toastAdminServerError'));
+  }
+};
 document.getElementById('saveSiteDesignBtn').onclick = async ()=>{
   const design = document.getElementById('siteDesignSelect').value;
   if(!BACKEND_BASE || !adminSessionToken) return;
@@ -5747,6 +5937,7 @@ async function applyHeroModeForThisDesign(){
   applyChildrenVisibility();
   setInterval(updateCountdown, 60000);
   await applyHeroModeForThisDesign();
+  initSideDrawer();
 
   // Secret admin entry point: visit index.html#mega-admin-9k2x, the
   // install-safe ?admin=9k2x query form, or the dedicated standalone

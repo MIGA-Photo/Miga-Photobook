@@ -37,6 +37,39 @@
     --rose:#c93368;
     --line:rgba(30,25,10,0.14);
   }
+  /* ===== Header / under-image accent color ===== deliberately its own
+     variable pair, not tied to --ink above — the header bar and the dark
+     placeholder behind product images are meant to always read as a dark
+     "photo mat" regardless of light/dark mode (see the day-mode comment
+     above), so switching one of these 6 options never interacts with the
+     light/dark toggle. "black" (the original look) is the default with no
+     attribute needed; the other 5 are selected from the admin panel by
+     setting data-accent on <html>, read from /site-config's colorTheme
+     field via the bootstrap script in index.html's <head>. */
+  :root{
+    --header-bg: rgba(12,12,16,0.94);
+    --media-bg: #150c26;
+  }
+  html[data-accent="brown"]{
+    --header-bg:#2b1d14;
+    --media-bg:#241a12;
+  }
+  html[data-accent="emerald"]{
+    --header-bg:#10241d;
+    --media-bg:#122e22;
+  }
+  html[data-accent="wine"]{
+    --header-bg:#2a1018;
+    --media-bg:#2f121a;
+  }
+  html[data-accent="navy"]{
+    --header-bg:#10182b;
+    --media-bg:#121c33;
+  }
+  html[data-accent="red"]{
+    --header-bg:#33121a;
+    --media-bg:#3a151f;
+  }
   /* ===== Living background watermark ===== */
   /* A slow-drifting collage of the site's own product photos, heavily faded and
      blurred, plus a diagonal repeating "Miga-Photobook" wordmark — reads as texture,
@@ -139,14 +172,14 @@
   .promo-marquee{
     position:relative; z-index:49; overflow:hidden;
     background:linear-gradient(90deg, var(--brass-dim), var(--brass), var(--brass-dim));
-    padding:7px 0; white-space:nowrap;
+    padding:4px 0; white-space:nowrap;
   }
   .promo-marquee-track{
     display:inline-flex; gap:64px; animation:marqueeScroll 22s linear infinite;
     will-change:transform;
   }
   .promo-marquee-track span{
-    font-size:15px; font-weight:800; color:#1a1305; letter-spacing:0.4px; padding-inline-end:64px;
+    font-size:13px; font-weight:800; color:#1a1305; letter-spacing:0.4px; padding-inline-end:64px;
     font-family:"Playfair Display", Georgia, "Times New Roman", serif;
     text-shadow:0 1px 0 rgba(255,255,255,0.25);
   }
@@ -236,7 +269,7 @@
   }
 
   header{
-    background:rgba(12,12,16,0.94);
+    background:var(--header-bg);
     backdrop-filter:blur(10px);
     border-bottom:1px solid var(--line);
   }
@@ -264,6 +297,51 @@
     max-width:1180px; margin:0 auto; padding:10px 24px;
     display:flex; align-items:center; justify-content:space-between; gap:20px;
   }
+  /* ===== Compact header mode — an admin-panel toggle (see #headerModeSelect)
+     that swaps the always-visible utility strip for a hamburger button
+     opening a side drawer, so the header takes up less permanent screen
+     height. Classic mode (default) keeps the old behavior exactly. */
+  .hamburger-btn{
+    display:none; background:transparent; border:1px solid var(--line); color:var(--paper);
+    width:38px; height:38px; border-radius:10px; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  html[data-header-mode="compact"] .hamburger-btn{ display:flex; }
+  html[data-header-mode="compact"] .header-utility{ display:none !important; }
+  .side-drawer-backdrop{
+    position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:98;
+    opacity:0; visibility:hidden; transition:opacity .22s ease;
+  }
+  .side-drawer-backdrop.open{ opacity:1; visibility:visible; }
+  .side-drawer{
+    position:fixed; top:0; bottom:0; inset-inline-end:0; width:300px; max-width:86vw;
+    background:var(--ink-2); border-inline-start:1px solid var(--line); z-index:99;
+    transform:translateX(100%); transition:transform .26s ease;
+    display:flex; flex-direction:column; overflow-y:auto;
+  }
+  html[dir="rtl"] .side-drawer{ transform:translateX(-100%); }
+  .side-drawer.open{ transform:translateX(0); }
+  .side-drawer-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 18px; border-bottom:1px solid var(--line); font-weight:700; color:var(--paper);
+  }
+  .side-drawer-account{ padding:14px 18px; border-bottom:1px solid var(--line); }
+  .side-drawer-account-btn{
+    display:flex; align-items:center; gap:12px; width:100%; background:transparent; border:none; padding:0;
+  }
+  .side-drawer-avatar{
+    width:40px; height:40px; border-radius:50%; border:1.5px solid var(--brass); overflow:hidden;
+    display:flex; align-items:center; justify-content:center; color:var(--brass); flex-shrink:0;
+  }
+  .side-drawer-avatar img{ width:100%; height:100%; object-fit:cover; }
+  .side-drawer-account-text{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; text-align:start; }
+  .side-drawer-account-sub{ font-size:12px; color:var(--paper-dim); }
+  .side-drawer-body{ padding:14px 18px; display:flex; flex-direction:column; gap:4px; }
+  .side-drawer-body .header-utility{
+    flex-direction:column; align-items:stretch; max-width:none; margin:0; padding:0;
+    border-bottom:none; gap:12px;
+  }
+  .side-drawer-body .util-link{ text-align:start; }
   .logo{
     font-size:20px; letter-spacing:0.5px; color:var(--paper); font-weight:600;
     display:flex; align-items:center; gap:10px;
@@ -1013,7 +1091,7 @@
     border-color:var(--brass-dim);
     box-shadow:0 14px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,201,77,0.15);
   }
-  .card-media{position:relative; aspect-ratio:4/5; background:#150c26; overflow:hidden;}
+  .card-media{position:relative; aspect-ratio:4/5; background:var(--media-bg); overflow:hidden;}
   /* Same upward crop bias as .cat-tile-cover img above: these product photos
      are much taller than the 4:5 card, and faces sit in the upper half, so
      the old default center-crop was slicing heads off the top of every card. */

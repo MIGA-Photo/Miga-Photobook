@@ -86,6 +86,12 @@
     .then(function(r){ return r.json(); })
     .then(function(data){
       clearTimeout(fallback);
+      if(data && data.colorTheme && data.colorTheme !== 'black'){
+        document.documentElement.setAttribute('data-accent', data.colorTheme);
+      }
+      if(data && data.headerMode === 'compact'){
+        document.documentElement.setAttribute('data-header-mode', 'compact');
+      }
       if(data && data.activeDesign && data.activeDesign !== MY_DESIGN_ID){
         var target = (data.availableDesigns || []).filter(function(d){ return d.id === data.activeDesign; })[0];
         var folder = target ? target.folder : '';
@@ -242,6 +248,9 @@
     <button type="button" class="util-link" id="trackOpenBtn" data-i18n="trackBtn">تتبع طلبي</button>
   </div>
   <div class="nav-wrap">
+    <button type="button" id="hamburgerBtn" class="hamburger-btn" aria-label="القائمة" aria-haspopup="true" aria-expanded="false">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg>
+    </button>
     <div class="logo">
       <svg class="logo-mark" viewBox="0 0 48 48" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
         <!-- open book -->
@@ -1152,6 +1161,27 @@
 </div>
 
 <!-- Account modal (login/register) -->
+<div class="side-drawer-backdrop" id="sideDrawerBackdrop"></div>
+<aside class="side-drawer" id="sideDrawer" aria-hidden="true">
+  <div class="side-drawer-head">
+    <span data-i18n="menuTitle">القائمة</span>
+    <button type="button" class="close-x" id="sideDrawerClose" aria-label="إغلاق">×</button>
+  </div>
+  <div class="side-drawer-account" id="sideDrawerAccount">
+    <button type="button" id="drawerAccountBtn" class="side-drawer-account-btn">
+      <span class="side-drawer-avatar" id="drawerAvatarWrap">
+        <img id="drawerAvatarImg" src="" alt="" style="display:none;">
+        <svg id="drawerAvatarPlaceholder" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"/></svg>
+      </span>
+      <span class="side-drawer-account-text">
+        <span id="drawerAccountName" data-i18n="accountBtnGuest">تسجيل الدخول</span>
+        <span class="side-drawer-account-sub" id="drawerAccountSub"></span>
+      </span>
+    </button>
+  </div>
+  <div class="side-drawer-body" id="sideDrawerBody"><!-- .header-utility is moved here by app.js when header mode is compact --></div>
+</aside>
+
 <div class="modal-bg" id="accountModalBg">
   <div class="modal" style="max-width:420px;">
     <button class="close-x" id="accountModalClose">×</button>
@@ -1201,6 +1231,10 @@
           <input type="text" id="registerName">
         </div>
         <div class="field">
+          <label data-i18n="phoneLabel">رقم التليفون</label>
+          <input type="tel" id="registerPhone" placeholder="01xxxxxxxxx">
+        </div>
+        <div class="field">
           <label data-i18n="emailLabel">البريد الإلكتروني</label>
           <input type="email" id="registerEmail" placeholder="you@example.com">
         </div>
@@ -1216,7 +1250,30 @@
 
     <div id="accountLoggedInView" style="display:none;">
       <h3 data-i18n="accountWelcome">أهلاً بيك!</h3>
-      <p class="sub" id="accountUserInfo"></p>
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+        <button type="button" id="accountAvatarBtn" aria-label="تغيير صورة البروفايل" style="position:relative; width:64px; height:64px; border-radius:50%; border:1.5px solid var(--brass); background:var(--ink-2); overflow:hidden; flex-shrink:0; padding:0;">
+          <img id="accountAvatarImg" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover;">
+          <span id="accountAvatarPlaceholder" style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:var(--brass);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"/></svg>
+          </span>
+          <span style="position:absolute; inset-inline-end:0; bottom:0; width:20px; height:20px; border-radius:50%; background:var(--brass); color:var(--ink); display:flex; align-items:center; justify-content:center; font-size:11px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 7h3l1.5-2h7L17 7h3v12H4z"/><circle cx="12" cy="13" r="3.2"/></svg>
+          </span>
+        </button>
+        <input type="file" id="accountAvatarFile" accept="image/*" style="display:none;">
+        <p class="sub" id="accountUserInfo" style="margin:0;"></p>
+      </div>
+      <div class="field">
+        <label data-i18n="nameLabel">الاسم</label>
+        <input type="text" id="accountProfileName">
+      </div>
+      <div class="field">
+        <label data-i18n="phoneLabel">رقم التليفون</label>
+        <input type="tel" id="accountProfilePhone" placeholder="01xxxxxxxxx">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-primary" id="saveAccountProfileBtn" data-i18n="saveProfileBtn">حفظ البيانات</button>
+      </div>
       <button class="btn-ghost social-btn" id="registerBiometricBtn" style="display:none; width:100%; margin-bottom:14px; display:flex; align-items:center; justify-content:center; gap:8px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a5 5 0 0 0-5 5v2a5 5 0 0 0 .4 2M7 15c0 2 1 4 5 5M17 9v2c0 1.5-.3 2.7-.8 3.6M12 7a2 2 0 0 1 2 2v3a6 6 0 0 1-1 3.4M9 9v2c0 3 1.5 5 4 6"/></svg>
         <span data-i18n="registerBiometricBtn">تفعيل الدخول ببصمة الوجه/الإصبع لهذا الجهاز</span>
@@ -1694,6 +1751,38 @@
         </div>
         <div class="modal-actions">
           <button class="btn-primary" id="saveResolutionBtn" data-i18n="resolutionSaveBtn">حفظ الدقة</button>
+        </div>
+
+        <hr style="border:none; border-top:1px solid var(--line); margin:22px 0;">
+        <h4 style="margin:0 0 8px;" data-i18n="colorThemeTitle">لون الهيدر والخلفية تحت الصور</h4>
+        <p class="sub" style="margin-bottom:14px;" data-i18n="colorThemeIntro">اختار درجة اللون الغامق اللي تظهر في شريط الهيدر والمساحة خلف صور المنتجات. باقي ألوان الموقع (الدهبي، الخط) بتفضل زي ما هي في كل الاختيارات.</p>
+        <div class="field">
+          <label data-i18n="colorThemeLabel">لون الهيدر</label>
+          <select id="colorThemeSelect">
+            <option value="black" data-i18n="colorThemeBlack">أسود (الحالي)</option>
+            <option value="brown" data-i18n="colorThemeBrown">بني قهوة فخم</option>
+            <option value="emerald" data-i18n="colorThemeEmerald">أخضر زمردي غامق</option>
+            <option value="wine" data-i18n="colorThemeWine">نبيتي غامق</option>
+            <option value="navy" data-i18n="colorThemeNavy">كحلي ملكي</option>
+            <option value="red" data-i18n="colorThemeRed">أحمر / وردي غامق</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="saveColorThemeBtn" data-i18n="colorThemeSaveBtn">حفظ اللون</button>
+        </div>
+
+        <hr style="border:none; border-top:1px solid var(--line); margin:22px 0;">
+        <h4 style="margin:0 0 8px;" data-i18n="headerModeTitle">شكل الهيدر</h4>
+        <p class="sub" style="margin-bottom:14px;" data-i18n="headerModeIntro">"الشكل الحالي" يعرض كل أزرار الهيدر (اللغة، الوضع الليلي، عرض الموبايل/الكمبيوتر، تتبع الطلب) في شريط دايمًا ظاهر. "قائمة مطوية" بينقلهم جوه قائمة (☰) بتتفتح عند الضغط، وده بيقلل ارتفاع الهيدر.</p>
+        <div class="field">
+          <label data-i18n="headerModeLabel">وضع الهيدر</label>
+          <select id="headerModeSelect">
+            <option value="classic" data-i18n="headerModeClassicOption">الشكل الحالي</option>
+            <option value="compact" data-i18n="headerModeCompactOption">قائمة مطوية (☰)</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="saveHeaderModeBtn" data-i18n="headerModeSaveBtn">حفظ شكل الهيدر</button>
         </div>
       </div>
 
