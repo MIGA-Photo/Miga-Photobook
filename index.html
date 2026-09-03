@@ -81,57 +81,30 @@
     reveal();
     return;
   }
-  var CONFIG_CACHE_KEY = 'megaSiteConfigCache';
-  function applyConfig(data){
-    if(data && data.colorTheme && data.colorTheme !== 'black'){
-      document.documentElement.setAttribute('data-accent', data.colorTheme);
-    }
-    if(data && data.headerMode === 'compact'){
-      document.documentElement.setAttribute('data-header-mode', 'compact');
-    }
-  }
-  function redirectIfNeeded(data){
-    if(data && data.activeDesign && data.activeDesign !== MY_DESIGN_ID){
-      var target = (data.availableDesigns || []).filter(function(d){ return d.id === data.activeDesign; })[0];
-      var folder = target ? target.folder : '';
-      var myFolder = MY_DESIGN_ID === 'v1' ? '' : MY_DESIGN_ID;
-      var dest = null;
-      if(myFolder === '' && folder !== ''){ dest = './' + folder + '/'; }
-      else if(myFolder !== '' && folder === ''){ dest = '../'; }
-      else if(myFolder !== '' && folder !== ''){ dest = '../' + folder + '/'; }
-      if(dest){ window.location.replace(dest); return true; }
-    }
-    return false;
-  }
-  var cachedConfig = null;
-  try{
-    var raw = localStorage.getItem(CONFIG_CACHE_KEY);
-    if(raw) cachedConfig = JSON.parse(raw);
-  }catch(e){ cachedConfig = null; }
-
-  var fallback;
-  if(cachedConfig){
-    // Repeat visit — apply what we already know instantly, no network wait
-    // at all. A background fetch below keeps this cache fresh for next
-    // time; it does not gate or redo this visit's reveal.
-    applyConfig(cachedConfig);
-    if(!redirectIfNeeded(cachedConfig)) reveal();
-  }else{
-    // True first-ever visit on this device — nothing to go on yet, so this
-    // one visit has to wait for the real answer (bounded by the fallback).
-    fallback = setTimeout(reveal, 1200);
-  }
+  var fallback = setTimeout(reveal, 1200);
   fetch('https://miga-photobook-api.magdyfarouk380.workers.dev/site-config')
     .then(function(r){ return r.json(); })
     .then(function(data){
-      if(fallback) clearTimeout(fallback);
-      try{ localStorage.setItem(CONFIG_CACHE_KEY, JSON.stringify(data)); }catch(e){}
-      if(cachedConfig) return; // already revealed off the cache above
-      applyConfig(data);
-      if(redirectIfNeeded(data)) return;
+      clearTimeout(fallback);
+      if(data && data.colorTheme && data.colorTheme !== 'black'){
+        document.documentElement.setAttribute('data-accent', data.colorTheme);
+      }
+      if(data && data.headerMode === 'compact'){
+        document.documentElement.setAttribute('data-header-mode', 'compact');
+      }
+      if(data && data.activeDesign && data.activeDesign !== MY_DESIGN_ID){
+        var target = (data.availableDesigns || []).filter(function(d){ return d.id === data.activeDesign; })[0];
+        var folder = target ? target.folder : '';
+        var myFolder = MY_DESIGN_ID === 'v1' ? '' : MY_DESIGN_ID;
+        var dest = null;
+        if(myFolder === '' && folder !== ''){ dest = './' + folder + '/'; }
+        else if(myFolder !== '' && folder === ''){ dest = '../'; }
+        else if(myFolder !== '' && folder !== ''){ dest = '../' + folder + '/'; }
+        if(dest){ window.location.replace(dest); return; }
+      }
       reveal();
     })
-    .catch(function(){ if(fallback) clearTimeout(fallback); reveal(); });
+    .catch(function(){ clearTimeout(fallback); reveal(); });
 })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
