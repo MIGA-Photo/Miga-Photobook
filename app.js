@@ -4399,7 +4399,7 @@ document.getElementById('scSaveBtn').onclick = async ()=>{
 
 /** Loads the saved showcase images (if any) into the homepage circle. If the
  * backend has nothing configured yet, the default images already baked into
- * the HTML (before-after/before-after/*.jpg) stay exactly as they are — this
+ * the HTML (before-after/*.jpg) stay exactly as they are — this
  * only overrides them once real choices exist. Each swap keeps the original
  * default as a fallback: if a custom-uploaded URL turns out to be broken
  * (deleted, expired, failed upload), the slot reverts to its default photo
