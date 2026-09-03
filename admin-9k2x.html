@@ -43,7 +43,26 @@
 <meta name="apple-mobile-web-app-title" content="إدارة ميجا">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0c0c10">
-<style id="__bootHide">html{visibility:hidden;}</style>
+<style id="__bootHide">
+  html{visibility:hidden;}
+  #__bootLoader{
+    visibility:visible; position:fixed; inset:0; z-index:999999;
+    background:#0c0c10; display:flex; align-items:center; justify-content:center;
+  }
+  #__bootLoader svg{ animation:__bootPulse 1.3s ease-in-out infinite; }
+  @keyframes __bootPulse{ 0%,100%{opacity:.5;} 50%{opacity:1;} }
+</style>
+<div id="__bootLoader">
+  <svg viewBox="0 0 48 48" width="56" height="56" xmlns="http://www.w3.org/2000/svg">
+    <path d="M24 14 C19 10 10 9 5 11 V37 C10 35 19 36 24 40 V14 Z" fill="none" stroke="#ffc94d" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M24 14 C29 10 38 9 43 11 V37 C38 35 29 36 24 40 V14 Z" fill="none" stroke="#ffc94d" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M24 14 V40" stroke="#ffc94d" stroke-width="1.5" opacity="0.5"/>
+    <rect x="14" y="18" width="20" height="14" rx="3" fill="#0c0c10" stroke="#ffc94d" stroke-width="2"/>
+    <rect x="20" y="14" width="8" height="5" rx="1.5" fill="#0c0c10" stroke="#ffc94d" stroke-width="2"/>
+    <circle cx="24" cy="25" r="4.5" fill="none" stroke="#ffc94d" stroke-width="2"/>
+    <circle cx="24" cy="25" r="1.6" fill="#ffc94d"/>
+  </svg>
+</div>
 <script>
 (function(){
   var revealed = false;
@@ -52,6 +71,8 @@
     revealed = true;
     var s = document.getElementById('__bootHide');
     if(s) s.remove();
+    var l = document.getElementById('__bootLoader');
+    if(l) l.remove();
   }
   var fallback = setTimeout(reveal, 1200);
   fetch('https://miga-photobook-api.magdyfarouk380.workers.dev/site-config')
