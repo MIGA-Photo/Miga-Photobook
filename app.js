@@ -3257,7 +3257,95 @@ document.getElementById('adminCollapseBtn').onclick = ()=>{
   collapseAdminPanel();
   syncAdminFabBadge();
 };
-document.getElementById('adminFab').onclick = expandAdminPanel;
+
+// ---- Draggable admin FAB ----------------------------------------------
+// The button can be dragged anywhere on screen and remembers where it was
+// left. A small movement threshold separates a drag from a tap, so moving
+// the button never accidentally opens the admin panel.
+(function initAdminFabDrag(){
+  const fab = document.getElementById('adminFab');
+  if(!fab) return;
+  const STORAGE_KEY = 'megaAdminFabPos';
+  const DRAG_THRESHOLD = 5; // px of movement before it counts as a drag
+  let dragging = false, moved = false;
+  let startX = 0, startY = 0, originLeft = 0, originTop = 0;
+
+  function clamp(left, top){
+    const w = fab.offsetWidth, h = fab.offsetHeight;
+    const maxLeft = Math.max(0, window.innerWidth - w - 8);
+    const maxTop = Math.max(0, window.innerHeight - h - 8);
+    return {
+      left: Math.min(Math.max(8, left), maxLeft),
+      top: Math.min(Math.max(8, top), maxTop),
+    };
+  }
+  function applyPos(left, top){
+    const p = clamp(left, top);
+    // Switch to explicit top/left once moved, overriding the CSS default
+    // bottom/left anchor.
+    fab.style.left = p.left + 'px';
+    fab.style.top = p.top + 'px';
+    fab.style.bottom = 'auto';
+    fab.style.right = 'auto';
+    return p;
+  }
+  function savePos(p){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); }catch(e){}
+  }
+
+  // Restore the last position, if any.
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const saved = JSON.parse(raw);
+      if(saved && typeof saved.left === 'number' && typeof saved.top === 'number'){
+        // Defer until layout is ready so offsetWidth/Height are correct.
+        requestAnimationFrame(()=>applyPos(saved.left, saved.top));
+      }
+    }
+  }catch(e){}
+
+  fab.addEventListener('pointerdown', (e)=>{
+    dragging = true; moved = false;
+    startX = e.clientX; startY = e.clientY;
+    const rect = fab.getBoundingClientRect();
+    originLeft = rect.left; originTop = rect.top;
+    fab.setPointerCapture(e.pointerId);
+  });
+  fab.addEventListener('pointermove', (e)=>{
+    if(!dragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    if(!moved && Math.abs(dx) < DRAG_THRESHOLD && Math.abs(dy) < DRAG_THRESHOLD) return;
+    if(!moved){ moved = true; fab.classList.add('dragging'); }
+    applyPos(originLeft + dx, originTop + dy);
+  });
+  function endDrag(e){
+    if(!dragging) return;
+    dragging = false;
+    fab.classList.remove('dragging');
+    if(moved){
+      const rect = fab.getBoundingClientRect();
+      savePos(clamp(rect.left, rect.top));
+    }
+    try{ fab.releasePointerCapture(e.pointerId); }catch(err){}
+  }
+  fab.addEventListener('pointerup', endDrag);
+  fab.addEventListener('pointercancel', endDrag);
+
+  // Only a genuine tap opens the panel — swallow the click that follows a drag.
+  fab.addEventListener('click', (e)=>{
+    if(moved){ e.preventDefault(); e.stopPropagation(); moved = false; return; }
+    expandAdminPanel();
+  });
+
+  // Keep it on screen if the window is resized or the device rotated.
+  window.addEventListener('resize', ()=>{
+    if(fab.style.left === '') return; // never moved; CSS default still applies
+    const rect = fab.getBoundingClientRect();
+    savePos(applyPos(rect.left, rect.top));
+  });
+})();
 document.getElementById('adminAlertsBtn').onclick = enableAdminAlerts;
 updateAdminAlertBtn();
 document.getElementById('pShareLinkCopy').onclick = ()=>

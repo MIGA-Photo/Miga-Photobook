@@ -1425,12 +1425,20 @@
     display:none; align-items:center; gap:8px;
     height:48px; padding:0 16px 0 14px; border-radius:26px;
     background:var(--ink-2); border:2px solid var(--brass); color:var(--brass);
-    font-size:14px; font-weight:800; font-family:inherit; cursor:pointer;
+    font-size:14px; font-weight:800; font-family:inherit; cursor:grab;
     box-shadow:0 8px 24px rgba(0,0,0,0.45);
     transition:transform .18s ease, background .18s ease;
+    touch-action:none; user-select:none; -webkit-user-select:none;
   }
   .admin-fab.show{display:inline-flex;}
   .admin-fab:hover{transform:translateY(-3px); background:rgba(255,201,77,0.12);}
+  /* While being dragged, drop the hover lift and the transition so the
+     button tracks the finger/pointer exactly instead of easing behind it. */
+  .admin-fab.dragging{
+    cursor:grabbing; transition:none; transform:none;
+    box-shadow:0 12px 30px rgba(0,0,0,0.55);
+  }
+  .admin-fab.dragging:hover{transform:none;}
   .admin-fab .af-icon{font-size:18px; line-height:1;}
   .admin-fab .af-badge{
     min-width:20px; height:20px; padding:0 6px; border-radius:10px;
