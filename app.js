@@ -2924,7 +2924,7 @@ function getStaticSearchIndex(){
   // scattered across a question and its answer — or a title and a bullet
   // several lines below it — still matches, instead of requiring both
   // words to land inside the same short phrase.
-  items.forEach(it => { it.searchText = [it.label, ...it.keywords].filter(Boolean).join(' ').toLowerCase(); });
+  items.forEach(it => { it.searchText = normalizeSearchText([it.label, ...it.keywords].filter(Boolean).join(' ')); });
   return items;
 }
 
@@ -2964,14 +2964,41 @@ document.addEventListener('click', (e)=>{
  * to appear somewhere in the given text (in any order, anywhere in it) —
  * so "دعم مباشر" still finds a phrase like "دعم فني سريع ومباشر" even
  * though the two query words aren't adjacent there. */
+/** Normalizes text so Arabic searches match regardless of how the user
+ * happens to type it. Without this, "اطفال" fails to find "أطفال", "علي"
+ * fails to find "على", and any word carrying diacritics never matches a
+ * plain-typed query. Also folds Arabic-Indic digits (٠١٢…) onto ASCII ones
+ * so "٢٥" and "25" find the same thing. */
+function normalizeSearchText(text){
+  if(!text) return '';
+  return String(text)
+    .toLowerCase()
+    // strip diacritics (tashkeel) and tatweel
+    .replace(/[\u064B-\u065F\u0670\u0640]/g, '')
+    // unify the alef family
+    .replace(/[\u0622\u0623\u0625\u0671]/g, '\u0627')
+    // alef maqsura -> yaa
+    .replace(/\u0649/g, '\u064A')
+    // taa marbuta -> haa
+    .replace(/\u0629/g, '\u0647')
+    // hamza carriers -> plain hamza seat
+    .replace(/[\u0624\u0626]/g, '\u0621')
+    // Arabic-Indic and Eastern Arabic-Indic digits -> ASCII
+    .replace(/[\u0660-\u0669]/g, d => String(d.charCodeAt(0) - 0x0660))
+    .replace(/[\u06F0-\u06F9]/g, d => String(d.charCodeAt(0) - 0x06F0))
+    // collapse whitespace
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function textHasAllWords(text, words){
   if(!text || !words.length) return false;
-  const hay = text.toLowerCase();
+  const hay = normalizeSearchText(text);
   return words.every(w => hay.includes(w));
 }
 
 function renderSearchDropdown(query){
-  query = (query || '').trim().toLowerCase();
+  query = normalizeSearchText(query);
   if(!query){
     const history = getSearchHistory();
     if(!history.length){
@@ -2991,8 +3018,14 @@ function renderSearchDropdown(query){
   const sectionMatches = getStaticSearchIndex()
     .filter(s => textHasAllWords(s.searchText, words))
     .slice(0, 6);
+  // Search a product's whole identity — Arabic title, English title, and the
+  // label of the category it sits in — so a query like "اطفال" surfaces the
+  // products in that category too, not just the category section itself.
   const productMatches = products
-    .filter(p => textHasAllWords(productTitle(p), words) || textHasAllWords(p.title, words))
+    .filter(p => textHasAllWords(
+      [productTitle(p), p.title, p.titleEn, catLabel(p.category)].filter(Boolean).join(' '),
+      words
+    ))
     .slice(0, 8);
 
   if(!sectionMatches.length && !productMatches.length){
