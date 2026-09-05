@@ -163,6 +163,8 @@ const translations = {
     how3Title:'ارفع صورتك', how3Desc:'بعد تأكيد التحويل (عادةً خلال دقائق)، ارفع صورتك بجودة واضحة.',
     how4Title:'استلم النتيجة', how4Desc:'هنطبّق الأسلوب اللي اخترته بالذكاء الاصطناعي، وتستلم صورتك الاحترافية خلال دقايق.',
     howItWorksCta:'ابدأ دلوقتي',
+    seeAllStylesCta:'شاهد 50+ ستايل',
+    pricingTrust1:'دفعك في أمان', pricingTrust2:'نتائج حقيقية موثّقة', pricingTrust3:'دعم واتساب سريع',
     mostRequestedTitle:'الأكثر طلبا',
     testimonialsTitle:'تقييمات وآراء عملائنا',
     testimonial1:'"أفضل تحويل صور جربته على الإطلاق"', testimonial2:'"حوّلت صوري إلى مستوى احترافي"',
@@ -458,6 +460,8 @@ const translations = {
     how3Title:'Upload your photo', how3Desc:'Once your transfer is confirmed (usually within minutes), upload a clear photo.',
     how4Title:'Get your result', how4Desc:"We'll apply the style you picked using AI, and you'll receive your professional photo within minutes.",
     howItWorksCta:'Start Now',
+    seeAllStylesCta:'See 50+ Styles',
+    pricingTrust1:'Secure payment', pricingTrust2:'Verified real results', pricingTrust3:'Fast WhatsApp support',
     mostRequestedTitle:'Most Ordered',
     testimonialsTitle:'Customer Reviews & Testimonials',
     testimonial1:'"Best photo transformation I have tried"', testimonial2:'"Turned my photos pro-level"',
@@ -2679,14 +2683,15 @@ function getCategoryOf(productId){
 })();
 
 // ---------- Quick-nav row ----------
-// "لماذا Miga-Photobook؟" / "كيف يعمل؟" / "من نحن" / "أسئلة شائعة" now share
-// one fixed content area right below the tab row (#sectionTabPanel):
-// clicking a tab is an instant show/hide swap — no scrolling, no animated
-// accordion expand — so the content always appears in the exact same spot
-// as the buttons. "تقييمات وآراء عملائنا" isn't part of this panel (it's
-// always visible further down the page, per explicit request), so its tab
-// is still a plain scroll-to-it shortcut.
-const TAB_PANEL_IDS = ['whyUs', 'howItWorks', 'aboutUs', 'faq'];
+// "لماذا Miga-Photobook؟" / "من نحن" / "أسئلة شائعة" share one fixed content
+// area right below the tab row (#sectionTabPanel): clicking a tab is an
+// instant show/hide swap — no scrolling, no animated accordion expand — so
+// the content always appears in the exact same spot as the buttons.
+// "كيف يعمل؟" and "تقييمات وآراء عملائنا" are NOT part of this panel — both
+// are always visible elsewhere on the page (how-it-works moved up near the
+// results gallery so visitors see it without a click, per explicit
+// request), so their tabs are plain scroll-to-it shortcuts instead.
+const TAB_PANEL_IDS = ['whyUs', 'aboutUs', 'faq'];
 function setActiveSectionTab(targetId, {scroll} = {scroll: true}){
   const row = document.getElementById('sectionTabsRow');
   document.querySelectorAll('.section-tab-btn').forEach(b=>{
