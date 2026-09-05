@@ -270,7 +270,14 @@
 
   header{
     background:var(--header-bg);
-    backdrop-filter:blur(10px);
+    /* backdrop-filter:blur() removed (5 سبتمبر 2026) — this header sits inside
+       .sticky-top-group (position:sticky), and sticky/fixed + backdrop-filter
+       is a well-known Android Chrome (Blink) rendering bug: it repaints/flickers
+       and stutters while scrolling. Safari and any browser on iOS (forced to
+       use WebKit, even "Chrome") never hit this path, which is exactly why it
+       only showed up on Android Chrome. --header-bg is already ~94% opaque by
+       default (and fully solid on the colored accent themes), so dropping the
+       blur has no visible cost. */
     border-bottom:1px solid var(--line);
   }
   /* ===== Utility strip — the quiet, secondary controls (language, theme,
@@ -572,8 +579,11 @@
   .request-count-overlay{
     position:absolute; bottom:8px; inset-inline-start:8px; z-index:2;
     display:flex; align-items:center; gap:4px;
-    background:rgba(10,8,4,0.75); color:var(--brass); font-weight:800; font-size:12px;
-    padding:4px 9px; border-radius:100px; backdrop-filter:blur(2px);
+    background:rgba(10,8,4,0.86); color:var(--brass); font-weight:800; font-size:12px;
+    padding:4px 9px; border-radius:100px; /* backdrop-filter removed — see header
+    comment above; this badge repeats on many cards in the grid at once, so each
+    copy was its own extra GPU compositing layer on Android Chrome. Background
+    opacity bumped 0.75→0.86 to keep it fully legible without the blur. */
   }
   .admin-btn{
     display:inline-flex; align-items:center; gap:8px; height:38px; box-sizing:border-box;
@@ -756,8 +766,9 @@
      crop upward instead of the default center crop slicing the head off. */
   .ba-item img{width:100%; aspect-ratio:4/5; object-fit:cover; object-position:center 22%; border-radius:12px; border:1px solid var(--line);}
   .ba-label{
-    position:absolute; bottom:10px; left:10px; background:rgba(10,6,20,0.75); color:var(--brass);
-    padding:4px 12px; border-radius:100px; font-size:12px; font-weight:700; backdrop-filter:blur(4px);
+    position:absolute; bottom:10px; left:10px; background:rgba(10,6,20,0.86); color:var(--brass);
+    padding:4px 12px; border-radius:100px; font-size:12px; font-weight:700;
+    /* backdrop-filter removed — see header comment above; opacity bumped 0.75→0.86 to compensate. */
   }
   .ba-arrow{font-size:32px; color:var(--brass);}
   html[dir="rtl"] .ba-arrow{display:inline-block; transform:scaleX(-1);}
@@ -901,14 +912,14 @@
     font-size:13px; padding:6px 13px; border-radius:100px; font-weight:800;
     letter-spacing:0.5px;
   }
-  .tag-children{background:rgba(47,230,176,0.16); color:var(--sage);}
-  .tag-male{background:rgba(62,167,255,0.16); color:var(--steel);}
-  .tag-female{background:rgba(255,92,150,0.16); color:var(--rose);}
-  .tag-business{background:rgba(62,167,255,0.16); color:var(--steel);}
-  .tag-cinematic{background:rgba(255,92,150,0.16); color:var(--rose);}
-  .tag-luxury{background:rgba(255,201,77,0.18); color:var(--brass);}
-  .tag-artistic{background:rgba(47,230,176,0.16); color:var(--sage);}
-  .tag-magazine{background:rgba(227,164,41,0.18); color:var(--brass-dim);}
+  .tag-children{background:rgba(47,230,176,0.24); color:var(--sage);}
+  .tag-male{background:rgba(62,167,255,0.24); color:var(--steel);}
+  .tag-female{background:rgba(255,92,150,0.24); color:var(--rose);}
+  .tag-business{background:rgba(62,167,255,0.24); color:var(--steel);}
+  .tag-cinematic{background:rgba(255,92,150,0.24); color:var(--rose);}
+  .tag-luxury{background:rgba(255,201,77,0.26); color:var(--brass);}
+  .tag-artistic{background:rgba(47,230,176,0.24); color:var(--sage);}
+  .tag-magazine{background:rgba(227,164,41,0.26); color:var(--brass-dim);}
 
   /* ===== Category tiles: one icon per section, built from that section's own
      photos, arranged in neat aligned rows on desktop and mobile. Clicking a
@@ -1001,7 +1012,11 @@
   .cat-chip{
     display:inline-flex; align-items:center; gap:7px;
     padding:6px 14px; border-radius:100px; font-weight:800; font-size:14px;
-    letter-spacing:0.2px; line-height:1; backdrop-filter:blur(2px);
+    letter-spacing:0.2px; line-height:1;
+    /* backdrop-filter removed — see header comment above; this chip repeats on
+       every product card, so it was one of the biggest single sources of extra
+       GPU layers on Android. The tag-<cat> background tints below are bumped
+       slightly darker to keep the pill readable without the blur. */
   }
   .cat-chip .cicon{display:flex; font-size:15px;}
   .cat-chip .cicon svg{width:1em; height:1em; display:block;}
@@ -1154,9 +1169,14 @@
   .card-media img{width:100%; height:100%; object-fit:cover; object-position:center 22%;}
   .card-badge{
     position:absolute; top:10px; right:10px; left:10px; font-size:10.5px; letter-spacing:0.3px;
-    background:rgba(10,6,20,0.72); backdrop-filter:blur(4px); color:var(--brass);
+    background:rgba(10,6,20,0.88); color:var(--brass);
     padding:5px 10px; border-radius:8px; font-weight:600; text-align:center;
     max-width:calc(100% - 20px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    /* backdrop-filter removed — see header comment above. This is the single
+       biggest offender: one badge per product card, so a page showing e.g.
+       20 cards meant 20 separate blur/compositing layers at once on Android
+       Chrome — a direct cause of scroll lag/jitter. Opacity bumped 0.72→0.88
+       to stay fully legible without it. */
   }
   .card-body{padding:18px 18px 20px; display:flex; flex-direction:column; gap:11px; flex:1;}
   .card-title{font-size:16px; font-weight:600; color:var(--paper); line-height:1.4;}
