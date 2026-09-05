@@ -142,7 +142,25 @@
 <meta property="og:site_name" content="Miga-Photobook">
 
 
-<meta name="robots" content="index, follow">
+<meta name="robots" content="index, follow" id="__robotsMeta">
+<script>
+// This exact file is also served, byte-for-byte, from GitHub Pages' own
+// default project URL (miga-photo.github.io/Miga-Photobook/) — once a
+// custom domain is attached, GitHub gives no way to turn that default URL
+// off, so it stays live and reachable forever, serving identical content.
+// The canonical tag below already tells Google the real page is
+// miga-photobook.com, but a static "index, follow" robots tag served on
+// BOTH hosts undercuts that hint and invites duplicate-content dilution.
+// This flips the on-page robots directive to noindex,nofollow whenever the
+// page isn't actually being served from the real domain, so only
+// miga-photobook.com is ever offered to search engines for indexing.
+(function(){
+  var host = location.hostname;
+  if(host !== 'miga-photobook.com' && host !== 'www.miga-photobook.com'){
+    document.getElementById('__robotsMeta').setAttribute('content', 'noindex, nofollow');
+  }
+})();
+</script>
 <link rel="canonical" href="https://miga-photobook.com/">
 
 <meta property="og:type" content="website">
