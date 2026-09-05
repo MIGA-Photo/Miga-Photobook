@@ -1670,12 +1670,19 @@ document.getElementById('detailCancelBtn').onclick = ()=> document.getElementByI
 
 /** Public, shareable address for one product. Used for ads: the link drops a
  * visitor straight onto this photo instead of the top of the storefront.
- * Always points at the public storefront root (index.html), never at
- * whatever page happened to call this — otherwise copying a link from the
- * admin panel (admin-9k2x.html) would hand out an admin URL to customers. */
+ * Goes through /share?product=<id> (a Cloudflare Worker route on this same
+ * domain) instead of a plain "#product=" hash: a hash never reaches the
+ * server, so Facebook/WhatsApp/Instagram crawlers couldn't see a
+ * product-specific preview image — they always showed the site's generic
+ * image. /share looks the product up server-side and returns a page with
+ * that product's own photo in its preview tags, then forwards real visitors
+ * straight into the normal storefront link below.
+ * Always points at the public storefront root, never at whatever page
+ * happened to call this — otherwise copying a link from the admin panel
+ * (admin-9k2x.html) would hand out an admin URL to customers. */
 function productShareLink(id){
   const base = window.location.origin + '/';
-  return `${base}#product=${encodeURIComponent(id)}`;
+  return `${base}share?product=${encodeURIComponent(id)}`;
 }
 
 function copyToClipboard(text, toastKey){
