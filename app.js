@@ -1670,9 +1670,11 @@ document.getElementById('detailCancelBtn').onclick = ()=> document.getElementByI
 
 /** Public, shareable address for one product. Used for ads: the link drops a
  * visitor straight onto this photo instead of the top of the storefront.
- * Built from the live page address so it stays correct if the site ever moves. */
+ * Always points at the public storefront root (index.html), never at
+ * whatever page happened to call this — otherwise copying a link from the
+ * admin panel (admin-9k2x.html) would hand out an admin URL to customers. */
 function productShareLink(id){
-  const base = window.location.origin + window.location.pathname;
+  const base = window.location.origin + '/';
   return `${base}#product=${encodeURIComponent(id)}`;
 }
 
