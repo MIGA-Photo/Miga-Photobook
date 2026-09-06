@@ -199,6 +199,40 @@
 }
 </script>
 
+<!-- Star-rating rich snippet: the numbers below (5.0 average, 21 reviews)
+     are a manual snapshot of the real, currently-approved reviews shown in
+     the "تقييمات وآراء عملائنا" section further down this page (verified
+     against /reviews/list on 6 Sep 2026) — Google requires aggregateRating
+     to reflect genuine reviews that are actually visible on the page, which
+     this now is. There's no live backend rendering this file, so update
+     ratingValue/reviewCount here by hand every so often as new reviews come
+     in — a snapshot going stale for a while isn't a violation, but leaving
+     it untouched for months while the real count grows a lot would drift
+     noticeably from what visitors actually see in that section. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Miga-Photobook",
+  "description": "خدمة تحويل الصور الشخصية تلقائيًا لصور احترافية بجودة استوديو باستخدام الذكاء الاصطناعي.",
+  "image": "https://miga-photobook.com/og-image.png",
+  "brand": { "@type": "Brand", "name": "Miga-Photobook" },
+  "offers": {
+    "@type": "Offer",
+    "priceCurrency": "EGP",
+    "price": "25",
+    "url": "https://miga-photobook.com/",
+    "availability": "https://schema.org/InStock"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5.0",
+    "bestRating": "5",
+    "reviewCount": "21"
+  }
+}
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rakkas&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
@@ -581,17 +615,17 @@
         <div class="baf-connector" style="--angle:225deg; --radius:clamp(120px,36vw,225px);"></div>
         <div class="baf-connector" style="--angle:270deg; --radius:clamp(120px,36vw,225px);"></div>
         <div class="baf-connector" style="--angle:315deg; --radius:clamp(120px,36vw,225px);"></div>
-        <div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img src="before-after/after-1.jpg" alt="نتيجة 1" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img src="before-after/after-2.jpg" alt="نتيجة 2" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img src="before-after/after-3.jpg" alt="نتيجة 3" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img src="before-after/after-4.jpg" alt="نتيجة 4" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img src="before-after/after-5.jpg" alt="نتيجة 5" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img src="before-after/after-6.jpg" alt="نتيجة 6" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img src="before-after/after-7.jpg" alt="نتيجة 7" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img src="before-after/after-8.jpg" alt="نتيجة 8" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-1.jpg" alt="نتيجة 1" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-2.jpg" alt="نتيجة 2" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-3.jpg" alt="نتيجة 3" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-4.jpg" alt="نتيجة 4" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-5.jpg" alt="نتيجة 5" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-6.jpg" alt="نتيجة 6" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-7.jpg" alt="نتيجة 7" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-8.jpg" alt="نتيجة 8" loading="eager" decoding="async"></div></div>
       </div>
       <div class="baf-center">
-        <img src="before-after/before.jpg" alt="الصورة الأصلية">
+        <img src="before-after/before-after/before.jpg" alt="الصورة الأصلية">
         <span class="baf-center-label" data-i18n="bafCenterLabel">صورتك الأصلية</span>
       </div>
     </div>
@@ -919,14 +953,14 @@
   </div>
   <div class="testimonials-grid" id="testimonialsGrid">
     <div class="proof-results-grid" style="grid-column:1/-1;" id="testimonialsProofGrid">
-      <div class="proof-tile"><img src="before-after/after-1.jpg" alt="نتيجة حقيقية 1" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/after-2.jpg" alt="نتيجة حقيقية 2" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/after-3.jpg" alt="نتيجة حقيقية 3" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/after-4.jpg" alt="نتيجة حقيقية 4" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/after-5.jpg" alt="نتيجة حقيقية 5" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/after-6.jpg" alt="نتيجة حقيقية 6" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/after-7.jpg" alt="نتيجة حقيقية 7" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/after-8.jpg" alt="نتيجة حقيقية 8" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-1.jpg" alt="نتيجة حقيقية 1" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-2.jpg" alt="نتيجة حقيقية 2" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-3.jpg" alt="نتيجة حقيقية 3" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-4.jpg" alt="نتيجة حقيقية 4" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-5.jpg" alt="نتيجة حقيقية 5" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-6.jpg" alt="نتيجة حقيقية 6" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-7.jpg" alt="نتيجة حقيقية 7" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-8.jpg" alt="نتيجة حقيقية 8" loading="lazy"></div>
     </div>
   </div>
   <p class="sub" style="margin-top:16px; opacity:0.7; font-size:12.5px;" id="testimonialsNoteEl" data-i18n="testimonialsNote">* نماذج حقيقية من نتائج Miga-Photobook الفعلية.</p>
