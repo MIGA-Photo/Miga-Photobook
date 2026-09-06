@@ -2,6 +2,14 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<!-- This is an alternate design, switchable on/off from the admin panel —
+     only one design is ever meant to be "live" for customers at a time,
+     and whichever one is active is always served at the real canonical
+     URL too (miga-photobook.com/). This folder must never be indexed on
+     its own, or Google ends up seeing 3 near-identical copies of the same
+     site (root, /v2/, /v3/) and that duplicate content dilutes ranking for
+     all of them. -->
+<meta name="robots" content="noindex, nofollow">
 <!-- Favicon — same files as the root design, referenced with root-absolute
      paths since favicon.ico/.svg/apple-touch-icon.png/icon-192.png/icon-512.png
      only exist once, at the repo root, not duplicated into this design folder. -->
