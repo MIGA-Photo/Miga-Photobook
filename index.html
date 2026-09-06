@@ -235,7 +235,15 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rakkas&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<!-- The "?v=..." on styles.css and app.js below (near the closing </body>) is a
+     cache-buster. Cloudflare/browsers otherwise cache these files under their
+     bare filename for a while, so a freshly-uploaded app.js/styles.css can look
+     "not applied yet" to a visitor even though the correct file is already on
+     GitHub — because they're still being served the old cached copy from the
+     old URL. Bumping this string (e.g. 20260906a -> 20260906b) any time
+     app.js or styles.css changes forces every visitor to fetch the new file
+     immediately, no manual cache-clearing needed on their end. -->
+<link rel="stylesheet" href="styles.css?v=20260906a">
 
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
@@ -1949,7 +1957,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js"></script>
+<script src="app.js?v=20260906a"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){

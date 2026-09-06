@@ -6232,6 +6232,17 @@ async function applyHeroModeForThisDesign(){
   // always had its own internal try/catch, so calling it here is safe on
   // its own and no longer depends on everything before it succeeding first.
   renderTestimonials();
+
+  // Same reasoning, same fix, applied to the public visitor-count badge:
+  // it used to sit near the very end of this same sequential await chain
+  // (right after checkBiometricAvailability()), so any earlier step that
+  // threw (or simply took a long time) meant the badge never appeared —
+  // exactly how the reviews went silently missing before. loadVisitorCount()
+  // already has its own try/catch and fails silently on its own, so firing
+  // it here, independent of everything else in this chain, is safe and
+  // means it can no longer be taken out by an unrelated failure elsewhere.
+  initVisitorCounter();
+
   logVisitOnce();
   const prefs = await loadUiPrefs();
   await loadProducts();
@@ -6256,7 +6267,6 @@ async function applyHeroModeForThisDesign(){
   applyViewMode(prefs?.view || 'mobile');
   await checkLoggedInUser();
   checkBiometricAvailability();
-  initVisitorCounter();
 
   if(LAUNCH_PROMO){
     const pricingSection = document.getElementById('pricing');
