@@ -2921,7 +2921,17 @@ function scrollToProductCard(p){
 /** Static, always-searchable parts of the site (category sections, FAQ,
  * testimonials, etc.) — combined with live product-title matches below so
  * the search box covers the whole site, not just products. Rebuilt fresh on
- * every call so labels follow the current language. */
+ * every call so labels follow the current language.
+ *
+ * This used to only index a handful of hand-picked strings per section —
+ * e.g. only 4 of the FAQ's 7 questions, and only 2 of the pricing section's
+ * ~20 lines (missing the whole "Premium" package and both subscription
+ * plans entirely). Any search for something that was genuinely on the page
+ * but outside that short list came back empty, which read as "the search
+ * box doesn't work at all" even though the matching logic itself was fine.
+ * Fixed by listing every text key that actually appears in each section,
+ * so a query matches if the words exist ANYWHERE in that section's real
+ * content, not just in whichever few lines were originally picked. */
 function getStaticSearchIndex(){
   const cats = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
   const items = cats.map(c => ({ id:c, label: catLabel(c), keywords:[catLabel(c)], icon:`<span class="cicon ${ICON_COLOR_CLASS[c]}" style="display:inline-flex;font-size:15px;vertical-align:-2px;">${CAT_ICON[c]}</span>` }));
@@ -2929,17 +2939,33 @@ function getStaticSearchIndex(){
     { id:'howItWorks', label:t('howItWorksTitle'), keywords:[t('how1Title'), t('how1Desc'), t('how2Title'), t('how2Desc'), t('how3Title'), t('how3Desc')], icon:'❔' },
     { id:'testimonials', label:t('testimonialsTitle'), keywords:['تقييم', 'تقييمات', 'review', 'reviews', 'rating'], icon:'⭐' },
     { id:'aboutUs', label:t('aboutUsTitle'), keywords:[t('aboutUsText')], icon:'👥' },
-    { id:'faq', label:t('faqTitle'), keywords:['اسئلة', 'أسئلة', 'faq', 'questions', t('faqQ1'), t('faqA1'), t('faqQ2'), t('faqA2'), t('faqQ3'), t('faqA3'), t('faqQ4'), t('faqA4')], icon:'❓' },
+    { id:'faq', label:t('faqTitle'), keywords:['اسئلة', 'أسئلة', 'faq', 'questions',
+        t('faqQ1'), t('faqA1'), t('faqQ2'), t('faqA2'), t('faqQ3'), t('faqA3'), t('faqQ4'), t('faqA4'),
+        t('faqQ5'), t('faqA5'), t('faqQ6'), t('faqA6'), t('faqQ7'), t('faqA7')], icon:'❓' },
     { id:'whyUs', label:t('whyUsTitle'), keywords:[t('whyUs1'), t('whyUs2'), t('whyUs3'), t('whyUs4'), t('whyUs5'), t('trustBadge1'), t('trustBadge2'), t('trustBadge3'), t('trustBadge4')], icon:'✅' },
+    { id:'whyEdge', label:t('whyEdgeTitle'), keywords:[t('whyEdgeP1'), t('whyEdgeP3'), t('whyEdgeP4')], icon:'💡' },
     { id:'mostRequested', label:t('mostRequestedTitle'), keywords:[], icon:'🔥' },
-    { id:'pricing', label:t('pricingTitle'), keywords:[t('pricingSub'), t('plan1Title'), t('plan1Price'), t('plan2Title'), t('plan2Unit')], icon:'💳' },
+    { id:'pricing', label:t('pricingTitle'), keywords:[
+        t('pricingSub'), t('pricingGuaranteeNote'), t('pricingTrust1'), t('pricingTrust2'), t('pricingTrust3'),
+        t('plan1Title'), t('plan1Unit'), t('plan1Li1'), t('plan1Li2'), t('plan1Li3'),
+        t('plan2Title'), t('plan2Unit'), t('plan2Li1'), t('plan2Li2'), t('plan2Li3'),
+        t('plan3Title'), t('plan3Unit'), t('plan3Li1'), t('plan3Li2'), t('plan3Li3'),
+        t('subTitle'), t('subSub'),
+        t('subPlan1Title'), t('subPlan1Unit'), t('subPlan1Li1'), t('subPlan1Li2'), t('subPlan1Li3'),
+        t('subPlan2Title'), t('subPlan2Unit'), t('subPlan2Li1'), t('subPlan2Li2'), t('subPlan2Li3'),
+      ], icon:'💳' },
   );
   // Every section's whole body text (title + every keyword phrase) is
   // flattened into one lowercase haystack, so a query whose words are
   // scattered across a question and its answer — or a title and a bullet
   // several lines below it — still matches, instead of requiring both
-  // words to land inside the same short phrase.
-  items.forEach(it => { it.searchText = normalizeSearchText([it.label, ...it.keywords].filter(Boolean).join(' ')); });
+  // words to land inside the same short phrase. Strip any stray HTML (a
+  // couple of these strings, like whyEdgeP4, contain an inline <a> link)
+  // before flattening so tag markup never pollutes the matchable text.
+  items.forEach(it => {
+    const flat = [it.label, ...it.keywords].filter(Boolean).join(' ').replace(/<[^>]+>/g, ' ');
+    it.searchText = normalizeSearchText(flat);
+  });
   return items;
 }
 
