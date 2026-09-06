@@ -2666,20 +2666,21 @@ function getCategoryOf(productId){
 
 
 // ---------- Promo video: don't fetch any of the ~14MB file until the visitor
-// actually scrolls near it, instead of downloading it on every page load. ----------
+// deliberately taps play, instead of downloading it automatically the
+// moment the section merely scrolls into view. On mobile data (many
+// visitors here are on Egyptian cellular networks), an unrequested 14MB
+// download is real money and real lag the visitor never asked for — the
+// poster image alone already tells the story; the file itself should only
+// move once someone actually asks to watch it. ----------
 (function(){
   const vid = document.getElementById('promoVideoEl');
   if(!vid) return;
-  const io = new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting){
-        vid.src = vid.dataset.src;
-        vid.play().catch(()=>{}); // ignore autoplay-blocked errors; the poster + controls still work
-        io.disconnect();
-      }
-    });
-  }, {rootMargin: '200px'});
-  io.observe(vid);
+  function loadAndPlay(){
+    if(vid.src) return; // already loaded, let native controls take over normally
+    vid.src = vid.dataset.src;
+    vid.play().catch(()=>{}); // ignore autoplay-blocked errors; controls still work
+  }
+  vid.addEventListener('click', loadAndPlay, {once:true});
 })();
 
 // ---------- Quick-nav row ----------
@@ -6194,6 +6195,17 @@ async function applyHeroModeForThisDesign(){
 
 // ---------- Init ----------
 (async function init(){
+  // Fired independently, up front, and NOT awaited: real customer reviews
+  // exist and are approved in the database, but this call used to sit near
+  // the end of a long sequential await chain below — if ANY earlier step in
+  // that chain ever threw (network hiccup, a missing/late DOM element, an
+  // edge case in login/purchase/order loading), the whole init() function
+  // stopped right there and renderTestimonials() was simply never reached,
+  // silently leaving the placeholder proof-photo grid showing instead of
+  // real reviews with no visible error anywhere. renderTestimonials() has
+  // always had its own internal try/catch, so calling it here is safe on
+  // its own and no longer depends on everything before it succeeding first.
+  renderTestimonials();
   logVisitOnce();
   const prefs = await loadUiPrefs();
   await loadProducts();
@@ -6217,7 +6229,6 @@ async function applyHeroModeForThisDesign(){
   // now the intended default first impression (per explicit request).
   applyViewMode(prefs?.view || 'mobile');
   await checkLoggedInUser();
-  await renderTestimonials();
   checkBiometricAvailability();
   initVisitorCounter();
 
