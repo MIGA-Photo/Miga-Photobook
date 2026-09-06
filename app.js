@@ -226,7 +226,7 @@ const translations = {
     detailValue1:'✓ نحوّل صورتك تلقائيًا فور تأكيد الدفع', detailValue2:'✓ جودة استوديو احترافية مضمونة',
     detailValue3:'✓ النتيجة جاهزة للتحميل مباشرة', detailValue4:'✓ دعم فني مباشر لو احتجت مساعدة',
     detailBuyBtn:'احصل عليها الآن',
-    cropModalTitle:'اضبط إطار الصورة', cropModalSub:'حرّك الصورة واستخدم شريط التكبير عشان تظبط الإطار — كل صور المنتجات هتخرج بنفس المقاس بالظبط بعد كده.',
+    cropModalTitle:'اضبط إطار الصورة', cropModalSub:'حرّك الصورة في أي اتجاه، وكبّر/صغّر بإصبعين على الموبايل أو بشريط التكبير على الكمبيوتر — كل صور المنتجات هتخرج بنفس المقاس بالظبط بعد كده.',
     cropConfirmBtn:'تأكيد القص',
     trackModalTitle:'تتبع طلبك', trackModalSub:'أدخل كود المتابعة الذي حصلت عليه بعد إرسال طلب الشراء.',
     myOrdersTitle:'طلباتك السابقة', loadingLabel:'جاري التحميل...',
@@ -523,7 +523,7 @@ const translations = {
     detailValue1:'✓ Your photo is transformed automatically right after payment', detailValue2:'✓ Guaranteed professional studio quality',
     detailValue3:'✓ Result ready to download within minutes', detailValue4:'✓ Direct support if you need help',
     detailBuyBtn:'Get It Now',
-    cropModalTitle:'Adjust the Photo Frame', cropModalSub:'Drag the photo and use the zoom slider to fit it in the frame — every product photo will come out at exactly the same size after this.',
+    cropModalTitle:'Adjust the Photo Frame', cropModalSub:'Drag the photo in any direction, and pinch with two fingers on mobile or use the zoom slider on desktop — every product photo will come out at exactly the same size after this.',
     cropConfirmBtn:'Confirm Crop',
     trackModalTitle:'Track Your Order', trackModalSub:'Enter the tracking code you received after sending a purchase request.',
     myOrdersTitle:'Your Past Orders', loadingLabel:'Loading...',
@@ -2225,17 +2225,75 @@ window.addEventListener('mousemove', (e)=>{
   cropPointerMove(e.clientX - rect.left, e.clientY - rect.top);
 });
 window.addEventListener('mouseup', cropPointerUp);
+
+// Two-finger pinch-to-zoom, on top of the existing one-finger drag. Dragging
+// with one finger already moves the photo freely in any direction once it's
+// zoomed in past the "just covers the frame" size (clampCropOffset only
+// locks an axis when the photo exactly fits it — a photo whose shape happens
+// to exactly match the frame on one side will look locked on that side at
+// zoom×1, which reads as "only moves up/down" for some photos). Pinch lets
+// the admin zoom in past that point with two fingers, exactly like every
+// native photo-editing gesture, which then frees up movement on every side.
+let cropPinch = null; // { startDist, startScale, startOffsetX, startOffsetY, startMid }
+function cropTouchDist(t1, t2){
+  return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+}
+function cropTouchMid(t1, t2, rect){
+  return { x: (t1.clientX + t2.clientX) / 2 - rect.left, y: (t1.clientY + t2.clientY) / 2 - rect.top };
+}
 cropCanvas.addEventListener('touchstart', (e)=>{
+  if(!cropState) return;
   const rect = cropCanvas.getBoundingClientRect();
-  const t = e.touches[0];
-  cropPointerDown(t.clientX - rect.left, t.clientY - rect.top);
+  if(e.touches.length >= 2){
+    cropDragging = false; // a pinch starting mid-drag takes over from the one-finger drag
+    const [t1, t2] = e.touches;
+    const dist = cropTouchDist(t1, t2);
+    if(dist < 1) return; // fingers exactly overlapping — ignore, avoids a divide-by-zero on move
+    cropPinch = {
+      startDist: dist,
+      startScale: cropState.scale,
+      startOffsetX: cropState.offsetX,
+      startOffsetY: cropState.offsetY,
+      startMid: cropTouchMid(t1, t2, rect)
+    };
+  } else {
+    cropPinch = null;
+    const t = e.touches[0];
+    cropPointerDown(t.clientX - rect.left, t.clientY - rect.top);
+  }
 }, { passive:true });
 cropCanvas.addEventListener('touchmove', (e)=>{
+  if(!cropState) return;
   const rect = cropCanvas.getBoundingClientRect();
-  const t = e.touches[0];
-  cropPointerMove(t.clientX - rect.left, t.clientY - rect.top);
+  if(e.touches.length >= 2 && cropPinch){
+    const [t1, t2] = e.touches;
+    const w = cropCanvas.width, h = cropCanvas.height;
+    const baseScale = Math.max(w / cropState.img.width, h / cropState.img.height);
+    const maxScale = baseScale * 4; // same ceiling the zoom slider already allows
+    const dist = cropTouchDist(t1, t2);
+    let newScale = cropPinch.startScale * (dist / cropPinch.startDist);
+    newScale = Math.min(maxScale, Math.max(baseScale, newScale));
+    // Anchor the zoom on the two-finger midpoint (tracking its movement too,
+    // so a pinch that also drifts sideways pans the photo at the same time)
+    // instead of always zooming toward dead-center, which would fight
+    // against wherever the admin is actually looking.
+    const mid = cropTouchMid(t1, t2, rect);
+    const scaleRatio = newScale / cropPinch.startScale;
+    cropState.offsetX = mid.x - w/2 - (cropPinch.startMid.x - w/2 - cropPinch.startOffsetX) * scaleRatio;
+    cropState.offsetY = mid.y - h/2 - (cropPinch.startMid.y - h/2 - cropPinch.startOffsetY) * scaleRatio;
+    cropState.scale = newScale;
+    clampCropOffset();
+    drawCrop();
+    cropZoomSlider.value = String(newScale / baseScale); // keep the slider in sync with pinch zoom
+  } else if(e.touches.length === 1 && !cropPinch){
+    const t = e.touches[0];
+    cropPointerMove(t.clientX - rect.left, t.clientY - rect.top);
+  }
 }, { passive:true });
-cropCanvas.addEventListener('touchend', cropPointerUp);
+cropCanvas.addEventListener('touchend', (e)=>{
+  if(e.touches.length < 2) cropPinch = null;
+  if(e.touches.length === 0) cropPointerUp();
+});
 
 function closeCropModal(result){
   cropModalBg.classList.remove('show');
