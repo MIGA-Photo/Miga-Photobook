@@ -213,8 +213,26 @@
     margin:0; border:0; overflow:hidden;
     transition:max-height .28s ease, opacity .2s ease, padding .28s ease;
   }
-  .header-utility, #softLaunchBanner, .search-box{
+  .header-utility, #softLaunchBanner{
     max-height:200px; overflow:hidden;
+    transition:max-height .28s ease, opacity .22s ease .05s, padding .28s ease;
+  }
+  /* .search-box gets the same expanded-state max-height/transition as the
+     other two utility-strip elements above, but deliberately WITHOUT
+     overflow:hidden here — this is the actual root cause of "search results
+     don't work": #searchDropdown is an absolutely-positioned child that
+     renders BELOW the input row (top:calc(100% + 8px)), extending past
+     .search-box's own short bounding box on purpose, like any normal
+     dropdown/autocomplete. With overflow:hidden on .search-box itself, that
+     entire dropdown was clipped to zero visible pixels on EVERY search, on
+     every device, regardless of scroll position — the dropdown was always
+     being populated with correct, matching results (confirmed by reading
+     its DOM content directly), they simply had no visible area to render
+     into. overflow:hidden is still correct and kept on the .hdr-collapsed
+     rule above, where the whole search box is genuinely collapsing away and
+     hiding its dropdown along with it is the right behavior. */
+  .search-box{
+    max-height:200px; overflow:visible;
     transition:max-height .28s ease, opacity .22s ease .05s, padding .28s ease;
   }
   .hdr-collapsed .nav-wrap{
