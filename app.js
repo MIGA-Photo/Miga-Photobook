@@ -325,6 +325,7 @@ const translations = {
     tabSiteDesign:'تصميم الموقع', siteDesignIntro:'اختار الشكل اللي هيشوفه العميل لما يفتح الموقع. لوحة الإدارة نفسها بتفضل زي ما هي دايمًا مهما كان اختيارك هنا.', siteDesignLabel:'التصميم الفعّال', siteDesignV1Option:'التصميم الأول (الحالي)', siteDesignV2Option:'التصميم الثاني (الجديد)', siteDesignSaveBtn:'حفظ الاختيار', toastSiteDesignSaved:'تم حفظ التصميم — هيظهر للعملاء من زيارتهم الجاية',
     heroModeIntro:'لكل تصميم، اختار شكل عرض "قبل/بعد" في الصفحة الرئيسية — الدائرة الدوّارة الأصلية، أو السلايدر التفاعلي بالسحب. الاختيار هنا مستقل عن السلايدر الثابت الجديد في التصميم الثاني (ده فاضل سلايدر دايمًا مهما اخترت).', heroModeSaveBtn:'حفظ أوضاع الهيرو', heroModeCircle:'دائرة دوّارة', heroModeSlider:'سلايدر تفاعلي', toastHeroModesSaved:'تم حفظ أوضاع الهيرو لكل التصاميم',
     resolutionTitle:'دقة الصور الناتجة', resolutionIntro:'اختار دقة الصورة اللي الذكاء الاصطناعي بينتجها. 4K أعلى دقة وأغلى في التكلفة، و2K أرخص والفرق بينهم تقريبًا مش محسوس على شاشة الموبايل. جرّب الاتنين وقارن بنفسك.', resolutionSaveBtn:'حفظ الدقة', resolution2K:'2K — أرخص (موصى به)', resolution4K:'4K — أعلى دقة (أغلى)', toastResolutionSaved:'تم حفظ دقة الصور',
+    aiModelTitle:'موديل الذكاء الاصطناعي', aiModelIntro:'اختار موديل توليد الصور اللي هيستخدمه الموقع. كل موديل بيفرق في السعر وجودة النتيجة — جرّب صورة تجريبية بكل موديل قبل ما تعتمده بشكل نهائي. ملحوظة: اختيار "دقة الصورة" فوق مالوش تأثير على Flux 2 Pro (بياخد دايمًا أفضل دقة متاحة أوتوماتيك).', aiModelSaveBtn:'حفظ الموديل', toastAiModelSaved:'تم حفظ موديل الذكاء الاصطناعي',
     colorThemeTitle:'لون الهيدر والخلفية تحت الصور', colorThemeIntro:'اختار درجة اللون الغامق اللي تظهر في شريط الهيدر والمساحة خلف صور المنتجات. باقي ألوان الموقع (الدهبي، الخط) بتفضل زي ما هي في كل الاختيارات.', colorThemeLabel:'لون الهيدر', colorThemeBlack:'أسود (الحالي)', colorThemeBrown:'بني قهوة فخم', colorThemeEmerald:'أخضر زمردي غامق', colorThemeWine:'نبيتي غامق', colorThemeNavy:'كحلي ملكي', colorThemeRed:'أحمر / وردي غامق', colorThemeSaveBtn:'حفظ اللون', toastColorThemeSaved:'تم حفظ اللون — هيظهر للعملاء من زيارتهم الجاية',
     headerModeTitle:'شكل الهيدر', headerModeIntro:'"الشكل الحالي" يعرض كل أزرار الهيدر (اللغة، الوضع الليلي، عرض الموبايل/الكمبيوتر، تتبع الطلب) في شريط دايمًا ظاهر. "قائمة مطوية" بينقلهم جوه قائمة (☰) بتتفتح عند الضغط، وده بيقلل ارتفاع الهيدر.', headerModeLabel:'وضع الهيدر', headerModeClassicOption:'الشكل الحالي', headerModeCompactOption:'قائمة مطوية (☰)', headerModeSaveBtn:'حفظ شكل الهيدر', toastHeaderModeSaved:'تم حفظ شكل الهيدر — هيظهر للعملاء من زيارتهم الجاية',
     menuTitle:'القائمة', drawerLangLabel:'اللغة', drawerThemeLabel:'المظهر', drawerViewLabel:'طريقة العرض', drawerOrderLabel:'الطلبات', drawerGuestHint:'لحفظ اسمك وتليفونك وصورتك', drawerHaveAccount:'عندك حساب؟ سجّل دخول',
@@ -622,6 +623,7 @@ const translations = {
     tabSiteDesign:'Site Design', siteDesignIntro:'Choose which look customers see when they open the site. The admin panel itself always stays the same regardless of your choice here.', siteDesignLabel:'Active design', siteDesignV1Option:'Design 1 (current)', siteDesignV2Option:'Design 2 (new)', siteDesignSaveBtn:'Save choice', toastSiteDesignSaved:'Design saved — customers will see it on their next visit',
     heroModeIntro:'For each design, choose the "before/after" showcase style on the homepage — the original orbiting circle, or the interactive drag slider. This choice is independent of Design 2\'s new fixed slider (that one always stays a slider regardless).', heroModeSaveBtn:'Save hero modes', heroModeCircle:'Orbiting circle', heroModeSlider:'Interactive slider', toastHeroModesSaved:'Hero modes saved for every design',
     resolutionTitle:'Output image resolution', resolutionIntro:'Choose the resolution the AI generates. 4K is higher detail and costs more per image; 2K is cheaper and the difference is essentially invisible on a phone screen. Try both and compare.', resolutionSaveBtn:'Save resolution', resolution2K:'2K — cheaper (recommended)', resolution4K:'4K — highest detail (pricier)', toastResolutionSaved:'Output resolution saved',
+    aiModelTitle:'AI model', aiModelIntro:'Choose which image-generation model the site uses. Each model differs in price and result quality — try a test image with each before committing to it. Note: the resolution choice above has no effect on Flux 2 Pro (it always uses the best resolution automatically).', aiModelSaveBtn:'Save model', toastAiModelSaved:'AI model saved',
     colorThemeTitle:'Header and image-background color', colorThemeIntro:'Choose the dark shade used for the header bar and the space behind product images. The rest of the site colors (gold, text) stay the same across every option.', colorThemeLabel:'Header color', colorThemeBlack:'Black (current)', colorThemeBrown:'Warm coffee brown', colorThemeEmerald:'Deep emerald green', colorThemeWine:'Deep wine', colorThemeNavy:'Royal navy', colorThemeRed:'Deep red / rose', colorThemeSaveBtn:'Save color', toastColorThemeSaved:'Color saved — customers will see it on their next visit',
     headerModeTitle:'Header layout', headerModeIntro:'"Current layout" shows every header button (language, dark mode, mobile/desktop preview, track order) in an always-visible strip. "Collapsed menu" moves them into a (☰) menu that opens on tap, which shortens the header.', headerModeLabel:'Header layout', headerModeClassicOption:'Current layout', headerModeCompactOption:'Collapsed menu (☰)', headerModeSaveBtn:'Save header layout', toastHeaderModeSaved:'Header layout saved — customers will see it on their next visit',
     menuTitle:'Menu', drawerLangLabel:'Language', drawerThemeLabel:'Appearance', drawerViewLabel:'View mode', drawerOrderLabel:'Orders', drawerGuestHint:'To save your name, phone, and photo', drawerHaveAccount:'Already have an account? Log in',
@@ -4436,6 +4438,12 @@ async function loadSiteDesignIntoAdmin(){
     if(resSelect && data.outputResolution){
       resSelect.value = data.outputResolution;
     }
+    const modelSelect = document.getElementById('aiModelSelect');
+    if(modelSelect){
+      const models = Array.isArray(data.availableModels) ? data.availableModels : [];
+      if(models.length) modelSelect.innerHTML = models.map(m => `<option value="${m.id}">${escapeHtml(m[lang] || m.id)}</option>`).join('');
+      if(data.aiModel) modelSelect.value = data.aiModel;
+    }
     const colorThemeSelect = document.getElementById('colorThemeSelect');
     if(colorThemeSelect){
       colorThemeSelect.value = data.colorTheme || 'black';
@@ -4528,6 +4536,25 @@ document.getElementById('saveResolutionBtn').onclick = async ()=>{
     });
     const data = await res.json().catch(()=>({}));
     showToast((res.ok && data.ok) ? t('toastResolutionSaved') : t('toastAdminServerError'));
+  }catch(e){
+    showToast(t('toastAdminServerError'));
+  }
+};
+
+/** Saves which fal.ai model generates the customer's photo. Same pattern as
+ * the resolution save button above — its own control so Magdy can flip
+ * models, generate one test image, and compare quality/cost before
+ * committing a change that affects every paying customer's order. */
+document.getElementById('saveAiModelBtn').onclick = async ()=>{
+  if(!BACKEND_BASE || !adminSessionToken) return;
+  const model = document.getElementById('aiModelSelect').value;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/set-ai-model?token=${encodeURIComponent(adminSessionToken)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ model })
+    });
+    const data = await res.json().catch(()=>({}));
+    showToast((res.ok && data.ok) ? t('toastAiModelSaved') : t('toastAdminServerError'));
   }catch(e){
     showToast(t('toastAdminServerError'));
   }
