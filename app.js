@@ -8,9 +8,12 @@ const LAUNCH_PROMO_END = new Date('2026-09-18T23:59:59+02:00');
 // "Buy the prompt" service — same launch-promo pattern as photo prices.
 const PROMPT_PRICE = 10;
 const PROMPT_ORIGINAL_PRICE = 15;
-// Card (Paymob) and Fawry are hidden from customers until their merchant credentials
+// Card (Fawaterk) and Fawry are hidden from customers until their merchant credentials
 // are set up (see transform-worker.js setup notes). Flip either to true once ready —
 // no other change needed, the payment tab will reappear automatically.
+// IMPORTANT: only flip card to true after one successful real test payment through
+// Fawaterk — the production API base URL for Fawaterk was inferred, not confirmed
+// by Fawaterk support, so it needs one live proof before real customers use it.
 const PAYMENT_METHODS_ENABLED = { card: false, fawry: false };
 // Was hardcoded to Arabic, so every price ("25 جنيه") stayed Arabic even on the
 // English page. Now tracks the active language and is refreshed in applyLanguage().
@@ -1907,13 +1910,13 @@ document.getElementById('payCardFawryBtn').onclick = async ()=>{
     // Create the underlying order first (same order system as InstaPay), then hand off to the gateway.
     const orderRes = await fetch(`${BACKEND_BASE}/orders/create`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: amount, phone, appUsed: method==='card' ? 'Paymob' : 'Fawry', ref:'', buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '', orderType: currentBuyType, packageSize: currentBuyType==='package' ? currentPackageSize : undefined })
+      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: amount, phone, appUsed: method==='card' ? 'Fawaterk' : 'Fawry', ref:'', buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '', orderType: currentBuyType, packageSize: currentBuyType==='package' ? currentPackageSize : undefined })
     });
     const orderData = await orderRes.json();
     if(!orderRes.ok || !orderData.code){ showToast(t('toastOrderFailed')); return; }
 
     if(method === 'card'){
-      const res = await fetch(`${BACKEND_BASE}/payment/paymob/create`, {
+      const res = await fetch(`${BACKEND_BASE}/payment/fawaterk/create`, {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ orderCode: orderData.code, amount, name, phone, email })
       });

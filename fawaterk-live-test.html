@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>اختبار Fawaterk</title>
+<style>
+  body{font-family:sans-serif;max-width:480px;margin:20px auto;padding:0 16px;background:#f7f7f7}
+  h1{font-size:18px}
+  label{display:block;margin-top:10px;font-size:14px;color:#333}
+  input{width:100%;box-sizing:border-box;padding:8px;font-size:16px;border:1px solid #ccc;border-radius:6px;margin-top:4px}
+  button{margin-top:16px;width:100%;padding:12px;font-size:16px;background:#2563eb;color:#fff;border:none;border-radius:6px}
+  #result{margin-top:16px;padding:12px;border-radius:6px;white-space:pre-wrap;word-break:break-all;font-family:monospace;font-size:13px;display:none}
+  .ok{background:#dcfce7;color:#166534;display:block !important}
+  .fail{background:#fee2e2;color:#991b1b;display:block !important}
+</style>
+</head>
+<body>
+<h1>اختبار سريع لتكامل Fawaterk — /payment/fawaterk/create</h1>
+<p style="font-size:13px;color:#666">ده اختبار بس بيطلب من Fawaterk إنشاء رابط فاتورة — مفيش فلوس بتتحرك، ومفيش عميل بيتأثر. لو رجع لينا رابط دفع، معناه المفتاح صح والاتصال شغال.</p>
+
+<label>اسم</label>
+<input id="name" value="Test Magdy">
+<label>موبايل</label>
+<input id="phone" value="01000000000">
+<label>إيميل</label>
+<input id="email" value="test@example.com">
+<label>المبلغ (EGP)</label>
+<input id="amount" value="5">
+
+<button id="btn">اختبر الآن</button>
+<div id="result"></div>
+
+<script>
+document.getElementById('btn').onclick = async () => {
+  const resEl = document.getElementById('result');
+  resEl.className = '';
+  resEl.style.display = 'block';
+  resEl.textContent = 'جاري الاختبار...';
+  const orderCode = 'TEST-' + Date.now();
+  try {
+    const r = await fetch('https://miga-photobook-api.magdyfarouk380.workers.dev/payment/fawaterk/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        orderCode,
+        amount: Number(document.getElementById('amount').value),
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value,
+      })
+    });
+    const text = await r.text();
+    let pretty = text;
+    try { pretty = JSON.stringify(JSON.parse(text), null, 2); } catch {}
+    resEl.className = r.ok ? 'ok' : 'fail';
+    resEl.textContent = 'HTTP ' + r.status + '\n' + pretty;
+  } catch (e) {
+    resEl.className = 'fail';
+    resEl.textContent = 'فشل الطلب فعليًا (على الأغلب مشكلة CORS أو الشبكة):\n' + String(e);
+  }
+};
+</script>
+</body>
+</html>
