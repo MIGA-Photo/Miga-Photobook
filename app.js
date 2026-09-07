@@ -5440,11 +5440,15 @@ document.getElementById('changeAdminPassBtn').onclick = async ()=>{
 
 const NEW_PRODUCT_DEFAULT_TITLE = 'Miga-photobook';
 const NEW_PRODUCT_DEFAULT_PRICE = 25;
-// Every new product's AI-transform prompt starts with this watermark
-// instruction pre-filled — it's still a normal editable textarea, so the
-// admin can add to it or delete it per product, but it no longer has to be
-// re-typed from scratch every single time.
-const NEW_PRODUCT_DEFAULT_PROMPT = 'Add  a custom luxury signature watermark logo at bottom-right: royal king crown with "Miga-photobook " in shield crest, metallic gold, elegant, minimal, premium, glowing edges, embossed texture, naturally blending.';
+// This used to pre-fill every new product's prompt with a hardcoded
+// watermark/logo instruction (a placeholder "royal crown" design, never the
+// real site logo). As of 2026-09-07 the real logo watermark is added
+// automatically server-side (transform-worker.js: WATERMARK_SUFFIX) for
+// every product, old and new, so it no longer belongs here — a new product's
+// prompt field now starts empty and should contain ONLY that product's own
+// transformation instructions (background, style, lighting...), never
+// anything about the logo/watermark.
+const NEW_PRODUCT_DEFAULT_PROMPT = '';
 
 /** Puts the add-product form back to a clean state for the *next* product:
  * the suggested name and price are filled in ready to be typed over, rather
