@@ -1524,12 +1524,24 @@
   .order-actions{display:flex; gap:8px; margin-top:8px;}
   .order-actions button{flex:1; padding:7px; border-radius:6px; font-size:12.5px;}
 
+  /* التوست ماكانش بيتخفي فعليًا — كان بس بيتزحلق لتحت بـ translateY(120%)
+     وبيعتمد إن الإزاحة دي تخرجه بره حافة الشاشة. على bottom:24px الإزاحة
+     (~29px) كانت بتوديه تحت الحافة فعلاً، فمحدش شافه. أول ما اترفع لـ96px
+     عشان يعدّي شريط المتصفح، نفس الإزاحة بقت بتسيبه على ~67px من تحت —
+     يعني **ظاهر على الشاشة، فاضي، وطول الوقت**: مستطيل أبيض صغير في نص
+     الشاشة. الحل إنه يتخفى بجد (شفافية + visibility) مش بالإزاحة بس. */
   .toast{
     position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(120%);
     background:var(--paper); color:var(--ink); padding:12px 22px; border-radius:8px;
-    font-size:14px; font-weight:600; z-index:300; transition:transform .3s ease;
+    font-size:14px; font-weight:600; z-index:300;
+    opacity:0; visibility:hidden; pointer-events:none;
+    transition:transform .3s ease, opacity .25s ease, visibility 0s linear .3s;
   }
-  .toast.show{transform:translateX(-50%) translateY(0);}
+  .toast.show{
+    transform:translateX(-50%) translateY(0);
+    opacity:1; visibility:visible;
+    transition:transform .3s ease, opacity .25s ease, visibility 0s;
+  }
   /* On a phone the browser's own bottom bar (the URL/tabs strip in Safari and
      Chrome) sits over the last ~50-90px of the page, and a fixed element
      anchored 24px from the bottom lands underneath it — every toast was being
