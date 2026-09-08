@@ -2226,6 +2226,10 @@
     padding-bottom:4px;
   }
   .admin-tabs::-webkit-scrollbar{display:none;}
+  /* .admin-modal فوقيها touch-action:pan-y (عشان السحب الأفقي يبقى لـ JS
+     بتاع طي اللوحة) — وده كان بيمنع المتصفح من تحريك شريط التبويبات أفقيًا
+     أصلاً. الشريط ده بيسترد السحب الأفقي لنفسه. */
+  .admin-tabs{ touch-action: pan-x; }
   .admin-tabs button{
     flex:0 0 auto; min-width:auto; white-space:nowrap;
     min-height:44px; padding:0 16px; border-radius:10px;

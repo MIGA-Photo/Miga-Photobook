@@ -751,11 +751,134 @@ function shortenProductTitle(title, isEnglish){
   const match = title.match(pattern);
   return match ? match[1] : title;
 }
+
+/* ---------- الاسم الإنجليزي للمنتج ----------
+ * الاسم بيتكتب بالعربي، وخانة "العنوان بالإنجليزي" في لوحة الإدارة كانت
+ * متعبّية مسبقًا بالقيمة "Miga-photobook" جوه الـHTML — فأي منتج يتحفظ من
+ * غير ما الخانة دي تتمسح بياخد الاسم ده، والصفحة الإنجليزية بتعرض كل
+ * المنتجات باسم واحد. القيمة اتشالت من الخانة، والاسم ده بقى متعامل معاه
+ * هنا على إنه "مش اسم" حتى لو موجود في بيانات منتجات قديمة — يعني
+ * المنتجات القديمة اتصلحت من غير ما نكتب أي حاجة في قاعدة البيانات.
+ *
+ * الترجمة بقاموس مفردات، مش خدمة خارجية: offline، فورية، وبدون تكلفة.
+ * القاعدة الحاكمة: **يا الاسم كله يتترجم يا مايتترجمش خالص** — اسم نصه
+ * عربي ونصه إنجليزي أوحش من الاسم العربي كامل. أي كلمة مش في القاموس
+ * معناها إننا نسيب الاسم العربي زي ما هو. */
+const DEFAULT_TITLE_PLACEHOLDERS = ['miga-photobook', 'miga photobook', 'migaphotobook'];
+function isPlaceholderTitle(s){
+  return !s || DEFAULT_TITLE_PLACEHOLDERS.includes(String(s).trim().toLowerCase());
+}
+
+const ARABIC_LETTER_RE = /[؀-ۿ]/;
+const TITLE_GAP = ''; // فاصل مؤقت جوه العبارات المترجمة عشان ماتتقسمش كلمات
+
+/* عبارات كاملة تتفحص الأول (قبل الكلمة الواحدة) */
+const TITLE_PHRASES_AR_EN = [
+  ['أبيض وأسود', 'Black & White'],
+  ['ابيض واسود', 'Black & White'],
+  ['العودة للمدارس', 'Back to School'],
+  ['عودة للمدارس', 'Back to School'],
+  ['عيد ميلاد', 'Birthday'],
+  ['كرة قدم', 'Football'],
+  ['كرة القدم', 'Football'],
+  ['مجلات وملصقات', 'Magazine & Poster'],
+];
+
+const TITLE_WORDS_AR_EN = {
+  'ميجا':'Miga',
+  'أطفال':'Kids','اطفال':'Kids','رجالي':'Men','نسائي':'Women','أعمال':'Business','اعمال':'Business',
+  'سينمائي':'Cinematic','سينمائية':'Cinematic','فني':'Artistic','فنية':'Artistic',
+  'مجلات':'Magazine','مجلة':'Magazine','ملصقات':'Posters','فاخر':'Luxury',
+  'بورتريه':'Portrait','صورة':'Photo','ستايل':'Style','شخصي':'Personal','شخصية':'Personal',
+  'احترافي':'Professional','احترافية':'Professional','رسمي':'Formal','رسمية':'Formal',
+  'إضاءة':'Lighting','اضاءة':'Lighting','استوديو':'Studio','طبيعية':'Natural','طبيعي':'Natural',
+  'كلاسيك':'Classic','كلاسيكي':'Classic','كلاسيكية':'Classic','عتيق':'Vintage','قديم':'Vintage',
+  'حديث':'Modern','حديثة':'Modern','فخم':'Elegant','فخمة':'Elegant','أنيق':'Elegant','انيق':'Elegant',
+  'شتوي':'Winter','صيفي':'Summer','خريفي':'Autumn','ربيعي':'Spring',
+  'قهوة':'Coffee','مكتب':'Office','بدلة':'Suit','كاجوال':'Casual',
+  'مدرسة':'School','مدارس':'School','تخرج':'Graduation','زفاف':'Wedding','خطوبة':'Engagement',
+  'سفاري':'Safari','مغامرة':'Adventure','فضاء':'Space','بحر':'Sea','شاطئ':'Beach','صحراء':'Desert',
+  'ملك':'King','أمير':'Prince','امير':'Prince','ملكة':'Queen','أميرة':'Princess','اميرة':'Princess',
+  'فرعوني':'Pharaonic','فرعونية':'Pharaonic','تراثي':'Heritage','تراثية':'Heritage',
+  'رياضة':'Sports','رياضي':'Sports','بطل':'Hero','محارب':'Warrior','فارس':'Knight',
+  'كارتون':'Cartoon','أنمي':'Anime','انمي':'Anime','رسم':'Drawing','لوحة':'Painting','زيتي':'Oil',
+  'شعار':'Logo','إطار':'Frame','اطار':'Frame','كروم':'Chrome','ذهبي':'Golden','فضي':'Silver',
+  'كتاب':'Book','قصص':'Stories','قصة':'Story','غلاف':'Cover',
+  'طبيب':'Doctor','مهندس':'Engineer','معلم':'Teacher','دكتور':'Doctor',
+  'عربي':'Arabic','عربية':'Arabic','إنجليزي':'English','انجليزي':'English','توقيع':'Signature',
+  'الاسم':'Name','اسم':'Name','باسم':'with Name','التمساح':'Crocodile','تمساح':'Crocodile',
+  // وقت ومكان
+  'صباح':'Morning','الصباح':'Morning','مساء':'Evening','المساء':'Evening','ليل':'Night','الليل':'Night',
+  'غروب':'Sunset','شروق':'Sunrise','مدينة':'City','المدينة':'City','ريف':'Countryside','شارع':'Street',
+  'حديقة':'Garden','مطر':'Rain','ثلج':'Snow','نار':'Fire','سماء':'Sky','جبل':'Mountain','غابة':'Forest',
+  // مصر
+  'مصر':'Egypt','مصري':'Egyptian','مصرية':'Egyptian','القاهرة':'Cairo','النيل':'Nile','نيل':'Nile',
+  'أهرامات':'Pyramids','الأهرامات':'Pyramids','اهرامات':'Pyramids','الاهرامات':'Pyramids',
+  'مسجد':'Mosque','قلعة':'Castle','معبد':'Temple',
+  // ناس ومهن
+  'طيار':'Pilot','جندي':'Soldier','ضابط':'Officer','شرطي':'Police','رجل':'Man','ولد':'Boy','بنت':'Girl',
+  'عروسة':'Bride','عريس':'Groom','عائلة':'Family','أب':'Father','أم':'Mother',
+  // أشياء وستايلات
+  'سيارة':'Car','دراجة':'Bike','حصان':'Horse','أسد':'Lion','اسد':'Lion','نمر':'Tiger','صقر':'Falcon',
+  'نجم':'Star','أسطورة':'Legend','اسطورة':'Legend','ملكي':'Royal','ملكية':'Royal','ذهب':'Gold',
+  'نظارة':'Glasses','ساعة':'Watch','كاميرا':'Camera','ورد':'Flowers','بالون':'Balloons',
+  'سوبر':'Super','هيرو':'Hero','بطولة':'Championship','كأس':'Cup','ميدالية':'Medal',
+  'ثلاثي':'3D','الأبعاد':'Dimensions','مصغر':'Miniature','مجسم':'Figurine','دمية':'Doll',
+  'نيون':'Neon','دخان':'Smoke','ظل':'Shadow','انعكاس':'Reflection','مرآة':'Mirror',
+};
+
+/** يترجم اسم منتج عربي كامل، أو يرجّع null لو فيه أي كلمة مش معروفة. */
+function translateProductTitle(ar){
+  if(!ar || !ARABIC_LETTER_RE.test(ar)) return null;
+  let s = String(ar).trim();
+  for(const [phrase, en] of TITLE_PHRASES_AR_EN){
+    if(s.indexOf(phrase) !== -1) s = s.split(phrase).join(' ' + en.split(' ').join(TITLE_GAP) + ' ');
+  }
+  const out = [];
+  for(const raw of s.split(/\s+/)){
+    const tok = raw.trim();
+    if(!tok) continue;
+    if(!ARABIC_LETTER_RE.test(tok)){ out.push(tok); continue; }  // أرقام، رموز، كلمات إنجليزية
+    const bare = tok.replace(/^ال/, '');               // شيل "ال" التعريف
+    const hit = TITLE_WORDS_AR_EN[tok] || TITLE_WORDS_AR_EN[bare];
+    if(!hit) return null;                                        // كلمة مجهولة -> مانترجمش خالص
+    out.push(hit);
+  }
+  const joined = out.join(' ').split(TITLE_GAP).join(' ').replace(/\s+/g,' ').trim();
+  return joined || null;
+}
+
+/** يقترح الاسم الإنجليزي وأنت بتكتب العربي في لوحة الإدارة.
+ * الاقتراح بيتكتب في الخانة عشان يكون قابل للتعديل قبل الحفظ، ومبيلمسش
+ * الخانة أبدًا لو الأدمن كتب فيها بنفسه — بنتتبع آخر اقتراح إحنا كتبناه،
+ * ولو اللي في الخانة مش هو، يبقى ده كلام الأدمن ومحدش يمسّه. */
+let lastSuggestedTitleEn = '';
+function initTitleEnSuggestion(){
+  const ar = document.getElementById('pTitle');
+  const en = document.getElementById('pTitleEn');
+  if(!ar || !en) return;
+  ar.addEventListener('input', ()=>{
+    const cur = en.value.trim();
+    if(cur && cur !== lastSuggestedTitleEn) return;   // الأدمن كتب اسمه بنفسه
+    const guess = translateProductTitle(ar.value) || '';
+    en.value = guess;
+    lastSuggestedTitleEn = guess;
+  });
+}
+initTitleEnSuggestion();
+
+/** الاسم الإنجليزي المعروض: اللي كتبه الأدمن، وإلا ترجمة القاموس، وإلا العربي. */
+function productTitleEn(p){
+  if(!isPlaceholderTitle(p.titleEn)) return p.titleEn;
+  return translateProductTitle(p.title) || p.title;
+}
+
 function productTitle(p){
   if(!p) return '';
-  const isEnglish = currentLang === 'en' && p.titleEn;
-  const full = isEnglish ? p.titleEn : p.title;
-  return shortenProductTitle(full, isEnglish);
+  const useEn = currentLang === 'en';
+  const full = useEn ? productTitleEn(p) : p.title;
+  // النمط الإنجليزي للاختصار يتطبق بس لو الاسم فعلاً طلع إنجليزي
+  return shortenProductTitle(full, useEn && !ARABIC_LETTER_RE.test(full));
 }
 
 async function saveUiPrefs(){
@@ -4049,7 +4172,28 @@ elById('adminCollapseBtn').onclick = ()=>{
   const DIRECTION_LOCK = 10; // px of movement before deciding this is a horizontal swipe, not a scroll/tap
   let tracking = false, horizontal = false, activePointerId = null, startX = 0, startY = 0, startTarget = null;
 
+  /** Does this gesture start inside something that scrolls sideways on its
+   * own — the tabs strip, or any future horizontal row in the panel?
+   * If so the swipe belongs to THAT element, not to "dismiss the panel".
+   * Without this the two features fight: the tabs bar became a horizontal
+   * strip, and every attempt to swipe it just folded the whole panel away. */
+  function startsInsideHorizontalScroller(target){
+    let el = target;
+    while(el && el !== modal){
+      if(el.scrollWidth > el.clientWidth + 2){
+        const ox = getComputedStyle(el).overflowX;
+        if(ox === 'auto' || ox === 'scroll') return true;
+      }
+      el = el.parentElement;
+    }
+    return false;
+  }
+
   modal.addEventListener('pointerdown', (e)=>{
+    if(startsInsideHorizontalScroller(e.target)){
+      tracking = false;
+      return;
+    }
     tracking = true; horizontal = false;
     activePointerId = e.pointerId;
     startX = e.clientX; startY = e.clientY;
@@ -6158,7 +6302,8 @@ elById('pImage').addEventListener('change', async (e)=>{
 elById('pSaveBtn').onclick = async ()=>{
   const cat = document.getElementById('pCat').value;
   const title = document.getElementById('pTitle').value.trim();
-  const titleEn = document.getElementById('pTitleEn').value.trim();
+  let titleEn = document.getElementById('pTitleEn').value.trim();
+  if(isPlaceholderTitle(titleEn)) titleEn = '';   // ماينحفظش الاسم الافتراضي كأنه اسم حقيقي
   const price = parseFloat(document.getElementById('pPrice').value || '0');
   const promptText = document.getElementById('pPrompt').value.trim();
   const fileInput = document.getElementById('pImage');
@@ -6261,7 +6406,8 @@ function editProduct(id){
   editingProductId = id;
   document.getElementById('pCat').value = p.category;
   document.getElementById('pTitle').value = p.title;
-  document.getElementById('pTitleEn').value = p.titleEn || '';
+  document.getElementById('pTitleEn').value = isPlaceholderTitle(p.titleEn) ? '' : p.titleEn;
+  lastSuggestedTitleEn = '';
   document.getElementById('pPrice').value = p.price;
   document.getElementById('pPrompt').value = p.prompt;
   document.getElementById('pImage').value = '';
