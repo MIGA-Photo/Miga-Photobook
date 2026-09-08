@@ -1114,6 +1114,10 @@ function toggleFavCategory(cat){
   if(nowFav) favCategories.unshift(cat); else favCategories.splice(i, 1);
   saveFavorites();
   renderCatTiles();
+  // Must refresh the favourites list too — hearting a category adds it to
+  // that list (and to the drawer count). Without this the tap saved silently
+  // and NOTHING appeared anywhere, which is exactly how this first shipped.
+  renderFavorites();
   showToast(t(nowFav ? 'toastFavCatAdded' : 'toastFavCatRemoved'));
 }
 
@@ -1124,7 +1128,18 @@ function renderFavorites(){
   const section = document.getElementById('favorites');
   const grid = document.getElementById('favoritesGrid');
   const dots = document.getElementById('gridDots-favorites');
+  const catsWrap = document.getElementById('favoritesCats');
   if(!section || !grid) return;
+
+  // Categories the visitor hearted belong IN this list, not only pinned to the
+  // front of the category row: the list was asked for as "my favourites, from
+  // the categories or the products", so both kinds live here side by side.
+  // Rendered with the exact same tile the category row uses.
+  const favCats = favCategories.filter(c => CAT_IDS.includes(c));
+  if(catsWrap){
+    catsWrap.innerHTML = favCats.map(catTileHtml).join('');
+    catsWrap.style.display = favCats.length ? '' : 'none';
+  }
 
   // Kept in the order they were added (newest first), and silently skips any
   // id that no longer exists or has lost its photo, so a product the admin
@@ -1133,9 +1148,10 @@ function renderFavorites(){
     .map(id => products.find(p => p.id === id))
     .filter(p => p && p.image && p.image !== PLACEHOLDER_IMG);
 
-  updateFavDrawerRow(items.length);
+  updateFavDrawerRow(items.length + favCats.length);
 
-  if(!items.length){
+  // The section shows if EITHER list has something in it.
+  if(!items.length && !favCats.length){
     section.style.display = 'none';
     grid.innerHTML = '';
     if(dots) dots.innerHTML = '';
@@ -1143,6 +1159,7 @@ function renderFavorites(){
   }
   section.style.display = '';
   grid.innerHTML = items.map(p => renderProductCard(p)).join('');
+  grid.style.display = items.length ? '' : 'none';
   buildRowArrows('favorites', dots, grid);
 }
 
@@ -1834,12 +1851,34 @@ function categoryCover(items, cat){
 function renderCatTiles(){
   const wrap = document.getElementById('categoryTilesGrid');
   if(!wrap) return;
-  // A visitor's pinned categories come first. Array.prototype.sort is stable,
-  // so everything else keeps its original CAT_IDS order — pinning reorders,
-  // it never hides or reshuffles the rest.
-  const ordered = [...CAT_IDS].sort((a, b) =>
-    (favCategories.includes(b) ? 1 : 0) - (favCategories.includes(a) ? 1 : 0));
-  wrap.innerHTML = ordered.map(cat=>{
+  wrap.innerHTML = catTileOrder().map(catTileHtml).join('');
+  renderCatTilesArrows();
+}
+
+/** The order the tiles appear in, decided ONCE per visit: a visitor's pinned
+ * categories first, everything else in its normal order (sort is stable, so
+ * pinning only moves things forward, it never reshuffles the rest).
+ *
+ * Frozen deliberately. Re-sorting on every render meant that hearting a
+ * category made the whole row jump under the finger that just tapped it —
+ * the tile you were looking at slid away mid-tap, and a second tap landed on
+ * whatever had moved into its place. The pin still works; it simply takes
+ * effect on the next visit, which is when a shortcut is actually useful.
+ * Meanwhile the hearted category shows up immediately in "my favourites" at
+ * the top of the page, so the tap is never without feedback. */
+let CAT_TILE_ORDER = null;
+function catTileOrder(){
+  if(!CAT_TILE_ORDER){
+    CAT_TILE_ORDER = [...CAT_IDS].sort((a, b) =>
+      (favCategories.includes(b) ? 1 : 0) - (favCategories.includes(a) ? 1 : 0));
+  }
+  return CAT_TILE_ORDER;
+}
+
+/** One category tile. Pulled out of renderCatTiles() so the favourites
+ * section can render the very same tile — same photo, same count, same tap —
+ * rather than a second, slightly-different-looking copy of the idea. */
+function catTileHtml(cat){
     const items = itemsForCategoryTile(cat);
     const cover = categoryCover(items, cat);
     const isOpen = document.getElementById(cat)?.classList.contains('open');
@@ -1876,7 +1915,11 @@ function renderCatTiles(){
       </div>
       <span class="sh-chevron" aria-hidden="true">&#9660;</span>
     </button>`;
-  }).join('');
+}
+
+function renderCatTilesArrows(){
+  const wrap = document.getElementById('categoryTilesGrid');
+  if(!wrap) return;
   // Same arrows as every product row, for the same reason — the tiles are now
   // one horizontal line, and the arrows are what make that obvious on a
   // desktop pointer, where there is no swipe to discover.
@@ -1919,7 +1962,7 @@ function cycleCategoryCover(cat){
 // Enter/Space on either span-button on a tile (pin, cycle photo). They can't
 // be real <button>s — the tile itself is one — so the keyboard behaviour a
 // button would give for free has to be wired up by hand.
-document.getElementById('categoryTilesGrid')?.addEventListener('keydown', (e)=>{
+function handleCatTilesKeydown(e){
   if(e.key !== 'Enter' && e.key !== ' ') return;
   const fav = e.target.closest('[data-fav-cat]');
   const cycle = e.target.closest('[data-cycle]');
@@ -1928,9 +1971,9 @@ document.getElementById('categoryTilesGrid')?.addEventListener('keydown', (e)=>{
   e.stopPropagation();
   if(fav) toggleFavCategory(fav.getAttribute('data-fav-cat'));
   else cycleCategoryCover(cycle.getAttribute('data-cycle'));
-});
+}
 
-document.getElementById('categoryTilesGrid')?.addEventListener('click', (e)=>{
+function handleCatTilesClick(e){
   const fav = e.target.closest('[data-fav-cat]');
   if(fav){
     // Swallow the tap so the tile underneath does not also open.
@@ -1956,6 +1999,16 @@ document.getElementById('categoryTilesGrid')?.addEventListener('click', (e)=>{
   tile.classList.toggle('open', willOpen);
   tile.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
   if(willOpen) sec.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// The same two handlers serve BOTH places a category tile can appear — the
+// category row and the favourites list — so a tile behaves identically
+// wherever it is shown, instead of the copy in one of them being inert.
+['categoryTilesGrid', 'favoritesCats'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.addEventListener('click', handleCatTilesClick);
+  el.addEventListener('keydown', handleCatTilesKeydown);
 });
 
 /** Shared helper for every other place in the app that needs to jump a

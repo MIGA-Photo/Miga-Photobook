@@ -1434,6 +1434,16 @@
     font-size:14px; font-weight:600; z-index:300; transition:transform .3s ease;
   }
   .toast.show{transform:translateX(-50%) translateY(0);}
+  /* On a phone the browser's own bottom bar (the URL/tabs strip in Safari and
+     Chrome) sits over the last ~50-90px of the page, and a fixed element
+     anchored 24px from the bottom lands underneath it — every toast was being
+     swallowed by that bar. Lifting it clear of both the bar and the row of
+     floating buttons is the same fix already applied to .stay-nudge below.
+     env() adds the home-indicator inset on top wherever the browser reports
+     one. */
+  @media(max-width:560px){
+    .toast{ bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+  }
 
   .contact-widget{position:fixed; bottom:26px; left:26px; z-index:200; display:flex; flex-direction:column; align-items:flex-start; gap:12px;}
 
