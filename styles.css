@@ -943,11 +943,35 @@
      photos, arranged in neat aligned rows on desktop and mobile. Clicking a
      tile opens (and scrolls to) the matching collapsible category section
      further down the page. ===== */
+  /* One horizontal, snap-scrolling line — deliberately the SAME interaction as
+     every product row on the page, so the whole site is swiped the same way
+     instead of asking a visitor to scroll a grid here and swipe a row a few
+     inches lower. The widths below always leave the next tile peeking past
+     the edge: without that peek nothing signals there are more categories,
+     and a carousel that looks like it holds one item gets treated like it
+     holds one item. */
   .cat-tiles-grid{
-    display:grid; grid-template-columns:repeat(4, 1fr); gap:18px;
+    display:flex; gap:18px; align-items:flex-start;
+    overflow-x:auto; overflow-y:hidden;
+    scroll-snap-type:x mandatory; scroll-behavior:smooth;
+    scrollbar-width:none; -ms-overflow-style:none;
+    padding-bottom:4px;
+    overscroll-behavior-x:contain;
   }
-  @media(max-width:980px){ .cat-tiles-grid{grid-template-columns:repeat(3, 1fr);} }
-  @media(max-width:700px){ .cat-tiles-grid{grid-template-columns:repeat(2, 1fr); gap:14px;} }
+  .cat-tiles-grid::-webkit-scrollbar{display:none;}
+  .cat-tiles-grid > .cat-tile{
+    flex:0 0 calc((100% - 4*18px) / 5);
+    scroll-snap-align:start;
+  }
+  @media(max-width:1180px){ .cat-tiles-grid > .cat-tile{flex-basis:calc((100% - 3*18px) / 4);} }
+  @media(max-width:980px){ .cat-tiles-grid > .cat-tile{flex-basis:calc((100% - 2*18px) / 3);} }
+  @media(max-width:700px){ .cat-tiles-grid{gap:14px;} .cat-tiles-grid > .cat-tile{flex-basis:calc((100% - 14px) / 2);} }
+  @media(max-width:560px){
+    /* Same 82% + centered snap as .grid > .card, for the same reason: one tile
+       mostly fills the view with a clear peek of its neighbour, and centering
+       the snap point avoids the sub-pixel sliver edge-snapping leaves behind. */
+    .cat-tiles-grid > .cat-tile{ flex-basis:82%; scroll-snap-align:center; }
+  }
   .cat-tile{
     display:flex; flex-direction:column; align-items:stretch; gap:8px;
     width:100%; background:var(--ink-2); color:var(--paper); border:1px solid var(--line); border-radius:16px;
@@ -1196,6 +1220,31 @@
        Chrome — a direct cause of scroll lag/jitter. Opacity bumped 0.72→0.88
        to stay fully legible without it. */
   }
+  /* ===== "My favourites" control =====
+     One heart, used on a product photo and on a category tile. Sits in the
+     corner the 🔥 order-count badge does NOT use (that one is bottom
+     inline-start), so the two never collide on a card that has both. Outline
+     when off, filled gold when on — the fill is the whole signal, so it stays
+     readable at a glance on any photo underneath. */
+  .fav-btn{
+    position:absolute; inset-inline-end:8px; bottom:8px; z-index:3;
+    width:34px; height:34px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(12,12,16,0.72); border:1px solid rgba(255,255,255,0.16);
+    color:var(--paper); cursor:pointer; padding:0;
+    transition:background .15s ease, color .15s ease, transform .15s ease;
+  }
+  .fav-btn svg{width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linejoin:round;}
+  .fav-btn:hover{background:rgba(255,201,77,0.16); color:var(--brass);}
+  .fav-btn:active{transform:scale(0.92);}
+  .fav-btn:focus-visible{outline:2px solid var(--brass); outline-offset:2px;}
+  .fav-btn.is-fav{color:var(--brass); border-color:rgba(255,201,77,0.55);}
+  .fav-btn.is-fav svg{fill:currentColor;}
+  /* On a category tile the heart takes the free bottom inline-start corner —
+     the name chip is centred and the count/cycle controls own the top row. */
+  .cat-tile-cover .fav-btn{inset-inline-end:auto; inset-inline-start:8px; width:30px; height:30px;}
+  .cat-tile-cover .fav-btn svg{width:16px; height:16px;}
+
   .card-body{padding:18px 18px 20px; display:flex; flex-direction:column; gap:11px; flex:1;}
   .card-title{font-size:16px; font-weight:600; color:var(--paper); line-height:1.4;}
   .card-price{
@@ -1829,7 +1878,12 @@
      category is obvious at a glance instead of needing to be discovered by
      accident. */
   body.view-mode-mobile .grid > .card{flex-basis:82%;}
-  body.view-mode-mobile .cat-tiles-grid{grid-template-columns:repeat(2, 1fr); gap:14px;}
+  /* Mobile preview mode renders a phone-width frame on a desktop screen, so the
+     viewport media queries above never fire — this repeats the small-screen
+     sizing (one tile with a peek) for that frame, exactly as the product rows
+     do with body.view-mode-mobile .grid > .card. */
+  body.view-mode-mobile .cat-tiles-grid{gap:14px;}
+  body.view-mode-mobile .cat-tiles-grid > .cat-tile{flex:0 0 82%; scroll-snap-align:center;}
   body.view-mode-mobile .pricing{padding:40px 16px;}
   body.view-mode-mobile .pricing-grid{grid-template-columns:1fr;}
   body.view-mode-mobile .modal{padding:20px;}

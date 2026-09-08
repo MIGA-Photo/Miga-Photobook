@@ -105,7 +105,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rakkas&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260906a">
+<link rel="stylesheet" href="styles.css?v=20260908f">
 
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
@@ -525,11 +525,24 @@
 <section class="sprockets"></section>
 
 
+<section class="cat-section" id="favorites" style="display:none;">
+  <div class="section-head">
+    <h2 data-i18n="favSectionTitle">قائمتي المفضلة</h2>
+  </div>
+  <div class="grid-nav-wrap">
+    <div class="grid" id="favoritesGrid"></div>
+  </div>
+  <div class="grid-page-dots" id="gridDots-favorites"></div>
+</section>
+
 <section class="cat-section" id="categoryTiles">
   <div class="section-head">
     <h2 data-i18n="categoriesLabel">الأقسام</h2>
   </div>
-  <div class="cat-tiles-grid" id="categoryTilesGrid"></div>
+  <div class="grid-nav-wrap">
+    <div class="cat-tiles-grid" id="categoryTilesGrid"></div>
+  </div>
+  <div class="grid-page-dots" id="gridDots-categoryTiles"></div>
 </section>
 
 <section class="cat-section" id="mostRequested" style="display:none;">
@@ -1827,7 +1840,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260908d"></script>
+<script src="app.js?v=20260908f"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){

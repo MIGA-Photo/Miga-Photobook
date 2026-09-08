@@ -360,6 +360,10 @@ const translations = {
     colorThemeTitle:'لون الهيدر والخلفية تحت الصور', colorThemeIntro:'اختار درجة اللون الغامق اللي تظهر في شريط الهيدر والمساحة خلف صور المنتجات. باقي ألوان الموقع (الدهبي، الخط) بتفضل زي ما هي في كل الاختيارات.', colorThemeLabel:'لون الهيدر', colorThemeBlack:'أسود (الحالي)', colorThemeBrown:'بني قهوة فخم', colorThemeEmerald:'أخضر زمردي غامق', colorThemeWine:'نبيتي غامق', colorThemeNavy:'كحلي ملكي', colorThemeRed:'أحمر / وردي غامق', colorThemeSaveBtn:'حفظ اللون', toastColorThemeSaved:'تم حفظ اللون — هيظهر للعملاء من زيارتهم الجاية',
     headerModeTitle:'شكل الهيدر', headerModeIntro:'"الشكل الحالي" يعرض كل أزرار الهيدر (اللغة، الوضع الليلي، عرض الموبايل/الكمبيوتر، تتبع الطلب) في شريط دايمًا ظاهر. "قائمة مطوية" بينقلهم جوه قائمة (☰) بتتفتح عند الضغط، وده بيقلل ارتفاع الهيدر.', headerModeLabel:'وضع الهيدر', headerModeClassicOption:'الشكل الحالي', headerModeCompactOption:'قائمة مطوية (☰)', headerModeSaveBtn:'حفظ شكل الهيدر', toastHeaderModeSaved:'تم حفظ شكل الهيدر — هيظهر للعملاء من زيارتهم الجاية',
     optPromptLibrary:'مكتبة البرومبتات', optPromptLibraryDisabledHint:'غير متاح — بيتجمع تلقائيًا', navPromptLibrary:'مكتبة البرومبتات',
+    favSectionTitle:'قائمتي المفضلة', favAddTitle:'ضيفها لقائمتي المفضلة', favRemoveTitle:'شيلها من المفضلة',
+    favCatAddTitle:'ثبّت القسم ده في الأول', favCatRemoveTitle:'شيل تثبيت القسم',
+    toastFavAdded:'اتضافت لقائمتك المفضلة ❤', toastFavRemoved:'اتشالت من المفضلة',
+    toastFavCatAdded:'تم تثبيت القسم في أول القائمة', toastFavCatRemoved:'تم إلغاء تثبيت القسم',
     promptLibraryHeading:'مكتبة البرومبتات للمحترفين — اشترِ البرومبت الاحترافي بمفرده، من غير تحويل صورة',
     promptLibraryModeTitle:'وضع مكتبة البرومبتات للمحترفين', promptLibraryModeIntro:'"الوضع الحالي" يسيب قسم "فاخر" فاضي زي ما هو. "الوضع الجديد" يحوّل نفس القسم لمكتبة برومبتات تجمع تلقائيًا كل منتجات الموقع من كل الأقسام لبيع البرومبت بمفرده، وبيشيل سطر "شراء البرومبت لوحده" من باقي كروت الأقسام العادية (بيفضل ظاهر بس هنا). تقدر ترجع للوضع الحالي في أي وقت من غير أي فقدان بيانات.',
     promptLibraryModeLabel:'الوضع', promptLibraryModeOffOption:'الوضع الحالي (فاخر قسم عادي فاضي)', promptLibraryModeOnOption:'الوضع الجديد (مكتبة البرومبتات للمحترفين)', promptLibraryModeSaveBtn:'حفظ الوضع', toastPromptLibraryModeSaved:'تم حفظ الوضع — هيظهر للعملاء من زيارتهم الجاية',
@@ -662,6 +666,10 @@ const translations = {
     colorThemeTitle:'Header and image-background color', colorThemeIntro:'Choose the dark shade used for the header bar and the space behind product images. The rest of the site colors (gold, text) stay the same across every option.', colorThemeLabel:'Header color', colorThemeBlack:'Black (current)', colorThemeBrown:'Warm coffee brown', colorThemeEmerald:'Deep emerald green', colorThemeWine:'Deep wine', colorThemeNavy:'Royal navy', colorThemeRed:'Deep red / rose', colorThemeSaveBtn:'Save color', toastColorThemeSaved:'Color saved — customers will see it on their next visit',
     headerModeTitle:'Header layout', headerModeIntro:'"Current layout" shows every header button (language, dark mode, mobile/desktop preview, track order) in an always-visible strip. "Collapsed menu" moves them into a (☰) menu that opens on tap, which shortens the header.', headerModeLabel:'Header layout', headerModeClassicOption:'Current layout', headerModeCompactOption:'Collapsed menu (☰)', headerModeSaveBtn:'Save header layout', toastHeaderModeSaved:'Header layout saved — customers will see it on their next visit',
     optPromptLibrary:'Prompt Library', optPromptLibraryDisabledHint:'unavailable — gathered automatically', navPromptLibrary:'Prompt Library',
+    favSectionTitle:'My Favorites', favAddTitle:'Add to my favorites', favRemoveTitle:'Remove from favorites',
+    favCatAddTitle:'Pin this category first', favCatRemoveTitle:'Unpin this category',
+    toastFavAdded:'Added to your favorites ❤', toastFavRemoved:'Removed from favorites',
+    toastFavCatAdded:'Category pinned to the front', toastFavCatRemoved:'Category unpinned',
     promptLibraryHeading:'Prompt Library for Professionals — buy the professional prompt on its own, no photo transformation needed',
     promptLibraryModeTitle:'Prompt Library for Professionals mode', promptLibraryModeIntro:'"Current mode" leaves the empty "Luxury" category as-is. "New mode" turns that same slot into a prompt library that automatically gathers every product from every category to sell its prompt alone, and removes the "buy the prompt alone" line from other category cards (it stays visible here only). You can switch back at any time with no data loss.',
     promptLibraryModeLabel:'Mode', promptLibraryModeOffOption:'Current mode (Luxury — empty category)', promptLibraryModeOnOption:'New mode (Prompt Library for Professionals)', promptLibraryModeSaveBtn:'Save mode', toastPromptLibraryModeSaved:'Mode saved — customers will see it on their next visit',
@@ -1008,6 +1016,15 @@ let purchasedPromptTexts = {}; // productId -> prompt text, once its order is ap
 // locally so the storefront can show "N photos left in your package" and
 // offer a "use a package credit" button on any product card.
 let packageCredits = {}; // { [orderCode]: { size, remaining, usedProductIds: [] } }
+// A visitor's own shortlist. Two separate lists, both saved in this browser
+// only (same reasoning as purchases above — there is no per-customer account
+// to hang them on, and nothing here is worth sending to the server):
+//   favorites     — product ids, shown as their own row at the top of the page
+//   favCategories — category ids, which simply sort to the front of the
+//                   category row so the sections someone actually shops sit
+//                   first without hiding anything from anyone else.
+let favorites = [];
+let favCategories = [];
 async function loadPurchases(){
   try{
     const raw = localStorage.getItem('megaPromptPurchases');
@@ -1037,6 +1054,94 @@ async function loadPurchases(){
     const raw = localStorage.getItem('megaPromptPackageCredits');
     packageCredits = raw ? JSON.parse(raw) : {};
   }catch(e){ packageCredits = {}; }
+  try{
+    const parsed = JSON.parse(localStorage.getItem('megaPromptFavorites'));
+    favorites = Array.isArray(parsed) ? parsed : [];
+  }catch(e){ favorites = []; }
+  try{
+    const parsed = JSON.parse(localStorage.getItem('megaPromptFavCategories'));
+    favCategories = Array.isArray(parsed) ? parsed : [];
+  }catch(e){ favCategories = []; }
+}
+
+function saveFavorites(){
+  try{ localStorage.setItem('megaPromptFavorites', JSON.stringify(favorites)); }
+  catch(e){ /* private mode / quota — the list just doesn't survive this visit */ }
+  try{ localStorage.setItem('megaPromptFavCategories', JSON.stringify(favCategories)); }
+  catch(e){}
+}
+
+/** The heart shown on a product photo. Rendered as part of the card's HTML
+ * string like everything else on the card, and stamped with data-fav so a tap
+ * can flip every copy of that same product's heart on the page (a product can
+ * appear in its category row, in the favourites row, and in the prompt library
+ * at the same time) without re-rendering the whole storefront. */
+function favBtnHtml(id){
+  const on = favorites.includes(id);
+  const label = t(on ? 'favRemoveTitle' : 'favAddTitle');
+  return `<button type="button" class="fav-btn${on ? ' is-fav' : ''}" data-fav="${escapeHtml(id)}"
+    onclick="event.stopPropagation(); toggleFavorite('${id}')"
+    title="${label}" aria-label="${label}" aria-pressed="${on ? 'true' : 'false'}">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3l-1.4-1.3C5.4 14.3 2 11.2 2 7.5 2 4.4 4.4 2 7.5 2c1.7 0 3.3.8 4.5 2.1C13.2 2.8 14.8 2 16.5 2 19.6 2 22 4.4 22 7.5c0 3.7-3.4 6.8-8.6 11.5L12 20.3z"/></svg>
+  </button>`;
+}
+
+function toggleFavorite(id){
+  const i = favorites.indexOf(id);
+  const nowFav = i === -1;
+  if(nowFav) favorites.unshift(id); else favorites.splice(i, 1);
+  saveFavorites();
+
+  // Flip every heart for this product wherever it currently sits, in place —
+  // re-rendering all the rows on a single tap would rebuild hundreds of card
+  // images and lose the visitor's scroll position mid-swipe.
+  document.querySelectorAll('.fav-btn').forEach(btn=>{
+    if(btn.getAttribute('data-fav') !== id) return;
+    const label = t(nowFav ? 'favRemoveTitle' : 'favAddTitle');
+    btn.classList.toggle('is-fav', nowFav);
+    btn.setAttribute('aria-pressed', nowFav ? 'true' : 'false');
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+  });
+
+  renderFavorites();
+  showToast(t(nowFav ? 'toastFavAdded' : 'toastFavRemoved'));
+}
+
+function toggleFavCategory(cat){
+  const i = favCategories.indexOf(cat);
+  const nowFav = i === -1;
+  if(nowFav) favCategories.unshift(cat); else favCategories.splice(i, 1);
+  saveFavorites();
+  renderCatTiles();
+  showToast(t(nowFav ? 'toastFavCatAdded' : 'toastFavCatRemoved'));
+}
+
+/** The visitor's own shortlist, drawn with the exact same card and row as any
+ * category — same swipe, same arrows. Hidden entirely until they've picked
+ * something, so a first-time visitor never meets an empty section. */
+function renderFavorites(){
+  const section = document.getElementById('favorites');
+  const grid = document.getElementById('favoritesGrid');
+  const dots = document.getElementById('gridDots-favorites');
+  if(!section || !grid) return;
+
+  // Kept in the order they were added (newest first), and silently skips any
+  // id that no longer exists or has lost its photo, so a product the admin
+  // removed can't leave a broken card in someone's list forever.
+  const items = favorites
+    .map(id => products.find(p => p.id === id))
+    .filter(p => p && p.image && p.image !== PLACEHOLDER_IMG);
+
+  if(!items.length){
+    section.style.display = 'none';
+    grid.innerHTML = '';
+    if(dots) dots.innerHTML = '';
+    return;
+  }
+  section.style.display = '';
+  grid.innerHTML = items.map(p => renderProductCard(p)).join('');
+  buildRowArrows('favorites', dots, grid);
 }
 async function savePurchases(){
   try{ localStorage.setItem('megaPromptPurchases', JSON.stringify(purchases)); }
@@ -1341,6 +1446,7 @@ function renderGrids(){
     buildRowArrows(cat, dotsEl, el);
   });
   renderCatTiles();
+  renderFavorites();
 }
 
 /** "مكتبة البرومبتات للمحترفين" — a derived view, not a real category: every
@@ -1426,13 +1532,19 @@ function buildRowArrows(key, dotsEl, rowEl){
   updateRowArrows(key);
 }
 
+/** Rows whose container id doesn't follow the "grid-<key>" convention that
+ * every category row uses. Keeping them in one table means the arrows and
+ * scrollRow() work for any row on the page without a new special case each
+ * time one is added. Note the dots id IS uniform ("gridDots-<key>") for all
+ * of them, which is why only the row container needs mapping. */
+const ROW_CONTAINER_IDS = {
+  mostRequested: 'mostRequestedGrid',
+  favorites: 'favoritesGrid',
+  categoryTiles: 'categoryTilesGrid',
+};
 function rowElements(key){
-  const rowEl = key === 'mostRequested'
-    ? document.getElementById('mostRequestedGrid')
-    : document.getElementById('grid-'+key);
-  const dotsEl = key === 'mostRequested'
-    ? document.getElementById('gridDots-mostRequested')
-    : document.getElementById('gridDots-'+key);
+  const rowEl = document.getElementById(ROW_CONTAINER_IDS[key] || ('grid-' + key));
+  const dotsEl = document.getElementById('gridDots-' + key);
   return {rowEl, dotsEl};
 }
 
@@ -1566,6 +1678,7 @@ function renderProductCard(p, opts){
         <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" decoding="async" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
         <span class="card-badge">${escapeHtml(productTitle(p))}</span>
         ${requestCount > 0 ? `<span class="request-count-overlay" title="${t('popularityCountTitle')}">🔥 ${requestCount}</span>` : ''}
+        ${favBtnHtml(p.id)}
       </div>
       <div class="card-body">
         <div class="card-title" onclick="openProductDetail('${p.id}')" style="cursor:pointer;">${escapeHtml(productTitle(p))}</div>
@@ -1592,6 +1705,7 @@ function renderProductCard(p, opts){
       <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" decoding="async" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
       <span class="card-badge">${escapeHtml(productTitle(p))}</span>
       ${requestCount > 0 ? `<span class="request-count-overlay" title="${t('popularityCountTitle')}">🔥 ${requestCount}</span>` : ''}
+      ${favBtnHtml(p.id)}
     </div>
     <div class="card-body">
       <div class="card-title" onclick="openProductDetail('${p.id}')" style="cursor:pointer;">${escapeHtml(productTitle(p))}</div>
@@ -1705,7 +1819,12 @@ function categoryCover(items, cat){
 function renderCatTiles(){
   const wrap = document.getElementById('categoryTilesGrid');
   if(!wrap) return;
-  wrap.innerHTML = CAT_IDS.map(cat=>{
+  // A visitor's pinned categories come first. Array.prototype.sort is stable,
+  // so everything else keeps its original CAT_IDS order — pinning reorders,
+  // it never hides or reshuffles the rest.
+  const ordered = [...CAT_IDS].sort((a, b) =>
+    (favCategories.includes(b) ? 1 : 0) - (favCategories.includes(a) ? 1 : 0));
+  wrap.innerHTML = ordered.map(cat=>{
     const items = itemsForCategoryTile(cat);
     const cover = categoryCover(items, cat);
     const isOpen = document.getElementById(cat)?.classList.contains('open');
@@ -1732,6 +1851,7 @@ function renderCatTiles(){
       <div class="cat-tile-cover">
         ${coverHtml}
         ${items.length ? `<span class="ct-count">${items.length}</span>` : ''}
+        ${catFavBtnHtml(cat)}
         <div class="cat-tile-label">
           <span class="cat-chip tag-${cat}">
             <span class="cicon" aria-hidden="true">${CAT_ICON[cat]}</span>
@@ -1742,6 +1862,23 @@ function renderCatTiles(){
       <span class="sh-chevron" aria-hidden="true">&#9660;</span>
     </button>`;
   }).join('');
+  // Same arrows as every product row, for the same reason — the tiles are now
+  // one horizontal line, and the arrows are what make that obvious on a
+  // desktop pointer, where there is no swipe to discover.
+  buildRowArrows('categoryTiles', document.getElementById('gridDots-categoryTiles'), wrap);
+}
+
+/** The pin/heart on a category tile. A <span role="button"> rather than a real
+ * <button>, because the tile itself IS a button and nesting one inside another
+ * is invalid — the same reason the ⟳ cycle control next to it is a span. Its
+ * tap is handled by the delegated listener on #categoryTilesGrid below. */
+function catFavBtnHtml(cat){
+  const on = favCategories.includes(cat);
+  const label = t(on ? 'favCatRemoveTitle' : 'favCatAddTitle');
+  return `<span class="fav-btn${on ? ' is-fav' : ''}" role="button" tabindex="0" data-fav-cat="${cat}"
+    title="${label}" aria-label="${label}" aria-pressed="${on ? 'true' : 'false'}">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3l-1.4-1.3C5.4 14.3 2 11.2 2 7.5 2 4.4 4.4 2 7.5 2c1.7 0 3.3.8 4.5 2.1C13.2 2.8 14.8 2 16.5 2 19.6 2 22 4.4 22 7.5c0 3.7-3.4 6.8-8.6 11.5L12 20.3z"/></svg>
+  </span>`;
 }
 
 /** Steps a tile to the next of its top photos. Bound to its own small control
@@ -1764,7 +1901,29 @@ function cycleCategoryCover(cat){
   }, 180);
 }
 
+// Enter/Space on either span-button on a tile (pin, cycle photo). They can't
+// be real <button>s — the tile itself is one — so the keyboard behaviour a
+// button would give for free has to be wired up by hand.
+document.getElementById('categoryTilesGrid')?.addEventListener('keydown', (e)=>{
+  if(e.key !== 'Enter' && e.key !== ' ') return;
+  const fav = e.target.closest('[data-fav-cat]');
+  const cycle = e.target.closest('[data-cycle]');
+  if(!fav && !cycle) return;
+  e.preventDefault();
+  e.stopPropagation();
+  if(fav) toggleFavCategory(fav.getAttribute('data-fav-cat'));
+  else cycleCategoryCover(cycle.getAttribute('data-cycle'));
+});
+
 document.getElementById('categoryTilesGrid')?.addEventListener('click', (e)=>{
+  const fav = e.target.closest('[data-fav-cat]');
+  if(fav){
+    // Swallow the tap so the tile underneath does not also open.
+    e.preventDefault();
+    e.stopPropagation();
+    toggleFavCategory(fav.getAttribute('data-fav-cat'));
+    return;
+  }
   const cycle = e.target.closest('[data-cycle]');
   if(cycle){
     // Swallow the click so the tile underneath does not also open.
