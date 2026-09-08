@@ -24,6 +24,41 @@
      mat stays dark in a bright room. Category accent hues are deepened
      slightly here so text and icons keep enough contrast on a light
      background — same identity, tuned for the new surface. */
+
+  /* ---- متغيّرات الطبقة الزجاجية ----
+     معرّفة هنا فوق عشان أي قاعدة تحت تقدر تستخدمها، ومعرّفة مرة تانية
+     للوضع النهاري: هناك السطح أبيض، فالتدرّج الأبيض والحد الأبيض بيختفوا
+     تمامًا — والكارت كان بيفضل من غير حد خالص. الوضع النهاري بياخد
+     تدرّج وحد غامقين بدل الفاتحين. */
+  :root{
+    --glass-sheen: linear-gradient(180deg,
+      rgba(255,255,255,0.085) 0%, rgba(255,255,255,0.024) 22%, rgba(255,255,255,0) 58%);
+    --glass-sheen-soft: linear-gradient(180deg,
+      rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.015) 26%, rgba(255,255,255,0) 62%);
+    --glass-edge: rgba(255,255,255,0.15);
+    --glass-lift:
+      inset 0 1px 0 rgba(255,255,255,0.24),
+      inset 0 -1px 0 rgba(0,0,0,0.45),
+      0 8px 22px rgba(0,0,0,0.34);
+    --glass-lift-sm:
+      inset 0 1px 0 rgba(255,255,255,0.18),
+      0 3px 10px rgba(0,0,0,0.26);
+  }
+  html[data-theme="light"]{
+    --glass-sheen: linear-gradient(180deg,
+      rgba(255,255,255,0.9) 0%, rgba(0,0,0,0.012) 60%, rgba(0,0,0,0.03) 100%);
+    --glass-sheen-soft: linear-gradient(180deg,
+      rgba(255,255,255,0.7) 0%, rgba(0,0,0,0.015) 70%);
+    --glass-edge: rgba(0,0,0,0.14);
+    --glass-lift:
+      inset 0 1px 0 rgba(255,255,255,0.9),
+      inset 0 -1px 0 rgba(0,0,0,0.06),
+      0 6px 18px rgba(60,45,15,0.14);
+    --glass-lift-sm:
+      inset 0 1px 0 rgba(255,255,255,0.8),
+      0 2px 8px rgba(60,45,15,0.10);
+  }
+
   html[data-theme="light"]{
     --ink:#faf7f0;
     --ink-2:#ffffff;
@@ -93,7 +128,10 @@
   @media(max-width:760px){ .wm-photos{ grid-template-columns:repeat(3, 1fr); grid-auto-rows:180px; } }
   .wm-photos img{
     width:100%; height:100%; object-fit:cover; border-radius:18px;
-    filter:grayscale(15%) blur(0.5px) brightness(1.1) contrast(1.05); opacity:0.28;
+    /* من 0.28 لـ 0.10، والـ blur اتشال (8 سبتمبر 2026): الوشوش في الخلفية
+       كانت بتزاحم صور المنتجات — والخلفية دي مفروض تبقى ملمس مش محتوى.
+       شيل الـ blur كمان بيوفّر شغل رسم على 24 صورة ثابتة. */
+    filter:grayscale(35%) brightness(1.05); opacity:0.10;
   }
   .wm-logo-layer{
     position:absolute; inset:-35% -15%; display:flex; flex-direction:column; justify-content:space-between;
@@ -102,7 +140,7 @@
   .wm-logo-row{
     display:flex; gap:64px; white-space:nowrap;
     font-family:'Rakkas','IBM Plex Sans Arabic',serif;
-    font-size:52px; color:var(--brass); opacity:0.09; letter-spacing:4px;
+    font-size:52px; color:var(--brass); opacity:0.05; letter-spacing:4px;
   }
 
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -287,7 +325,12 @@
   }
 
   header{
-    background:var(--header-bg);
+    /* التدرّج فوق var(--header-bg) مش بدله — عشان ثيمات الألوان
+       (بني/زمردي/نبيتي/كحلي/أحمر) تفضل شغالة زي ما هي. */
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 44%),
+      var(--header-bg);
+    box-shadow: inset 0 -1px 0 rgba(255,255,255,0.12);
     /* backdrop-filter:blur() removed (5 سبتمبر 2026) — this header sits inside
        .sticky-top-group (position:sticky), and sticky/fixed + backdrop-filter
        is a well-known Android Chrome (Blink) rendering bug: it repaints/flickers
@@ -595,6 +638,7 @@
     padding:5px 10px; border-radius:100px; white-space:nowrap;
   }
   .request-count-overlay{
+    opacity:0.72; transition:opacity .2s ease;
     position:absolute; bottom:8px; inset-inline-start:8px; z-index:2;
     display:flex; align-items:center; gap:4px;
     background:rgba(10,8,4,0.86); color:var(--brass); font-weight:800; font-size:12px;
@@ -974,10 +1018,18 @@
   }
   .cat-tile{
     display:flex; flex-direction:column; align-items:stretch; gap:8px;
-    width:100%; background:var(--ink-2); color:var(--paper); border:1px solid var(--line); border-radius:16px;
+    width:100%; color:var(--paper); border-radius:16px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.028) 22%, rgba(255,255,255,0) 58%),
+      var(--ink-2);
+    border:1px solid var(--glass-edge);
+    box-shadow:var(--glass-lift);
     padding:8px; text-align:center; transition:transform .15s ease, border-color .15s ease;
   }
-  .cat-tile:hover{ border-color:var(--brass-dim); transform:translateY(-2px); }
+  .cat-tile:hover{
+    border-color:rgba(255,201,77,0.55); transform:translateY(-2px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.34), 0 16px 34px rgba(0,0,0,0.48);
+  }
   .cat-tile:focus-visible{ outline:2px solid var(--brass); outline-offset:2px; }
   .cat-tile.open{ border-color:var(--brass); }
   /* One tall cover photo per category rather than a four-way collage. A single
@@ -985,8 +1037,14 @@
      squares crop faces off and look accidental. The 4:5 frame matches the
      portrait ratio the photos are actually produced in, so nothing is lost. */
   .cat-tile-cover{
-    position:relative; aspect-ratio:4/5; border-radius:12px; overflow:hidden;
+    position:relative; aspect-ratio:3/4; border-radius:12px; overflow:hidden;
     background:var(--ink-3);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10), inset 0 -14px 26px -18px rgba(0,0,0,0.8);
+  }
+  .cat-tile-cover::before{
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:2;
+    background:linear-gradient(158deg,
+      rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.045) 15%, rgba(255,255,255,0) 40%);
   }
   .cat-tile-cover img{
     width:100%; height:100%; object-fit:cover; display:block;
@@ -1180,11 +1238,20 @@
   }
 
   /* ===== Product Card ===== */
+  /* ===== الطبقة الزجاجية (8 سبتمبر 2026) =====
+     كل اللمعة هنا تدرّجات وظلال ثابتة: المتصفح يرسمها مرة ويخزّنها.
+     مفيش backdrop-filter ولا blur — دي بالظبط الخاصية اللي اتشالت في
+     5 سبتمبر لأنها كانت بتعمل لاج على كروم أندرويد، ومرجعناهاش.
+     التدرّج دايمًا أبيض شفاف *فوق* لون الخلفية الأصلي (مش بديل عنه)،
+     عشان ثيمات الألوان والوضع النهاري يفضلوا شغالين زي ما هم. */
   .card{
-    background:var(--ink-2); border:1px solid var(--line); border-radius:14px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.028) 22%, rgba(255,255,255,0) 58%),
+      var(--ink-2);
+    border:1px solid var(--glass-edge); border-radius:14px;
     overflow:hidden; display:flex; flex-direction:column;
     transition:transform .28s ease, box-shadow .28s ease, border-color .28s ease;
-    box-shadow:0 2px 10px rgba(0,0,0,0.25);
+    box-shadow:var(--glass-lift);
     /* Reserve room for the sticky header on ANY scroll that targets this
        card. Every JS-side attempt to compute this offset by hand kept
        breaking, because the numbers involved (header height, section
@@ -1201,14 +1268,31 @@
   }
   .card:hover{
     transform:translateY(-4px);
-    border-color:var(--brass-dim);
-    box-shadow:0 14px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,201,77,0.15);
+    border-color:rgba(255,201,77,0.55);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.34),
+      0 16px 34px rgba(0,0,0,0.48),
+      0 0 0 1px rgba(255,201,77,0.18);
   }
-  .card-media{position:relative; aspect-ratio:4/5; background:var(--media-bg); overflow:hidden;}
+  /* 3/4 بدل 4/5: صورة أطول = شغل أكتر وإطار أقل. الصورة هي المنتج. */
+  .card-media{
+    position:relative; aspect-ratio:3/4; background:var(--media-bg); overflow:hidden;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10), inset 0 -14px 26px -18px rgba(0,0,0,0.8);
+  }
+  /* انعكاس ضوء مائل خفيف — بيدي إحساس الزجاج من غير ما يغسل الصورة */
+  .card-media::after{
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:1;
+    background:linear-gradient(158deg,
+      rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.045) 15%, rgba(255,255,255,0) 40%);
+  }
   /* Same upward crop bias as .cat-tile-cover img above: these product photos
      are much taller than the 4:5 card, and faces sit in the upper half, so
      the old default center-crop was slicing heads off the top of every card. */
   .card-media img{width:100%; height:100%; object-fit:cover; object-position:center 22%;}
+  /* اسم المنتج اتشال من فوق الصورة (8 سبتمبر 2026): هو مكتوب تحتها في
+     .card-title أصلاً، ونص فوق الصورة بيقلّل من قيمتها — المعرض بيعرض
+     الشغل نضيف. رجوعه = شيل السطر ده وبس. */
+  .card-badge{ display:none; }
   .card-badge{
     position:absolute; top:10px; right:10px; left:10px; font-size:10.5px; letter-spacing:0.3px;
     background:rgba(10,6,20,0.88); color:var(--brass);
@@ -1236,6 +1320,7 @@
     font-size:12px; font-weight:800; line-height:1;
   }
   .fav-btn{
+    opacity:0.78;
     position:absolute; inset-inline-end:8px; bottom:8px; z-index:3;
     width:34px; height:34px; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
@@ -1244,7 +1329,9 @@
     transition:background .15s ease, color .15s ease, transform .15s ease;
   }
   .fav-btn svg{width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linejoin:round;}
-  .fav-btn:hover{background:rgba(255,201,77,0.16); color:var(--brass);}
+  .card:hover .fav-btn, .card:hover .request-count-overlay,
+  .cat-tile:hover .fav-btn{ opacity:1; }
+  .fav-btn:hover{background:rgba(255,201,77,0.16); color:var(--brass); opacity:1;}
   .fav-btn:active{transform:scale(0.92);}
   .fav-btn:focus-visible{outline:2px solid var(--brass); outline-offset:2px;}
   .fav-btn.is-fav{color:var(--brass); border-color:rgba(255,201,77,0.55);}
@@ -1294,10 +1381,19 @@
   .card-actions{display:flex; flex-wrap:wrap; gap:8px; margin-top:auto;}
   .card-actions .buy-btn, .card-actions .copy-btn{flex:1 1 auto;}
   .buy-btn{
-    flex:1; background:var(--brass); color:var(--ink); font-weight:700; font-size:13.5px;
+    flex:1; color:var(--ink); font-weight:700; font-size:13.5px;
     padding:11px; border-radius:8px; transition:.2s;
+    background:linear-gradient(180deg, #ffe391 0%, #ffca50 46%, #e8a92a 100%);
+    border:1px solid rgba(255,255,255,0.28);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.8),
+      inset 0 -1px 0 rgba(120,70,0,0.32),
+      0 4px 12px rgba(0,0,0,0.32);
   }
-  .buy-btn:hover{background:#ffd873; transform:translateY(-1px);}
+  .buy-btn:hover{
+    background:linear-gradient(180deg, #fff0b8 0%, #ffd469 46%, #efb437 100%);
+    transform:translateY(-1px);
+  }
   /* The "professional prompt" add-on used to share the exact same solid-gold
      treatment as the primary "buy this photo" button — two equally loud
      CTAs on one card meant a shopper's eye had no clear place to land first.
@@ -2027,3 +2123,159 @@
   .ctrl-group button.active:active{
     transform:translateY(1px); box-shadow:0 1px 0 color-mix(in srgb, var(--brass) 55%, black), 0 1px 4px rgba(0,0,0,0.16);
   }
+
+
+  /* =========================================================================
+     الطبقة الزجاجية — التطبيق العام على كل أسطح الموقع (8 سبتمبر 2026)
+     -------------------------------------------------------------------------
+     مكتوبة كقاعدة واحدة مشتركة بدل ما نعدّل 30 قاعدة واحدة واحدة: الأسطح دي
+     كلها بتحدد لونها بـ `background: var(--ink…)`، واللي بيتكتب هنا هو
+     `background-image` بس — يعني التدرّج بيتحط *فوق* اللون الأصلي من غير ما
+     يمسّه. النتيجة: ثيمات الألوان (بني/زمردي/نبيتي/كحلي/أحمر) والوضع النهاري
+     كلهم بيفضلوا شغالين زي ما هم، والتدرّج الأبيض الشفاف بيختفي لوحده فوق
+     الخلفيات الفاتحة.
+     ولا واحدة من دي بتستخدم backdrop-filter أو blur — كلها تدرّجات وظلال
+     ثابتة يرسمها المتصفح مرة ويخزّنها.
+     ========================================================================= */
+  /* الأسطح الكبيرة: النوافذ، الألواح، الأقسام، البطاقات */
+  .modal,
+  .side-drawer,
+  .plan,
+  .testimonial-card,
+  .how-step,
+  .why-edge-card,
+  .trust-item,
+  .order-row,
+  .admin-product-row,
+  .prompt-panel,
+  .stay-nudge,
+  .search-panel,
+  .cat-dropdown-menu,
+  .admin-quick-menu{
+    background-image: var(--glass-sheen);
+    border-color: var(--glass-edge);
+    box-shadow: var(--glass-lift);
+  }
+
+  /* العناصر الصغيرة: الأزرار الثانوية، الحقول، الشرائح، المفاتيح */
+  .btn-ghost,
+  .copy-btn,
+  .admin-icon-btn,
+  .admin-tabs button,
+  .ctrl-group,
+  .ctrl-group button,
+  .drawer-link-row,
+  .drawer-select,
+  .grid-page-dots .gp-arrow,
+  .contact-bubble,
+  .back-to-top-fab,
+  .admin-fab,
+  .cat-dropdown-btn,
+  nav.cats button,
+  #catNav button{
+    background-image: var(--glass-sheen-soft);
+    box-shadow: var(--glass-lift-sm);
+  }
+
+  /* الحقول: غايرة شوية عن السطح اللي وراها عشان تبان إنها مكان كتابة */
+  .field input, .field select, .field textarea,
+  .drawer-input{
+    background-image: linear-gradient(180deg, rgba(0,0,0,0.22), rgba(255,255,255,0.02));
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.35);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.35), 0 0 0 3px rgba(255,201,77,0.18);
+  }
+
+  /* الأزرار الدهبي في أي مكان تاني غير كارت المنتج (نفس معدن .buy-btn) */
+  .btn-primary, .nav-cta, .plan button, .hero-cta-primary{
+    background-image: linear-gradient(180deg,
+      rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.06) 45%, rgba(90,55,0,0.16) 100%);
+    border:1px solid rgba(255,255,255,0.28);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.7),
+      inset 0 -1px 0 rgba(120,70,0,0.28),
+      0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  /* الشرائح والبادچات الصغيرة */
+  .cat-chip, .ct-count, .request-count-overlay, .ct-cycle, .fav-btn,
+  .order-status, .owned-pill, .status-pill{
+    background-image: linear-gradient(180deg, rgba(255,255,255,0.13), rgba(255,255,255,0));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.20), 0 2px 7px rgba(0,0,0,0.28);
+  }
+
+
+  /* =========================================================================
+     لوحة التحكم — إعادة تنسيق وتحجيم (8 سبتمبر 2026)
+     -------------------------------------------------------------------------
+     اللوحة دي بتُدار من الموبايل بشكل أساسي، وكانت متزنّقة: 8 تبويبات
+     بتتلف على 3 صفوف من أزرار صغيرة، وحقول بارتفاع أقل من الحد المريح
+     للمس، وتبويب "تصميم الموقع" شريط طويل من الإعدادات مفصولة بخطوط
+     رفيعة من غير أي تجميع بصري. التعديلات هنا كلها عن الوضوح وسهولة
+     اللمس — مش زخرفة.
+     ========================================================================= */
+
+  /* التبويبات: شريط واحد بالإزاحة بالإصبع بدل 3 صفوف مكسّرة،
+     وأهداف لمس بارتفاع 44px (الحد الموصى به). */
+  .admin-tabs{
+    display:flex; flex-wrap:nowrap; gap:8px; margin-bottom:18px;
+    overflow-x:auto; overflow-y:hidden;
+    scrollbar-width:none; -ms-overflow-style:none;
+    overscroll-behavior-x:contain;
+    padding-bottom:4px;
+  }
+  .admin-tabs::-webkit-scrollbar{display:none;}
+  .admin-tabs button{
+    flex:0 0 auto; min-width:auto; white-space:nowrap;
+    min-height:44px; padding:0 16px; border-radius:10px;
+    font-size:14px; font-weight:600;
+  }
+  /* التبويب المفتوح ملّي مش مجرد حد ملوّن — يبان من نص متر */
+  .admin-tabs button.active{
+    background-color:rgba(255,201,77,0.16);
+    border-color:var(--brass); color:var(--brass);
+  }
+
+  /* كل إعداد في صندوقه: تجميع بصري بدل شريط طويل مفصول بخطوط */
+  .admin-card{
+    background:var(--ink-2);
+    background-image:var(--glass-sheen);
+    border:1px solid var(--glass-edge); border-radius:14px;
+    box-shadow:var(--glass-lift);
+    padding:18px 16px 16px; margin-bottom:16px;
+  }
+  .admin-card > h4{
+    margin:0 0 8px; font-size:15.5px; font-weight:800; color:var(--paper);
+  }
+  .admin-card > p.sub{ margin-bottom:14px; font-size:13px; line-height:1.65; }
+  .admin-card > .modal-actions{ margin-top:14px; }
+  .admin-card > .modal-actions button{ width:100%; }
+  body.view-mode-desktop .admin-card > .modal-actions button{ width:auto; }
+
+  /* الحقول: ارتفاع مريح للمس ونص أوضح */
+  .modal .field{ margin-bottom:14px; }
+  .modal .field label{ font-size:13.5px; color:var(--paper); opacity:0.82; margin-bottom:7px; }
+  .modal .field input,
+  .modal .field select,
+  .modal .field textarea{
+    min-height:46px; font-size:15px; padding:11px 13px; border-radius:10px;
+  }
+  .modal .field textarea{ min-height:96px; }
+
+  /* الأزرار الأساسية في اللوحة: أهداف لمس كاملة */
+  .modal .btn-primary, .modal .btn-ghost{
+    min-height:46px; font-size:14.5px; border-radius:10px;
+  }
+
+  /* صفوف المنتجات في تبويب الإدارة: مسافات أوضح وصورة أكبر شوية */
+  .admin-product-row{ padding:12px; border-radius:12px; margin-bottom:10px; }
+  .admin-product-row img{ width:52px; height:66px; border-radius:8px; }
+  .admin-product-actions button{ min-width:38px; min-height:38px; }
+
+  @media(max-width:560px){
+    /* اللوحة تاخد عرض الشاشة كامل تقريبًا بدل ما تفضل عمود ضيق في النص */
+    .modal.admin-modal{ max-width:none; width:calc(100vw - 20px); padding:18px 14px; }
+    .admin-card{ padding:16px 13px 14px; }
+  }
+

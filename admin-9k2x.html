@@ -105,7 +105,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rakkas&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260908g">
+<link rel="stylesheet" href="styles.css?v=20260908i">
 
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
@@ -1751,6 +1751,8 @@
 
       <div id="adminTabSiteDesign" style="display:none;">
         <p class="sub" style="margin-bottom:14px;" data-i18n="siteDesignIntro">اختار الشكل اللي هيشوفه العميل لما يفتح الموقع. لوحة الإدارة نفسها بتفضل زي ما هي دايمًا مهما كان اختيارك هنا.</p>
+
+        <div class="admin-card">
         <div class="field">
           <label data-i18n="siteDesignLabel">التصميم الفعّال</label>
           <select id="siteDesignSelect"><!-- populated dynamically from /site-config so a future Design MIGA 3/4 appears automatically once added to the backend registry --></select>
@@ -1759,14 +1761,18 @@
           <button class="btn-primary" id="saveSiteDesignBtn" data-i18n="siteDesignSaveBtn">حفظ الاختيار</button>
         </div>
 
-        <hr style="border:none; border-top:1px solid var(--line); margin:22px 0;">
+        </div>
+
+        <div class="admin-card">
         <p class="sub" style="margin-bottom:14px;" data-i18n="heroModeIntro">لكل تصميم، اختار شكل عرض "قبل/بعد" في الصفحة الرئيسية — الدائرة الدوّارة الأصلية، أو السلايدر التفاعلي بالسحب. الاختيار هنا مستقل عن السلايدر الثابت الجديد في التصميم الثاني (ده فاضل سلايدر دايمًا مهما اخترت).</p>
         <div id="heroModeRows"><!-- populated dynamically, one row per design in the registry --></div>
         <div class="modal-actions">
           <button class="btn-primary" id="saveHeroModesBtn" data-i18n="heroModeSaveBtn">حفظ أوضاع الهيرو</button>
         </div>
 
-        <hr style="border:none; border-top:1px solid var(--line); margin:22px 0;">
+        </div>
+
+        <div class="admin-card">
         <h4 style="margin:0 0 8px;" data-i18n="resolutionTitle">دقة الصور الناتجة</h4>
         <p class="sub" style="margin-bottom:14px;" data-i18n="resolutionIntro">اختار دقة الصورة اللي الذكاء الاصطناعي بينتجها. 4K أعلى دقة وأغلى في التكلفة، و2K أرخص والفرق بينهم تقريبًا مش محسوس على شاشة الموبايل. جرّب الاتنين وقارن بنفسك.</p>
         <div class="field">
@@ -1779,7 +1785,9 @@
           <button class="btn-primary" id="saveResolutionBtn" data-i18n="resolutionSaveBtn">حفظ الدقة</button>
         </div>
 
-        <hr style="border:none; border-top:1px solid var(--line); margin:22px 0;">
+        </div>
+
+        <div class="admin-card">
         <h4 style="margin:0 0 8px;" data-i18n="aiModelTitle">موديل الذكاء الاصطناعي</h4>
         <p class="sub" style="margin-bottom:14px;" data-i18n="aiModelIntro">اختار موديل توليد الصور اللي هيستخدمه الموقع. كل موديل بيفرق في السعر وجودة النتيجة — جرّب صورة تجريبية بكل موديل قبل ما تعتمده بشكل نهائي. ملحوظة: اختيار "دقة الصورة" فوق مالوش تأثير على Flux 2 Pro (بياخد دايمًا أفضل دقة متاحة أوتوماتيك).</p>
         <div class="field">
@@ -1789,7 +1797,9 @@
           <button class="btn-primary" id="saveAiModelBtn" data-i18n="aiModelSaveBtn">حفظ الموديل</button>
         </div>
 
-        <hr style="border:none; border-top:1px solid var(--line); margin:22px 0;">
+        </div>
+
+        <div class="admin-card">
         <h4 style="margin:0 0 8px;" data-i18n="colorThemeTitle">لون الهيدر والخلفية تحت الصور</h4>
         <p class="sub" style="margin-bottom:14px;" data-i18n="colorThemeIntro">اختار درجة اللون الغامق اللي تظهر في شريط الهيدر والمساحة خلف صور المنتجات. باقي ألوان الموقع (الدهبي، الخط) بتفضل زي ما هي في كل الاختيارات.</p>
         <div class="field">
@@ -1807,7 +1817,9 @@
           <button class="btn-primary" id="saveColorThemeBtn" data-i18n="colorThemeSaveBtn">حفظ اللون</button>
         </div>
 
-        <hr style="border:none; border-top:1px solid var(--line); margin:22px 0;">
+        </div>
+
+        <div class="admin-card">
         <h4 style="margin:0 0 8px;" data-i18n="headerModeTitle">شكل الهيدر</h4>
         <p class="sub" style="margin-bottom:14px;" data-i18n="headerModeIntro">"الشكل الحالي" يعرض كل أزرار الهيدر (اللغة، الوضع الليلي، عرض الموبايل/الكمبيوتر، تتبع الطلب) في شريط دايمًا ظاهر. "قائمة مطوية" بينقلهم جوه قائمة (☰) بتتفتح عند الضغط، وده بيقلل ارتفاع الهيدر.</p>
         <div class="field">
@@ -1821,7 +1833,9 @@
           <button class="btn-primary" id="saveHeaderModeBtn" data-i18n="headerModeSaveBtn">حفظ شكل الهيدر</button>
         </div>
 
-        <hr style="border:none; border-top:1px solid var(--line); margin:22px 0;">
+        </div>
+
+        <div class="admin-card">
         <h4 style="margin:0 0 8px;" data-i18n="promptLibraryModeTitle">وضع مكتبة البرومبتات للمحترفين</h4>
         <p class="sub" style="margin-bottom:14px;" data-i18n="promptLibraryModeIntro">"الوضع الحالي" يسيب قسم "فاخر" فاضي زي ما هو. "الوضع الجديد" يحوّل نفس القسم لمكتبة برومبتات تجمع تلقائيًا كل منتجات الموقع من كل الأقسام لبيع البرومبت بمفرده، وبيشيل سطر "شراء البرومبت لوحده" من باقي كروت الأقسام العادية (بيفضل ظاهر بس هنا). تقدر ترجع للوضع الحالي في أي وقت من غير أي فقدان بيانات.</p>
         <div class="field">
@@ -1834,6 +1848,7 @@
         <div class="modal-actions">
           <button class="btn-primary" id="savePromptLibraryModeBtn" data-i18n="promptLibraryModeSaveBtn">حفظ الوضع</button>
         </div>
+        </div>
       </div>
 
       <div class="modal-actions" style="margin-top:14px;">
@@ -1845,7 +1860,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260908g"></script>
+<script src="app.js?v=20260908i"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
