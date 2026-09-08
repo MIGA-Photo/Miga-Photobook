@@ -1173,9 +1173,17 @@ function applyChildrenVisibility(){
     // OTHER category (see itemsForCategoryTile()) — "has products" for it
     // means the catalog as a whole has products, not that anything is
     // literally tagged 'luxury'.
+    // "Has products" must mean here exactly what it means in renderGrids():
+    // a product with a REAL photo. Counting photo-less drafts too left a
+    // category holding nothing but drafts visible to customers, who opened it
+    // and found the admin-facing "no products in this category yet — add some
+    // from the admin panel" note staring back at them. Drafts are backstage
+    // work: the category reappears for everyone the moment one of them gets a
+    // real photo, and stays visible to a logged-in admin either way so those
+    // drafts are still reachable.
     const hasProducts = (cat === 'luxury' && PROMPT_LIBRARY_MODE)
       ? products.some(p => p.category !== 'luxury' && p.image && p.image !== PLACEHOLDER_IMG)
-      : products.some(p => p.category === cat);
+      : products.some(p => p.category === cat && p.image && p.image !== PLACEHOLDER_IMG);
     const catVisible = hasProducts || adminLoggedIn;
     const btn = document.querySelector('#catNav button[data-cat="'+cat+'"]');
     const sec = document.getElementById(cat);
@@ -1865,7 +1873,13 @@ function itemsForCategoryTile(cat){
       .filter(p => p.category !== 'luxury' && p.image && p.image !== PLACEHOLDER_IMG)
       .sort((a,b) => (b.order ?? 9999) - (a.order ?? 9999));
   }
-  return products.filter(p => p.category === cat).sort((a,b) => (b.order ?? 9999) - (a.order ?? 9999));
+  // Photo-less drafts are left out here too, for the same reason as in
+  // applyChildrenVisibility(): this list drives the tile's cover photo, its
+  // item count, and whether the tile shows at all — and all three must agree
+  // with what the category's grid actually renders, which excludes drafts.
+  return products
+    .filter(p => p.category === cat && p.image && p.image !== PLACEHOLDER_IMG)
+    .sort((a,b) => (b.order ?? 9999) - (a.order ?? 9999));
 }
 function escapeHtml(s){ const d=document.createElement('div'); d.innerText = s ?? ''; return d.innerHTML; }
 
