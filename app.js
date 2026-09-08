@@ -1356,7 +1356,7 @@ function renderHeroStrip(){
   const doubled = [...sample, ...sample];
   track.innerHTML = doubled.map((p,i) => `
     <div class="frame">
-      <img src="${p.image}" alt="" decoding="async">
+      <img src="${p.image}" alt="" loading="lazy" decoding="async">
     </div>`).join('');
 
   // ---- Constant on-screen speed regardless of catalog size ----
@@ -1441,10 +1441,6 @@ function renderGrids(){
     if(!el) return;
     const dotsEl = document.getElementById('gridDots-'+cat);
 
-    if(cat === 'luxury' && PROMPT_LIBRARY_MODE){
-      renderPromptLibraryGrid(el, dotsEl);
-      return;
-    }
 
     // Undo renderPromptLibraryGrid()'s inline layout override below, in case
     // this is 'luxury' switching back from prompt-library mode to its normal
@@ -1453,6 +1449,25 @@ function renderGrids(){
     el.style.display = '';
     el.style.overflowX = '';
     el.style.overflowY = '';
+
+    // A collapsed section's cards are built on first open, not now. Every
+    // category section starts collapsed, so building all of them up front
+    // put the ENTIRE catalogue (and the prompt library's copy of it) into
+    // the layout tree at once — hundreds of cards and images the visitor
+    // may never scroll to, all of it competing with the main thread on
+    // every tap and scroll. See ensureCategoryRendered().
+    if(!document.getElementById(cat)?.classList.contains('open')){
+      el.dataset.pendingCat = cat;
+      el.innerHTML = '';
+      if(dotsEl) dotsEl.innerHTML = '';
+      return;
+    }
+    delete el.dataset.pendingCat;
+
+    if(cat === 'luxury' && PROMPT_LIBRARY_MODE){
+      renderPromptLibraryGrid(el, dotsEl);
+      return;
+    }
 
     // Products the admin has written up (title, prompt, price) but hasn't
     // attached a real photo to yet still carry PLACEHOLDER_IMG — a mostly
@@ -1479,6 +1494,33 @@ function renderGrids(){
   });
   renderCatTiles();
   renderFavorites();
+}
+
+/** Fills in a category row that renderGrids() deliberately left empty because
+ * its section was closed. Called the instant a section is opened — before the
+ * scroll that follows — so the cards are in place by the time anything
+ * measures or scrolls to them. Cheap and idempotent: it does nothing at all
+ * for a row that is already built. */
+function ensureCategoryRendered(cat){
+  if(!CAT_IDS.includes(cat)) return;           // not a category section
+  const el = document.getElementById('grid-' + cat);
+  if(!el || !el.dataset.pendingCat) return;    // already built
+  const dotsEl = document.getElementById('gridDots-' + cat);
+  delete el.dataset.pendingCat;
+
+  if(cat === 'luxury' && PROMPT_LIBRARY_MODE){
+    renderPromptLibraryGrid(el, dotsEl);
+    return;
+  }
+  const allItems = products.filter(p=>p.category===cat && p.image && p.image !== PLACEHOLDER_IMG)
+    .sort((a,b) => (b.order ?? 9999) - (a.order ?? 9999));
+  if(!allItems.length){
+    el.innerHTML = `<div class="empty-note">${t('emptyNoteCategory')}</div>`;
+    if(dotsEl) dotsEl.innerHTML = '';
+    return;
+  }
+  el.innerHTML = allItems.map(p => renderProductCard(p)).join('');
+  buildRowArrows(cat, dotsEl, el);
 }
 
 /** "مكتبة البرومبتات للمحترفين" — a derived view, not a real category: every
@@ -1707,7 +1749,7 @@ function renderProductCard(p, opts){
     return `
     <div class="card">
       <div class="card-media">
-        <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" decoding="async" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
+        <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" loading="lazy" decoding="async" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
         <span class="card-badge">${escapeHtml(productTitle(p))}</span>
         ${requestCount > 0 ? `<span class="request-count-overlay" title="${t('popularityCountTitle')}">🔥 ${requestCount}</span>` : ''}
         ${favBtnHtml(p.id)}
@@ -1734,7 +1776,7 @@ function renderProductCard(p, opts){
   return `
   <div class="card">
     <div class="card-media">
-      <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" decoding="async" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
+      <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" loading="lazy" decoding="async" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
       <span class="card-badge">${escapeHtml(productTitle(p))}</span>
       ${requestCount > 0 ? `<span class="request-count-overlay" title="${t('popularityCountTitle')}">🔥 ${requestCount}</span>` : ''}
       ${favBtnHtml(p.id)}
@@ -1995,6 +2037,7 @@ function handleCatTilesClick(e){
   const sec = document.getElementById(tile.dataset.cat);
   if(!sec) return;
   const willOpen = !sec.classList.contains('open');
+  if(willOpen) ensureCategoryRendered(tile.dataset.cat);
   sec.classList.toggle('open', willOpen);
   tile.classList.toggle('open', willOpen);
   tile.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
@@ -2019,6 +2062,7 @@ function handleCatTilesClick(e){
 function openCatSection(id){
   const sec = document.getElementById(id);
   if(!sec) return null;
+  ensureCategoryRendered(id);
   // Opening a collapsible section transitions its padding-top from 0 to
   // ~52px over 250ms (see .cat-section.collapsible.open in the CSS) — the
   // exact same category of bug as the header collapse: any code measuring
