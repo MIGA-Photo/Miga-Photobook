@@ -767,7 +767,7 @@
 
 <section class="cat-section collapsible" id="luxury">
   <div class="cs-body">
-  <h2 class="cat-section-heading" id="luxurySectionHeading" data-i18n="promptLibraryHeading" style="display:none;">مكتبة البرومبتات للمحترفين — برومبتات جاهزة ومجرّبة تشتريها بمفردها بدون تحويل صورة، بنفس أسعار وخصومات الموقع الحالية</h2>
+  <h2 class="cat-section-heading" id="luxurySectionHeading" data-i18n="promptLibraryHeading" style="display:none;">مكتبة البرومبتات للمحترفين — اشترِ البرومبت الاحترافي بمفرده، من غير تحويل صورة</h2>
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-luxury"></div>
   </div>
@@ -1917,6 +1917,16 @@
         </div>
 
         <hr style="border:none; border-top:1px solid var(--line); margin:22px 0;">
+        <h4 style="margin:0 0 8px;" data-i18n="aiModelTitle">موديل الذكاء الاصطناعي</h4>
+        <p class="sub" style="margin-bottom:14px;" data-i18n="aiModelIntro">اختار موديل توليد الصور اللي هيستخدمه الموقع. كل موديل بيفرق في السعر وجودة النتيجة — جرّب صورة تجريبية بكل موديل قبل ما تعتمده بشكل نهائي. ملحوظة: اختيار "دقة الصورة" فوق مالوش تأثير على Flux 2 Pro (بياخد دايمًا أفضل دقة متاحة أوتوماتيك).</p>
+        <div class="field">
+          <select id="aiModelSelect"><!-- populated dynamically from /site-config so a future model just needs one entry added to the Worker's MODEL_REGISTRY to show up here --></select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="saveAiModelBtn" data-i18n="aiModelSaveBtn">حفظ الموديل</button>
+        </div>
+
+        <hr style="border:none; border-top:1px solid var(--line); margin:22px 0;">
         <h4 style="margin:0 0 8px;" data-i18n="colorThemeTitle">لون الهيدر والخلفية تحت الصور</h4>
         <p class="sub" style="margin-bottom:14px;" data-i18n="colorThemeIntro">اختار درجة اللون الغامق اللي تظهر في شريط الهيدر والمساحة خلف صور المنتجات. باقي ألوان الموقع (الدهبي، الخط) بتفضل زي ما هي في كل الاختيارات.</p>
         <div class="field">
@@ -1972,7 +1982,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260908c"></script>
+<script src="app.js?v=20260908d"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){

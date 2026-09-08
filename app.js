@@ -39,6 +39,23 @@ const TRANSFORM_API_ENDPOINT = "https://miga-photobook-api.magdyfarouk380.worker
 // also handles products, orders, and admin login. See setup notes at the top of that file.
 const BACKEND_BASE = TRANSFORM_API_ENDPOINT;
 
+// ---------- Safe element lookup for top-level bindings ----------
+// app.js is shared by BOTH index.html and admin-9k2x.html, and those two files
+// are maintained separately — so an admin control added to one of them but not
+// the other leaves this script binding a handler to an element that does not
+// exist on that page. Because these bindings run at the top level, ONE missing
+// element used to throw a TypeError that aborted the rest of the file,
+// including init() near the bottom — i.e. a single missing admin button took
+// the entire customer-facing storefront down (no products, no categories, no
+// hero strip). That is exactly what happened when the AI-model dropdown landed
+// in admin-9k2x.html but not in index.html.
+// Returning an inert, detached element instead means a handler bound to a
+// control that is not on this page simply never fires — which is the intended
+// behaviour anyway — and can never stop the page from booting.
+const MISSING_EL_SINK = document.createElement('div');
+function elById(id){ return document.getElementById(id) || MISSING_EL_SINK; }
+
+
 // Fill these in once you've registered each app with the provider — until then the
 // corresponding social login button just shows a "not configured yet" toast, it never
 // pretends to sign someone in.
@@ -342,8 +359,8 @@ const translations = {
     aiModelTitle:'موديل الذكاء الاصطناعي', aiModelIntro:'اختار موديل توليد الصور اللي هيستخدمه الموقع. كل موديل بيفرق في السعر وجودة النتيجة — جرّب صورة تجريبية بكل موديل قبل ما تعتمده بشكل نهائي. ملحوظة: اختيار "دقة الصورة" فوق مالوش تأثير على Flux 2 Pro (بياخد دايمًا أفضل دقة متاحة أوتوماتيك).', aiModelSaveBtn:'حفظ الموديل', toastAiModelSaved:'تم حفظ موديل الذكاء الاصطناعي',
     colorThemeTitle:'لون الهيدر والخلفية تحت الصور', colorThemeIntro:'اختار درجة اللون الغامق اللي تظهر في شريط الهيدر والمساحة خلف صور المنتجات. باقي ألوان الموقع (الدهبي، الخط) بتفضل زي ما هي في كل الاختيارات.', colorThemeLabel:'لون الهيدر', colorThemeBlack:'أسود (الحالي)', colorThemeBrown:'بني قهوة فخم', colorThemeEmerald:'أخضر زمردي غامق', colorThemeWine:'نبيتي غامق', colorThemeNavy:'كحلي ملكي', colorThemeRed:'أحمر / وردي غامق', colorThemeSaveBtn:'حفظ اللون', toastColorThemeSaved:'تم حفظ اللون — هيظهر للعملاء من زيارتهم الجاية',
     headerModeTitle:'شكل الهيدر', headerModeIntro:'"الشكل الحالي" يعرض كل أزرار الهيدر (اللغة، الوضع الليلي، عرض الموبايل/الكمبيوتر، تتبع الطلب) في شريط دايمًا ظاهر. "قائمة مطوية" بينقلهم جوه قائمة (☰) بتتفتح عند الضغط، وده بيقلل ارتفاع الهيدر.', headerModeLabel:'وضع الهيدر', headerModeClassicOption:'الشكل الحالي', headerModeCompactOption:'قائمة مطوية (☰)', headerModeSaveBtn:'حفظ شكل الهيدر', toastHeaderModeSaved:'تم حفظ شكل الهيدر — هيظهر للعملاء من زيارتهم الجاية',
-    optPromptLibrary:'مكتبة البرومبتات للمحترفين', optPromptLibraryDisabledHint:'غير متاح — بيتجمع تلقائيًا', navPromptLibrary:'مكتبة البرومبتات',
-    promptLibraryHeading:'مكتبة البرومبتات للمحترفين — برومبتات جاهزة ومجرّبة تشتريها بمفردها بدون تحويل صورة، بنفس أسعار وخصومات الموقع الحالية',
+    optPromptLibrary:'مكتبة البرومبتات', optPromptLibraryDisabledHint:'غير متاح — بيتجمع تلقائيًا', navPromptLibrary:'مكتبة البرومبتات',
+    promptLibraryHeading:'مكتبة البرومبتات للمحترفين — اشترِ البرومبت الاحترافي بمفرده، من غير تحويل صورة',
     promptLibraryModeTitle:'وضع مكتبة البرومبتات للمحترفين', promptLibraryModeIntro:'"الوضع الحالي" يسيب قسم "فاخر" فاضي زي ما هو. "الوضع الجديد" يحوّل نفس القسم لمكتبة برومبتات تجمع تلقائيًا كل منتجات الموقع من كل الأقسام لبيع البرومبت بمفرده، وبيشيل سطر "شراء البرومبت لوحده" من باقي كروت الأقسام العادية (بيفضل ظاهر بس هنا). تقدر ترجع للوضع الحالي في أي وقت من غير أي فقدان بيانات.',
     promptLibraryModeLabel:'الوضع', promptLibraryModeOffOption:'الوضع الحالي (فاخر قسم عادي فاضي)', promptLibraryModeOnOption:'الوضع الجديد (مكتبة البرومبتات للمحترفين)', promptLibraryModeSaveBtn:'حفظ الوضع', toastPromptLibraryModeSaved:'تم حفظ الوضع — هيظهر للعملاء من زيارتهم الجاية',
     menuTitle:'القائمة', drawerLangLabel:'اللغة', drawerThemeLabel:'المظهر', drawerViewLabel:'طريقة العرض', drawerOrderLabel:'الطلبات', drawerGuestHint:'لحفظ اسمك وتليفونك وصورتك', drawerHaveAccount:'عندك حساب؟ سجّل دخول',
@@ -644,8 +661,8 @@ const translations = {
     aiModelTitle:'AI model', aiModelIntro:'Choose which image-generation model the site uses. Each model differs in price and result quality — try a test image with each before committing to it. Note: the resolution choice above has no effect on Flux 2 Pro (it always uses the best resolution automatically).', aiModelSaveBtn:'Save model', toastAiModelSaved:'AI model saved',
     colorThemeTitle:'Header and image-background color', colorThemeIntro:'Choose the dark shade used for the header bar and the space behind product images. The rest of the site colors (gold, text) stay the same across every option.', colorThemeLabel:'Header color', colorThemeBlack:'Black (current)', colorThemeBrown:'Warm coffee brown', colorThemeEmerald:'Deep emerald green', colorThemeWine:'Deep wine', colorThemeNavy:'Royal navy', colorThemeRed:'Deep red / rose', colorThemeSaveBtn:'Save color', toastColorThemeSaved:'Color saved — customers will see it on their next visit',
     headerModeTitle:'Header layout', headerModeIntro:'"Current layout" shows every header button (language, dark mode, mobile/desktop preview, track order) in an always-visible strip. "Collapsed menu" moves them into a (☰) menu that opens on tap, which shortens the header.', headerModeLabel:'Header layout', headerModeClassicOption:'Current layout', headerModeCompactOption:'Collapsed menu (☰)', headerModeSaveBtn:'Save header layout', toastHeaderModeSaved:'Header layout saved — customers will see it on their next visit',
-    optPromptLibrary:'Prompt Library for Professionals', optPromptLibraryDisabledHint:'unavailable — gathered automatically', navPromptLibrary:'Prompt Library',
-    promptLibraryHeading:"Prompt Library for Professionals — tested, ready-made prompts you can buy on their own without a photo transformation, at the site's current prices and discounts",
+    optPromptLibrary:'Prompt Library', optPromptLibraryDisabledHint:'unavailable — gathered automatically', navPromptLibrary:'Prompt Library',
+    promptLibraryHeading:'Prompt Library for Professionals — buy the professional prompt on its own, no photo transformation needed',
     promptLibraryModeTitle:'Prompt Library for Professionals mode', promptLibraryModeIntro:'"Current mode" leaves the empty "Luxury" category as-is. "New mode" turns that same slot into a prompt library that automatically gathers every product from every category to sell its prompt alone, and removes the "buy the prompt alone" line from other category cards (it stays visible here only). You can switch back at any time with no data loss.',
     promptLibraryModeLabel:'Mode', promptLibraryModeOffOption:'Current mode (Luxury — empty category)', promptLibraryModeOnOption:'New mode (Prompt Library for Professionals)', promptLibraryModeSaveBtn:'Save mode', toastPromptLibraryModeSaved:'Mode saved — customers will see it on their next visit',
     menuTitle:'Menu', drawerLangLabel:'Language', drawerThemeLabel:'Appearance', drawerViewLabel:'View mode', drawerOrderLabel:'Orders', drawerGuestHint:'To save your name, phone, and photo', drawerHaveAccount:'Already have an account? Log in',
@@ -851,12 +868,12 @@ document.querySelectorAll('.theme-toggle').forEach(btn=>{
   btn.addEventListener('click', toggleTheme);
 });
 
-document.getElementById('langToggle').addEventListener('click', (e)=>{
+elById('langToggle').addEventListener('click', (e)=>{
   const btn = e.target.closest('button');
   if(!btn) return;
   applyLanguage(btn.dataset.lang);
 });
-document.getElementById('viewToggle').addEventListener('click', (e)=>{
+elById('viewToggle').addEventListener('click', (e)=>{
   const btn = e.target.closest('button');
   if(!btn) return;
   applyViewMode(btn.dataset.view);
@@ -883,7 +900,7 @@ document.addEventListener('click', (e)=>{
   if(e.target.closest('button, .buy-btn, .copy-btn, .contact-item')) playClickSound();
 }, true);
 
-document.getElementById('contactFabBtn').addEventListener('click', (e)=>{
+elById('contactFabBtn').addEventListener('click', (e)=>{
   e.stopPropagation();
   document.getElementById('contactMenu').classList.toggle('show');
 });
@@ -1157,7 +1174,7 @@ function applyChildrenVisibility(){
     // means the catalog as a whole has products, not that anything is
     // literally tagged 'luxury'.
     const hasProducts = (cat === 'luxury' && PROMPT_LIBRARY_MODE)
-      ? products.some(p => p.category !== 'luxury')
+      ? products.some(p => p.category !== 'luxury' && p.image && p.image !== PLACEHOLDER_IMG)
       : products.some(p => p.category === cat);
     const catVisible = hasProducts || adminLoggedIn;
     const btn = document.querySelector('#catNav button[data-cat="'+cat+'"]');
@@ -1284,6 +1301,14 @@ function renderGrids(){
       return;
     }
 
+    // Undo renderPromptLibraryGrid()'s inline layout override below, in case
+    // this is 'luxury' switching back from prompt-library mode to its normal
+    // single horizontal row — a harmless no-op for every other category,
+    // which never had the override applied in the first place.
+    el.style.display = '';
+    el.style.overflowX = '';
+    el.style.overflowY = '';
+
     // Products the admin has written up (title, prompt, price) but hasn't
     // attached a real photo to yet still carry PLACEHOLDER_IMG — a mostly
     // empty dark rectangle with small centered text. Left unfiltered here,
@@ -1320,6 +1345,21 @@ function renderGrids(){
  * empty in this mode — each group below gets its own row + its own arrows,
  * matching the exact markup/CSS every other category row already uses. */
 function renderPromptLibraryGrid(container, outerDotsEl){
+  // `container` (#grid-luxury) carries the sitewide `.grid` class — a single
+  // horizontal-scrolling flex row (see styles.css: display:flex,
+  // overflow-x:auto). That's exactly right for one category's row of cards,
+  // but wrong for THIS container specifically: it needs to stack several
+  // independent category groups vertically, each with its OWN
+  // horizontal-scrolling row nested inside. Without this override, every
+  // group div became a flex ITEM sitting side-by-side instead of a stacked
+  // section — no visible grouping, cards squeezed to almost nothing. Inline
+  // styles win over the class regardless of stylesheet order, and
+  // renderGrids() undoes this the moment the mode switches back off, so
+  // every other page keeps using the exact same `.grid` class untouched.
+  container.style.display = 'block';
+  container.style.overflowX = 'visible';
+  container.style.overflowY = 'visible';
+
   if(outerDotsEl) outerDotsEl.innerHTML = '';
   const groups = CAT_IDS.filter(c => c !== 'luxury');
   const sections = groups.map(cat=>{
@@ -1328,7 +1368,7 @@ function renderPromptLibraryGrid(container, outerDotsEl){
     if(!items.length) return '';
     const rowKey = 'luxury__' + cat;
     return `
-      <div class="prompt-lib-group">
+      <div class="prompt-lib-group" style="margin-bottom:28px;">
         <div class="prompt-lib-group-title" style="display:flex; align-items:center; gap:8px; font-size:16px; font-weight:700; color:var(--paper); margin:0 0 12px; padding-top:6px;">
           <span class="cicon ${ICON_COLOR_CLASS[cat]}" aria-hidden="true" style="display:inline-flex; font-size:18px;">${CAT_ICON[cat]}</span>
           <span>${escapeHtml(catLabel(cat))}</span>
@@ -1817,7 +1857,13 @@ function applyPromptLibraryLabels(){
  * sync with each other on what "luxury has products" actually means. */
 function itemsForCategoryTile(cat){
   if(cat === 'luxury' && PROMPT_LIBRARY_MODE){
-    return products.filter(p => p.category !== 'luxury').sort((a,b) => (b.order ?? 9999) - (a.order ?? 9999));
+    // Photo-less drafts are excluded here specifically (unlike a normal
+    // category tile, which counts everything it holds) so the number on this
+    // tile is exactly the number of prompt cards a visitor will actually
+    // find inside — renderPromptLibraryGrid() applies the same filter.
+    return products
+      .filter(p => p.category !== 'luxury' && p.image && p.image !== PLACEHOLDER_IMG)
+      .sort((a,b) => (b.order ?? 9999) - (a.order ?? 9999));
   }
   return products.filter(p => p.category === cat).sort((a,b) => (b.order ?? 9999) - (a.order ?? 9999));
 }
@@ -1861,8 +1907,8 @@ function openProductDetail(id){
   };
   document.getElementById('detailModalBg').classList.add('show');
 }
-document.getElementById('detailModalClose').onclick = ()=> document.getElementById('detailModalBg').classList.remove('show');
-document.getElementById('detailCancelBtn').onclick = ()=> document.getElementById('detailModalBg').classList.remove('show');
+elById('detailModalClose').onclick = ()=> document.getElementById('detailModalBg').classList.remove('show');
+elById('detailCancelBtn').onclick = ()=> document.getElementById('detailModalBg').classList.remove('show');
 
 /** Public, shareable address for one product. Used for ads: the link drops a
  * visitor straight onto this photo instead of the top of the storefront.
@@ -1970,8 +2016,8 @@ function armStayNudge(){
     nudge.classList.remove('show');
     try{ sessionStorage.setItem('migaNudgeSeen','1'); }catch(e){}
   };
-  document.getElementById('stayNudgeClose').onclick = hide;
-  document.getElementById('nudgeBrowseBtn').onclick = hide;
+  elById('stayNudgeClose').onclick = hide;
+  elById('nudgeBrowseBtn').onclick = hide;
 
   setTimeout(()=>{
     // Re-check at the last moment: they may have bought, logged in as admin,
@@ -2049,7 +2095,7 @@ function syncBuyConfirmBtn(){
   if(!chk || !btn) return;
   btn.disabled = !chk.checked;
 }
-document.getElementById('payConfirmChk').addEventListener('change', syncBuyConfirmBtn);
+elById('payConfirmChk').addEventListener('change', syncBuyConfirmBtn);
 
 function setPaymentMethod(method){
   document.querySelectorAll('#paymentMethodTabs button').forEach(b=>{
@@ -2073,17 +2119,17 @@ function setPaymentMethod(method){
       method === 'card' ? t('payNowBtn') : t('getFawryCodeBtn');
   }
 }
-document.getElementById('paymentMethodTabs').addEventListener('click', (e)=>{
+elById('paymentMethodTabs').addEventListener('click', (e)=>{
   const btn = e.target.closest('button');
   if(!btn) return;
   setPaymentMethod(btn.dataset.method);
 });
 
-document.getElementById('buyModalClose').onclick = ()=> document.getElementById('buyModalBg').classList.remove('show');
-document.getElementById('buyCancelBtn').onclick = ()=> document.getElementById('buyModalBg').classList.remove('show');
-document.getElementById('payCardFawryCancelBtn').onclick = ()=> document.getElementById('buyModalBg').classList.remove('show');
+elById('buyModalClose').onclick = ()=> document.getElementById('buyModalBg').classList.remove('show');
+elById('buyCancelBtn').onclick = ()=> document.getElementById('buyModalBg').classList.remove('show');
+elById('payCardFawryCancelBtn').onclick = ()=> document.getElementById('buyModalBg').classList.remove('show');
 
-document.getElementById('payCardFawryBtn').onclick = async ()=>{
+elById('payCardFawryBtn').onclick = async ()=>{
   const method = document.getElementById('payCardFawryBtn').dataset.method;
   const name = document.getElementById('payerName').value.trim();
   const phone = document.getElementById('payerPhone').value.trim();
@@ -2126,7 +2172,7 @@ document.getElementById('payCardFawryBtn').onclick = async ()=>{
     showToast(t('toastOrderFailed'));
   }
 };
-document.getElementById('ipCopyBtn').onclick = ()=>{
+elById('ipCopyBtn').onclick = ()=>{
   const shownNumber = document.getElementById('ipNumber').textContent;
   navigator.clipboard?.writeText(shownNumber).then(()=> showToast(t('toastCopiedNumber'))).catch(()=>{});
 };
@@ -2134,12 +2180,12 @@ document.getElementById('ipCopyBtn').onclick = ()=>{
 // Quiet expand/collapse for "where do I find the transaction number?" —
 // stays hidden by default so it doesn't add clutter for buyers who already
 // know, but one tap away for anyone stuck on this specific field.
-document.getElementById('refHelpToggle').onclick = ()=>{
+elById('refHelpToggle').onclick = ()=>{
   const box = document.getElementById('refHelpBox');
   box.hidden = !box.hidden;
 };
 
-document.getElementById('buyConfirmBtn').onclick = async ()=>{
+elById('buyConfirmBtn').onclick = async ()=>{
   if(!currentBuyId) return;
   const phone = document.getElementById('buyerPhone').value.trim();
   const activeTab = document.querySelector('#paymentMethodTabs button.active');
@@ -2296,7 +2342,7 @@ function showOrderStatusPanel(productId, code, orderType){
   orderStatusPollTimer = setInterval(check, 6000);
 }
 
-document.getElementById('payStatusCloseBtn').onclick = ()=>{
+elById('payStatusCloseBtn').onclick = ()=>{
   stopOrderStatusPolling();
   document.getElementById('buyModalBg').classList.remove('show');
   const p = getBuyItem();
@@ -2496,7 +2542,7 @@ function closeCropModal(result){
   }
 }
 
-document.getElementById('cropConfirmBtn').onclick = ()=>{
+elById('cropConfirmBtn').onclick = ()=>{
   if(!cropState) return;
   const out = document.createElement('canvas');
   out.width = CROP_OUTPUT_W; out.height = CROP_OUTPUT_H;
@@ -2509,8 +2555,8 @@ document.getElementById('cropConfirmBtn').onclick = ()=>{
   octx.restore();
   out.toBlob((blob)=> closeCropModal(blob), 'image/jpeg', 0.92);
 };
-document.getElementById('cropCancelBtn').onclick = ()=> closeCropModal(null);
-document.getElementById('cropModalClose').onclick = ()=> closeCropModal(null);
+elById('cropCancelBtn').onclick = ()=> closeCropModal(null);
+elById('cropModalClose').onclick = ()=> closeCropModal(null);
 
 let currentTransformId = null;
 let transformImg = null;
@@ -2579,10 +2625,10 @@ function openTransformModal(id){
   }
   transformModalBg.classList.add('show');
 }
-document.getElementById('transformModalClose').onclick = ()=> transformModalBg.classList.remove('show');
-document.getElementById('transformCancelBtn').onclick = ()=> transformModalBg.classList.remove('show');
+elById('transformModalClose').onclick = ()=> transformModalBg.classList.remove('show');
+elById('transformCancelBtn').onclick = ()=> transformModalBg.classList.remove('show');
 
-document.getElementById('transformFileInput').addEventListener('change', (e)=>{
+elById('transformFileInput').addEventListener('change', (e)=>{
   const file = e.target.files && e.target.files[0];
   if(!file) return;
   if(!file.type.startsWith('image/')){
@@ -2647,7 +2693,7 @@ function buildFullResSource(img){
   return canvas.toDataURL('image/jpeg', 0.95);
 }
 
-document.getElementById('transformGenerateBtn').onclick = async ()=>{
+elById('transformGenerateBtn').onclick = async ()=>{
   if(!transformImg){ showToast(t('toastSelectPhoto')); return; }
   if(!document.getElementById('transformConsent').checked){ showToast(t('toastConsentRequired')); return; }
   const p = products.find(x=>x.id===currentTransformId);
@@ -2764,7 +2810,7 @@ document.getElementById('transformGenerateBtn').onclick = async ()=>{
 /** Lets a happy customer pass the result on. Uses the phone's native share
  * sheet with the actual image where the browser allows it, and falls back to
  * sharing (or copying) the storefront link everywhere else. */
-document.getElementById('transformShareBtn').onclick = async ()=>{
+elById('transformShareBtn').onclick = async ()=>{
   const outCanvas = document.getElementById('transformOutCanvas');
   const shareText = t('shareResultText');
   const shareUrl = window.location.origin + window.location.pathname;
@@ -2787,7 +2833,7 @@ document.getElementById('transformShareBtn').onclick = async ()=>{
   copyToClipboard(`${shareText} ${shareUrl}`, 'toastShareCopied');
 };
 
-document.getElementById('transformDownloadBtn').onclick = async ()=>{
+elById('transformDownloadBtn').onclick = async ()=>{
   // Prefer downloading the ORIGINAL file straight from the generation
   // service. Re-encoding via canvas.toDataURL() re-compresses the image a
   // second time and, more importantly, only ever captures whatever the
@@ -2826,7 +2872,7 @@ document.getElementById('transformDownloadBtn').onclick = async ()=>{
 
 // ---------- Order tracking ----------
 const trackModalBg = document.getElementById('trackModalBg');
-document.getElementById('trackOpenBtn').onclick = ()=>{
+elById('trackOpenBtn').onclick = ()=>{
   trackModalBg.classList.add('show');
   renderMyOrdersHistory();
 };
@@ -2880,9 +2926,9 @@ async function renderMyOrdersHistory(){
         </div>` : ''}
     </div>`).join('');
 }
-document.getElementById('trackModalClose').onclick = ()=> trackModalBg.classList.remove('show');
-document.getElementById('trackCancelBtn').onclick = ()=> trackModalBg.classList.remove('show');
-document.getElementById('trackCheckBtn').onclick = async ()=>{
+elById('trackModalClose').onclick = ()=> trackModalBg.classList.remove('show');
+elById('trackCancelBtn').onclick = ()=> trackModalBg.classList.remove('show');
+elById('trackCheckBtn').onclick = async ()=>{
   const code = document.getElementById('trackCode').value.trim().toUpperCase();
   if(!code){ showToast(t('toastEnterCode')); return; }
   if(!BACKEND_BASE){ showToast(t('toastOrderNotFound')); return; }
@@ -2956,7 +3002,7 @@ function setActiveSectionTab(targetId, {scroll} = {scroll: true}){
     document.getElementById(targetId)?.scrollIntoView({behavior:'smooth', block:'start'});
   }
 }
-document.getElementById('sectionTabsRow').addEventListener('click', (e)=>{
+elById('sectionTabsRow').addEventListener('click', (e)=>{
   const btn = e.target.closest('.section-tab-btn');
   if(!btn) return;
   if(!TAB_PANEL_IDS.includes(btn.dataset.target)){
@@ -3100,10 +3146,10 @@ backToTopBtn.addEventListener('click', ()=>{
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
-document.getElementById('scrollRulerUp').addEventListener('click', ()=>{
+elById('scrollRulerUp').addEventListener('click', ()=>{
   window.scrollBy({ top: -window.innerHeight * 0.8, behavior: 'smooth' });
 });
-document.getElementById('scrollRulerDown').addEventListener('click', ()=>{
+elById('scrollRulerDown').addEventListener('click', ()=>{
   window.scrollBy({ top: window.innerHeight * 0.8, behavior: 'smooth' });
 });
 
@@ -3408,7 +3454,7 @@ document.addEventListener('keydown', (e)=>{
   if(e.key === 'Escape') closeCatDropdown();
 });
 
-document.getElementById('catNav').addEventListener('click', (e)=>{
+elById('catNav').addEventListener('click', (e)=>{
   const btn = e.target.closest('button');
   if(!btn) return;
   [...document.querySelectorAll('#catNav button')].forEach(b=>b.classList.remove('active'));
@@ -3445,7 +3491,7 @@ document.addEventListener('click', (e)=>{
   if(!adminQuickAccess.contains(e.target)) closeAdminQuickMenu();
 });
 
-document.getElementById('adminQuickMenu').addEventListener('click', (e)=>{
+elById('adminQuickMenu').addEventListener('click', (e)=>{
   const btn = e.target.closest('button[data-admin-tab]');
   if(!btn) return;
   closeAdminQuickMenu();
@@ -3458,7 +3504,7 @@ document.getElementById('adminQuickMenu').addEventListener('click', (e)=>{
   if(tab === 'showcase'){ loadShowcaseIntoAdmin(); }
   if(tab === 'promoimages'){ loadPromoImagesIntoAdmin(); }
 });
-document.getElementById('adminQuickLogout').addEventListener('click', ()=>{
+elById('adminQuickLogout').addEventListener('click', ()=>{
   closeAdminQuickMenu();
   document.getElementById('adminLogoutBtn').click();
 });
@@ -3577,7 +3623,7 @@ function syncAdminFabBadge(){
   badge.classList.toggle('show', !!text);
 }
 
-document.getElementById('adminCollapseBtn').onclick = ()=>{
+elById('adminCollapseBtn').onclick = ()=>{
   collapseAdminPanel();
   syncAdminFabBadge();
 };
@@ -3772,11 +3818,11 @@ document.getElementById('adminCollapseBtn').onclick = ()=>{
   modal.addEventListener('pointercancel', endSwipe);
 })();
 
-document.getElementById('adminAlertsBtn').onclick = enableAdminAlerts;
+elById('adminAlertsBtn').onclick = enableAdminAlerts;
 updateAdminAlertBtn();
-document.getElementById('pShareLinkCopy').onclick = ()=>
+elById('pShareLinkCopy').onclick = ()=>
   copyToClipboard(document.getElementById('pShareLink').value, 'toastLinkCopied');
-document.getElementById('pImageLinkCopy').onclick = ()=>
+elById('pImageLinkCopy').onclick = ()=>
   copyToClipboard(document.getElementById('pImageLink').value, 'toastImageLinkCopied');
 
 function showAdminQuickAccess(){
@@ -3997,7 +4043,7 @@ async function saveProfileDetails(name, phone){
 }
 
 const accountModalBg = document.getElementById('accountModalBg');
-document.getElementById('accountOpenBtn').onclick = ()=>{
+elById('accountOpenBtn').onclick = ()=>{
   accountModalBg.classList.add('show');
   document.getElementById('accountLoggedOutView').style.display = currentUser ? 'none' : 'block';
   document.getElementById('accountLoggedInView').style.display = currentUser ? 'block' : 'none';
@@ -4018,22 +4064,22 @@ document.getElementById('accountOpenBtn').onclick = ()=>{
   }
   checkBiometricAvailability();
 };
-document.getElementById('accountModalClose').onclick = ()=> accountModalBg.classList.remove('show');
+elById('accountModalClose').onclick = ()=> accountModalBg.classList.remove('show');
 
-document.getElementById('tabLoginBtn').onclick = ()=>{
+elById('tabLoginBtn').onclick = ()=>{
   document.getElementById('tabLoginBtn').classList.add('active');
   document.getElementById('tabRegisterBtn').classList.remove('active');
   document.getElementById('loginFormView').style.display = 'block';
   document.getElementById('registerFormView').style.display = 'none';
 };
-document.getElementById('tabRegisterBtn').onclick = ()=>{
+elById('tabRegisterBtn').onclick = ()=>{
   document.getElementById('tabRegisterBtn').classList.add('active');
   document.getElementById('tabLoginBtn').classList.remove('active');
   document.getElementById('registerFormView').style.display = 'block';
   document.getElementById('loginFormView').style.display = 'none';
 };
 
-document.getElementById('loginSubmitBtn').onclick = async ()=>{
+elById('loginSubmitBtn').onclick = async ()=>{
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
   if(!email || !password){ showToast(t('toastFillFields')); return; }
@@ -4048,7 +4094,7 @@ document.getElementById('loginSubmitBtn').onclick = async ()=>{
   }catch(e){ showToast(t('toastAuthFailed')); }
 };
 
-document.getElementById('registerSubmitBtn').onclick = async ()=>{
+elById('registerSubmitBtn').onclick = async ()=>{
   const name = document.getElementById('registerName').value.trim();
   const phone = document.getElementById('registerPhone').value.trim();
   const email = document.getElementById('registerEmail').value.trim();
@@ -4066,7 +4112,7 @@ document.getElementById('registerSubmitBtn').onclick = async ()=>{
   }catch(e){ showToast(t('toastAuthFailed')); }
 };
 
-document.getElementById('accountLogoutBtn').onclick = ()=>{
+elById('accountLogoutBtn').onclick = ()=>{
   localStorage.removeItem('megaPromptAuthToken');
   currentUser = null;
   updateAccountButton();
@@ -4078,7 +4124,7 @@ document.getElementById('accountLogoutBtn').onclick = ()=>{
 // this stays fast on a phone connection and light on R2 storage. Both the
 // account modal's avatar button and the drawer's avatar button trigger the
 // same hidden file input — the change handler below updates both places.
-document.getElementById('accountAvatarBtn').onclick = ()=>{
+elById('accountAvatarBtn').onclick = ()=>{
   document.getElementById('accountAvatarFile').click();
 };
 document.getElementById('accountAvatarFile').onchange = async (e)=>{
@@ -4141,7 +4187,7 @@ function resizeImageToBlob(file, maxSize, quality){
   });
 }
 
-document.getElementById('saveAccountProfileBtn').onclick = async ()=>{
+elById('saveAccountProfileBtn').onclick = async ()=>{
   const name = document.getElementById('accountProfileName').value.trim();
   const phone = document.getElementById('accountProfilePhone').value.trim();
   if(!name){ showToast(t('toastFillFields')); return; }
@@ -4197,7 +4243,7 @@ function loadScriptOnce(src, id){
   });
 }
 
-document.getElementById('googleLoginBtn').onclick = async ()=>{
+elById('googleLoginBtn').onclick = async ()=>{
   if(!GOOGLE_CLIENT_ID){ showToast(t('toastSocialNotConfigured')); return; }
   try{
     await loadScriptOnce('https://accounts.google.com/gsi/client', 'googleGsiScript');
@@ -4219,7 +4265,7 @@ document.getElementById('googleLoginBtn').onclick = async ()=>{
   }catch(e){ showToast(t('toastAuthFailed')); }
 };
 
-document.getElementById('facebookLoginBtn').onclick = async ()=>{
+elById('facebookLoginBtn').onclick = async ()=>{
   if(!FACEBOOK_APP_ID){ showToast(t('toastSocialNotConfigured')); return; }
   try{
     await loadScriptOnce('https://connect.facebook.net/en_US/sdk.js', 'facebookSdkScript');
@@ -4239,7 +4285,7 @@ document.getElementById('facebookLoginBtn').onclick = async ()=>{
   }catch(e){ showToast(t('toastAuthFailed')); }
 };
 
-document.getElementById('appleLoginBtn').onclick = async ()=>{
+elById('appleLoginBtn').onclick = async ()=>{
   if(!APPLE_CLIENT_ID){ showToast(t('toastSocialNotConfigured')); return; }
   try{
     await loadScriptOnce('https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js', 'appleAuthScript');
@@ -4324,7 +4370,7 @@ function initVisitorCounter(){
   visitorCounterTimer = setInterval(loadVisitorCount, 60000); // refresh every minute
 }
 
-document.getElementById('biometricLoginBtn').onclick = async ()=>{
+elById('biometricLoginBtn').onclick = async ()=>{
   if(!BACKEND_BASE) return;
   try{
     const optRes = await fetch(`${BACKEND_BASE}/auth/webauthn/login-options`, {
@@ -4367,7 +4413,7 @@ document.getElementById('biometricLoginBtn').onclick = async ()=>{
   }
 };
 
-document.getElementById('registerBiometricBtn').onclick = async ()=>{
+elById('registerBiometricBtn').onclick = async ()=>{
   const authToken = localStorage.getItem('megaPromptAuthToken');
   if(!BACKEND_BASE || !authToken) return;
   try{
@@ -4420,9 +4466,9 @@ document.getElementById('registerBiometricBtn').onclick = async ()=>{
 const reviewModalBg = document.getElementById('reviewModalBg');
 // The thank-you panel reuses the buttons that already exist, so there is one
 // share implementation and one review flow rather than parallel copies.
-document.getElementById('thanksShareBtn').onclick = ()=>
+elById('thanksShareBtn').onclick = ()=>
   document.getElementById('transformShareBtn').click();
-document.getElementById('thanksReviewBtn').onclick = ()=>
+elById('thanksReviewBtn').onclick = ()=>
   document.getElementById('writeReviewBtn').click();
 
 let selectedReviewPhotoUrl = null;
@@ -4450,7 +4496,7 @@ function populateReviewPhotoPicker(){
     picker.appendChild(thumb);
   });
 }
-document.getElementById('reviewPhotoConsent').addEventListener('change', function(){
+elById('reviewPhotoConsent').addEventListener('change', function(){
   const picker = document.getElementById('reviewPhotoPicker');
   if(this.checked){
     if(reviewResultUrls.length > 1){
@@ -4471,7 +4517,7 @@ document.getElementById('reviewPhotoConsent').addEventListener('change', functio
   }
 });
 
-document.getElementById('writeReviewBtn').onclick = ()=>{
+elById('writeReviewBtn').onclick = ()=>{
   if(!currentUser){
     showToast(t('toastLoginRequired'));
     document.getElementById('accountOpenBtn').click();
@@ -4480,10 +4526,10 @@ document.getElementById('writeReviewBtn').onclick = ()=>{
   populateReviewPhotoPicker();
   reviewModalBg.classList.add('show');
 };
-document.getElementById('reviewModalClose').onclick = ()=> reviewModalBg.classList.remove('show');
-document.getElementById('reviewCancelBtn').onclick = ()=> reviewModalBg.classList.remove('show');
+elById('reviewModalClose').onclick = ()=> reviewModalBg.classList.remove('show');
+elById('reviewCancelBtn').onclick = ()=> reviewModalBg.classList.remove('show');
 
-document.getElementById('reviewSubmitBtn').onclick = async ()=>{
+elById('reviewSubmitBtn').onclick = async ()=>{
   const rating = document.getElementById('reviewRating').value;
   const comment = document.getElementById('reviewComment').value.trim();
   const token = localStorage.getItem('megaPromptAuthToken');
@@ -4601,7 +4647,7 @@ function renderReviewStatsTable(pending, approved){
   </table>`;
 }
 
-document.getElementById('reviewStatsBar').addEventListener('click', function(){
+elById('reviewStatsBar').addEventListener('click', function(){
   const isOpen = this.classList.toggle('open');
   this.setAttribute('aria-expanded', String(isOpen));
   document.getElementById('reviewStatsTable').style.display = isOpen ? 'block' : 'none';
@@ -4670,30 +4716,30 @@ function setAdminTab(tab){
   document.getElementById('adminTabChangePassword').style.display = tab==='changepassword' ? 'block' : 'none';
   document.getElementById('adminTabSiteDesign').style.display = tab==='sitedesign' ? 'block' : 'none';
 }
-document.getElementById('tabBtnProducts').onclick = ()=> setAdminTab('products');
-document.getElementById('tabBtnOrders').onclick = async ()=>{
+elById('tabBtnProducts').onclick = ()=> setAdminTab('products');
+elById('tabBtnOrders').onclick = async ()=>{
   setAdminTab('orders');
   await loadOrders();
   renderOrdersList();
 };
-document.getElementById('tabBtnReviews').onclick = async ()=>{
+elById('tabBtnReviews').onclick = async ()=>{
   setAdminTab('reviews');
   await loadPendingReviews();
 };
-document.getElementById('tabBtnVisitors').onclick = async ()=>{
+elById('tabBtnVisitors').onclick = async ()=>{
   setAdminTab('visitors');
   await loadVisitorStats();
 };
-document.getElementById('tabBtnShowcase').onclick = async ()=>{
+elById('tabBtnShowcase').onclick = async ()=>{
   setAdminTab('showcase');
   await loadShowcaseIntoAdmin();
 };
-document.getElementById('tabBtnPromoImages').onclick = async ()=>{
+elById('tabBtnPromoImages').onclick = async ()=>{
   setAdminTab('promoimages');
   await loadPromoImagesIntoAdmin();
 };
-document.getElementById('tabBtnChangePassword').onclick = ()=> setAdminTab('changepassword');
-document.getElementById('tabBtnSiteDesign').onclick = async ()=>{
+elById('tabBtnChangePassword').onclick = ()=> setAdminTab('changepassword');
+elById('tabBtnSiteDesign').onclick = async ()=>{
   setAdminTab('sitedesign');
   await loadSiteDesignIntoAdmin();
 };
@@ -4750,7 +4796,7 @@ async function loadSiteDesignIntoAdmin(){
     }
   }catch(e){ /* leave the dropdown empty on a network hiccup */ }
 }
-document.getElementById('saveColorThemeBtn').onclick = async ()=>{
+elById('saveColorThemeBtn').onclick = async ()=>{
   const theme = document.getElementById('colorThemeSelect').value;
   if(!BACKEND_BASE || !adminSessionToken) return;
   try{
@@ -4765,7 +4811,7 @@ document.getElementById('saveColorThemeBtn').onclick = async ()=>{
     showToast(t('toastAdminServerError'));
   }
 };
-document.getElementById('saveHeaderModeBtn').onclick = async ()=>{
+elById('saveHeaderModeBtn').onclick = async ()=>{
   const mode = document.getElementById('headerModeSelect').value;
   if(!BACKEND_BASE || !adminSessionToken) return;
   try{
@@ -4802,7 +4848,7 @@ document.getElementById('savePromptLibraryModeBtn')?.addEventListener('click', a
     showToast(t('toastAdminServerError'));
   }
 });
-document.getElementById('saveSiteDesignBtn').onclick = async ()=>{
+elById('saveSiteDesignBtn').onclick = async ()=>{
   const design = document.getElementById('siteDesignSelect').value;
   if(!BACKEND_BASE || !adminSessionToken) return;
   try{
@@ -4822,7 +4868,7 @@ document.getElementById('saveSiteDesignBtn').onclick = async ()=>{
  * design) — three rapid writes to the same KV key back-to-back was tripping
  * Cloudflare's KV write-rate limit, which surfaced to the admin as a random,
  * unhelpful server error even though nothing was actually misconfigured. */
-document.getElementById('saveHeroModesBtn').onclick = async ()=>{
+elById('saveHeroModesBtn').onclick = async ()=>{
   if(!BACKEND_BASE || !adminSessionToken) return;
   const selects = [...document.querySelectorAll('[data-hero-mode-select]')];
   if(!selects.length) return;
@@ -4844,7 +4890,7 @@ document.getElementById('saveHeroModesBtn').onclick = async ()=>{
  * rather than folded into another save button so the admin can flip it,
  * generate one test image, and compare — the whole point is being able to
  * evaluate the cost/quality tradeoff against real results quickly. */
-document.getElementById('saveResolutionBtn').onclick = async ()=>{
+elById('saveResolutionBtn').onclick = async ()=>{
   if(!BACKEND_BASE || !adminSessionToken) return;
   const resolution = document.getElementById('outputResolutionSelect').value;
   try{
@@ -4863,7 +4909,7 @@ document.getElementById('saveResolutionBtn').onclick = async ()=>{
  * the resolution save button above — its own control so Magdy can flip
  * models, generate one test image, and compare quality/cost before
  * committing a change that affects every paying customer's order. */
-document.getElementById('saveAiModelBtn').onclick = async ()=>{
+elById('saveAiModelBtn').onclick = async ()=>{
   if(!BACKEND_BASE || !adminSessionToken) return;
   const model = document.getElementById('aiModelSelect').value;
   try{
@@ -4931,7 +4977,7 @@ SHOWCASE_SLOTS.forEach(slot=>{
   });
 });
 
-document.getElementById('scSaveBtn').onclick = async ()=>{
+elById('scSaveBtn').onclick = async ()=>{
   if(!BACKEND_BASE){ showToast(t('toastOrderFailed')); return; }
   const missing = SHOWCASE_SLOTS.filter(s=>!showcaseState[s]);
   if(missing.length){ showToast(t('toastShowcaseIncomplete') || 'لازم ترفع كل الـ9 صور الأول'); return; }
@@ -5059,7 +5105,7 @@ PROMO_IMAGE_SLOTS.forEach(slot=>{
   });
 });
 
-document.getElementById('piSaveBtn').onclick = async ()=>{
+elById('piSaveBtn').onclick = async ()=>{
   if(!BACKEND_BASE){ showToast(t('toastOrderFailed')); return; }
   const items = PROMO_IMAGE_SLOTS.map(s=>promoImagesState[s]).filter(Boolean);
   // Either a full, meaningful gallery (3+) or a fully cleared one (0) — a
@@ -5282,7 +5328,7 @@ async function loadVisitorStats(){
   }
 }
 
-document.getElementById('visitorStatsBar').addEventListener('click', function(){
+elById('visitorStatsBar').addEventListener('click', function(){
   const isOpen = this.classList.toggle('open');
   this.setAttribute('aria-expanded', String(isOpen));
   document.getElementById('visitorsLogList').style.display = isOpen ? 'block' : 'none';
@@ -5445,7 +5491,7 @@ function renderOrderStatsTable(){
   </table>`;
 }
 
-document.getElementById('orderStatsBar').addEventListener('click', function(){
+elById('orderStatsBar').addEventListener('click', function(){
   const isOpen = this.classList.toggle('open');
   this.setAttribute('aria-expanded', String(isOpen));
   document.getElementById('orderStatsTable').style.display = isOpen ? 'block' : 'none';
@@ -5569,7 +5615,7 @@ function sendPromptViaWhatsApp(code){
     .replace('{prompt}', order.promptText);
   window.open(`https://wa.me/${intlPhone}?text=${encodeURIComponent(message)}`, '_blank');
 }
-document.getElementById('adminModalClose').onclick = ()=>{
+elById('adminModalClose').onclick = ()=>{
   adminModalBg.classList.remove('show');
   document.getElementById('adminFab').classList.remove('show');
   editingProductId = null;
@@ -5589,7 +5635,7 @@ async function loadAdminProducts(){
   }catch(e){ console.error('load admin products failed', e); }
 }
 
-document.getElementById('adminLoginBtn').onclick = async ()=>{
+elById('adminLoginBtn').onclick = async ()=>{
   const val = document.getElementById('adminPass').value;
   const result = await adminLoginWithPassword(val);
   if(!result.ok){
@@ -5676,7 +5722,7 @@ async function activateAdminSession(token, persist){
   }
   return true;
 }
-document.getElementById('adminLogoutBtn').onclick = async ()=>{
+elById('adminLogoutBtn').onclick = async ()=>{
   const tokenToRevoke = adminSessionToken;
   adminLoggedIn = false;
   adminSessionToken = '';
@@ -5707,7 +5753,7 @@ document.getElementById('adminLogoutBtn').onclick = async ()=>{
  * person typing isn't just riding a leaked/stolen session token). The new
  * password is sent once over HTTPS and never stored client-side — same
  * trust model as the original login. */
-document.getElementById('changeAdminPassBtn').onclick = async ()=>{
+elById('changeAdminPassBtn').onclick = async ()=>{
   const currentPassInput = document.getElementById('currentAdminPass');
   const newPassInput = document.getElementById('newAdminPass');
   const confirmPassInput = document.getElementById('confirmNewAdminPass');
@@ -5803,7 +5849,7 @@ let editingProductId = null;
 // never uploaded directly — selecting one immediately opens the crop tool,
 // and only the resulting fixed-size Blob is ever sent to the server.
 let pendingCroppedBlob = null;
-document.getElementById('pImage').addEventListener('change', async (e)=>{
+elById('pImage').addEventListener('change', async (e)=>{
   const file = e.target.files && e.target.files[0];
   if(!file){ pendingCroppedBlob = null; return; }
   const blob = await openCropModal(file);
@@ -5815,7 +5861,7 @@ document.getElementById('pImage').addEventListener('change', async (e)=>{
   pendingCroppedBlob = blob;
 });
 
-document.getElementById('pSaveBtn').onclick = async ()=>{
+elById('pSaveBtn').onclick = async ()=>{
   const cat = document.getElementById('pCat').value;
   const title = document.getElementById('pTitle').value.trim();
   const titleEn = document.getElementById('pTitleEn').value.trim();
@@ -5908,12 +5954,12 @@ function resetEditUI(){
   document.getElementById('pCancelEditBtn').style.display = 'none';
   document.getElementById('editingBanner').style.display = 'none';
 }
-document.getElementById('pCancelEditBtn').onclick = ()=>{
+elById('pCancelEditBtn').onclick = ()=>{
   editingProductId = null;
   resetEditUI();
   resetProductFormToDefaults();
 };
-document.getElementById('pCat').addEventListener('change', renderAdminProductsList);
+elById('pCat').addEventListener('change', renderAdminProductsList);
 
 function editProduct(id){
   const p = products.find(x=>x.id===id);
@@ -6376,11 +6422,11 @@ if(reportApplyRangeBtn) reportApplyRangeBtn.addEventListener('click', () => {
   if(!reportCustomFrom || !reportCustomTo){ showToast(t('periodCustomMissing')); return; }
   renderPerformanceReport();
 });
-document.getElementById('dailyReportDownloadBtn').onclick = exportReportExcel;
+elById('dailyReportDownloadBtn').onclick = exportReportExcel;
 const reportDownloadChartBtn = document.getElementById('reportDownloadChartBtn');
 if(reportDownloadChartBtn) reportDownloadChartBtn.onclick = downloadReportChartImage;
-document.getElementById('dailyReportModalClose').onclick = ()=> document.getElementById('dailyReportModalBg').classList.remove('show');
-document.getElementById('dailyReportCloseBtn').onclick = ()=> document.getElementById('dailyReportModalBg').classList.remove('show');
+elById('dailyReportModalClose').onclick = ()=> document.getElementById('dailyReportModalBg').classList.remove('show');
+elById('dailyReportCloseBtn').onclick = ()=> document.getElementById('dailyReportModalBg').classList.remove('show');
 
 function renderAdminProductsList(){
   const el = document.getElementById('adminProductsList');
@@ -6445,7 +6491,7 @@ async function moveProductOrder(id, direction){
 
 // ---------- Admin: quick image replace / remove / move category (no full edit form needed) ----------
 let quickImageTargetId = null;
-document.getElementById('adminQuickImageInput').addEventListener('change', async (e)=>{
+elById('adminQuickImageInput').addEventListener('change', async (e)=>{
   const file = e.target.files && e.target.files[0];
   const id = quickImageTargetId;
   e.target.value = '';
