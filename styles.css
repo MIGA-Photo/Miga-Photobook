@@ -1494,6 +1494,11 @@
   .admin-head{
     display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
     margin-bottom:6px;
+    /* Reserve horizontal drags on this bar for the swipe-to-collapse gesture
+       (see initAdminPanelSwipeCollapse in app.js) instead of letting the
+       browser interpret them as its own edge-swipe/back gesture. Vertical
+       panning is left alone. */
+    touch-action: pan-y;
   }
   .admin-head-actions{display:flex; align-items:center; gap:6px; flex-shrink:0;}
   .admin-icon-btn{

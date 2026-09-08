@@ -3483,6 +3483,61 @@ document.getElementById('adminCollapseBtn').onclick = ()=>{
     savePos(applyPos(rect.left, rect.top));
   });
 })();
+
+// ---- Swipe-to-collapse admin panel -------------------------------------
+// Swiping the panel's header left or right folds it back into the floating
+// launcher — the same effect as tapping the "-" (طي اللوحة) button, but as
+// a natural drag gesture. Scoped to the header bar (.admin-head) rather than
+// the whole panel body on purpose: the panel body holds scrollable lists and
+// the image cropper's own pinch/pan gestures, and a swipe-anywhere listener
+// would fight both of those. The header itself is just a title + a row of
+// icon buttons, so it's a safe "handle" — taps on those buttons are excluded
+// below so the gesture never swallows a real tap on them.
+(function initAdminPanelSwipeCollapse(){
+  const modal = document.getElementById('adminModal');
+  const head = modal ? modal.querySelector('.admin-head') : null;
+  if(!modal || !head) return;
+  const SWIPE_THRESHOLD = 70; // px of horizontal movement before it counts as a dismiss
+  let tracking = false, activePointerId = null, startX = 0, startY = 0;
+
+  head.addEventListener('pointerdown', (e)=>{
+    if(e.target.closest('button, a, input, select, textarea')) return; // let taps on the header's own buttons through untouched
+    tracking = true;
+    activePointerId = e.pointerId;
+    startX = e.clientX; startY = e.clientY;
+    modal.style.transition = 'none';
+    try{ head.setPointerCapture(e.pointerId); }catch(err){}
+  });
+
+  head.addEventListener('pointermove', (e)=>{
+    if(!tracking || e.pointerId !== activePointerId) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    // Only follow the finger once the movement is clearly more horizontal
+    // than vertical — avoids hijacking an attempt to scroll the page.
+    if(Math.abs(dx) > Math.abs(dy)){
+      modal.style.transform = `translateX(${dx}px)`;
+      modal.style.opacity = String(Math.max(0.35, 1 - Math.abs(dx) / 400));
+    }
+  });
+
+  function endSwipe(e){
+    if(!tracking || e.pointerId !== activePointerId) return;
+    tracking = false;
+    const dx = e.clientX - startX;
+    modal.style.transition = 'transform .2s ease, opacity .2s ease';
+    modal.style.transform = '';
+    modal.style.opacity = '';
+    try{ head.releasePointerCapture(e.pointerId); }catch(err){}
+    if(Math.abs(dx) > SWIPE_THRESHOLD){
+      collapseAdminPanel();
+      syncAdminFabBadge();
+    }
+  }
+  head.addEventListener('pointerup', endSwipe);
+  head.addEventListener('pointercancel', endSwipe);
+})();
+
 document.getElementById('adminAlertsBtn').onclick = enableAdminAlerts;
 updateAdminAlertBtn();
 document.getElementById('pShareLinkCopy').onclick = ()=>
