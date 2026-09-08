@@ -767,6 +767,7 @@
 
 <section class="cat-section collapsible" id="luxury">
   <div class="cs-body">
+  <h2 class="cat-section-heading" id="luxurySectionHeading" data-i18n="promptLibraryHeading" style="display:none;">مكتبة البرومبتات للمحترفين — برومبتات جاهزة ومجرّبة تشتريها بمفردها بدون تحويل صورة، بنفس أسعار وخصومات الموقع الحالية</h2>
   <div class="grid-nav-wrap">
     <div class="grid" id="grid-luxury"></div>
   </div>
@@ -1946,6 +1947,20 @@
         <div class="modal-actions">
           <button class="btn-primary" id="saveHeaderModeBtn" data-i18n="headerModeSaveBtn">حفظ شكل الهيدر</button>
         </div>
+
+        <hr style="border:none; border-top:1px solid var(--line); margin:22px 0;">
+        <h4 style="margin:0 0 8px;" data-i18n="promptLibraryModeTitle">وضع مكتبة البرومبتات للمحترفين</h4>
+        <p class="sub" style="margin-bottom:14px;" data-i18n="promptLibraryModeIntro">"الوضع الحالي" يسيب قسم "فاخر" فاضي زي ما هو. "الوضع الجديد" يحوّل نفس القسم لمكتبة برومبتات تجمع تلقائيًا كل منتجات الموقع من كل الأقسام لبيع البرومبت بمفرده، وبيشيل سطر "شراء البرومبت لوحده" من باقي كروت الأقسام العادية (بيفضل ظاهر بس هنا). تقدر ترجع للوضع الحالي في أي وقت من غير أي فقدان بيانات.</p>
+        <div class="field">
+          <label data-i18n="promptLibraryModeLabel">الوضع</label>
+          <select id="promptLibraryModeSelect">
+            <option value="off" data-i18n="promptLibraryModeOffOption">الوضع الحالي (فاخر قسم عادي فاضي)</option>
+            <option value="on" data-i18n="promptLibraryModeOnOption">الوضع الجديد (مكتبة البرومبتات للمحترفين)</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="savePromptLibraryModeBtn" data-i18n="promptLibraryModeSaveBtn">حفظ الوضع</button>
+        </div>
       </div>
 
       <div class="modal-actions" style="margin-top:14px;">
@@ -1957,7 +1972,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260908b"></script>
+<script src="app.js?v=20260908c"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){

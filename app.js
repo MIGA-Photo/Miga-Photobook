@@ -20,6 +20,17 @@ const PAYMENT_METHODS_ENABLED = { card: false, fawry: false };
 let CURRENCY = 'جنيه';
 const HIDE_CHILDREN_FROM_CUSTOMERS = false; // children section is now live for all visitors
 
+// "مكتبة البرومبتات للمحترفين" — Prompt Library for Professionals. Off by
+// default: loaded from the server on startup (see loadPromptLibraryMode())
+// and switched from the admin panel's "تصميم الموقع" tab, NOT edited here by
+// hand. When on, the 'luxury' slot (currently an ordinary, empty category)
+// is repurposed by the frontend into a derived view aggregating every OTHER
+// category's real products as prompt-only cards, grouped by their real
+// category — nothing here duplicates or moves any product data, so turning
+// this back off from the admin panel restores the exact old behaviour with
+// zero data loss.
+let PROMPT_LIBRARY_MODE = false;
+
 // Paste your deployed Cloudflare Worker URL here (see backend/transform-worker.js) to enable
 // real AI photo transformation. Leave empty ("") to keep the client-side style-preview fallback.
 const TRANSFORM_API_ENDPOINT = "https://miga-photobook-api.magdyfarouk380.workers.dev";
@@ -331,6 +342,10 @@ const translations = {
     aiModelTitle:'موديل الذكاء الاصطناعي', aiModelIntro:'اختار موديل توليد الصور اللي هيستخدمه الموقع. كل موديل بيفرق في السعر وجودة النتيجة — جرّب صورة تجريبية بكل موديل قبل ما تعتمده بشكل نهائي. ملحوظة: اختيار "دقة الصورة" فوق مالوش تأثير على Flux 2 Pro (بياخد دايمًا أفضل دقة متاحة أوتوماتيك).', aiModelSaveBtn:'حفظ الموديل', toastAiModelSaved:'تم حفظ موديل الذكاء الاصطناعي',
     colorThemeTitle:'لون الهيدر والخلفية تحت الصور', colorThemeIntro:'اختار درجة اللون الغامق اللي تظهر في شريط الهيدر والمساحة خلف صور المنتجات. باقي ألوان الموقع (الدهبي، الخط) بتفضل زي ما هي في كل الاختيارات.', colorThemeLabel:'لون الهيدر', colorThemeBlack:'أسود (الحالي)', colorThemeBrown:'بني قهوة فخم', colorThemeEmerald:'أخضر زمردي غامق', colorThemeWine:'نبيتي غامق', colorThemeNavy:'كحلي ملكي', colorThemeRed:'أحمر / وردي غامق', colorThemeSaveBtn:'حفظ اللون', toastColorThemeSaved:'تم حفظ اللون — هيظهر للعملاء من زيارتهم الجاية',
     headerModeTitle:'شكل الهيدر', headerModeIntro:'"الشكل الحالي" يعرض كل أزرار الهيدر (اللغة، الوضع الليلي، عرض الموبايل/الكمبيوتر، تتبع الطلب) في شريط دايمًا ظاهر. "قائمة مطوية" بينقلهم جوه قائمة (☰) بتتفتح عند الضغط، وده بيقلل ارتفاع الهيدر.', headerModeLabel:'وضع الهيدر', headerModeClassicOption:'الشكل الحالي', headerModeCompactOption:'قائمة مطوية (☰)', headerModeSaveBtn:'حفظ شكل الهيدر', toastHeaderModeSaved:'تم حفظ شكل الهيدر — هيظهر للعملاء من زيارتهم الجاية',
+    optPromptLibrary:'مكتبة البرومبتات للمحترفين', optPromptLibraryDisabledHint:'غير متاح — بيتجمع تلقائيًا', navPromptLibrary:'مكتبة البرومبتات',
+    promptLibraryHeading:'مكتبة البرومبتات للمحترفين — برومبتات جاهزة ومجرّبة تشتريها بمفردها بدون تحويل صورة، بنفس أسعار وخصومات الموقع الحالية',
+    promptLibraryModeTitle:'وضع مكتبة البرومبتات للمحترفين', promptLibraryModeIntro:'"الوضع الحالي" يسيب قسم "فاخر" فاضي زي ما هو. "الوضع الجديد" يحوّل نفس القسم لمكتبة برومبتات تجمع تلقائيًا كل منتجات الموقع من كل الأقسام لبيع البرومبت بمفرده، وبيشيل سطر "شراء البرومبت لوحده" من باقي كروت الأقسام العادية (بيفضل ظاهر بس هنا). تقدر ترجع للوضع الحالي في أي وقت من غير أي فقدان بيانات.',
+    promptLibraryModeLabel:'الوضع', promptLibraryModeOffOption:'الوضع الحالي (فاخر قسم عادي فاضي)', promptLibraryModeOnOption:'الوضع الجديد (مكتبة البرومبتات للمحترفين)', promptLibraryModeSaveBtn:'حفظ الوضع', toastPromptLibraryModeSaved:'تم حفظ الوضع — هيظهر للعملاء من زيارتهم الجاية',
     menuTitle:'القائمة', drawerLangLabel:'اللغة', drawerThemeLabel:'المظهر', drawerViewLabel:'طريقة العرض', drawerOrderLabel:'الطلبات', drawerGuestHint:'لحفظ اسمك وتليفونك وصورتك', drawerHaveAccount:'عندك حساب؟ سجّل دخول',
     toastPassChanged:'تم تغيير كلمة المرور بنجاح', toastPassMismatch:'كلمة المرور الجديدة وتأكيدها غير متطابقين', toastPassTooShort:'كلمة المرور الجديدة يجب أن تكون 8 أحرف على الأقل', toastCurrentPassWrong:'كلمة المرور الحالية غير صحيحة', toastFillPassFields:'يرجى إدخال كل الحقول',
     toastProductAdded:'تم إضافة المنتج بنجاح',
@@ -629,6 +644,10 @@ const translations = {
     aiModelTitle:'AI model', aiModelIntro:'Choose which image-generation model the site uses. Each model differs in price and result quality — try a test image with each before committing to it. Note: the resolution choice above has no effect on Flux 2 Pro (it always uses the best resolution automatically).', aiModelSaveBtn:'Save model', toastAiModelSaved:'AI model saved',
     colorThemeTitle:'Header and image-background color', colorThemeIntro:'Choose the dark shade used for the header bar and the space behind product images. The rest of the site colors (gold, text) stay the same across every option.', colorThemeLabel:'Header color', colorThemeBlack:'Black (current)', colorThemeBrown:'Warm coffee brown', colorThemeEmerald:'Deep emerald green', colorThemeWine:'Deep wine', colorThemeNavy:'Royal navy', colorThemeRed:'Deep red / rose', colorThemeSaveBtn:'Save color', toastColorThemeSaved:'Color saved — customers will see it on their next visit',
     headerModeTitle:'Header layout', headerModeIntro:'"Current layout" shows every header button (language, dark mode, mobile/desktop preview, track order) in an always-visible strip. "Collapsed menu" moves them into a (☰) menu that opens on tap, which shortens the header.', headerModeLabel:'Header layout', headerModeClassicOption:'Current layout', headerModeCompactOption:'Collapsed menu (☰)', headerModeSaveBtn:'Save header layout', toastHeaderModeSaved:'Header layout saved — customers will see it on their next visit',
+    optPromptLibrary:'Prompt Library for Professionals', optPromptLibraryDisabledHint:'unavailable — gathered automatically', navPromptLibrary:'Prompt Library',
+    promptLibraryHeading:"Prompt Library for Professionals — tested, ready-made prompts you can buy on their own without a photo transformation, at the site's current prices and discounts",
+    promptLibraryModeTitle:'Prompt Library for Professionals mode', promptLibraryModeIntro:'"Current mode" leaves the empty "Luxury" category as-is. "New mode" turns that same slot into a prompt library that automatically gathers every product from every category to sell its prompt alone, and removes the "buy the prompt alone" line from other category cards (it stays visible here only). You can switch back at any time with no data loss.',
+    promptLibraryModeLabel:'Mode', promptLibraryModeOffOption:'Current mode (Luxury — empty category)', promptLibraryModeOnOption:'New mode (Prompt Library for Professionals)', promptLibraryModeSaveBtn:'Save mode', toastPromptLibraryModeSaved:'Mode saved — customers will see it on their next visit',
     menuTitle:'Menu', drawerLangLabel:'Language', drawerThemeLabel:'Appearance', drawerViewLabel:'View mode', drawerOrderLabel:'Orders', drawerGuestHint:'To save your name, phone, and photo', drawerHaveAccount:'Already have an account? Log in',
     toastPassChanged:'Password changed successfully', toastPassMismatch:'New password and confirmation do not match', toastPassTooShort:'New password must be at least 8 characters', toastCurrentPassWrong:'Current password is incorrect', toastFillPassFields:'Please fill in all fields',
     toastProductAdded:'Product added successfully',
@@ -740,6 +759,14 @@ function applyLanguage(lang){
   document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
     el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
   });
+
+  // Must run BEFORE the active-category dropdown-label sync just below —
+  // that sync copies the nav button's CURRENT text into the dropdown
+  // toggle, so if 'luxury' is the active filter while PROMPT_LIBRARY_MODE
+  // is on, its correct name needs to already be in place on the button
+  // before this text gets copied, or the toggle would show the stale
+  // "فاخر"/"Luxury" name until the next unrelated re-render.
+  applyPromptLibraryLabels();
 
   // If a specific category (not "All") is selected, the dropdown button shows
   // that category's name — the blanket data-i18n pass above just reset it to
@@ -902,6 +929,22 @@ async function loadProducts(){
     products = [];
   }
 }
+
+/** Whether the 'luxury' slot is running as the derived "Prompt Library for
+ * Professionals" view instead of an ordinary category — a single flag the
+ * admin flips from the "تصميم الموقع" tab, stored server-side (config:
+ * promptLibraryMode) via the same pattern as colorTheme/headerMode, so every
+ * visitor (not just this browser) sees the same mode. Read alongside the
+ * product catalog on every page load, before anything renders it. */
+async function loadPromptLibraryMode(){
+  if(!BACKEND_BASE) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/site-config`);
+    const data = await res.json();
+    PROMPT_LIBRARY_MODE = !!(data && data.promptLibraryMode);
+  }catch(e){ /* network hiccup — keep default (off) */ }
+}
+
 async function upsertProductRemote(product){
   if(!BACKEND_BASE) return false;
   try{
@@ -1109,7 +1152,13 @@ function applyChildrenVisibility(){
   const allCats = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
   allCats.forEach(cat=>{
     if(cat === 'children') return; // handled by HIDE_CHILDREN_FROM_CUSTOMERS above
-    const hasProducts = products.some(p => p.category === cat);
+    // 'luxury' under PROMPT_LIBRARY_MODE is a derived aggregate of every
+    // OTHER category (see itemsForCategoryTile()) — "has products" for it
+    // means the catalog as a whole has products, not that anything is
+    // literally tagged 'luxury'.
+    const hasProducts = (cat === 'luxury' && PROMPT_LIBRARY_MODE)
+      ? products.some(p => p.category !== 'luxury')
+      : products.some(p => p.category === cat);
     const catVisible = hasProducts || adminLoggedIn;
     const btn = document.querySelector('#catNav button[data-cat="'+cat+'"]');
     const sec = document.getElementById(cat);
@@ -1228,6 +1277,13 @@ function renderGrids(){
   CAT_IDS.forEach(cat=>{
     const el = document.getElementById('grid-'+cat);
     if(!el) return;
+    const dotsEl = document.getElementById('gridDots-'+cat);
+
+    if(cat === 'luxury' && PROMPT_LIBRARY_MODE){
+      renderPromptLibraryGrid(el, dotsEl);
+      return;
+    }
+
     // Products the admin has written up (title, prompt, price) but hasn't
     // attached a real photo to yet still carry PLACEHOLDER_IMG — a mostly
     // empty dark rectangle with small centered text. Left unfiltered here,
@@ -1239,7 +1295,6 @@ function renderGrids(){
     // customer-facing empty tile.
     const allItems = products.filter(p=>p.category===cat && p.image && p.image !== PLACEHOLDER_IMG)
       .sort((a,b) => (b.order ?? 9999) - (a.order ?? 9999));
-    const dotsEl = document.getElementById('gridDots-'+cat);
 
     if(!allItems.length){
       el.innerHTML = `<div class="empty-note">${t('emptyNoteCategory')}</div>`;
@@ -1249,10 +1304,59 @@ function renderGrids(){
 
     // Every product is rendered into one scrollable row; the arrows move the
     // row by exactly one visible width rather than swapping a page of cards.
-    el.innerHTML = allItems.map(renderProductCard).join('');
+    el.innerHTML = allItems.map(p => renderProductCard(p)).join('');
     buildRowArrows(cat, dotsEl, el);
   });
   renderCatTiles();
+}
+
+/** "مكتبة البرومبتات للمحترفين" — a derived view, not a real category: every
+ * product from every OTHER real category, grouped under its own original
+ * category name, shown as a prompt-only card. Reuses the live `products`
+ * array exactly as-is (nothing duplicated, nothing written back), so this
+ * can never drift out of sync with the real catalog, and switching
+ * PROMPT_LIBRARY_MODE back off fully restores the plain 'luxury' grid with
+ * zero data loss. The section's outer #gridDots-luxury is intentionally left
+ * empty in this mode — each group below gets its own row + its own arrows,
+ * matching the exact markup/CSS every other category row already uses. */
+function renderPromptLibraryGrid(container, outerDotsEl){
+  if(outerDotsEl) outerDotsEl.innerHTML = '';
+  const groups = CAT_IDS.filter(c => c !== 'luxury');
+  const sections = groups.map(cat=>{
+    const items = products.filter(p => p.category===cat && p.image && p.image !== PLACEHOLDER_IMG)
+      .sort((a,b) => (b.order ?? 9999) - (a.order ?? 9999));
+    if(!items.length) return '';
+    const rowKey = 'luxury__' + cat;
+    return `
+      <div class="prompt-lib-group">
+        <div class="prompt-lib-group-title" style="display:flex; align-items:center; gap:8px; font-size:16px; font-weight:700; color:var(--paper); margin:0 0 12px; padding-top:6px;">
+          <span class="cicon ${ICON_COLOR_CLASS[cat]}" aria-hidden="true" style="display:inline-flex; font-size:18px;">${CAT_ICON[cat]}</span>
+          <span>${escapeHtml(catLabel(cat))}</span>
+        </div>
+        <div class="grid-nav-wrap">
+          <div class="grid" id="grid-${rowKey}"></div>
+        </div>
+        <div class="grid-page-dots" id="gridDots-${rowKey}"></div>
+      </div>`;
+  }).filter(Boolean);
+
+  if(!sections.length){
+    container.innerHTML = `<div class="empty-note">${t('emptyNoteCategory')}</div>`;
+    return;
+  }
+  container.innerHTML = sections.join('');
+
+  groups.forEach(cat=>{
+    const items = products.filter(p => p.category===cat && p.image && p.image !== PLACEHOLDER_IMG)
+      .sort((a,b) => (b.order ?? 9999) - (a.order ?? 9999));
+    if(!items.length) return;
+    const rowKey = 'luxury__' + cat;
+    const rowEl = document.getElementById('grid-'+rowKey);
+    const dEl = document.getElementById('gridDots-'+rowKey);
+    if(!rowEl) return;
+    rowEl.innerHTML = items.map(p => renderProductCard(p, {promptOnly:true})).join('');
+    buildRowArrows(rowKey, dEl, rowEl);
+  });
 }
 
 /** Draws the two arrows under a product row and keeps their enabled state in
@@ -1396,10 +1500,42 @@ function updateRowArrows(key){
  * photo to zoom, same title/price/buttons to order right away), and so the
  * 🔥 order-count badge (once a product has at least one confirmed order)
  * shows consistently on every card site-wide, not just in one section. */
-function renderProductCard(p){
+function renderProductCard(p, opts){
+  const promptOnly = !!(opts && opts.promptOnly);
+  const requestCount = productPopularity[p.id] || 0;
+
+  // Prompt Library for Professionals card: this view's only purpose is
+  // buying the text prompt alone, so it skips the photo-transform purchase
+  // path entirely (owned/package-credit/transform state don't apply here) —
+  // same unlock mechanic, same price/discount, same WhatsApp delivery as
+  // the regular "buy the prompt alone" line, just promoted to the card's
+  // one and only action.
+  if(promptOnly){
+    const hasPrompt = promptPurchases.includes(p.id);
+    return `
+    <div class="card">
+      <div class="card-media">
+        <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" decoding="async" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
+        <span class="card-badge">${escapeHtml(productTitle(p))}</span>
+        ${requestCount > 0 ? `<span class="request-count-overlay" title="${t('popularityCountTitle')}">🔥 ${requestCount}</span>` : ''}
+      </div>
+      <div class="card-body">
+        <div class="card-title" onclick="openProductDetail('${p.id}')" style="cursor:pointer;">${escapeHtml(productTitle(p))}</div>
+        <div class="card-actions">
+          ${hasPrompt
+            ? (purchasedPromptTexts[p.id]
+                ? `<button class="buy-btn" onclick="copyPurchasedPrompt('${p.id}')">${t('copyPromptBtn')}</button>`
+                : `<button class="buy-btn" onclick="openTrackForPrompt('${p.id}')">${t('promptPendingBtn')}</button>`)
+            : `<button class="buy-btn" onclick="openBuyModal('${p.id}', 'prompt')">
+                 ${t('buyPromptBtnPrefix')} — <span class="price-old">${PROMPT_ORIGINAL_PRICE} ${CURRENCY}</span> <span class="price-new">${PROMPT_PRICE} ${CURRENCY}</span>
+               </button>`}
+        </div>
+      </div>
+    </div>`;
+  }
+
   const owned = purchases.includes(p.id);
   const alreadyTransformed = !!transformedResults[p.id];
-  const requestCount = productPopularity[p.id] || 0;
   const activePkg = !owned ? activePackageWithCredits() : null;
   const pkgAvailableHere = activePkg && !activePkg.usedProductIds.includes(p.id);
   return `
@@ -1423,13 +1559,15 @@ function renderProductCard(p){
         ${pkgAvailableHere
           ? `<button class="buy-btn package-credit-btn" onclick="usePackageCredit('${p.id}')">${t('usePackageCreditBtnPrefix')} (${activePkg.remaining})</button>`
           : ''}
-        ${promptPurchases.includes(p.id)
-          ? (purchasedPromptTexts[p.id]
-              ? `<button class="buy-btn prompt-btn" onclick="copyPurchasedPrompt('${p.id}')">${t('copyPromptBtn')}</button>`
-              : `<button class="buy-btn prompt-btn" onclick="openTrackForPrompt('${p.id}')">${t('promptPendingBtn')}</button>`)
-          : `<button class="buy-btn prompt-btn" onclick="openBuyModal('${p.id}', 'prompt')">
-               ${t('buyPromptBtnPrefix')} — <span class="price-old">${PROMPT_ORIGINAL_PRICE} ${CURRENCY}</span> <span class="price-new">${PROMPT_PRICE} ${CURRENCY}</span>
-             </button>`}
+        ${PROMPT_LIBRARY_MODE ? '' : (
+          promptPurchases.includes(p.id)
+            ? (purchasedPromptTexts[p.id]
+                ? `<button class="buy-btn prompt-btn" onclick="copyPurchasedPrompt('${p.id}')">${t('copyPromptBtn')}</button>`
+                : `<button class="buy-btn prompt-btn" onclick="openTrackForPrompt('${p.id}')">${t('promptPendingBtn')}</button>`)
+            : `<button class="buy-btn prompt-btn" onclick="openBuyModal('${p.id}', 'prompt')">
+                 ${t('buyPromptBtnPrefix')} — <span class="price-old">${PROMPT_ORIGINAL_PRICE} ${CURRENCY}</span> <span class="price-new">${PROMPT_PRICE} ${CURRENCY}</span>
+               </button>`
+        )}
       </div>
     </div>
   </div>`;
@@ -1489,7 +1627,7 @@ const COVER_POOL_SIZE = 3;
  * moving under anyone's eyes. */
 const sessionCoverPick = {};
 
-function categoryCover(items){
+function categoryCover(items, cat){
   const withPhoto = items.filter(p => p.image && p.image !== PLACEHOLDER_IMG);
   if(!withPhoto.length) return null;
 
@@ -1497,22 +1635,31 @@ function categoryCover(items){
   const chosen = withPhoto.find(p => p.isCover);
   if(chosen) return chosen;
 
-  const cat = withPhoto[0].category;
+  // The tile this cover is FOR — not necessarily what withPhoto[0] itself is
+  // tagged as. Under PROMPT_LIBRARY_MODE, `items` for 'luxury' is a mixed
+  // bag of every other category's products, so inferring the cache key from
+  // the first item's own .category would silently collide the luxury
+  // tile's cover-cycling state with whichever real category happened to
+  // sort first (e.g. 'male') — the ⟳ control on one tile would then shift
+  // the other's photo too. Falling back to withPhoto[0].category keeps every
+  // existing call site (a real, single-category list) working exactly as
+  // before.
+  const key = cat || withPhoto[0].category;
   const pool = categoryTopPhotos(withPhoto, COVER_POOL_SIZE);
   if(pool.length === 1) return pool[0];
 
-  if(!(cat in sessionCoverPick)){
-    sessionCoverPick[cat] = Math.floor(Math.random() * pool.length);
+  if(!(key in sessionCoverPick)){
+    sessionCoverPick[key] = Math.floor(Math.random() * pool.length);
   }
-  return pool[Math.min(sessionCoverPick[cat], pool.length - 1)] || pool[0];
+  return pool[Math.min(sessionCoverPick[key], pool.length - 1)] || pool[0];
 }
 
 function renderCatTiles(){
   const wrap = document.getElementById('categoryTilesGrid');
   if(!wrap) return;
   wrap.innerHTML = CAT_IDS.map(cat=>{
-    const items = products.filter(p=>p.category===cat).sort((a,b) => (b.order ?? 9999) - (a.order ?? 9999));
-    const cover = categoryCover(items);
+    const items = itemsForCategoryTile(cat);
+    const cover = categoryCover(items, cat);
     const isOpen = document.getElementById(cat)?.classList.contains('open');
     // One photo, swapped only when the small ⟳ control is pressed. The tile's
     // own job is to open the category, so nothing else about it moves.
@@ -1554,7 +1701,7 @@ function renderCatTiles(){
  * category, and a tap that sometimes opened and sometimes swapped the picture
  * would make it unpredictable. */
 function cycleCategoryCover(cat){
-  const items = products.filter(p => p.category === cat);
+  const items = itemsForCategoryTile(cat);
   const pool = categoryTopPhotos(items, COVER_POOL_SIZE);
   if(pool.length < 2) return;
   sessionCoverPick[cat] = ((sessionCoverPick[cat] ?? 0) + 1) % pool.length;
@@ -1631,8 +1778,48 @@ function firstCardOrSelf(sec){
 }
 
 function catLabel(c){
-  const map = { children:'optChildren', male:'optMale', female:'optFemale', business:'optBusiness', cinematic:'optCinematic', luxury:'optLuxury', artistic:'optArtistic', magazine:'optMagazine' };
+  const map = { children:'optChildren', male:'optMale', female:'optFemale', business:'optBusiness', cinematic:'optCinematic', luxury: PROMPT_LIBRARY_MODE ? 'optPromptLibrary' : 'optLuxury', artistic:'optArtistic', magazine:'optMagazine' };
   return t(map[c] || 'optChildren');
+}
+
+/** Overrides the handful of labels that the blanket [data-i18n] pass in
+ * applyLanguage() can't reach dynamically (a static <option>/nav button
+ * whose text is fixed at translation time) so they correctly read as the
+ * Prompt Library name whenever PROMPT_LIBRARY_MODE is on. Called from
+ * applyLanguage() (covers page load + language switch) and again right
+ * after the admin toggles the mode, so every place this name appears stays
+ * in sync without a page reload. Also disables 'luxury' as an assignable
+ * category in the admin's product forms while the mode is on — it's a
+ * derived view now, not a real bucket a new product should be tagged into. */
+function applyPromptLibraryLabels(){
+  const navLuxuryBtn = document.querySelector('#catNav button[data-cat="luxury"]');
+  if(navLuxuryBtn) navLuxuryBtn.textContent = PROMPT_LIBRARY_MODE ? t('navPromptLibrary') : t('navLuxury');
+
+  const heading = document.getElementById('luxurySectionHeading');
+  if(heading) heading.style.display = PROMPT_LIBRARY_MODE ? '' : 'none';
+
+  document.querySelectorAll('#pCat option[value="luxury"]').forEach(opt=>{
+    opt.disabled = PROMPT_LIBRARY_MODE;
+    opt.textContent = PROMPT_LIBRARY_MODE
+      ? `${t('optPromptLibrary')} — ${t('optPromptLibraryDisabledHint')}`
+      : t('optLuxury');
+  });
+}
+
+/** Products backing the "luxury" tile/section: under normal operation, just
+ * that category's own products, same as any other category. Under
+ * PROMPT_LIBRARY_MODE, this slot no longer holds real 'luxury'-tagged
+ * products — it's a derived, read-only aggregate of every OTHER category's
+ * products (for buying their prompt alone) — so its tile cover/count and its
+ * "has products, so show it to everyone" check are computed from that
+ * aggregate instead. Centralising this in one helper keeps renderCatTiles(),
+ * cycleCategoryCover() and applyChildrenVisibility() from drifting out of
+ * sync with each other on what "luxury has products" actually means. */
+function itemsForCategoryTile(cat){
+  if(cat === 'luxury' && PROMPT_LIBRARY_MODE){
+    return products.filter(p => p.category !== 'luxury').sort((a,b) => (b.order ?? 9999) - (a.order ?? 9999));
+  }
+  return products.filter(p => p.category === cat).sort((a,b) => (b.order ?? 9999) - (a.order ?? 9999));
 }
 function escapeHtml(s){ const d=document.createElement('div'); d.innerText = s ?? ''; return d.innerHTML; }
 
@@ -4557,6 +4744,10 @@ async function loadSiteDesignIntoAdmin(){
     if(headerModeSelect){
       headerModeSelect.value = data.headerMode === 'compact' ? 'compact' : 'classic';
     }
+    const promptLibraryModeSelect = document.getElementById('promptLibraryModeSelect');
+    if(promptLibraryModeSelect){
+      promptLibraryModeSelect.value = data.promptLibraryMode ? 'on' : 'off';
+    }
   }catch(e){ /* leave the dropdown empty on a network hiccup */ }
 }
 document.getElementById('saveColorThemeBtn').onclick = async ()=>{
@@ -4589,6 +4780,28 @@ document.getElementById('saveHeaderModeBtn').onclick = async ()=>{
     showToast(t('toastAdminServerError'));
   }
 };
+document.getElementById('savePromptLibraryModeBtn')?.addEventListener('click', async ()=>{
+  const enabled = document.getElementById('promptLibraryModeSelect').value === 'on';
+  if(!BACKEND_BASE || !adminSessionToken) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/set-prompt-library-mode?token=${encodeURIComponent(adminSessionToken)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ enabled })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(res.ok && data.ok){
+      PROMPT_LIBRARY_MODE = enabled;
+      applyPromptLibraryLabels();
+      renderGrids();
+      applyChildrenVisibility();
+      showToast(t('toastPromptLibraryModeSaved'));
+    }else{
+      showToast(t('toastAdminServerError'));
+    }
+  }catch(e){
+    showToast(t('toastAdminServerError'));
+  }
+});
 document.getElementById('saveSiteDesignBtn').onclick = async ()=>{
   const design = document.getElementById('siteDesignSelect').value;
   if(!BACKEND_BASE || !adminSessionToken) return;
@@ -6188,7 +6401,7 @@ function renderAdminProductsList(){
           <b>${escapeHtml(p.title)}</b>
           <span>${p.price} ${CURRENCY}</span>
           <select class="admin-move-cat" onchange="moveProductCategory('${p.id}', this.value)" title="${t('moveCategoryTitle')}">
-            ${allCats.map(c => `<option value="${c}" ${c===p.category?'selected':''}>${catLabel(c)}</option>`).join('')}
+            ${allCats.map(c => `<option value="${c}" ${c===p.category?'selected':''} ${c==='luxury' && PROMPT_LIBRARY_MODE ? 'disabled':''}>${catLabel(c)}</option>`).join('')}
           </select>
         </div>
         <span class="popularity-badge" title="${t('popularityCountTitle')}">🔥 ${productPopularity[p.id] || 0}</span>
@@ -6440,6 +6653,7 @@ async function applyHeroModeForThisDesign(){
   logVisitOnce();
   const prefs = await loadUiPrefs();
   await loadProducts();
+  await loadPromptLibraryMode();
   renderWatermarkBackground();
   await loadPurchases();
   await loadOrders();
