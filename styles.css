@@ -1494,13 +1494,16 @@
   .admin-head{
     display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
     margin-bottom:6px;
-    /* Reserve horizontal drags on this bar for the swipe-to-collapse gesture
-       (see initAdminPanelSwipeCollapse in app.js) instead of letting the
-       browser interpret them as its own edge-swipe/back gesture. Vertical
-       panning is left alone. */
-    touch-action: pan-y;
   }
   .admin-head-actions{display:flex; align-items:center; gap:6px; flex-shrink:0;}
+  /* Reserve horizontal drags anywhere on the admin panel for the
+     swipe-to-collapse gesture (see initAdminPanelSwipeCollapse in app.js)
+     instead of letting the browser interpret them as its own edge-swipe/back
+     gesture. Vertical panning (scrolling the orders/products lists) is left
+     completely alone. Scoped to .admin-modal specifically — this has no
+     effect on the separate image-cropper modal (.crop-modal / #cropModalBg),
+     which isn't a child of .admin-modal and keeps its own touch handling. */
+  .admin-modal{ touch-action: pan-y; }
   .admin-icon-btn{
     width:34px; height:34px; border-radius:9px; flex-shrink:0;
     background:var(--ink); border:1px solid var(--line); color:var(--paper-dim);

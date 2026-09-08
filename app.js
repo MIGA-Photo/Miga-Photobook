@@ -3485,57 +3485,77 @@ document.getElementById('adminCollapseBtn').onclick = ()=>{
 })();
 
 // ---- Swipe-to-collapse admin panel -------------------------------------
-// Swiping the panel's header left or right folds it back into the floating
-// launcher — the same effect as tapping the "-" (طي اللوحة) button, but as
-// a natural drag gesture. Scoped to the header bar (.admin-head) rather than
-// the whole panel body on purpose: the panel body holds scrollable lists and
-// the image cropper's own pinch/pan gestures, and a swipe-anywhere listener
-// would fight both of those. The header itself is just a title + a row of
-// icon buttons, so it's a safe "handle" — taps on those buttons are excluded
-// below so the gesture never swallows a real tap on them.
+// Swiping anywhere on the panel left or right folds it back into the
+// floating launcher — the same effect as tapping the "-" (طي اللوحة) button,
+// but as a natural drag gesture.
+//
+// This is scoped to the whole #adminModal now (an earlier version only
+// listened on the header bar, which left too little hit-area to actually
+// find on a phone). Widening it to the full panel is safe for two reasons,
+// checked directly against the actual markup/CSS before doing this:
+//   1. The image cropper (#cropModalBg / cropCanvas) is a SEPARATE top-level
+//      modal, not a child of #adminModal — it opens on top with a higher
+//      z-index and has its own dedicated touchstart/touchmove handlers. When
+//      it's open it visually and functionally covers the admin panel, so
+//      this listener never sees those touches at all; there is no shared
+//      surface for the two gesture handlers to fight over.
+//   2. Nothing inside #adminModal itself scrolls horizontally — .admin-tabs
+//      wraps onto multiple lines instead (flex-wrap:wrap), so there's no
+//      "swipe between tabs" gesture to collide with.
+// The remaining real risk is ordinary VERTICAL scrolling of admin content
+// (the orders/products lists) and taps on the admin panel's own buttons —
+// both are guarded below: a pointerdown starting on a button/link/input/
+// select/textarea never starts a swipe, and the drag is only ever treated as
+// a horizontal swipe once the movement is clearly more horizontal than
+// vertical, so a vertical scroll gesture is left completely alone.
 (function initAdminPanelSwipeCollapse(){
   const modal = document.getElementById('adminModal');
-  const head = modal ? modal.querySelector('.admin-head') : null;
-  if(!modal || !head) return;
+  if(!modal) return;
   const SWIPE_THRESHOLD = 70; // px of horizontal movement before it counts as a dismiss
-  let tracking = false, activePointerId = null, startX = 0, startY = 0;
+  const DIRECTION_LOCK = 10; // px of movement before deciding this is a horizontal swipe, not a scroll
+  let tracking = false, horizontal = false, activePointerId = null, startX = 0, startY = 0;
 
-  head.addEventListener('pointerdown', (e)=>{
-    if(e.target.closest('button, a, input, select, textarea')) return; // let taps on the header's own buttons through untouched
-    tracking = true;
+  modal.addEventListener('pointerdown', (e)=>{
+    if(e.target.closest('button, a, input, select, textarea')) return; // let taps/typing/scrolling on real controls through untouched
+    tracking = true; horizontal = false;
     activePointerId = e.pointerId;
     startX = e.clientX; startY = e.clientY;
-    modal.style.transition = 'none';
-    try{ head.setPointerCapture(e.pointerId); }catch(err){}
   });
 
-  head.addEventListener('pointermove', (e)=>{
+  modal.addEventListener('pointermove', (e)=>{
     if(!tracking || e.pointerId !== activePointerId) return;
     const dx = e.clientX - startX;
     const dy = e.clientY - startY;
-    // Only follow the finger once the movement is clearly more horizontal
-    // than vertical — avoids hijacking an attempt to scroll the page.
-    if(Math.abs(dx) > Math.abs(dy)){
-      modal.style.transform = `translateX(${dx}px)`;
-      modal.style.opacity = String(Math.max(0.35, 1 - Math.abs(dx) / 400));
+    if(!horizontal){
+      // Haven't committed to a direction yet — once movement is big enough
+      // to tell, decide once. If it turns out vertical, back off entirely
+      // for the rest of this gesture so the page/list scrolls normally.
+      if(Math.max(Math.abs(dx), Math.abs(dy)) < DIRECTION_LOCK) return;
+      if(Math.abs(dy) >= Math.abs(dx)){ tracking = false; return; }
+      horizontal = true;
+      modal.style.transition = 'none';
     }
+    modal.style.transform = `translateX(${dx}px)`;
+    modal.style.opacity = String(Math.max(0.35, 1 - Math.abs(dx) / 400));
   });
 
   function endSwipe(e){
     if(!tracking || e.pointerId !== activePointerId) return;
     tracking = false;
     const dx = e.clientX - startX;
-    modal.style.transition = 'transform .2s ease, opacity .2s ease';
-    modal.style.transform = '';
-    modal.style.opacity = '';
-    try{ head.releasePointerCapture(e.pointerId); }catch(err){}
-    if(Math.abs(dx) > SWIPE_THRESHOLD){
-      collapseAdminPanel();
-      syncAdminFabBadge();
+    if(horizontal){
+      modal.style.transition = 'transform .2s ease, opacity .2s ease';
+      modal.style.transform = '';
+      modal.style.opacity = '';
+      if(Math.abs(dx) > SWIPE_THRESHOLD){
+        collapseAdminPanel();
+        syncAdminFabBadge();
+      }
     }
+    horizontal = false;
   }
-  head.addEventListener('pointerup', endSwipe);
-  head.addEventListener('pointercancel', endSwipe);
+  modal.addEventListener('pointerup', endSwipe);
+  modal.addEventListener('pointercancel', endSwipe);
 })();
 
 document.getElementById('adminAlertsBtn').onclick = enableAdminAlerts;
