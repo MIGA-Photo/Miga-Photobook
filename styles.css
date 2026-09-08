@@ -1226,6 +1226,15 @@
      inline-start), so the two never collide on a card that has both. Outline
      when off, filled gold when on — the fill is the whole signal, so it stays
      readable at a glance on any photo underneath. */
+  /* Count chip next to "My favourites" in the side drawer — the row is the
+     only way into that list, so the number is what tells a returning visitor
+     they left something there without having to open it and look. */
+  .drawer-fav-count{
+    display:inline-flex; align-items:center; justify-content:center;
+    min-width:22px; height:22px; padding:0 7px; margin-inline-start:6px;
+    border-radius:100px; background:rgba(255,201,77,0.18); color:var(--brass);
+    font-size:12px; font-weight:800; line-height:1;
+  }
   .fav-btn{
     position:absolute; inset-inline-end:8px; bottom:8px; z-index:3;
     width:34px; height:34px; border-radius:50%;

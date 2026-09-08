@@ -1133,6 +1133,8 @@ function renderFavorites(){
     .map(id => products.find(p => p.id === id))
     .filter(p => p && p.image && p.image !== PLACEHOLDER_IMG);
 
+  updateFavDrawerRow(items.length);
+
   if(!items.length){
     section.style.display = 'none';
     grid.innerHTML = '';
@@ -1142,6 +1144,19 @@ function renderFavorites(){
   section.style.display = '';
   grid.innerHTML = items.map(p => renderProductCard(p)).join('');
   buildRowArrows('favorites', dots, grid);
+}
+
+/** The side-drawer row is the only entry point into the favourites list, so it
+ * has to mirror the list exactly: hidden while the list is empty (nothing to
+ * go to), visible with a live count the moment something is in it. Called from
+ * renderFavorites(), which already runs on every render and on every heart
+ * tap, so the row can never drift out of sync with the row it points at. */
+function updateFavDrawerRow(count){
+  const row = document.getElementById('drawerFavBtn');
+  const badge = document.getElementById('drawerFavCount');
+  if(!row) return;
+  row.style.display = count > 0 ? '' : 'none';
+  if(badge) badge.textContent = count > 0 ? String(count) : '';
 }
 async function savePurchases(){
   try{ localStorage.setItem('megaPromptPurchases', JSON.stringify(purchases)); }
@@ -4138,6 +4153,15 @@ function initSideDrawer(){
     drawerTrackBtn.onclick = ()=>{
       closeDrawer();
       document.getElementById('trackOpenBtn').click();
+    };
+  }
+  const drawerFavBtn = document.getElementById('drawerFavBtn');
+  if(drawerFavBtn){
+    drawerFavBtn.onclick = ()=>{
+      closeDrawer();
+      // Same scroll helper every other jump on the page uses, so the section
+      // lands below the sticky header instead of behind it.
+      scrollToSectionBelowHeader(document.getElementById('favorites'));
     };
   }
 
