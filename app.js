@@ -3503,23 +3503,39 @@ document.getElementById('adminCollapseBtn').onclick = ()=>{
 //      wraps onto multiple lines instead (flex-wrap:wrap), so there's no
 //      "swipe between tabs" gesture to collide with.
 // The remaining real risk is ordinary VERTICAL scrolling of admin content
-// (the orders/products lists) and taps on the admin panel's own buttons —
-// both are guarded below: a pointerdown starting on a button/link/input/
-// select/textarea never starts a swipe, and the drag is only ever treated as
-// a horizontal swipe once the movement is clearly more horizontal than
-// vertical, so a vertical scroll gesture is left completely alone.
+// (the orders/products lists) and taps on the admin panel's own buttons.
+//
+// REAL BUG FOUND AND FIXED (Sep 8, 2026): the first version of this handler
+// bailed out of tracking entirely on pointerdown if the touch started on a
+// button/link/input/select/textarea. That sounds safe, but the admin panel's
+// visible surface is almost ENTIRELY buttons (the 8-button nav grid, the
+// header icons, the "خروج" button) — only the small title/subtitle text and
+// the thin margins around the stats box were ever actually swipeable. A real
+// user swiping anywhere on the button grid (the most natural, most obvious
+// place to swipe) got silently ignored every time, which is almost certainly
+// why this reported as "not working" repeatedly even after every caching fix
+// was confirmed live and code was verified byte-for-byte correct.
+//
+// Fix: track the gesture from ANY pointerdown on the panel, regardless of
+// target. A normal tap has near-zero movement, so it's never reclassified as
+// `horizontal` and the button's click fires completely normally. Only once
+// movement clearly exceeds DIRECTION_LOCK *and* is more horizontal than
+// vertical do we commit to "this is a swipe" — and only then do we suppress
+// the click that would otherwise fire on the element under the finger, so a
+// real swipe starting on a nav button collapses the panel instead of also
+// activating that button.
 (function initAdminPanelSwipeCollapse(){
   const modal = document.getElementById('adminModal');
   if(!modal) return;
   const SWIPE_THRESHOLD = 70; // px of horizontal movement before it counts as a dismiss
-  const DIRECTION_LOCK = 10; // px of movement before deciding this is a horizontal swipe, not a scroll
-  let tracking = false, horizontal = false, activePointerId = null, startX = 0, startY = 0;
+  const DIRECTION_LOCK = 10; // px of movement before deciding this is a horizontal swipe, not a scroll/tap
+  let tracking = false, horizontal = false, activePointerId = null, startX = 0, startY = 0, startTarget = null;
 
   modal.addEventListener('pointerdown', (e)=>{
-    if(e.target.closest('button, a, input, select, textarea')) return; // let taps/typing/scrolling on real controls through untouched
     tracking = true; horizontal = false;
     activePointerId = e.pointerId;
     startX = e.clientX; startY = e.clientY;
+    startTarget = e.target;
   });
 
   modal.addEventListener('pointermove', (e)=>{
@@ -3539,6 +3555,16 @@ document.getElementById('adminCollapseBtn').onclick = ()=>{
     modal.style.opacity = String(Math.max(0.35, 1 - Math.abs(dx) / 400));
   });
 
+  function suppressGhostClick(target){
+    // A real swipe was just detected starting on `target` (which may be a
+    // button/link) — stop the click the browser is about to fire on it once
+    // the finger lifts, so swiping off a nav button doesn't also open it.
+    if(!target) return;
+    const block = (ev)=>{ ev.stopPropagation(); ev.preventDefault(); };
+    target.addEventListener('click', block, { capture: true, once: true });
+    setTimeout(()=>target.removeEventListener('click', block, { capture: true }), 500);
+  }
+
   function endSwipe(e){
     if(!tracking || e.pointerId !== activePointerId) return;
     tracking = false;
@@ -3547,6 +3573,7 @@ document.getElementById('adminCollapseBtn').onclick = ()=>{
       modal.style.transition = 'transform .2s ease, opacity .2s ease';
       modal.style.transform = '';
       modal.style.opacity = '';
+      suppressGhostClick(startTarget);
       if(Math.abs(dx) > SWIPE_THRESHOLD){
         collapseAdminPanel();
         syncAdminFabBadge();
