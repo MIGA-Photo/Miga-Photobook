@@ -395,9 +395,12 @@
     transition:color .18s ease, text-decoration-color .18s ease;
   }
   .util-link:hover{color:var(--brass); text-decoration-color:var(--brass);}
+  /* nav-wrap بقى عمود من صفين: صف الاسم (.nav-top) وصف البحث (.search-row).
+     كان صف واحد بيلفّ، وده اللي خلّى التوسيط الرأسي للاسم يحسب الصفين
+     مع بعض ويركب على البحث. */
   .nav-wrap{
     max-width:1180px; margin:0 auto; padding:10px 24px;
-    display:flex; align-items:center; justify-content:space-between; gap:20px;
+    display:flex; flex-direction:column; align-items:stretch; gap:8px;
   }
   /* ===== Compact header mode — an admin-panel toggle (see #headerModeSelect)
      that swaps the always-visible utility strip for a hamburger button
@@ -527,13 +530,34 @@
     background-size:260% 100%;
     -webkit-background-clip:text; background-clip:text;
     color:transparent; -webkit-text-fill-color:transparent;
-    animation:logoSheen 4.6s ease-in-out infinite;
+    /* 7.5s بدل 4.6s — الموجة كانت سريعة، دلوقتي بتعدّي مرة كل ٧ ثواني ونص */
+    animation:logoSheen 7.5s ease-in-out infinite;
+  }
+  /* الاسم في نص الصف الأول بالظبط.
+     المحاولة الأولى ثبّتته مطلقًا جوه .nav-wrap — والغلط إن .nav-wrap فيه
+     **صفين** (صف الاسم وصف البحث)، فالتوسيط الرأسي حطّه في نص الاتنين مع
+     بعض وركب على صف البحث. الحل إن الصف الأول يبقى ليه غلاف خاص بيه،
+     والتوسيط يبقى بالنسبة له هو. */
+  .nav-top{
+    position:relative; width:100%;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .nav-top > .logo{
+    position:absolute; left:50%; top:50%;
+    transform:translate(-50%, -50%);
+    margin:0; pointer-events:none;
   }
   .logo .lg-en, .side-drawer-logo .lg-en{
     font-size:18px; font-weight:700; letter-spacing:0.2px; white-space:nowrap;
   }
   .logo .lg-ar, .side-drawer-logo .lg-ar{
     font-size:16px; font-weight:700; letter-spacing:0.3px; white-space:nowrap;
+  }
+  /* Readex Pro أقصى وزن فيه 700 وإحنا واصلينه. الزيادة في السُمك بحد رفيع
+     حوالين الحروف بنفس لون التدرّج — أنضف من إن المتصفح يصنع وزن مزيّف. */
+  .logo .lg-en, .logo .lg-ar,
+  .side-drawer-logo .lg-en, .side-drawer-logo .lg-ar{
+    -webkit-text-stroke:0.4px var(--brass);
   }
   /* الاسمين ماياخدوش تدرّج خاص بيهم — الموجة بتاعة الأب هي اللي بترسمهم */
   .logo .lg-ar, .side-drawer-logo .lg-ar,
@@ -1821,27 +1845,24 @@
      محيط دايرة 64px = 200px، والقوس العلوي 100px. */
   .back-to-top-fab, .contact-fab{
     position:relative;
-    width:64px; height:64px; padding:0; border-radius:50%;
+    width:62px; height:62px; padding:0; border-radius:50%;
     background:var(--ink-2); border:2px solid var(--brass); color:var(--brass);
     display:inline-flex; align-items:center; justify-content:center;
     font-family:inherit; white-space:nowrap;
     box-shadow:0 3px 0 color-mix(in srgb, var(--brass) 55%, black), 0 6px 16px rgba(0,0,0,0.45);
     transition:transform .12s ease, box-shadow .12s ease, background .18s ease;
   }
-  .fab-ring{
-    position:absolute; inset:0; width:100%; height:100%;
-    pointer-events:none; overflow:visible;
-  }
-  .fab-arc-text{
-    font-family:inherit; font-size:9px; font-weight:700;
-    fill:var(--brass); letter-spacing:0.2px;
-  }
+  /* الكلام أفقي جوه الدايرة، مش على قوس. الخط العربي حروفه متصلة — ولما
+     كل حرف بيتلفّ بزاوية مختلفة على قوس، الوصلات بتتكسر والكلمة بتتفكّك
+     لحروف مايلة مالهاش معنى. الحرف اللاتيني منفصل أصلًا فالقوس بيشتغل معاه؛
+     العربي لأ. ودي مش مسألة ترتيب — الترتيب كان صح. */
   .fab-core{
     position:relative; z-index:1;
     display:inline-flex; flex-direction:column; align-items:center; gap:1px;
-    line-height:1; margin-top:5px;
+    line-height:1.1; padding:0 4px; text-align:center;
   }
   .fab-core svg{ display:block; }
+  .fab-word{ font-size:8.5px; font-weight:700; letter-spacing:0; }
   .fab-wrap{ display:inline-flex; }
   .fab-wrap-home{ position:fixed; bottom:26px; right:26px; z-index:200; }
   .back-to-top-fab:hover, .contact-fab:hover{
@@ -1854,8 +1875,7 @@
   }
 
   @media(max-width:520px){
-    .back-to-top-fab, .contact-fab{ width:60px; height:60px; }
-    .fab-arc-text{ font-size:8.6px; }
+    .back-to-top-fab, .contact-fab{ width:58px; height:58px; }
     .fab-wrap-home{ bottom:20px; right:16px; }
   }
   /* الموقع رايح تطبيق أندرويد وiOS: على أجهزة النوتش الشريط السفلي بياكل من
@@ -1949,10 +1969,6 @@
     .search-box input{width:150px;}
   }
   @media(max-width:700px){
-    /* الصف كله (بحث + بانر) هو اللي بياخد سطر كامل ويتأخر للآخر — مش
-       صندوق البحث لوحده. من غير كده زرار الدخول كان بينط لسطر تالت
-       والهيدر بيرجع طويل زي ما كان. */
-    .search-row{order:4; width:100%; flex:1 1 100%;}
     .search-box{width:auto;}
     .search-box input{width:100%; min-width:0;}
   }
@@ -1963,7 +1979,7 @@
   /* «ميجا» جوه الدايرة تحت الأيقونة. 9.5px هو أكبر مقاس بيخلي الكلمة
      تدخل جوه دايرة 52px من غير ما تلمس الإطار. */
   .contact-fab .fab-mega{
-    color:#ff4d4d; font-weight:700; font-size:11px; line-height:1;
+    color:#ff4d4d; font-weight:700; font-size:11.5px; line-height:1.1;
     animation:megaBlink 1.5s ease-in-out infinite;
   }
   @media(prefers-reduced-motion: reduce){ .contact-fab .fab-mega{ animation:none; } }
@@ -2190,7 +2206,7 @@
     border-top-left-radius:26px; border-top-right-radius:26px; overflow:hidden;
   }
   body.view-mode-mobile .header-utility{justify-content:center; flex-wrap:wrap; padding:4px 16px;}
-  body.view-mode-mobile .nav-wrap{flex-wrap:wrap; gap:6px; padding:8px 16px;}
+  body.view-mode-mobile .nav-wrap{gap:6px; padding:8px 16px;}
   body.view-mode-mobile nav.cats{width:100%; order:3; overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch; overscroll-behavior-x:contain;}
   body.view-mode-mobile .hero{grid-template-columns:1fr; padding:28px 18px 24px; gap:24px;}
   body.view-mode-mobile .hero::before{width:320px; height:320px; top:-80px; left:-80px; filter:blur(50px);}
