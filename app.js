@@ -1054,6 +1054,54 @@ async function loadUiPrefs(){
   }catch(e){ return null; }
 }
 
+/* ---------- تبديل اللغة: الرابط يمشي مع اللغة ----------
+ * الموقع بقى بصفحتين حقيقيتين: / بالعربي و /en/ بالإنجليزي. لو التبديل
+ * فضل بالجافاسكريبت بس، بيحصل تنافر: زائر على /en/ يدوس "عربي" فيشوف
+ * عربي، لكن الرابط لسه /en/ والـcanonical بتاعه بيقول لجوجل "دي الصفحة
+ * الإنجليزية" — وأول تحديث للصفحة بترجع إنجليزي قدامه.
+ *
+ * فالتبديل بقى بينقل للرابط الصح. تمنه إعادة تحميل، وده مقبول لإن
+ * تبديل اللغة بيحصل مرة في العمر تقريبًا، والصفحتين مخزّنين في الكاش.
+ *
+ * استثناء مهم: لو في مودال مفتوح (رفع صورة، شراء، تتبع طلب، تقييم)،
+ * الزائر في نص شغل — والخروج من الصفحة هيضيّعه. في الحالة دي بنبدّل
+ * في المكان من غير نقل. لغة غلط لدقيقة أهون من صورة ضاعت. */
+const LANG_MODALS = ['transformModalBg','buyModalBg','cropModalBg','trackModalBg',
+                     'reviewModalBg','accountModalBg','detailModalBg','adminModalBg'];
+
+function hasOpenModal(){
+  return LANG_MODALS.some(id=>{
+    const el = document.getElementById(id);
+    return el && el.classList.contains('show');
+  });
+}
+
+/** الرابط المقابل للغة المطلوبة، مع الحفاظ على الكويري والهاش
+ *  (عشان اللينكات العميقة زي #children ما تضيعش). */
+function languageUrlFor(lang){
+  return (lang === 'en' ? '/en/' : '/') + location.search + location.hash;
+}
+
+function switchLanguage(lang){
+  lang = (lang === 'en') ? 'en' : 'ar';
+  const onEnglishPage   = document.documentElement.lang === 'en';
+  const wantsEnglishPage = (lang === 'en');
+
+  // نفس الصفحة أصلاً، أو الزائر في نص شغل -> بدّل في المكان
+  if(onEnglishPage === wantsEnglishPage || hasOpenModal()){
+    applyLanguage(lang);
+    return;
+  }
+  // نحفظ الاختيار قبل النقل — الصفحة الجاية هتقرا التفضيل ده
+  try{
+    const raw = localStorage.getItem('megaPromptUiPrefs');
+    const prefs = raw ? JSON.parse(raw) : {};
+    prefs.lang = lang;
+    localStorage.setItem('megaPromptUiPrefs', JSON.stringify(prefs));
+  }catch(e){ /* التخزين مقفول — النقل لسه هيشتغل */ }
+  location.href = languageUrlFor(lang);
+}
+
 function applyLanguage(lang){
   currentLang = (lang === 'en') ? 'en' : 'ar';
   document.documentElement.lang = currentLang;
@@ -1180,7 +1228,7 @@ document.querySelectorAll('.theme-toggle').forEach(btn=>{
 elById('langToggle').addEventListener('click', (e)=>{
   const btn = e.target.closest('button');
   if(!btn) return;
-  applyLanguage(btn.dataset.lang);
+  switchLanguage(btn.dataset.lang);
 });
 elById('viewToggle').addEventListener('click', (e)=>{
   const btn = e.target.closest('button');
@@ -4563,7 +4611,7 @@ function initSideDrawer(){
     };
   }
   if(drawerLangSelect){
-    drawerLangSelect.addEventListener('change', ()=>{ applyLanguage(drawerLangSelect.value); });
+    drawerLangSelect.addEventListener('change', ()=>{ switchLanguage(drawerLangSelect.value); });
   }
   if(drawerThemeSwitch){
     drawerThemeSwitch.onclick = toggleTheme;
@@ -7366,12 +7414,19 @@ async function applyHeroModeForThisDesign(){
   }catch(e){}
 
   applyTheme(prefs?.theme || 'dark');
-  // اللغة الافتراضية بتيجي من <html lang> بتاع الصفحة نفسها: صفحة /en/
-  // بتفتح إنجليزي على طول، والجذر بيفتح عربي. تفضيل الزائر المحفوظ بيغلب
-  // الاتنين — لو اختار لغة قبل كده بتفضل معاه على أي صفحة.
-  // من غير ده كانت /en/ هتترسم إنجليزي في الـHTML وبعدين app.js يرجّعها
-  // عربي بعد ثانية — أوحش من إنها تبقى عربي من الأول.
-  applyLanguage(prefs?.lang || (document.documentElement.lang === 'en' ? 'en' : 'ar'));
+  // **الرابط هو اللي بيحدد اللغة، مش التفضيل المحفوظ.**
+  //
+  // النسخة الأولى من السطر ده كانت `prefs?.lang || pageLang` — يعني
+  // التفضيل المحفوظ يغلب. وده كان بيعمل عيب واضح: زائر فتح الموقع العربي
+  // قبل كده (فاتخزّن عنده lang:'ar')، ولما يفتح /en/ الصفحة بتظهر
+  // إنجليزي — لأن الـHTML نفسه إنجليزي — وبعد شوية ما init() يخلص
+  // طلباته بترجع عربي قدام عينيه. أوحش انطباع ممكن.
+  //
+  // الصح إن الرابط نية صريحة: اللي فتح /en/ طلب إنجليزي دلوقتي، سواء جاي
+  // من جوجل أو من لينك. التفضيل المحفوظ من زيارة قديمة مايغلبش ده.
+  // التفضيل بيفضل شغال على الصفحة الرئيسية زي ما هو.
+  const pageIsEnglish = document.documentElement.lang === 'en';
+  applyLanguage(pageIsEnglish ? 'en' : (prefs?.lang || 'ar'));
   // Defaults to 'mobile' for a first-time visitor with no saved preference —
   // most customers land here from their phones, and the mobile layout is
   // now the intended default first impression (per explicit request).
