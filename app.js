@@ -774,58 +774,153 @@ const TITLE_GAP = ''; // فاصل مؤقت جوه العبارات المترج
 
 /* عبارات كاملة تتفحص الأول (قبل الكلمة الواحدة) */
 const TITLE_PHRASES_AR_EN = [
+  ['رسم زيتي', 'Oil Painting'],
+  ['لوحة زيتية', 'Oil Painting'],
+  ['ألوان زيتية', 'Oil Colors'],
+  ['ألوان مائية', 'Watercolors'],
+  ['قلم رصاص', 'Pencil'],
   ['أبيض وأسود', 'Black & White'],
-  ['ابيض واسود', 'Black & White'],
   ['العودة للمدارس', 'Back to School'],
   ['عودة للمدارس', 'Back to School'],
   ['عيد ميلاد', 'Birthday'],
-  ['كرة قدم', 'Football'],
+  ['عيد الفطر', 'Eid al-Fitr'],
+  ['عيد الأضحى', 'Eid al-Adha'],
+  ['رأس السنة', 'New Year'],
   ['كرة القدم', 'Football'],
+  ['كرة قدم', 'Football'],
+  ['كرة السلة', 'Basketball'],
   ['مجلات وملصقات', 'Magazine & Poster'],
+  ['ثلاثي الأبعاد', '3D'],
+  ['ذكاء اصطناعي', 'AI'],
+  ['الذكاء الاصطناعي', 'AI'],
+  ['خيال علمي', 'Sci-Fi'],
+  ['رجل أعمال', 'Businessman'],
+  ['سيدة أعمال', 'Businesswoman'],
+  ['أبو الهول', 'The Sphinx'],
+  ['خان الخليلي', 'Khan El-Khalili'],
+  ['شرم الشيخ', 'Sharm El-Sheikh'],
+  ['وحيد القرن', 'Rhino'],
+  ['طائرة بدون طيار', 'Drone'],
+  ['ساعة ذكية', 'Smart Watch'],
+  ['رفع أثقال', 'Weightlifting'],
+  ['قوس قزح', 'Rainbow'],
+  ['منتصف الليل', 'Midnight'],
+  ['آيس كريم', 'Ice Cream'],
+  ['عيد الأم', 'Mother\'s Day'],
+  ['عيد الأب', 'Father\'s Day'],
+  ['بوب آرت', 'Pop Art'],
+  ['سوبر هيرو', 'Superhero'],
+  ['رائد فضاء', 'Astronaut'],
+  ['على الشاطئ', 'on the Beach'],
 ];
 
-const TITLE_WORDS_AR_EN = {
-  'ميجا':'Miga',
-  'أطفال':'Kids','اطفال':'Kids','رجالي':'Men','نسائي':'Women','أعمال':'Business','اعمال':'Business',
-  'سينمائي':'Cinematic','سينمائية':'Cinematic','فني':'Artistic','فنية':'Artistic',
-  'مجلات':'Magazine','مجلة':'Magazine','ملصقات':'Posters','فاخر':'Luxury',
-  'بورتريه':'Portrait','صورة':'Photo','ستايل':'Style','شخصي':'Personal','شخصية':'Personal',
-  'احترافي':'Professional','احترافية':'Professional','رسمي':'Formal','رسمية':'Formal',
-  'إضاءة':'Lighting','اضاءة':'Lighting','استوديو':'Studio','طبيعية':'Natural','طبيعي':'Natural',
-  'كلاسيك':'Classic','كلاسيكي':'Classic','كلاسيكية':'Classic','عتيق':'Vintage','قديم':'Vintage',
-  'حديث':'Modern','حديثة':'Modern','فخم':'Elegant','فخمة':'Elegant','أنيق':'Elegant','انيق':'Elegant',
-  'شتوي':'Winter','صيفي':'Summer','خريفي':'Autumn','ربيعي':'Spring',
-  'قهوة':'Coffee','مكتب':'Office','بدلة':'Suit','كاجوال':'Casual',
-  'مدرسة':'School','مدارس':'School','تخرج':'Graduation','زفاف':'Wedding','خطوبة':'Engagement',
-  'سفاري':'Safari','مغامرة':'Adventure','فضاء':'Space','بحر':'Sea','شاطئ':'Beach','صحراء':'Desert',
-  'ملك':'King','أمير':'Prince','امير':'Prince','ملكة':'Queen','أميرة':'Princess','اميرة':'Princess',
-  'فرعوني':'Pharaonic','فرعونية':'Pharaonic','تراثي':'Heritage','تراثية':'Heritage',
-  'رياضة':'Sports','رياضي':'Sports','بطل':'Hero','محارب':'Warrior','فارس':'Knight',
-  'كارتون':'Cartoon','أنمي':'Anime','انمي':'Anime','رسم':'Drawing','لوحة':'Painting','زيتي':'Oil',
-  'شعار':'Logo','إطار':'Frame','اطار':'Frame','كروم':'Chrome','ذهبي':'Golden','فضي':'Silver',
-  'كتاب':'Book','قصص':'Stories','قصة':'Story','غلاف':'Cover',
-  'طبيب':'Doctor','مهندس':'Engineer','معلم':'Teacher','دكتور':'Doctor',
-  'عربي':'Arabic','عربية':'Arabic','إنجليزي':'English','انجليزي':'English','توقيع':'Signature',
-  'الاسم':'Name','اسم':'Name','باسم':'with Name','التمساح':'Crocodile','تمساح':'Crocodile',
-  // وقت ومكان
-  'صباح':'Morning','الصباح':'Morning','مساء':'Evening','المساء':'Evening','ليل':'Night','الليل':'Night',
-  'غروب':'Sunset','شروق':'Sunrise','مدينة':'City','المدينة':'City','ريف':'Countryside','شارع':'Street',
-  'حديقة':'Garden','مطر':'Rain','ثلج':'Snow','نار':'Fire','سماء':'Sky','جبل':'Mountain','غابة':'Forest',
-  // مصر
-  'مصر':'Egypt','مصري':'Egyptian','مصرية':'Egyptian','القاهرة':'Cairo','النيل':'Nile','نيل':'Nile',
-  'أهرامات':'Pyramids','الأهرامات':'Pyramids','اهرامات':'Pyramids','الاهرامات':'Pyramids',
-  'مسجد':'Mosque','قلعة':'Castle','معبد':'Temple',
-  // ناس ومهن
-  'طيار':'Pilot','جندي':'Soldier','ضابط':'Officer','شرطي':'Police','رجل':'Man','ولد':'Boy','بنت':'Girl',
-  'عروسة':'Bride','عريس':'Groom','عائلة':'Family','أب':'Father','أم':'Mother',
-  // أشياء وستايلات
-  'سيارة':'Car','دراجة':'Bike','حصان':'Horse','أسد':'Lion','اسد':'Lion','نمر':'Tiger','صقر':'Falcon',
-  'نجم':'Star','أسطورة':'Legend','اسطورة':'Legend','ملكي':'Royal','ملكية':'Royal','ذهب':'Gold',
-  'نظارة':'Glasses','ساعة':'Watch','كاميرا':'Camera','ورد':'Flowers','بالون':'Balloons',
-  'سوبر':'Super','هيرو':'Hero','بطولة':'Championship','كأس':'Cup','ميدالية':'Medal',
-  'ثلاثي':'3D','الأبعاد':'Dimensions','مصغر':'Miniature','مجسم':'Figurine','دمية':'Doll',
-  'نيون':'Neon','دخان':'Smoke','ظل':'Shadow','انعكاس':'Reflection','مرآة':'Mirror',
-};
+
+
+/* ---------- تطبيع صرفي ----------
+ * القاموس فيه ~800 كلمة أساسية، لكن العربي بيكتب نفس الكلمة بأشكال كتير:
+ * "الأسد" و"وأسد" و"بالأسد" و"أسود" — لو كل شكل محتاج مدخل لوحده،
+ * القاموس مش هيخلص. فبدل كده الكلمة بتتنضّف قبل البحث:
+ *   1) شيل التشكيل والتطويل (ـ)
+ *   2) وحّد الهمزات (أ إ آ → ا) والياء (ى → ي) والتاء المربوطة (ة → ه)
+ *   3) جرّب الكلمة كاملة، وبعدين من غير السوابق (ال، و، ب، ل، ك، ف، بال، وال، لل)
+ *      وبعدين من غير اللواحق (ات، ين، ون، ية، ه)
+ * كده الـ800 مدخل بتغطي آلاف الأشكال الفعلية. */
+const AR_DIACRITICS = /[ً-ْـ]/g;
+function normalizeAr(w){
+  return String(w)
+    .replace(AR_DIACRITICS, '')
+    .replace(/[أإآٱ]/g, 'ا')
+    .replace(/ى/g, 'ي')
+    .replace(/ؤ/g, 'و')
+    .replace(/ئ/g, 'ي')
+    .replace(/ة/g, 'ه')
+    .trim();
+}
+
+/* خريطة بحث على شكل مُطبَّع — البحث بيبقى O(1).
+ *
+ * **بتتبني عند أول استخدام، مش وقت تحميل الصفحة.** الفرق مهم: الزائر
+ * العادي على الصفحة العربية عمره ما بيترجم اسم منتج، فمالوش لازمة يدفع
+ * تمن بناء ~900 مدخل (كل واحد بيعدي على 5 عمليات تطبيع) في أول لحظة
+ * تحميل. اللي بيحتاجها فعلاً حاجتين بس: الأدمن وهو بيكتب اسم منتج،
+ * والزائر لو حوّل الصفحة للإنجليزي — ووقتها بتتبني مرة واحدة وتفضل
+ * محفوظة. */
+let _titleWordsNorm = null;
+function titleWordsNorm(){
+  if(_titleWordsNorm) return _titleWordsNorm;
+  /* القاموس جوه الدالة عن قصد، مش const في المستوى الأعلى.
+   * السبب أداء: المحرّك بيعمل pre-parse سريع لجسم أي دالة لسه ماتنادتش،
+   * وبيأجّل التحليل الكامل لأول استدعاء. طول ما الـ20KB دي في المستوى
+   * الأعلى، كل زائر بيدفع تمن تحليلها وقت تحميل الصفحة — حتى لو عمره
+   * ما هيترجم اسم منتج. جوه الدالة، بيدفعه بس اللي محتاجه فعلاً:
+   * الأدمن وهو بيكتب اسم، أو زائر حوّل الصفحة للإنجليزي.
+   * الشكل: عربي|إنجليزي~عربي|إنجليزي — الحرفين دول مش في أي مدخل. */
+  const PACKED = [
+    'أب|Father~أخ|Brother~أم|Mother~جد|Grandfather~حب|Love~خط|Font~دب|Bear~زي|Outfit~ظل|Shadow~عم|Uncle~في|in~قط|Cat~كل|All~مع|with~من|from~نص|Text~يد|Hand~آرت|Art~آيس|Ice~أخت|Sister~أرض|Earth~أسد|Lion~أمل|Hope~أول|First~إلى|to~ابن|Son~اسم|Name~باص|Bus~بحر|Sea~برج|Tower~برق|Lightning~بطة|Duck~بطل|Hero~بعض|Some~بنت|Girl~بني|Brown~بوب|Pop~بيت|Home~بيج|Beige~بين|between',
+    'تاج|Crown~تحت|under~تمر|Dates~تنس|Tennis~ثقة|Confidence~ثلج|Snow~جبل|Mountain~جدة|Grandmother~جري|Running~جسم|Body~جمل|Camel~جيم|Gym~حاد|Sharp~حفل|Ceremony~حقل|Field~حلم|Dream~حلو|Sweet~حوت|Whale~حول|around~خاص|Special~خال|Uncle~خان|Khan~ختم|Stamp~خيل|Horse~درع|Shield~ديك|Rooster~ذئب|Wolf~ذكي|Smart~ذهب|Gold~ربع|Quarter~رجل|Man~رسم|Drawing~رعب|Horror~رعد|Thunder~رمل|Sand~روح|Soul~ريف|Countryside~زمن|Time~زوج|Husband~ستة|Six',
+    'سحر|Magic~سطح|Rooftop~سفر|Travel~سلة|Basketball~سمك|Fish~سوق|Market~سيد|Master~سيف|Sword~شاب|Young Man~شاي|Tea~شرم|Sharm~شعر|Hair~شمس|Sun~شيخ|Elder~شيف|Chef~صقر|Falcon~صور|Photos~صيف|Summer~ضوء|Light~ضيق|Narrow~طفل|Child~ظهر|Back~عسل|Honey~عشب|Grass~عصر|Afternoon~عقل|Mind~علم|Flag~على|on~عمة|Aunt~عمق|Depth~عمل|Work~عنب|Grapes~عند|at~عيد|Eid~عين|Eye~فجر|Dawn~فحم|Charcoal~فخر|Pride~فخم|Elegant~فرح|Wedding',
+    'فرس|Mare~فصل|Chapter~فضة|Silver~فضي|Silver~فني|Artistic~فهد|Cheetah~فوق|above~فيل|Elephant~قدم|Football~قرد|Monkey~قرش|Shark~قرط|Earring~قزح|Rainbow~قصة|Story~قصر|Palace~قصص|Stories~قطة|Cat~قلب|Heart~قلم|Pen~قمر|Moon~قوة|Power~قوي|Strong~كأس|Cup~كاب|Cap~كتب|Books~كرة|Ball~كلب|Dog~كهف|Cave~كيك|Cake~لهب|Flame~لون|Color~ليل|Night~ماء|Water~مصر|Egypt~مطر|Rain~ملك|King~موج|Waves~موز|Banana~ناد|Club~نار|Fire',
+    'ناس|People~نجم|Star~ندى|Dew~نسر|Eagle~نصف|Half~نمر|Tiger~نهر|River~نيل|Nile~هدف|Goal~هرم|Pyramid~وجه|Face~ورد|Roses~وشم|Tattoo~وقت|Time~ولد|Boy~آنسة|Miss~أبيض|White~أحمر|Red~أخضر|Green~أرنب|Rabbit~أزرق|Blue~أسرة|Family~أسود|Black~أصفر|Yellow~أكشن|Action~أمير|Prince~أنمي|Anime~أنيق|Elegant~إطار|Frame~ابنة|Daughter~بائع|Seller~بابا|Dad~باحث|Researcher~بارد|Cool~باقة|Pack~باهت|Faded~بدلة|Suit~بدون|without~برجر|Burger~بسيط|Simple',
+    'بطلة|Heroine~بطيء|Slow~بطيخ|Watermelon~بعيد|Far~بقرة|Cow~بومة|Owl~بيبي|Baby~تاجر|Merchant~تخرج|Graduation~تدرج|Gradient~تراث|Heritage~تسعة|Nine~تفاح|Apple~تنين|Dragon~توأم|Twins~ثالث|Third~ثاني|Second~ثعلب|Fox~جديد|New~جريء|Bold~جزمة|Boots~جميل|Beautiful~جندي|Soldier~جودو|Judo~جولف|Golf~جينز|Jeans~حارة|Alley~حاضر|Present~حالم|Dreamy~حجاب|Hijab~حداد|Blacksmith~حديث|Modern~حذاء|Shoes~حرية|Freedom~حزين|Sad~حصان|Horse~حفلة|Party~حكيم|Sage~حلاق|Barber~حمار|Donkey',
+    'خاتم|Ring~خارج|outside~خالة|Aunt~خجول|Shy~خروف|Sheep~خريج|Graduate~خريف|Autumn~خشبي|Wooden~خمري|Burgundy~خمسة|Five~خياط|Tailor~خيال|Fiction~داخل|inside~دافئ|Warm~دخان|Smoke~درون|Drone~دعوة|Invitation~دقيق|Precise~دمعة|Tear~دمية|Doll~ذكاء|Intelligence~ذكرى|Anniversary~ذكية|Smart~ذهبي|Golden~رئيس|President~رائد|Astronaut~رائع|Wonderful~راقي|Refined~راية|Banner~ربطة|Tie~ربيع|Spring~رحلة|Journey~رسام|Painter~رسمة|Drawing~رسمي|Formal~رصاص|Pencil~رضيع|Baby~رفيق|Companion~رياح|Wind~زعيم|Chief',
+    'زفاف|Wedding~زهري|Pink~زهور|Flowers~زوجة|Wife~زيتي|Olive~سائق|Driver~ساحر|Wizard~ساعة|Watch~سبعة|Seven~سحاب|Clouds~سحري|Magical~سريع|Fast~سعيد|Happy~سكتش|Sketch~سلام|Peace~سماء|Sky~سمكة|Fish~سوبر|Super~سويت|Sweatshirt~سيدة|Lady~شارع|Street~شاشة|Screen~شاطئ|Beach~شاعر|Poet~شبكة|Network~شتاء|Winter~شتوي|Winter~شجرة|Tree~شخصي|Personal~شرطي|Police~شرفة|Balcony~شرقي|Oriental~شروق|Sunrise~شعار|Logo~شلال|Waterfall~شمعة|Candle~شنطة|Bag~شهير|Famous~صباح|Morning~صحفي|Journalist',
+    'صديق|Friend~صغير|Small~صفحة|Page~صورة|Photo~صياد|Fisherman~صيفي|Summer~ضابط|Officer~ضباب|Fog~ضحكة|Laugh~ضوئي|Light~طائر|Bird~طالب|Student~طباخ|Cook~طبيب|Doctor~طرحة|Veil~طموح|Ambition~طويل|Tall~طيار|Pilot~طيور|Birds~عاصف|Stormy~عالم|World~عامل|Worker~عتيق|Vintage~عجوز|Elder~عدسة|Lens~عربي|Arabic~عريس|Groom~عريض|Wide~عشاء|Dinner~عشرة|Ten~عصري|Contemporary~عصير|Juice~عطلة|Holiday~علمي|Science~عيون|Eyes~غابة|Forest~غاضب|Angry~غامض|Mysterious~غامق|Dark~غداء|Lunch',
+    'غربي|Western~غرفة|Room~غروب|Sunset~غزال|Deer~غلاف|Cover~غموض|Mystery~غيوم|Clouds~فاتح|Light~فاخر|Luxury~فارس|Knight~فتاة|Girl~فخمة|Elegant~فريد|Unique~فريق|Team~فضاء|Space~فضية|Silver~فطار|Breakfast~فلاح|Farmer~فلاش|Flash~فلتر|Filter~فندق|Hotel~فنية|Artistic~قائد|Leader~قارب|Boat~قاضي|Judge~قبعة|Hat~قديم|Vintage~قريب|Close~قرية|Village~قصير|Short~قطار|Train~قلعة|Castle~قميص|Shirt~قهوة|Coffee~قوية|Strong~كاتب|Writer~كبير|Big~كتاب|Book~كحلي|Navy~كروم|Chrome',
+    'كريم|Cream~كلمة|Word~كوكب|Planet~لاعب|Player~لامع|Glossy~لبؤة|Lioness~لبني|Light Blue~لحظة|Moment~لحية|Beard~لعبة|Game~لقطة|Shot~لوتس|Lotus~لوحة|Painting~مائي|Watercolor~ماضي|Past~ماما|Mom~متحف|Museum~مجرة|Galaxy~مجسم|Figurine~مجلة|Magazine~محطة|Station~محلي|Local~محيط|Ocean~مدرب|Coach~مدرج|Stands~مدرس|Teacher~مدير|Manager~مذهل|Stunning~مذيع|Anchor~مرآة|Mirror~مرتب|Tidy~مركب|Boat~مريح|Comfortable~مساء|Evening~مسجد|Mosque~مسرح|Theater~مشبع|Saturated~مشهد|Scene~مصري|Egyptian~مصغر|Miniature',
+    'مصمم|Designer~مصنع|Factory~مصور|Photographer~مضحك|Funny~مطار|Airport~مطعم|Restaurant~مطفي|Matte~معبد|Temple~معرض|Exhibition~معطف|Coat~معلم|Teacher~مغني|Singer~مفضل|Favorite~مقهى|Cafe~مكتب|Office~ملصق|Poster~ملعب|Stadium~ملكة|Queen~ملكي|Royal~ملون|Colorful~ممثل|Actor~ممرض|Nurse~مميز|Special~منزل|House~موضة|Fashion~موظف|Employee~مياه|Water~ميجا|Miga~نادر|Rare~ناعم|Soft~نبيل|Noble~نجاح|Success~نجار|Carpenter~نجمة|Star~نجوم|Stars~نحلة|Bee~نخلة|Palm~نخيل|Palms~نسخة|Version~نظيف|Clean',
+    'نهار|Day~نيلي|Indigo~نيون|Neon~هاتف|Phone~هادئ|Calm~هدية|Gift~هودي|Hoodie~هوية|Identity~هيرو|Hero~واحة|Oasis~واحد|One~وحيد|Single~وردة|Rose~وردي|Pink~ورشة|Workshop~ورقة|Paper~وشاح|Scarf~أثقال|Weights~أربعة|Four~أزياء|Fashion~أسوان|Aswan~أسورة|Bracelet~أشجار|Trees~أضواء|Lights~أطفال|Kids~أعمال|Business~ألوان|Colors~أميرة|Princess~أنيقة|Elegant~أوراق|Leaves~إجازة|Vacation~إضاءة|Lighting~اثنين|Two~السنة|Year~الشيخ|El-Sheikh~النيل|Nile~الهول|The Sphinx~امرأة|Woman~بالطو|Coat~بالون|Balloons',
+    'ببغاء|Parrot~بحيرة|Lake~بداية|Beginning~بطريق|Penguin~بطولة|Championship~بوصلة|Compass~بوكيه|Bokeh~بيتزا|Pizza~بيضاء|White~تباين|Contrast~تحويل|Transform~تراثي|Heritage~تصميم|Design~تطبيق|App~تعريض|Exposure~تكريم|Honoring~تمثال|Statue~تمساح|Crocodile~تنورة|Skirt~تهنئة|Greeting~تورتة|Cake~توقيع|Signature~ثعبان|Snake~ثلاثة|Three~ثلاثي|3D~جائزة|Award~جاكيت|Jacket~جامعة|University~جزيرة|Island~جمهور|Audience~جميلة|Beautiful~حديثة|Modern~حديقة|Garden~حقيبة|Bag~حقيقي|Real~حمامة|Dove~حمراء|Red~خريطة|Map~خريفي|Autumn~خضراء|Green',
+    'خطوبة|Engagement~خلفية|Background~خليفة|Caliph~دبابة|Tank~دجاجة|Chicken~دراجة|Bicycle~دراسة|Study~دراما|Drama~درامي|Dramatic~دكتور|Doctor~ذاكرة|Memory~ذهبية|Golden~ربيعي|Spring~رجالي|Men~رخامي|Marble~رسالة|Letter~رسمية|Formal~رمادي|Gray~رمضان|Ramadan~رملية|Hourglass~روبوت|Robot~رياضة|Sports~رياضي|Sporty~ريترو|Retro~زاوية|Angle~زجاجي|Glass~زرافة|Giraffe~زرقاء|Blue~سباحة|Swimming~سفاري|Safari~سفينة|Ship~سلسلة|Necklace~سلطان|Sultan~سماعة|Headphones~سماوي|Sky Blue~سوداء|Black~سيارة|Car~سيناء|Sinai~شخصية|Personal~شطرنج|Chess',
+    'شهادة|Certificate~صاروخ|Rocket~صحراء|Desert~صفراء|Yellow~صيدلي|Pharmacist~طائرة|Plane~طالبة|Student~طبيعي|Natural~طربوش|Tarboosh~عائلة|Family~عاصفة|Storm~عالمي|Global~عباية|Abaya~عبقري|Genius~عربية|Car~عروسة|Bride~عصفور|Bird~عقيقة|Aqiqah~عمامة|Turban~عنابي|Maroon~عنوان|Title~فاخرة|Luxury~فاكهة|Fruit~فراشة|Butterfly~فرعون|Pharaoh~فستان|Dress~قدمين|Feet~قرمزي|Crimson~قفطان|Kaftan~كافيه|Cafe~كريمي|Cream~كنيسة|Church~كوفية|Keffiyeh~لياقة|Fitness~ليمون|Lemon~ماكرو|Macro~مانجا|Manga~مانجو|Mango~مبرمج|Programmer~مثالي|Perfect',
+    'مجاني|Free~مجتمع|Community~مجلات|Magazine~محارب|Warrior~محاسب|Accountant~محامي|Lawyer~مدارس|School~مدرسة|School~مدفوع|Paid~مدينة|City~مركبة|Vehicle~مزارع|Farmer~مزدوج|Double~مزرعة|Farm~مشهور|Famous~مصباح|Lamp~مصرية|Egyptian~معدني|Metallic~مغنية|Singer~مفتاح|Key~مقاتل|Fighter~مقدمة|Foreground~مكتبة|Library~ملابس|Outfit~ملحمي|Epic~ملكية|Royal~ملونة|Colorful~ممتاز|Excellent~ممثلة|Actress~ممرضة|Nurse~منتخب|National Team~منتصف|Mid~مهندس|Engineer~مولود|Newborn~ميلاد|Birthday~نحاسي|Copper~نسائي|Women~نظارة|Glasses~نهاية|End~واجهة|Front',
+    'واقعي|Realistic~وردية|Pink~أتوبيس|Bus~أسطورة|Legend~أسطوري|Legendary~أصدقاء|Friends~أيقونة|Icon~إنترنت|Internet~احتفال|Celebration~الأقصر|Luxor~امتحان|Exam~انعكاس|Reflection~بابيون|Bow Tie~بترولي|Teal~برتقال|Orange~برنامج|Program~برومبت|Prompt~برونزي|Bronze~بطولات|Championships~بنطلون|Trousers~بنفسجي|Purple~بوهيمي|Boho~بيضاوي|Oval~تجريدي|Abstract~تراثية|Heritage~تركواز|Turquoise~تليفون|Phone~تيشيرت|T-shirt~ثمانية|Eight~جلابية|Galabeya~حبيبات|Grain~حلويات|Sweets~دولفين|Dolphin~رمادية|Gray~ستوديو|Studio~سلحفاة|Turtle~سيلويت|Silhouette~طبيعية|Natural~فراولة|Strawberry~فرعوني|Pharaonic',
+    'فروسية|Equestrian~فيروزي|Turquoise~فينتدج|Vintage~كاجوال|Casual~كارتون|Cartoon~كاميرا|Camera~كرافتة|Tie~كلاسيك|Classic~كوميدي|Comedy~كوميكس|Comics~لابتوب|Laptop~ليموني|Lime~مباراة|Match~مجموعة|Collection~مرجاني|Coral~مستشفى|Hospital~مستقبل|Future~مصارعة|Wrestling~معماري|Architect~مغامرة|Adventure~مفاجأة|Surprise~مكسرات|Nuts~ملاكمة|Boxing~ملصقات|Posters~مناسبة|Occasion~منحوتة|Sculpture~موبايل|Mobile~موسيقي|Musician~نظارات|Glasses~ياسمين|Jasmine~أهرامات|Pyramids~إنجليزي|English~ابتسامة|Smile~احترافي|Professional~استوديو|Studio~اصطناعي|Artificial~الأبعاد|Dimensions~الخليلي|El-Khalili~الغردقة|Hurghada~القاهرة|Cairo',
+    'انطباعي|Impressionist~بالونات|Balloons~برتقالي|Orange~بروفايل|Profile~بلياردو|Billiards~بنفسجية|Purple~بورتريه|Portrait~جرافيتي|Graffiti~ديناصور|Dinosaur~رومانسي|Romantic~سيريالي|Surreal~سينمائي|Cinematic~شمبانيا|Champagne~فرعونية|Pharaonic~فوتوبوك|Photobook~كاراتيه|Karate~كريسماس|Christmas~كلاسيكي|Classic~كمبيوتر|Computer~كهربائي|Electrician~مجوهرات|Jewelry~موزاييك|Mosaic~ميدالية|Medal~مينيمال|Minimal~احترافية|Professional~بانوراما|Panorama~برتقالية|Orange~ساندويتش|Sandwich~ستيمبانك|Steampunk~سينمائية|Cinematic~شوكولاتة|Chocolate~فانتازيا|Fantasy~كارديجان|Cardigan~كلاسيكية|Classic~موتوسيكل|Motorcycle~ميكانيكي|Mechanic~ميكروفون|Microphone~هليكوبتر|Helicopter~بلايستيشن|PlayStation~سايبربانك|Cyberpunk',
+    'كاريكاتير|Caricature~الإسكندرية|Alexandria~جزر|Islands~سحب|Clouds~سفن|Ships~صحف|Newspapers~غرف|Rooms~قرى|Villages~قطط|Cats~مدن|Cities~أيدي|Hands~بحار|Seas~بنات|Girls~بيوت|Houses~جبال|Mountains~جنود|Soldiers~حروف|Letters~حمام|Doves~خيول|Horses~دببة|Bears~دروع|Shields~ذئاب|Wolves~رجال|Men~رمال|Sands~سيوف|Swords~شباب|Youth~شموس|Suns~شموع|Candles~صخور|Rocks~صقور|Falcons~ضباط|Officers~طلاب|Students~عقول|Minds~عمال|Workers~قصور|Palaces~قلاع|Castles~قلوب|Hearts~كلاب|Dogs~كهوف|Caves~ملوك|Kings',
+    'نساء|Women~نسور|Eagles~نمور|Tigers~وجوه|Faces~ورود|Roses~أبطال|Heroes~أبواب|Doors~أحجار|Stones~أحذية|Shoes~أحلام|Dreams~أرانب|Rabbits~أرقام|Numbers~أرواح|Souls~أزهار|Flowers~أسماك|Fish~أسواق|Markets~أصحاب|Friends~أطباء|Doctors~أعلام|Flags~أفيال|Elephants~أقلام|Pens~أقمار|Moons~أمراء|Princes~أمواج|Waves~أنهار|Rivers~أولاد|Boys~تيجان|Crowns~جواهر|Jewels~حدائق|Gardens~حقائب|Bags~خرائط|Maps~خواتم|Rings~رايات|Banners~رحلات|Journeys~رسائل|Letters~ساعات|Watches~شوارع|Streets~شواطئ|Beaches~صحاري|Deserts~صفحات|Pages',
+    'غابات|Forests~غزلان|Deer~فرسان|Knights~فنادق|Hotels~قبعات|Hats~كلمات|Words~كنائس|Churches~لحظات|Moments~لوحات|Paintings~متاحف|Museums~مجلات|Magazines~مراكب|Boats~مساجد|Mosques~مطاعم|Restaurants~معابد|Temples~مكاتب|Offices~ملابس|Clothes~ملكات|Queens~منازل|Houses~نوافذ|Windows~هدايا|Gifts~أميرات|Princesses~بحيرات|Lakes~بطولات|Championships~تماثيل|Statues~جامعات|Universities~ذكريات|Memories~رسومات|Drawings~سيارات|Cars~شلالات|Waterfalls~طائرات|Planes~عصافير|Birds~عناوين|Titles~فراشات|Butterflies~قطارات|Trains~مصابيح|Lamps~معلمون|Teachers~مفاتيح|Keys~ملصقات|Posters~نظارات|Glasses',
+    'مباريات|Matches~محاربون|Warriors~مغامرات|Adventures~مهندسون|Engineers~ميداليات|Medals'
+  ].join('~');
+  const m = Object.create(null);
+  for(const entry of PACKED.split('~')){
+    const i = entry.indexOf('|');
+    if(i < 1) continue;
+    const n = normalizeAr(entry.slice(0, i));
+    if(!(n in m)) m[n] = entry.slice(i + 1);
+  }
+  _titleWordsNorm = m;
+  return m;
+}
+
+const AR_PREFIXES = ['بال','وال','فال','كال','لل','ال','و','ف','ب','ك','ل'];
+const AR_SUFFIXES = ['ات','ين','ون','يه','يا','ها','هم','ه','ي'];
+
+/** يدوّر على كلمة واحدة في القاموس بكل أشكالها المحتملة. */
+function lookupArWord(tok){
+  const n = normalizeAr(tok);
+  if(!n) return null;
+  const NORM = titleWordsNorm();
+  if(NORM[n]) return NORM[n];
+  for(const pre of AR_PREFIXES){
+    if(n.length > pre.length + 1 && n.startsWith(pre)){
+      const stem = n.slice(pre.length);
+      if(NORM[stem]) return NORM[stem];
+      for(const suf of AR_SUFFIXES){
+        if(stem.length > suf.length + 1 && stem.endsWith(suf)){
+          const s2 = stem.slice(0, -suf.length);
+          if(NORM[s2]) return NORM[s2];
+        }
+      }
+    }
+  }
+  for(const suf of AR_SUFFIXES){
+    if(n.length > suf.length + 1 && n.endsWith(suf)){
+      const s2 = n.slice(0, -suf.length);
+      if(NORM[s2]) return NORM[s2];
+    }
+  }
+  return null;
+}
 
 /** يترجم اسم منتج عربي كامل، أو يرجّع null لو فيه أي كلمة مش معروفة. */
 function translateProductTitle(ar){
@@ -839,8 +934,7 @@ function translateProductTitle(ar){
     const tok = raw.trim();
     if(!tok) continue;
     if(!ARABIC_LETTER_RE.test(tok)){ out.push(tok); continue; }  // أرقام، رموز، كلمات إنجليزية
-    const bare = tok.replace(/^ال/, '');               // شيل "ال" التعريف
-    const hit = TITLE_WORDS_AR_EN[tok] || TITLE_WORDS_AR_EN[bare];
+    const hit = lookupArWord(tok);
     if(!hit) return null;                                        // كلمة مجهولة -> مانترجمش خالص
     out.push(hit);
   }
@@ -853,16 +947,70 @@ function translateProductTitle(ar){
  * الخانة أبدًا لو الأدمن كتب فيها بنفسه — بنتتبع آخر اقتراح إحنا كتبناه،
  * ولو اللي في الخانة مش هو، يبقى ده كلام الأدمن ومحدش يمسّه. */
 let lastSuggestedTitleEn = '';
+/* ---------- الترجمة الآلية (احتياطي القاموس) ----------
+ * القاموس بيغطي مفردات التصوير والمنتجات، بس مش هيغطي "كل مفردات اللغة"
+ * — ده مستحيل بقائمة مكتوبة بالإيد. فلما القاموس يقف عند كلمة مش عارفها،
+ * بنسأل الووركر اللي بيشغّل موديل ترجمة على Cloudflare.
+ *
+ * الترتيب مقصود: **القاموس الأول**، لأنه فوري، بدون إنترنت، وبيضمن إن
+ * "ميجا" تفضل Miga و"فرعوني" تفضل Pharaonic زي ما إحنا عايزين — الموديل
+ * ممكن يجتهد ويطلّع حاجة تانية. الذكاء الاصطناعي بيشتغل بس على اللي
+ * القاموس وقف عنده.
+ *
+ * بينادى مرة واحدة وقت الكتابة، والنتيجة بتتحفظ في titleEn — فالزوار
+ * عمرهم ما بيشغّلوا الموديل. */
+const aiTitleCache = new Map();   // نفس الاسم مايتترجمش مرتين
+let aiTitleTimer = null;
+let aiTitleSeq = 0;               // بيلغي نتيجة طلب قديم وصلت متأخرة
+
+async function translateTitleViaAI(ar){
+  const key = String(ar || '').trim();
+  if(!key || !BACKEND_BASE || !adminSessionToken) return null;
+  if(aiTitleCache.has(key)) return aiTitleCache.get(key);
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/translate-title`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ token: adminSessionToken, text: key })
+    });
+    const data = await res.json();
+    const out = (data && data.ok && typeof data.text === 'string') ? data.text.trim() : null;
+    aiTitleCache.set(key, out);   // نخزّن حتى الفشل (null) عشان مانكررش نفس الطلب الفاشل
+    return out;
+  }catch(e){
+    return null;                  // مفيش نت أو الـbinding مش مضاف — القاموس بيفضل شغال
+  }
+}
+
 function initTitleEnSuggestion(){
   const ar = document.getElementById('pTitle');
   const en = document.getElementById('pTitleEn');
   if(!ar || !en) return;
+
+  const setSuggestion = (val)=>{ en.value = val; lastSuggestedTitleEn = val; };
+
   ar.addEventListener('input', ()=>{
     const cur = en.value.trim();
     if(cur && cur !== lastSuggestedTitleEn) return;   // الأدمن كتب اسمه بنفسه
-    const guess = translateProductTitle(ar.value) || '';
-    en.value = guess;
-    lastSuggestedTitleEn = guess;
+    const raw = ar.value;
+    const seq = ++aiTitleSeq;
+
+    // 1) القاموس — فوري
+    const guess = translateProductTitle(raw);
+    if(guess){ clearTimeout(aiTitleTimer); setSuggestion(guess); return; }
+
+    // 2) الذكاء الاصطناعي — بعد ما الكتابة تهدى، عشان ما نبعتش طلب لكل حرف
+    setSuggestion('');
+    clearTimeout(aiTitleTimer);
+    const text = raw.trim();
+    if(!text || !ARABIC_LETTER_RE.test(text)) return;
+    aiTitleTimer = setTimeout(async ()=>{
+      const aiOut = await translateTitleViaAI(text);
+      if(seq !== aiTitleSeq) return;                       // الأدمن كمّل كتابة
+      if(!aiOut) return;
+      const now = en.value.trim();
+      if(now && now !== lastSuggestedTitleEn) return;      // الأدمن كتب بنفسه وإحنا مستنيين
+      setSuggestion(aiOut);
+    }, 700);
   });
 }
 initTitleEnSuggestion();
@@ -5053,6 +5201,31 @@ async function loadPendingReviews(){
   }catch(e){ el.innerHTML = `<div class="empty-note">${t('noPendingReviews')}</div>`; }
 }
 
+/** يخلي أي جدول جوه لوحة التحكم يتقرا كـ"بطاقات" على الموبايل.
+ * الجدول بيفضل جدول حقيقي في الـHTML (نفس البيانات، نفس التصدير، نفس
+ * إمكانية النسخ)، لكن كل خلية بتاخد `data-label` من عنوان عمودها في
+ * الـ<thead>، والـCSS بيستخدم الـlabel ده عشان يعرض كل صف كبطاقة مستقلة
+ * فيها سطور "العنوان : القيمة" — بالظبط زي شكل بطاقة الطلب (.order-row).
+ *
+ * ليه بالطريقة دي مش بإعادة كتابة كل جدول بإيدي؟ لإن الترجمة بتتغير مع
+ * اللغة (ar/en) والأعمدة ممكن تزيد بعدين — فلو الليبل اتنسخ يدوي هيبوظ أول
+ * ما عمود يتغير. هنا الليبل بييجي من الـ<thead> نفسه، فمستحيل يختلف عنه.
+ * الأعمدة اللي عنوانها فاضي (عمود الأزرار) بتاخد data-label="" والـCSS
+ * بيعرضها كصف أزرار بعرض البطاقة. */
+function stampTableLabels(root){
+  if(!root) return;
+  const tables = root.tagName === 'TABLE' ? [root] : root.querySelectorAll('table');
+  tables.forEach(tb=>{
+    const heads = [...tb.querySelectorAll('thead th')].map(th => th.textContent.trim());
+    if(!heads.length) return;
+    tb.querySelectorAll('tbody tr').forEach(tr=>{
+      [...tr.children].forEach((td, i)=>{
+        td.setAttribute('data-label', heads[i] !== undefined ? heads[i] : '');
+      });
+    });
+  });
+}
+
 /** Same compact-table-on-expand pattern as the orders stats bar — shows the
  * most recent pending reviews (need action) followed by the most recent
  * approved ones, so admin gets a live snapshot without scrolling the full
@@ -5077,12 +5250,13 @@ function renderReviewStatsTable(pending, approved){
         <tr>
           <td>${escapeHtml(r.user_name || '—')}</td>
           <td>${'⭐'.repeat(r.rating || 0)}</td>
-          <td>${escapeHtml((r.comment || '').slice(0, 60))}</td>
+          <td>${escapeHtml((r.comment || '').slice(0, 200))}</td>
           <td><span class="order-status ${r.status==='approved' ? 'status-approved' : 'status-pending'}">${r.status==='approved' ? t('orderStatusApproved') : t('orderStatusPending')}</span></td>
-          <td><button class="btn-ghost reject-btn" style="padding:4px 8px; font-size:12px;" onclick="deleteReviewPrompt(${r.id})" title="${t('reviewDeleteBtn')}">🗑️</button></td>
+          <td><button class="btn-ghost reject-btn" onclick="deleteReviewPrompt(${r.id})" title="${t('reviewDeleteBtn')}">🗑️ ${t('reviewDeleteBtn')}</button></td>
         </tr>`).join('')}
     </tbody>
   </table>`;
+  stampTableLabels(tableEl);
 }
 
 elById('reviewStatsBar').addEventListener('click', function(){
@@ -5739,28 +5913,31 @@ async function loadVisitorStats(){
       listEl.innerHTML = `<div class="empty-note">${t('visitorsEmptyNote')}</div>`;
       return;
     }
+    // الأنماط كانت inline على كل خلية — والـinline بيغلب أي CSS، فكان
+    // مستحيل شكل البطاقات يشتغل على الجدول ده. اتنقلت كلها للـstylesheet.
     listEl.innerHTML = `
-      <table style="width:100%; border-collapse:collapse; font-size:12.5px;">
+      <table>
         <thead>
-          <tr style="text-align:right; color:var(--paper-dim);">
-            <th style="padding:6px 4px; border-bottom:1px solid var(--line);">${t('visitorsColDate')}</th>
-            <th style="padding:6px 4px; border-bottom:1px solid var(--line);">${t('visitorsColPage')}</th>
-            <th style="padding:6px 4px; border-bottom:1px solid var(--line);">${t('visitorsColCountry')}</th>
-            <th style="padding:6px 4px; border-bottom:1px solid var(--line);">${t('visitorsColName')}</th>
-            <th style="padding:6px 4px; border-bottom:1px solid var(--line);">${t('visitorsColEmail')}</th>
+          <tr>
+            <th>${t('visitorsColDate')}</th>
+            <th>${t('visitorsColPage')}</th>
+            <th>${t('visitorsColCountry')}</th>
+            <th>${t('visitorsColName')}</th>
+            <th>${t('visitorsColEmail')}</th>
           </tr>
         </thead>
         <tbody>
           ${recent.map(v => `
             <tr>
-              <td style="padding:6px 4px; border-bottom:1px solid var(--line);">${escapeHtml(new Date(v.visited_at).toLocaleString())}</td>
-              <td style="padding:6px 4px; border-bottom:1px solid var(--line);">${escapeHtml(v.path || '/')}</td>
-              <td style="padding:6px 4px; border-bottom:1px solid var(--line);">${escapeHtml(v.country || '—')}</td>
-              <td style="padding:6px 4px; border-bottom:1px solid var(--line);">${escapeHtml(v.user_name || '—')}</td>
-              <td style="padding:6px 4px; border-bottom:1px solid var(--line);">${escapeHtml(v.user_email || '—')}</td>
+              <td>${escapeHtml(new Date(v.visited_at).toLocaleString())}</td>
+              <td>${escapeHtml(v.path || '/')}</td>
+              <td>${escapeHtml(v.country || '—')}</td>
+              <td>${escapeHtml(v.user_name || '—')}</td>
+              <td>${escapeHtml(v.user_email || '—')}</td>
             </tr>`).join('')}
         </tbody>
       </table>`;
+    stampTableLabels(listEl);
   }catch(e){
     listEl.innerHTML = `<div class="empty-note">${t('visitorsEmptyNote')}</div>`;
   }
@@ -5927,6 +6104,7 @@ function renderOrderStatsTable(){
         </tr>`).join('')}
     </tbody>
   </table>`;
+  stampTableLabels(tableEl);
 }
 
 elById('orderStatsBar').addEventListener('click', function(){

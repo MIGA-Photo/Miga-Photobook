@@ -2295,3 +2295,68 @@
     .admin-card{ padding:16px 13px 14px; }
   }
 
+  /* ===== جداول لوحة التحكم: كل صف بطاقة مستقلة =====
+     الجداول (التقييمات، آخر الطلبات، سجل الزوار) كانت 5 أعمدة مضغوطة في
+     عرض موبايل: العناوين بتتلف على سطرين، الشارات بتتقسم نصين، والتعليق
+     بيتقص. الحل هنا هو نفس الحل اللي شغال في قسم الطلبات: **كل صف بطاقة**
+     — إطار، حواف مدورة، وسطور "العنوان على اليمين والقيمة على الشمال".
+     الجدول بيفضل <table> حقيقي في الـDOM (نفس البيانات والتصدير)، بس
+     display بتتغير لبطاقات، والعنوان بييجي من data-label اللي stampTableLabels
+     بتحطه من الـ<thead>. على الشاشات الواسعة بيرجع جدول عادي لإن الجدول
+     أوضح لما يبقى فيه مكان. */
+  .admin-modal table{ width:100%; border-collapse:collapse; font-size:13px; }
+  .admin-modal thead th{
+    text-align:start; padding:8px 6px; font-weight:700;
+    color:var(--paper-dim); border-bottom:1px solid var(--line);
+  }
+  .admin-modal tbody td{ padding:8px 6px; border-bottom:1px solid var(--line); }
+
+  @media(max-width:760px){
+    .admin-modal table,
+    .admin-modal tbody,
+    .admin-modal tr,
+    .admin-modal td{ display:block; }
+    .admin-modal thead{ display:none; }   /* العناوين بقت جوه كل بطاقة */
+
+    .admin-modal tbody tr{
+      background:var(--ink-2);
+      background-image:var(--glass-sheen);
+      border:1px solid var(--glass-edge);
+      border-radius:12px;
+      box-shadow:var(--glass-lift-sm, var(--glass-lift));
+      padding:12px 13px;
+      margin-bottom:10px;
+    }
+
+    .admin-modal tbody td{
+      display:flex; align-items:flex-start; justify-content:space-between;
+      gap:14px; padding:0 0 6px; border-bottom:0;
+      color:var(--paper); font-weight:600; line-height:1.6;
+      text-align:end; word-break:break-word; min-width:0;
+      /* القيم بتيجي مختلطة: تاريخ ووقت بالإنجليزي، إيميل، ونص عربي. من غير
+         ده الصفحة RTL بتقلب التاريخ لـ"AM 9:10:00 ,9/8/2026". plaintext
+         بتخلي كل قيمة تاخد اتجاهها من أول حرف فيها. */
+      unicode-bidi:plaintext;
+    }
+    .admin-modal tbody td:last-child{ padding-bottom:0; }
+    .admin-modal tbody td::before{
+      content:attr(data-label);
+      color:var(--paper-dim); font-weight:400;
+      flex:0 0 auto; text-align:start; white-space:nowrap;
+    }
+    /* الخلية اللي عمودها بلا عنوان = عمود الأزرار: تاخد عرض البطاقة كامل */
+    .admin-modal tbody td[data-label=""]{
+      display:flex; gap:8px; padding-top:10px; margin-top:6px;
+      border-top:1px solid var(--line);
+    }
+    .admin-modal tbody td[data-label=""]::before{ content:none; }
+    /* زي أزرار بطاقة الطلب بالظبط: تملا عرض البطاقة بدل زرار صغير في الركن */
+    .admin-modal tbody td[data-label=""] button{
+      flex:1; min-height:38px; padding:7px; border-radius:8px; font-size:13px;
+    }
+
+    /* شارة الحالة كانت بتتلف على سطرين جوه العمود الضيق، وكل سطر بياخد
+       خلفية مدورة لوحده — فتبان كأنها شارتين. سطر واحد دايمًا. */
+    .admin-modal tbody td .order-status{ white-space:nowrap; }
+  }
+
