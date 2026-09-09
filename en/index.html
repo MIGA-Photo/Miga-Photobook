@@ -416,7 +416,6 @@
 </header>
 <div class="soft-launch-banner" id="softLaunchBanner">
 <span data-i18n="launchPromoBannerText">🎉 Launch Offer — every photo for just 25 EGP!</span>
-<span class="promo-countdown" id="promoCountdown"></span>
 </div>
 </div><!-- /.sticky-top-group -->
 <!-- Permanent showcase slider — always the interactive drag slider, in this
@@ -459,11 +458,28 @@
 </div>
 </div>
 </section>
-<div class="visitor-counter" id="visitorCounter" style="display:none;">
+<!-- شريط الثقة: كبسولة واحدة فيها تلات أجزاء مفصولة بنقطة.
+     كل جزء بيظهر لوحده لما يبقى عنده رقم حقيقي، وبيفضل مخفي غير كده —
+     فمفيش رقم مكتوب بالإيد ولا ادعاء مش مدعوم ببيانات. -->
+<div class="visitor-counter trust-row" id="trustRow" style="display:none;">
+<span class="tr-part" id="visitorCounter" style="display:none;">
 <span class="vc-dot"></span>
-<span data-i18n="visitorCounterPrefix">Join</span>
 <span class="vc-number" id="visitorCounterNumber">0</span>
-<span data-i18n="visitorCounterSuffix">visitors so far</span>
+<span data-i18n="trustVisitors">visitors</span>
+</span>
+<span class="tr-sep" data-for="ratingBadge" style="display:none;">·</span>
+<span class="tr-part" id="ratingBadge" style="display:none;">
+<span class="vc-star">★</span>
+<span class="vc-number" id="ratingAvg">5</span>
+<span class="tr-dim">(<span id="ratingCount">0</span>)</span>
+</span>
+<!-- الصور المحوّلة: مخفية لحد ما توصل العتبة (TRANSFORM_BADGE_MIN) -->
+<span class="tr-sep" data-for="transformBadge" style="display:none;">·</span>
+<span class="tr-part" id="transformBadge" style="display:none;">
+<span class="vc-cam">✨</span>
+<span class="vc-number" id="transformCount">0</span>
+<span data-i18n="trustPhotos">photos</span>
+</span>
 </div>
 <section class="wrap">
 <div class="contact-sheet">
@@ -473,10 +489,17 @@
 <style>
   .visitor-counter{
     display:flex; align-items:center; justify-content:center; gap:8px;
-    max-width:fit-content; margin:0 auto 28px; padding:10px 22px;
+    max-width:fit-content; margin:0 auto 28px; padding:10px 20px;
     background:var(--ink-2); border:1px solid var(--brass-dim);
     border-radius:100px; font-size:14px; color:var(--paper-dim);
   }
+  /* الأجزاء التلاتة جوه كبسولة واحدة — سطر واحد دايمًا، مايلفّش */
+  .trust-row{ flex-wrap:nowrap; white-space:nowrap; }
+  .trust-row .tr-part{ display:inline-flex; align-items:center; gap:5px; }
+  .trust-row .tr-sep{ color:var(--brass-dim); opacity:0.6; margin:0 2px; }
+  .trust-row .tr-dim{ opacity:0.75; }
+  .vc-star{ color:#ffc94d; font-size:15px; line-height:1; }
+  .vc-cam{ font-size:14px; line-height:1; }
   .visitor-counter .vc-number{ color:var(--brass); font-weight:800; font-size:15px; }
   .vc-dot{
     width:8px; height:8px; border-radius:50%; background:#3ddc84;
@@ -490,8 +513,9 @@
   }
   @media(prefers-reduced-motion: reduce){ .vc-dot{ animation:none; } }
   @media(max-width:480px){
-    .visitor-counter{ font-size:12.5px; padding:8px 16px; gap:6px; margin-bottom:20px; }
-    .visitor-counter .vc-number{ font-size:13.5px; }
+    .visitor-counter{ font-size:12px; padding:8px 14px; gap:6px; margin-bottom:20px; }
+    .visitor-counter .vc-number{ font-size:13px; }
+    .trust-row .tr-part{ gap:4px; }
   }
 </style>
 <style>

@@ -3,8 +3,11 @@ const INSTAPAY_NUMBER = "01202530308";
 const VODAFONE_CASH_NUMBER = "01017877978";
 const SOFT_LAUNCH = false; // when true: all prompts unlock free, no payment required. Flip to false to resume paid InstaPay flow.
 const LAUNCH_PROMO = true; // opening-offer mode: flat promo price, launch banner, bundles hidden
-// Change this date to extend/shorten the launch offer countdown shown in the banner.
-const LAUNCH_PROMO_END = new Date('2026-09-18T23:59:59+02:00');
+// العدّاد التنازلي اتشال عن قصد. كان في متغيرين بيتحكموا في نفس البانر:
+// LAUNCH_PROMO (ثابت) بيشغّل البانر، وتاريخ انتهاء بيتحكم في العدّاد.
+// أول ما التاريخ يعدّي، البانر بيفضل يقول «عرض افتتاح — 25 جنيه» والعدّاد
+// جنبه يقول «انتهى العرض» — في نفس اللحظة وفي نفس السطر. مصدر واحد
+// للحقيقة أأمن من اتنين ممكن يتخالفوا.
 // "Buy the prompt" service — same launch-promo pattern as photo prices.
 const PROMPT_PRICE = 10;
 const PROMPT_ORIGINAL_PRICE = 15;
@@ -391,9 +394,6 @@ const translations = {
     orderApproveBtn:'موافقة وتفعيل التحويل',
     softLaunchBanner:'🎉 إطلاق تجريبي — كل التحويلات متاحة مجانًا الآن لفترة محدودة',
     launchPromoBannerText:'🎉 عرض افتتاح الموقع — كل صورة بـ 25 جنيه فقط!',
-    countdownFormat:'العرض ينتهي خلال: {d} يوم {h} ساعة',
-    countdownFormatHoursOnly:'العرض ينتهي خلال: {h} ساعة {m} دقيقة',
-    countdownEnded:'انتهى العرض',
     freeLabel:'مجانًا', claimFreeBtn:'احصل عليه مجانًا',
     toastFreeUnlocked:'تم الفتح مجانًا — جاهز تحوّل صورتك! (فترة الإطلاق التجريبي)',
     transformBtn:'حوّل صورتك', viewResultBtn:'شاهد نتيجتك ✅', transformModalTitle:'حوّل صورتك',
@@ -414,6 +414,8 @@ const translations = {
     toastDownloadFailed:'تعذّر تحميل الصورة تلقائيًا',
     // تسميات لقارئ الشاشة والـtooltips — كانت مكتوبة ثابتة في الـHTML
     // فمكانتش بتترجم أبدًا. زائر إنجليزي أعمى كان بيسمعها بالعربي.
+    ratingBadgeMid:'من 5 —', ratingBadgeSuffix:'تقييم', transformBadgeSuffix:'صورة تم تحويلها',
+    trustVisitors:'زائر', trustPhotos:'صورة',
     a11yResult:'نتيجة', a11yExample:'مثال', a11ySearch:'بحث', a11yPrev:'السابق', a11yNext:'التالي',
     a11yContact:'تواصل معنا', a11yBackToTop:'العودة لأعلى الصفحة',
     a11yScrollUp:'لأعلى', a11yScrollDown:'لأسفل',
@@ -705,9 +707,6 @@ const translations = {
     orderApproveBtn:'Approve & Enable Transform',
     softLaunchBanner:'🎉 Soft Launch — all transformations are free right now for a limited time',
     launchPromoBannerText:'🎉 Launch Offer — every photo for just 25 EGP!',
-    countdownFormat:'Offer ends in: {d}d {h}h',
-    countdownFormatHoursOnly:'Offer ends in: {h}h {m}m',
-    countdownEnded:'Offer ended',
     freeLabel:'Free', claimFreeBtn:'Get It Free',
     toastFreeUnlocked:'Unlocked for free — ready to transform your photo! (soft launch period)',
     transformBtn:'Transform Your Photo', viewResultBtn:'View Your Result ✅', transformModalTitle:'Transform Your Photo',
@@ -726,6 +725,8 @@ const translations = {
     toastGenerateFailed:'Something went wrong while generating, please try again',
     toastOrderFailed:"Couldn't send your order right now — check your connection and try again, or contact us directly.",
     toastDownloadFailed:'Could not download the image automatically',
+    ratingBadgeMid:'of 5 —', ratingBadgeSuffix:'reviews', transformBadgeSuffix:'photos transformed',
+    trustVisitors:'visitors', trustPhotos:'photos',
     a11yResult:'Result', a11yExample:'Example', a11ySearch:'Search', a11yPrev:'Previous', a11yNext:'Next',
     a11yContact:'Contact us', a11yBackToTop:'Back to top',
     a11yScrollUp:'Scroll up', a11yScrollDown:'Scroll down',
@@ -1172,7 +1173,6 @@ function applyLanguage(lang){
   renderHeroStrip();
   renderGrids();
   renderMostRequested();
-  updateCountdown();
   if(adminLoggedIn && document.getElementById('adminTabOrders').style.display !== 'none'){
     renderOrdersList();
   }
@@ -1613,25 +1613,6 @@ function seedProducts(){
 }
 
 // ---------- Render ----------
-function updateCountdown(){
-  const el = document.getElementById('promoCountdown');
-  if(!el) return;
-  const now = new Date();
-  const diff = LAUNCH_PROMO_END - now;
-  if(diff <= 0){
-    el.textContent = t('countdownEnded');
-    return;
-  }
-  const totalHours = Math.floor(diff / (1000*60*60));
-  const days = Math.floor(totalHours / 24);
-  const hours = totalHours % 24;
-  const minutes = Math.floor((diff / (1000*60)) % 60);
-  if(days > 0){
-    el.textContent = t('countdownFormat').replace('{d}', days).replace('{h}', hours);
-  }else{
-    el.textContent = t('countdownFormatHoursOnly').replace('{h}', hours).replace('{m}', minutes);
-  }
-}
 
 function applyChildrenVisibility(){
   const visible = !HIDE_CHILDREN_FROM_CUSTOMERS || adminLoggedIn;
@@ -5013,6 +4994,17 @@ async function checkBiometricAvailability(){
  * page, and fails silently (badge just stays hidden) if the backend isn't
  * reachable or the visits table isn't set up yet, so it can never break
  * the rest of the page. */
+/** العتبة اللي بادج الصور المحوّلة بيظهر عندها.
+ *
+ * السبب في وجودها: رقم صغير في بادج «إنجاز» بيضر أكتر ما بينفع — «12
+ * صورة تم تحويلها» بيقول للزائر إن الموقع لسه في أوله. فالبادج بيفضل
+ * **مخفي تمامًا** لحد ما الرقم الحقيقي يعدّي العتبة دي، وساعتها بيظهر
+ * لوحده من غير ما حد يعمل حاجة.
+ *
+ * الرقم اللي بيتعرض بييجي من عدّاد فعلي في الووركر بيزيد مع كل تحويل
+ * ناجح — مش رقم مكتوب بالإيد. يعني اللي بيتنشر حقيقي دايمًا. */
+const TRANSFORM_BADGE_MIN = 1000;
+
 let visitorCounterTimer = null;
 async function loadVisitorCount(){
   if(!BACKEND_BASE) return;
@@ -5020,16 +5012,50 @@ async function loadVisitorCount(){
     const res = await fetch(`${BACKEND_BASE}/visits/public-count`);
     if(!res.ok) return;
     const data = await res.json();
+    // أرقام غربية بفواصل الآلاف، زي باقي أرقام الموقع (مثال: "25 جنيه")
+    const fmt = (n)=> Number(n).toLocaleString('en-US');
+
+    const show = (id)=>{ const e=document.getElementById(id); if(e) e.style.display='inline-flex'; };
+    // الفاصل بيظهر بس لو الجزء اللي بعده ظاهر — عشان ما نسيبش نقطة معلّقة
+    const showSep = (forId)=>{
+      const e = document.querySelector(`.tr-sep[data-for="${forId}"]`);
+      if(e) e.style.display = 'inline';
+    };
+    let anyShown = false;
+
+    // ١) الزائرين
     const total = typeof data.total === 'number' ? data.total : 0;
-    if(total <= 0) return; // nothing meaningful to show yet
-    const el = document.getElementById('visitorCounterNumber');
-    const wrap = document.getElementById('visitorCounter');
-    if(el) el.textContent = total.toLocaleString('en-US'); // Western digits with
-      // thousand separators, matching how prices/discounts are written
-      // everywhere else on the site (e.g. "25 جنيه") rather than switching
-      // to Arabic-Indic numerals just for this one badge.
-    if(wrap) wrap.style.display = 'flex';
-  }catch(e){ /* offline or backend hiccup — badge just stays hidden, page unaffected */ }
+    if(total > 0){
+      const el = document.getElementById('visitorCounterNumber');
+      if(el) el.textContent = fmt(total);
+      show('visitorCounter'); anyShown = true;
+    }
+
+    // ٢) التقييم — يظهر بتقييم واحد معتمد على الأقل
+    const rc = typeof data.reviewCount === 'number' ? data.reviewCount : 0;
+    const ra = typeof data.reviewAvg === 'number' ? data.reviewAvg : 0;
+    if(rc > 0 && ra > 0){
+      const avgEl = document.getElementById('ratingAvg');
+      const cntEl = document.getElementById('ratingCount');
+      if(avgEl) avgEl.textContent = ra.toLocaleString('en-US');
+      if(cntEl) cntEl.textContent = fmt(rc);
+      if(anyShown) showSep('ratingBadge');
+      show('ratingBadge'); anyShown = true;
+    }
+
+    // ٣) الصور المحوّلة — مخفي لحد ما يعدّي العتبة
+    const tr = typeof data.transforms === 'number' ? data.transforms : 0;
+    if(tr >= TRANSFORM_BADGE_MIN){
+      const el = document.getElementById('transformCount');
+      if(el) el.textContent = fmt(tr);
+      if(anyShown) showSep('transformBadge');
+      show('transformBadge'); anyShown = true;
+    }
+
+    // الكبسولة نفسها مخفية لحد ما يبقى فيها جزء واحد على الأقل
+    const row = document.getElementById('trustRow');
+    if(row && anyShown) row.style.display = 'flex';
+  }catch(e){ /* offline or backend hiccup — badges just stay hidden, page unaffected */ }
 }
 function initVisitorCounter(){
   loadVisitorCount();
@@ -7435,8 +7461,12 @@ async function applyHeroModeForThisDesign(){
   checkBiometricAvailability();
 
   if(LAUNCH_PROMO){
+    // الباقات والاشتراكات (5 منتجات) كانت display:none طول فترة العرض،
+    // ومفيش ولا رابط في القايمة بيوصّلهم — يعني منتجات موجودة ومحدش
+    // يقدر يشوفها. دلوقتي بتظهر جنب سعر الصورة الواحدة، فالعميل يقارن
+    // ويشوف إن الباقة بتوفّرله أكتر.
     const pricingSection = document.getElementById('pricing');
-    if(pricingSection) pricingSection.style.display = 'none';
+    if(pricingSection) pricingSection.style.display = '';
     // heroCta2Link (the hero's own "الأسعار والعروض" link) was removed from
     // the hero-with-slider column to reclaim vertical space there — pricing
     // is still reachable from the nav bar, so there's nothing left to hide
@@ -7446,7 +7476,6 @@ async function applyHeroModeForThisDesign(){
     if(softLaunchBanner) softLaunchBanner.style.display = 'none';
   }
   applyChildrenVisibility();
-  setInterval(updateCountdown, 60000);
   await applyHeroModeForThisDesign();
   initSideDrawer();
 
