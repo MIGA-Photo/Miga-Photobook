@@ -417,7 +417,7 @@ const translations = {
     trustVisitors:'زائر', trustPhotos:'صورة',
     a11yResult:'نتيجة', a11yExample:'مثال', a11ySearch:'بحث', a11yPrev:'السابق', a11yNext:'التالي',
     a11yContact:'تواصل معنا', a11yBackToTop:'العودة لأعلى الصفحة',
-    backHomeLabel:'الرئيسية', contactFabWord:'تواصل مع', contactFabBrand:'ميجا',
+    brandNameAr:'ميجا فوتوبوك', backHomeLabel:'الرئيسية', contactFabWord:'تواصل مع', contactFabBrand:'ميجا',
     launchPromoBannerShort:'🎉 صورتك بـ 25 بدل 50 جنيه',
     a11yScrollUp:'لأعلى', a11yScrollDown:'لأسفل',
     a11yOriginalPhoto:'الصورة الأصلية', a11yChangeAvatar:'تغيير صورة البروفايل',
@@ -729,7 +729,7 @@ const translations = {
     trustVisitors:'visitors', trustPhotos:'photos',
     a11yResult:'Result', a11yExample:'Example', a11ySearch:'Search', a11yPrev:'Previous', a11yNext:'Next',
     a11yContact:'Contact us', a11yBackToTop:'Back to top',
-    backHomeLabel:'Home', contactFabWord:'Contact', contactFabBrand:'Miga',
+    brandNameAr:'ميجا فوتوبوك', backHomeLabel:'Home', contactFabWord:'Contact', contactFabBrand:'Miga',
     launchPromoBannerShort:'🎉 25 EGP instead of 50',
     a11yScrollUp:'Scroll up', a11yScrollDown:'Scroll down',
     a11yOriginalPhoto:'Original photo', a11yChangeAvatar:'Change profile photo',
@@ -4584,7 +4584,12 @@ function updateAccountButton(){
   const btn = document.getElementById('accountOpenBtn');
   if(!btn) return;
   const personIcon = '<span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"/></svg></span>';
-  btn.innerHTML = personIcon + `<span>${currentUser ? escapeHtml(currentUser.name) : t('accountBtnGuest')}</span>`;
+  const label = currentUser ? currentUser.name : t('accountBtnGuest');
+  btn.innerHTML = personIcon + `<span>${escapeHtml(label)}</span>`;
+  // على الموبايل الكلمة مخفية والأيقونة بس هي الظاهرة — من غير السطر ده
+  // الزرار بيبقى من غير أي اسم لقارئ الشاشة.
+  btn.setAttribute('aria-label', label);
+  btn.setAttribute('title', label);
   populateDrawerProfileFields();
 }
 

@@ -502,9 +502,57 @@
   html[dir="rtl"] .drawer-link-row svg{ transform:scaleX(-1); }
   .logo{
     font-size:20px; letter-spacing:0.5px; color:var(--paper); font-weight:600;
-    display:flex; align-items:center; gap:10px;
+    display:flex; align-items:center; gap:9px; min-width:0;
   }
   .logo-mark{flex-shrink:0;}
+  /* ══════════ اللوجو الثنائي اللغة ══════════
+     ميجا فوتوبوك · العلامة · Miga-Photobook  (في RTL أول عنصر = أقصى اليمين)
+
+     اللمعة موجة **واحدة** على الكتلة كلها، مش لمعة لكل اسم لوحده: التدرّج
+     متحطّ على .logo نفسه، والأولاد بيرثوا الشفافية — فالضوء بيمشي على
+     اللوجو كوحدة واحدة من العربي، يعدّي على العلامة، ويطلع من الإنجليزي.
+     الدورة 4.6 ثانية واللمعة منها ١.٦ — موجة هادية مش وميض متكرر.
+
+     ملحوظة: العلامة (SVG) لونها متحدد بـstroke="var(--brass)" صراحةً،
+     فالـcolor:transparent اللي فوق مابيأثرش عليها. */
+  .logo, .side-drawer-logo{
+    /* اللوجو علامة ثابتة — ترتيبه ما ينعكسش مع اتجاه الصفحة. من غير السطر
+       ده، الصفحة الإنجليزية (dir=ltr) كانت بتقلب الترتيب فيبقى
+       Miga-Photobook · العلامة · ميجا فوتوبوك — مرآة للمطلوب.
+       (الفحص صاده: «العربي على اليمين» كان بيفشل على /en/ وعلى الرئيسية
+       بعد تبديل اللغة، وبينجح على العربي والأدمن.) */
+    direction:rtl;
+    background:linear-gradient(90deg, var(--brass) 0%, var(--brass) 34%,
+               #fff6d0 50%, var(--brass) 66%, var(--brass) 100%);
+    background-size:260% 100%;
+    -webkit-background-clip:text; background-clip:text;
+    color:transparent; -webkit-text-fill-color:transparent;
+    animation:logoSheen 4.6s ease-in-out infinite;
+  }
+  .logo .lg-en, .side-drawer-logo .lg-en{
+    font-size:18px; font-weight:700; letter-spacing:0.2px; white-space:nowrap;
+  }
+  .logo .lg-ar, .side-drawer-logo .lg-ar{
+    font-size:16px; font-weight:700; letter-spacing:0.3px; white-space:nowrap;
+  }
+  /* الاسمين ماياخدوش تدرّج خاص بيهم — الموجة بتاعة الأب هي اللي بترسمهم */
+  .logo .lg-ar, .side-drawer-logo .lg-ar,
+  .logo .lg-en .logo-accent, .side-drawer-logo .lg-en .logo-accent{
+    background:none; animation:none; -webkit-text-fill-color:inherit;
+  }
+  @media(prefers-reduced-motion: reduce){
+    .logo, .side-drawer-logo{ animation:none; }
+  }
+  @media(max-width:520px){
+    .logo{ gap:8px; }
+    .logo .lg-en{ font-size:16px; }
+    .logo .lg-ar{ font-size:14.5px; }
+    .logo .logo-mark{ width:26px; height:26px; }
+    /* زرار الحساب أيقونة بس: الاسم الثلاثي محتاج العرض ده. الأيقونة موجودة
+       أصلًا جوه الزرار، فبنخفي الكلمة بس. */
+    #accountOpenBtn{ width:44px; height:44px; padding:0; justify-content:center; gap:0; }
+    #accountOpenBtn > span:not(.icon-badge){ display:none; }
+  }
   .logo-accent{color:var(--brass);}
   nav.cats{display:flex; gap:6px; flex-wrap:wrap;}
   nav.cats button{
@@ -2048,6 +2096,11 @@
     border:1.5px solid var(--brass); color:var(--brass);
   }
   .icon-badge svg{width:17px; height:17px; display:block;}
+  /* عيب كان موجود من قبل التعديل ده: زرار «تسجيل الدخول» خلفيته نحاسية،
+     والأيقونة اللي جواه كانت نحاسية بإطار نحاسي — يعني **ذهبي على ذهبي،
+     مختفية تمامًا**. مكانتش باينة لأن الكلمة كانت بتغطي عليها؛ أول ما
+     الزرار بقى أيقونة بس على الموبايل، بان إنه مربع فاضي. */
+  #accountOpenBtn .icon-badge{ border-color:var(--ink); color:var(--ink); }
   @media(max-width:460px){
     .icon-badge{width:24px; height:24px;}
     .icon-badge svg{width:15px; height:15px;}
