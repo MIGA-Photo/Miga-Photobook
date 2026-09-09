@@ -5,17 +5,20 @@
  * Loaded by index.html; the two files must be uploaded together. */
 
   :root{
-    --ink:#0c0c10;
-    --ink-2:#17161d;
-    --ink-3:#201f28;
-    --paper:#fff8ec;
-    --paper-dim:#c9c4d6;
-    --brass:#ffc94d;
-    --brass-dim:#e3a429;
+    /* لوحة «ب — استوديو». الأرضية فحمي محايد بدل الأسود المزرق، والنص
+       الثانوي رمادي دافي بدل البنفسجي الفاتح — البنفسجي كان تباينه 11.5:1
+       (ممتاز) ومع ذلك بيدّي إحساس الغبش، لأن التلوين نفسه بيوحي بالبهتان. */
+    --ink:#131316;
+    --ink-2:#1c1c20;
+    --ink-3:#26262b;
+    --paper:#f4f1ea;
+    --paper-dim:#cfc8bf;
+    --brass:#e8b64a;
+    --brass-dim:#c8992f;
     --sage:#2fe6b0;
     --steel:#3ea7ff;
     --rose:#ff5c96;
-    --line:rgba(255,248,236,0.12);
+    --line:rgba(244,241,234,0.15);
   }
   /* ===== Day mode — same variable names, repainted for a light surface.
      Everything built on the variables above (the large majority of the
@@ -139,7 +142,7 @@
   }
   .wm-logo-row{
     display:flex; gap:64px; white-space:nowrap;
-    font-family:'Rakkas','IBM Plex Sans Arabic',serif;
+    font-family:'Rakkas','Readex Pro',serif;
     font-size:52px; color:var(--brass); opacity:0.05; letter-spacing:4px;
   }
 
@@ -148,8 +151,13 @@
   body{
     background:var(--ink);
     color:var(--paper);
-    font-family:'IBM Plex Sans Arabic', sans-serif;
-    line-height:1.7;
+    font-family:'Readex Pro', sans-serif;
+    /* الوزن 500 هو أهم سطر في الملف ده: 124 عنصر كانوا بيرثوا الوزن 400،
+       والخط العربي الخفيف على أرضية غامقة بيبان رفيع ومغبّش مهما كان
+       تباينه عالي. و16px بدل 15px الافتراضي في أغلب العناصر. */
+    font-size:16px;
+    font-weight:500;
+    line-height:1.75;
     min-height:100vh;
     overflow-x:clip;
     /* Clips any element that overflows the viewport horizontally (even by a
@@ -186,11 +194,11 @@
     background:var(--ink-3);
   }
   h1,h2,.display{
-    font-family:'Rakkas', 'IBM Plex Sans Arabic', serif;
+    font-family:'Rakkas', 'Readex Pro', serif;
     font-weight:400;
     letter-spacing:0.3px;
   }
-  h3{font-family:'IBM Plex Sans Arabic', sans-serif; font-weight:700; letter-spacing:0.1px;}
+  h3{font-family:'Readex Pro', sans-serif; font-weight:700; letter-spacing:0.1px;}
   a{color:inherit; text-decoration:none;}
   img{display:block; max-width:100%;}
   button{font-family:inherit; cursor:pointer; border:none; transition:transform .12s ease;}
@@ -217,8 +225,8 @@
     will-change:transform;
   }
   .promo-marquee-track span{
-    font-size:13px; font-weight:800; color:#1a1305; letter-spacing:0.4px; padding-inline-end:64px;
-    font-family:"Playfair Display", Georgia, "Times New Roman", serif;
+    font-size:13px; font-weight:700; color:#1a1305; letter-spacing:0.4px; padding-inline-end:64px;
+    font-family:'Readex Pro', sans-serif;
     text-shadow:0 1px 0 rgba(255,255,255,0.25);
   }
   @keyframes marqueeScroll{
@@ -236,7 +244,15 @@
   .sticky-top-group{
     position:sticky; top:0; z-index:55;
     display:flex; flex-direction:column;
+    /* الطي بالـtransform مش بالارتفاع — ده الفرق بين CLS=0.71 وCLS=0.
+       أي تغيير في الارتفاع هنا بيحرّك الصفحة كلها تحت صباع الزائر. */
+    transition:transform .24s ease;
+    will-change:transform;
   }
+  .sticky-top-group.hdr-collapsed{
+    transform:translate3d(0, calc(-1 * var(--hdrUtilH, 0px)), 0);
+  }
+  @media(prefers-reduced-motion: reduce){ .sticky-top-group{ transition:none; } }
   /* Collapsed state — hides the utility strip (lang/theme/view toggles,
      "track order") and the promo banner entirely, and shrinks the
      logo/login row's padding, leaving just: a slim brand row + the category
@@ -244,16 +260,14 @@
      (max-height/opacity/padding) rather than `all`, so this stays smooth
      without accidentally animating unrelated hover states elsewhere in the
      header. */
-  .hdr-collapsed .header-utility,
-  .hdr-collapsed #softLaunchBanner,
-  .hdr-collapsed .search-box{
-    max-height:0; opacity:0; padding-top:0; padding-bottom:0;
-    margin:0; border:0; overflow:hidden;
-    transition:max-height .28s ease, opacity .2s ease, padding .28s ease;
+  /* الشريط العلوي بيبهت وهو ماشي لفوق. مفيش max-height ولا padding
+     بيتحركوا — دول خصائص تخطيط، وتحريكهم هو اللي كان بينطّ الصفحة. */
+  .hdr-collapsed .header-utility{
+    opacity:0; pointer-events:none;
+    transition:opacity .16s ease;
   }
   .header-utility, #softLaunchBanner{
-    max-height:200px; overflow:hidden;
-    transition:max-height .28s ease, opacity .22s ease .05s, padding .28s ease;
+    transition:opacity .22s ease .04s;
   }
   /* .search-box gets the same expanded-state max-height/transition as the
      other two utility-strip elements above, but deliberately WITHOUT
@@ -269,17 +283,10 @@
      into. overflow:hidden is still correct and kept on the .hdr-collapsed
      rule above, where the whole search box is genuinely collapsing away and
      hiding its dropdown along with it is the right behavior. */
-  .search-box{
-    max-height:200px; overflow:visible;
-    transition:max-height .28s ease, opacity .22s ease .05s, padding .28s ease;
-  }
-  .hdr-collapsed .nav-wrap{
-    padding-top:6px; padding-bottom:6px;
-    transition:padding .28s ease;
-  }
-  .nav-wrap{ transition:padding .28s ease; }
-  .hdr-collapsed .logo{ font-size:17px; }
-  .hdr-collapsed .logo-mark{ width:24px; height:24px; }
+  .search-box{ overflow:visible; }
+  /* صندوق البحث والبانر بقوا يفضلوا ظاهرين أثناء السكرول — كانوا بيختفوا،
+     والبحث كان بيروح من تحت إيد الزائر أول ما ينزل. وحجم اللوجو ثابت:
+     تغييره كان بيغيّر ارتفاع الصف، وده تخطيط. */
   /* ===== Category pills row (Option 1 + visible pills) — same #catNav
      element and click logic as the dropdown version, restyled to render as
      an always-visible horizontal-scroll strip instead of a hidden panel.
@@ -356,7 +363,7 @@
     border-bottom:1px solid var(--line);
   }
   .util-link{
-    background:transparent; border:none; color:var(--paper-dim); font-size:12px;
+    background:transparent; border:none; color:var(--paper-dim); font-size:12.5px;
     padding:4px 4px; text-decoration:underline; text-decoration-color:transparent;
     transition:color .18s ease, text-decoration-color .18s ease;
   }
@@ -395,7 +402,7 @@
     padding:16px 18px; border-bottom:1px solid var(--line); font-weight:700; color:var(--paper);
   }
   .side-drawer-head .close-x{ background:transparent; border:none; color:var(--paper); font-size:22px; line-height:1; padding:4px 8px; }
-  .side-drawer-logo{ display:flex; align-items:center; gap:8px; font-weight:800; font-size:16px; color:var(--paper); }
+  .side-drawer-logo{ display:flex; align-items:center; gap:8px; font-weight:700; font-size:16px; color:var(--paper); }
   .side-drawer-logo .logo-accent{ color:var(--brass); }
   .side-drawer-footer{
     margin-top:auto; display:flex; align-items:center; justify-content:center; gap:8px;
@@ -488,7 +495,7 @@
   .cat-dropdown-btn{
     display:flex; align-items:center; gap:10px;
     background:transparent; color:var(--paper); border:1.5px solid var(--brass);
-    padding:11px 20px; border-radius:10px; font-size:17px; font-weight:800;
+    padding:11px 20px; border-radius:10px; font-size:17px; font-weight:700;
     transition:.2s;
   }
   .cat-dropdown-btn:hover{background:rgba(255,201,77,0.08);}
@@ -513,7 +520,7 @@
   .admin-bell-badge{
     display:inline-flex; align-items:center; justify-content:center;
     min-width:20px; height:20px; padding:0 5px; border-radius:10px;
-    background:#e0524a; color:#fff; font-size:12px; font-weight:800;
+    background:#e0524a; color:#fff; font-size:12.5px; font-weight:700;
     line-height:1; margin-inline-start:-2px;
   }
 
@@ -565,7 +572,7 @@
     width:100%; height:66px; box-sizing:border-box; text-align:center;
     background:var(--ink-2); border:1.5px solid var(--brass); color:var(--paper);
     padding:0 20px; border-radius:14px;
-    font-size:18px; font-weight:800; letter-spacing:0.2px; font-family:inherit;
+    font-size:18px; font-weight:700; letter-spacing:0.2px; font-family:inherit;
     transition:.2s;
   }
   .section-tab-btn:hover{background:rgba(255,201,77,0.08);}
@@ -587,7 +594,7 @@
     padding:16px 20px; margin-bottom:16px;
   }
   .order-stat{display:flex; flex-direction:column; align-items:flex-start; gap:2px;}
-  .order-stat-num{font-size:26px; font-weight:800; color:var(--brass); line-height:1;}
+  .order-stat-num{font-size:26px; font-weight:700; color:var(--brass); line-height:1;}
   .order-stat-label{font-size:12.5px; color:var(--paper-dim);}
   .order-stats-chevron{margin-inline-start:auto; color:var(--brass); font-size:15px; transition:transform .2s;}
   .order-stats-bar.open .order-stats-chevron{transform:rotate(180deg);}
@@ -597,10 +604,10 @@
   }
   #orderStatsTable table{width:100%; border-collapse:collapse;}
   #orderStatsTable th, #orderStatsTable td{padding:8px 10px; text-align:inherit; border-bottom:1px solid var(--line);}
-  #orderStatsTable th{color:var(--paper-dim); font-weight:600; font-size:12px;}
+  #orderStatsTable th{color:var(--paper-dim); font-weight:600; font-size:12.5px;}
 
   .order-type-badge{
-    display:inline-block; font-size:11.5px; font-weight:800; padding:3px 10px; border-radius:100px;
+    display:inline-block; font-size:12.5px; font-weight:700; padding:3px 10px; border-radius:100px;
   }
   .order-type-badge.type-transform{background:rgba(62,167,255,0.16); color:var(--steel);}
   .order-type-badge.type-prompt{background:rgba(255,201,77,0.16); color:var(--brass);}
@@ -611,7 +618,7 @@
     padding:10px 14px; margin-bottom:8px; font-size:13px;
   }
   .my-order-row .mo-info{display:flex; flex-direction:column; gap:2px;}
-  .my-order-row .mo-date{color:var(--paper-dim); font-size:11.5px;}
+  .my-order-row .mo-date{color:var(--paper-dim); font-size:12.5px;}
 
   .purchased-prompt-box{
     background:var(--ink); border:1px solid var(--line); border-radius:10px;
@@ -634,14 +641,14 @@
 
   .popularity-badge{
     display:inline-flex; align-items:center; gap:4px; align-self:center;
-    background:rgba(255,201,77,0.14); color:var(--brass); font-weight:800; font-size:13px;
+    background:rgba(255,201,77,0.14); color:var(--brass); font-weight:700; font-size:13px;
     padding:5px 10px; border-radius:100px; white-space:nowrap;
   }
   .request-count-overlay{
     opacity:0.72; transition:opacity .2s ease;
     position:absolute; bottom:8px; inset-inline-start:8px; z-index:2;
     display:flex; align-items:center; gap:4px;
-    background:rgba(10,8,4,0.86); color:var(--brass); font-weight:800; font-size:12px;
+    background:rgba(10,8,4,0.86); color:var(--brass); font-weight:700; font-size:12.5px;
     padding:4px 9px; border-radius:100px; /* backdrop-filter removed — see header
     comment above; this badge repeats on many cards in the grid at once, so each
     copy was its own extra GPU compositing layer on Android Chrome. Background
@@ -678,17 +685,18 @@
     filter:blur(70px);
   }
   .eyebrow{
-    color:var(--brass); font-size:13px; letter-spacing:3px; font-weight:600;
+    color:var(--brass); font-size:13px; letter-spacing:2px; font-weight:600;
     display:flex; align-items:center; gap:10px; margin-bottom:18px;
+    white-space:nowrap;   /* Readex أعرض من الخط القديم فكانت بتلف على سطرين */
   }
   .eyebrow::before{content:""; width:26px; height:1px; background:var(--brass);}
   .tagline{
-    font-family:'Rakkas','IBM Plex Sans Arabic',serif; font-size:22px; color:var(--rose);
+    font-family:'Rakkas','Readex Pro',serif; font-size:22px; color:var(--rose);
     margin-bottom:14px; letter-spacing:0.3px;
   }
   .hero h1{font-size:52px; line-height:1.25; color:var(--paper); margin-bottom:20px;}
   .hero h1 em{font-style:normal; color:var(--brass);}
-  .hero h1 .brand-mark{font-style:normal; color:var(--brass); font-family:'Georgia','Times New Roman',serif; letter-spacing:0.3px; text-shadow:0 0 14px rgba(227,164,41,0.35);}
+  .hero h1 .brand-mark{font-style:normal; color:var(--brass); font-family:'Readex Pro', sans-serif; letter-spacing:0.3px; text-shadow:0 0 14px rgba(227,164,41,0.35);}
   /* Every standalone mention of "ميجا"/"Mega" gets this same bold,
      brand-colored treatment, wherever it appears in copy across the site —
      a small, consistent visual cue that reinforces the brand name itself
@@ -697,7 +705,7 @@
      reads clearly against BOTH the dark page background and the gold
      buttons alike — no separate per-context override needed anymore. */
   .brand-mega{
-    font-weight:800; color:#e21c1c;
+    font-weight:700; color:#e21c1c;
     font-size:1.32em; line-height:1;
     animation:megaBlink 1.5s ease-in-out infinite;
   }
@@ -724,7 +732,7 @@
   }
   .why-edge::before{
     content:"💡 السر"; position:absolute; top:-14px; right:24px; background:var(--brass);
-    color:var(--ink); font-size:11.5px; font-weight:700; padding:4px 14px; border-radius:100px;
+    color:var(--ink); font-size:12.5px; font-weight:700; padding:4px 14px; border-radius:100px;
     box-shadow:0 4px 12px rgba(0,0,0,0.35);
   }
   html[dir="rtl"] .why-edge::before{ right:24px; left:auto; }
@@ -749,7 +757,7 @@
     padding:22px 18px; position:relative; overflow:hidden;
   }
   .how-step-num{
-    font-family:'Rakkas','IBM Plex Sans Arabic',serif; font-size:34px; color:var(--brass);
+    font-family:'Rakkas','Readex Pro',serif; font-size:34px; color:var(--brass);
     opacity:0.5; line-height:1; margin-bottom:10px;
   }
   .how-step h3{font-size:15.5px; color:var(--paper); margin-bottom:6px;}
@@ -779,7 +787,7 @@
     box-shadow:0 0 24px rgba(255,201,77,0.14);
   }
   .promo-video-copy h2{
-    margin-bottom:10px; font-family:'Georgia','Times New Roman',serif; font-weight:700;
+    margin-bottom:10px; font-family:'Readex Pro', sans-serif; font-weight:700;
     background:linear-gradient(90deg, var(--brass) 0%, #fff8e1 45%, var(--brass) 90%);
     background-size:100% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
     text-shadow:0 0 22px rgba(227,164,41,0.45);
@@ -833,7 +841,7 @@
   .ba-item img{width:100%; aspect-ratio:4/5; object-fit:cover; object-position:center 22%; border-radius:12px; border:1px solid var(--line);}
   .ba-label{
     position:absolute; bottom:10px; left:10px; background:rgba(10,6,20,0.86); color:var(--brass);
-    padding:4px 12px; border-radius:100px; font-size:12px; font-weight:700;
+    padding:4px 12px; border-radius:100px; font-size:12.5px; font-weight:700;
     /* backdrop-filter removed — see header comment above; opacity bumped 0.75→0.86 to compensate. */
   }
   .ba-arrow{font-size:32px; color:var(--brass);}
@@ -855,8 +863,8 @@
   .review-photo-thumb.selected{border-color:var(--brass);}
   .review-photo-thumb.selected::after{
     content:"✓"; position:absolute; top:2px; right:2px; width:18px; height:18px;
-    background:var(--brass); color:var(--ink); border-radius:50%; font-size:11px;
-    font-weight:800; display:flex; align-items:center; justify-content:center;
+    background:var(--brass); color:var(--ink); border-radius:50%; font-size:12.5px;
+    font-weight:700; display:flex; align-items:center; justify-content:center;
   }
   .proof-results-grid{
     display:grid; grid-template-columns:repeat(auto-fill, minmax(130px,1fr)); gap:12px;
@@ -955,7 +963,7 @@
      portrait product photos, default center-crop was slicing heads off the top. */
   .frame img{width:100%; height:100%; object-fit:cover; object-position:center 22%; filter:grayscale(35%) contrast(1.05);}
   .frame .fno{
-    position:absolute; bottom:6px; left:6px; font-size:10px; letter-spacing:1px;
+    position:absolute; bottom:6px; left:6px; font-size:12.5px; letter-spacing:1px;
     color:var(--brass); background:rgba(0,0,0,0.55); padding:2px 6px; border-radius:3px;
   }
 
@@ -967,15 +975,15 @@
     border-bottom:1px solid transparent;
     border-image:linear-gradient(90deg, var(--line), transparent) 1;
   }
-  .section-head h2{font-size:32px; font-weight:800; letter-spacing:0.2px;}
+  .section-head h2{font-size:32px; font-weight:700; letter-spacing:0.2px;}
   .cat-section-heading{
-    font-size:clamp(18px,4vw,26px); font-weight:800; text-align:center;
+    font-size:clamp(18px,4vw,26px); font-weight:700; text-align:center;
     color:var(--paper); margin-bottom:22px; padding-top:6px;
   }
   /* (brand-mega no longer needs a per-context color override — the red
      blink above already reads clearly in every context on the page) */
   .section-head .tag{
-    font-size:13px; padding:6px 13px; border-radius:100px; font-weight:800;
+    font-size:13px; padding:6px 13px; border-radius:100px; font-weight:700;
     letter-spacing:0.5px;
   }
   .tag-children{background:rgba(47,230,176,0.24); color:var(--sage);}
@@ -1090,13 +1098,13 @@
   }
   .cat-tile-cover .ct-count{
     position:absolute; inset-inline-end:8px; inset-block-start:8px; z-index:2;
-    background:rgba(12,12,16,0.78); color:var(--paper); font-size:11px; font-weight:700;
+    background:rgba(12,12,16,0.78); color:var(--paper); font-size:12.5px; font-weight:700;
     padding:4px 9px; border-radius:100px; letter-spacing:0.2px;
     border:1px solid rgba(255,255,255,0.10);
   }
   .cat-tile-cover .ct-empty{
     position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    padding:14px; font-size:12px; color:var(--paper-dim); text-align:center;
+    padding:14px; font-size:12.5px; color:var(--paper-dim); text-align:center;
   }
   /* The label sits on the photo instead of below it, so the tile is one block
      of image rather than a picture with a caption stuck underneath. */
@@ -1115,7 +1123,7 @@
      function that builds the tile. */
   .cat-chip{
     display:inline-flex; align-items:center; gap:7px;
-    padding:6px 14px; border-radius:100px; font-weight:800; font-size:14px;
+    padding:6px 14px; border-radius:100px; font-weight:700; font-size:14px;
     letter-spacing:0.2px; line-height:1;
     /* backdrop-filter removed — see header comment above; this chip repeats on
        every product card, so it was one of the biggest single sources of extra
@@ -1125,7 +1133,7 @@
   .cat-chip .cicon{display:flex; font-size:15px;}
   .cat-chip .cicon svg{width:1em; height:1em; display:block;}
   @media(max-width:460px){
-    .cat-chip{font-size:12px; padding:5px 11px; gap:5px;}
+    .cat-chip{font-size:12.5px; padding:5px 11px; gap:5px;}
     .cat-chip .cicon{font-size:13px;}
   }
   .cat-tile .sh-chevron{
@@ -1219,7 +1227,7 @@
     display:flex; align-items:center; justify-content:center;
     width:52px; height:46px; border-radius:12px;
     background:var(--ink-2); border:2px solid var(--brass); color:var(--brass);
-    font-size:26px; font-weight:800; cursor:pointer; line-height:1;
+    font-size:26px; font-weight:700; cursor:pointer; line-height:1;
     box-shadow:0 2px 10px rgba(0,0,0,0.35);
   }
   .grid-page-dots .gp-arrow:hover{background:rgba(255,201,77,0.12);}
@@ -1228,7 +1236,7 @@
   .grid-page-dots .gp-num{
     min-width:34px; height:34px; padding:0 6px; border-radius:8px;
     background:transparent; border:none; color:var(--paper-dim);
-    font-size:19px; font-weight:800; cursor:pointer;
+    font-size:19px; font-weight:700; cursor:pointer;
   }
   .grid-page-dots .gp-num:hover{color:var(--paper);}
   .grid-page-dots .gp-num.active{color:var(--brass); background:rgba(255,201,77,0.14);}
@@ -1298,7 +1306,7 @@
      الشغل نضيف. رجوعه = شيل السطر ده وبس. */
   .card-badge{ display:none; }
   .card-badge{
-    position:absolute; top:10px; right:10px; left:10px; font-size:10.5px; letter-spacing:0.3px;
+    position:absolute; top:10px; right:10px; left:10px; font-size:12.5px; letter-spacing:0.3px;
     background:rgba(10,6,20,0.88); color:var(--brass);
     padding:5px 10px; border-radius:8px; font-weight:600; text-align:center;
     max-width:calc(100% - 20px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
@@ -1321,7 +1329,7 @@
     display:inline-flex; align-items:center; justify-content:center;
     min-width:22px; height:22px; padding:0 7px; margin-inline-start:6px;
     border-radius:100px; background:rgba(255,201,77,0.18); color:var(--brass);
-    font-size:12px; font-weight:800; line-height:1;
+    font-size:12.5px; font-weight:700; line-height:1;
   }
   .fav-btn{
     opacity:0.78;
@@ -1358,7 +1366,7 @@
      prompt-purchase button's price reads exactly as clearly as the plain
      price text in the transform button next to it. */
   .buy-btn .price-old{color:rgba(20,15,5,0.55); opacity:1;}
-  .buy-btn .price-new{color:var(--ink); font-weight:800; font-size:13.5px;}
+  .buy-btn .price-new{color:var(--ink); font-weight:700; font-size:13.5px;}
 
   .prompt-panel{
     border:1px solid var(--line); border-radius:8px; padding:12px; font-size:13px;
@@ -1371,7 +1379,7 @@
   .prompt-missing{opacity:0.7; font-style:italic; margin-bottom:8px;}
   .lock-overlay{
     position:absolute; inset:0; display:flex; flex-direction:column; align-items:center;
-    justify-content:center; gap:4px; font-size:12px; color:var(--paper-dim);
+    justify-content:center; gap:4px; font-size:12.5px; color:var(--paper-dim);
   }
   .lock-overlay svg{width:16px; height:16px; stroke:var(--brass);}
   .prompt-panel.unlocked{
@@ -1425,7 +1433,7 @@
   .reject-btn{border-color:rgba(224,122,122,0.4); color:#e07a7a;}
   .reject-btn:hover{border-color:#e07a7a; background:rgba(224,122,122,0.08);}
   .owned-pill{
-    font-size:11px; color:var(--sage); border:1px solid rgba(47,230,176,0.35);
+    font-size:12.5px; color:var(--sage); border:1px solid rgba(47,230,176,0.35);
     padding:3px 10px; border-radius:100px; align-self:flex-start; font-weight:600; letter-spacing:0.2px;
   }
 
@@ -1436,7 +1444,7 @@
     margin-top:14px; font-size:13.5px; color:var(--paper-dim);
   }
   .pricing-trust-strip .pts-sep{ color:var(--line); }
-  @media(max-width:480px){ .pricing-trust-strip{ font-size:12px; gap:7px; } }
+  @media(max-width:480px){ .pricing-trust-strip{ font-size:12.5px; gap:7px; } }
   .pricing-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:30px;}
   .plan{
     border:1px solid var(--line); border-radius:12px; padding:28px 24px;
@@ -1445,7 +1453,7 @@
   .plan.featured{border-color:var(--brass); position:relative; background:linear-gradient(180deg, rgba(255,201,77,0.12), transparent 60%);}
   .plan.featured::before{
     content:"⭐ الأكثر طلبًا"; position:absolute; top:-13px; right:24px; background:var(--brass);
-    color:var(--ink); font-size:11.5px; font-weight:700; padding:4px 12px; border-radius:100px;
+    color:var(--ink); font-size:12.5px; font-weight:700; padding:4px 12px; border-radius:100px;
   }
   .plan h3{font-size:20px; color:var(--paper);}
   .plan .price{font-size:34px; color:var(--brass); font-weight:700;}
@@ -1521,7 +1529,7 @@
   }
   .order-row .oline{display:flex; justify-content:space-between; color:var(--paper-dim); margin-bottom:4px;}
   .order-row .oline b{color:var(--paper); font-weight:600;}
-  .order-status{font-size:11.5px; padding:2px 8px; border-radius:100px; font-weight:600;}
+  .order-status{font-size:12.5px; padding:2px 8px; border-radius:100px; font-weight:600;}
   .status-pending{background:rgba(255,201,77,0.15); color:var(--brass);}
   .status-approved{background:rgba(47,230,176,0.15); color:var(--sage);}
   .status-rejected{background:rgba(224,122,122,0.15); color:#e07a7a;}
@@ -1651,12 +1659,16 @@
     display:none; align-items:center; justify-content:center;
     width:46px; height:46px; padding:0; border-radius:50%;
     background:var(--ink-2); border:2px solid var(--brass); color:var(--brass);
-    font-size:14px; font-weight:800; font-family:inherit; cursor:grab;
-    box-shadow:0 8px 24px rgba(0,0,0,0.45);
-    transition:transform .18s ease, background .18s ease;
+    font-size:14px; font-weight:700; font-family:inherit; cursor:grab;
+    box-shadow:0 3px 0 color-mix(in srgb, var(--brass) 55%, black), 0 6px 16px rgba(0,0,0,0.45);
+    transition:transform .12s ease, box-shadow .12s ease, background .18s ease;
     touch-action:none; user-select:none; -webkit-user-select:none;
   }
   .admin-fab.show{display:inline-flex;}
+  .admin-fab:active{
+    transform:translateY(2px);
+    box-shadow:0 1px 0 color-mix(in srgb, var(--brass) 55%, black), 0 2px 6px rgba(0,0,0,0.3);
+  }
   .admin-fab .af-label{ display:none; }
   @media(max-width:520px){
     .admin-fab{ width:44px; height:44px; bottom:78px; left:16px; }
@@ -1674,7 +1686,7 @@
   .admin-fab .af-badge{
     position:absolute; top:-5px; inset-inline-end:-5px;
     min-width:19px; height:19px; padding:0 5px; border-radius:10px;
-    background:var(--brass); color:var(--ink); font-size:11px; font-weight:800;
+    background:var(--brass); color:var(--ink); font-size:12.5px; font-weight:700;
     box-shadow:0 2px 6px rgba(0,0,0,0.5);
     display:none; align-items:center; justify-content:center;
   }
@@ -1721,18 +1733,30 @@
      الزرارين اللي العميل بيشوفهم بنفس الشكل بالظبط — نفس الارتفاع ونفس نصف
      القطر ونفس الخط — عشان يبانوا من نفس العيلة. وكل واحد فيهم عليه كلمة،
      مش أيقونة لوحدها: الأيقونة بتخلي الزائر يفكّر، والكلمة بتجاوب عليه. */
-  .back-to-top-fab{
-    position:fixed; bottom:26px; right:26px; z-index:200;
-    height:46px; padding:0 18px; border-radius:23px;
+  /* ===== الأزرار العائمة =====
+     نفس لغة أزرار الموقع بالظبط: نصف قطر 9px، نحاسي، نص غامق، وزن 700،
+     مقاس 15px، وحافة سفلية صلبة بتنضغط لتحت عند اللمس. الفرق الوحيد إنهم
+     ثابتين في مكانهم على الشاشة. */
+  .back-to-top-fab, .contact-fab{
+    height:48px; padding:0 20px; border-radius:9px;
     background:var(--brass); color:var(--ink);
-    display:inline-flex; align-items:center; gap:8px;
-    font-family:inherit; font-size:14px; font-weight:800; white-space:nowrap;
-    box-shadow:0 8px 24px rgba(0,0,0,0.42);
-    transition:opacity .2s ease, transform .2s ease, box-shadow .2s ease;
+    display:inline-flex; align-items:center; gap:9px;
+    font-family:inherit; font-size:15px; font-weight:700; white-space:nowrap;
+    box-shadow:0 4px 0 color-mix(in srgb, var(--brass) 60%, black), 0 7px 18px rgba(0,0,0,0.42);
+    transition:transform .12s ease, box-shadow .12s ease, background .22s ease;
   }
-  .back-to-top-fab:hover{transform:translateY(-3px); box-shadow:0 12px 30px rgba(0,0,0,0.5);}
+  .back-to-top-fab:hover, .contact-fab:hover{
+    background:#ffd873;
+    box-shadow:0 5px 0 color-mix(in srgb, var(--brass) 60%, black), 0 9px 22px rgba(0,0,0,0.46);
+  }
+  .back-to-top-fab:active, .contact-fab:active{
+    transform:translateY(3px);
+    box-shadow:0 1px 0 color-mix(in srgb, var(--brass) 60%, black), 0 2px 7px rgba(0,0,0,0.28);
+  }
+  .back-to-top-fab{ position:fixed; bottom:26px; right:26px; z-index:200; }
   @media(max-width:520px){
-    .back-to-top-fab{ height:44px; padding:0 15px; border-radius:22px; font-size:13px; gap:6px; bottom:20px; right:16px; }
+    .back-to-top-fab, .contact-fab{ height:44px; padding:0 16px; font-size:14px; gap:7px; }
+    .back-to-top-fab{ bottom:20px; right:16px; }
   }
 
   .scroll-ruler{
@@ -1741,7 +1765,7 @@
   }
   .scroll-ruler-arrow{
     width:32px; height:28px; border-radius:8px;
-    background:var(--ink-2); border:1px solid var(--steel); color:var(--steel); font-size:12px;
+    background:var(--ink-2); border:1px solid var(--steel); color:var(--steel); font-size:12.5px;
   }
   .scroll-ruler-arrow:hover{background:rgba(62,167,255,0.12);}
   .scroll-ruler-track{
@@ -1777,7 +1801,7 @@
   }
   .search-box.open .search-dropdown{display:block;}
   .search-dropdown .sd-section-label{
-    font-size:11px; color:var(--paper-dim); padding:8px 10px 4px; text-transform:uppercase; letter-spacing:0.5px;
+    font-size:12.5px; color:var(--paper-dim); padding:8px 10px 4px; text-transform:uppercase; letter-spacing:0.5px;
   }
   .search-dropdown .sd-history-item{
     display:flex; align-items:center; justify-content:space-between; gap:8px;
@@ -1792,7 +1816,7 @@
   .search-dropdown .sd-result:hover{background:rgba(255,255,255,0.05);}
   .search-dropdown .sd-result img{width:38px; height:38px; border-radius:8px; object-fit:cover; flex-shrink:0;}
   .search-dropdown .sd-result .sd-title{font-size:13.5px; color:var(--paper);}
-  .search-dropdown .sd-result .sd-cat{font-size:11.5px; color:var(--paper-dim);}
+  .search-dropdown .sd-result .sd-cat{font-size:12.5px; color:var(--paper-dim);}
   .search-dropdown .sd-empty{padding:14px 10px; font-size:13px; color:var(--paper-dim); text-align:center;}
   @media(max-width:980px){
     .search-box input{width:150px;}
@@ -1801,24 +1825,14 @@
     .search-box{order:4; width:100%;}
     .search-box input{width:100%;}
   }
-  .contact-fab{
-    height:46px; padding:0 18px; border-radius:23px; background:var(--brass); color:var(--ink);
-    display:inline-flex; align-items:center; gap:8px;
-    font-family:inherit; font-size:14px; font-weight:800; white-space:nowrap;
-    box-shadow:0 8px 24px rgba(255,201,77,0.35); transition:transform .25s ease, box-shadow .25s ease;
-  }
-  .contact-fab:hover{transform:translateY(-3px); box-shadow:0 12px 30px rgba(255,201,77,0.55);}
   /* «ميجا» بنفس وميض الاسم اللي في الهيرو، بس بأحمر أغمق شوية: الأحمر الفاتح
      على الأصفر الذهبي تباينه ضعيف ومش بيتقرا — الأغمق ده تباينه 8.6:1. */
   .contact-fab .fab-mega{
-    color:#a80f0f; font-weight:900; font-size:1.08em; line-height:1;
+    color:#8f0c0c; font-weight:700; font-size:1.08em; line-height:1;
     animation:megaBlink 1.5s ease-in-out infinite;
   }
   @media(prefers-reduced-motion: reduce){ .contact-fab .fab-mega{ animation:none; } }
-  @media(max-width:520px){
-    .contact-fab{ height:44px; padding:0 15px; border-radius:22px; font-size:13px; gap:6px; }
-    .contact-widget{ bottom:20px; left:16px; }
-  }
+  @media(max-width:520px){ .contact-widget{ bottom:20px; left:16px; } }
   .contact-menu{
     display:flex; flex-direction:column; gap:8px;
     opacity:0; pointer-events:none; transform:translateY(10px) scale(0.9); transform-origin:bottom left;
@@ -1845,14 +1859,14 @@
   }
   .admin-product-row img{width:44px; height:56px; object-fit:cover; border-radius:6px; flex-shrink:0;}
   .admin-product-info{flex:1; display:flex; flex-direction:column; gap:2px; font-size:13px;}
-  .admin-product-info span{color:var(--paper-dim); font-size:12px;}
+  .admin-product-info span{color:var(--paper-dim); font-size:12.5px;}
   .admin-move-cat{
     margin-top:4px; background:var(--ink); color:var(--paper); border:1px solid var(--line);
-    border-radius:6px; padding:3px 6px; font-size:11.5px; max-width:150px;
+    border-radius:6px; padding:3px 6px; font-size:12.5px; max-width:150px;
   }
   .admin-cat-group{margin-bottom:10px;}
   .admin-cat-group h4{
-    font-size:12px; color:var(--brass); text-transform:uppercase; letter-spacing:0.5px;
+    font-size:12.5px; color:var(--brass); text-transform:uppercase; letter-spacing:0.5px;
     margin:14px 0 6px; padding-bottom:4px; border-bottom:1px solid var(--line);
   }
   .admin-product-actions button:disabled{opacity:0.25; cursor:default;}
@@ -1929,7 +1943,7 @@
   /* Utility-strip sizing — the same gold-outlined pill family, scaled down
      since these live in the quiet secondary strip, not the main row. */
   .ctrl-group.ctrl-group-sm{height:30px; border-width:1px;}
-  .ctrl-group.ctrl-group-sm button{height:24px; padding:0 8px; font-size:11px; gap:4px;}
+  .ctrl-group.ctrl-group-sm button{height:24px; padding:0 8px; font-size:12.5px; gap:4px;}
   .ctrl-group.ctrl-group-sm .icon-badge{width:18px; height:18px;}
   .ctrl-group.ctrl-group-sm .icon-badge svg{width:11px; height:11px;}
 
@@ -2040,7 +2054,7 @@
   body.view-mode-mobile .hero::before{width:320px; height:320px; top:-80px; left:-80px; filter:blur(50px);}
   body.view-mode-mobile .hero h1{font-size:26px;}
   body.view-mode-mobile .hero p{font-size:14.5px;}
-  body.view-mode-mobile .eyebrow{font-size:11px;}
+  body.view-mode-mobile .eyebrow{font-size:12.5px;}
   body.view-mode-mobile .cat-section{padding:22px 16px 10px;}
   body.view-mode-mobile .section-head h2{font-size:22px;}
   /* Was 100% — a card exactly as wide as the screen reads as "the whole
@@ -2060,7 +2074,7 @@
   body.view-mode-mobile .pricing-grid{grid-template-columns:1fr;}
   body.view-mode-mobile .modal{padding:20px;}
   body.view-mode-mobile .frame{width:110px; height:140px;}
-  body.view-mode-mobile footer{padding:24px 16px; font-size:12px;}
+  body.view-mode-mobile footer{padding:24px 16px; font-size:12.5px;}
 
   @media(max-width:860px){
     body:not(.view-mode-desktop) .hero{grid-template-columns:1fr;}
@@ -2086,7 +2100,7 @@
     border-radius:6px; padding:6px 8px; font-size:12.5px;
   }
   .report-h4{margin:0 0 8px; font-size:14px; color:var(--brass); font-weight:700;}
-  .report-scope-note{font-weight:400; color:var(--paper-dim); font-size:11.5px;}
+  .report-scope-note{font-weight:400; color:var(--paper-dim); font-size:12.5px;}
   .report-compare-note{font-size:13px; color:var(--paper-dim);}
   .report-up{color:var(--sage); font-weight:700;}
   .report-down{color:#e07a7a; font-weight:700;}
@@ -2307,7 +2321,7 @@
     padding:18px 16px 16px; margin-bottom:16px;
   }
   .admin-card > h4{
-    margin:0 0 8px; font-size:15.5px; font-weight:800; color:var(--paper);
+    margin:0 0 8px; font-size:15.5px; font-weight:700; color:var(--paper);
   }
   .admin-card > p.sub{ margin-bottom:14px; font-size:13px; line-height:1.65; }
   .admin-card > .modal-actions{ margin-top:14px; }

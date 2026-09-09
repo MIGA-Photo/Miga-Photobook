@@ -3678,7 +3678,18 @@ function scrollToSectionBelowHeader(el){
   // Committing to the collapsed state upfront makes the calculation match
   // the header height that will actually still be true when this settles.
   let headerHeight = 0;
+  /* الهيدر مابقاش بيغيّر ارتفاعه — بيتزحلق بالـtransform. فالارتفاع الفعّال
+     = ارتفاع المجموعة ناقص المسافة المتزحلقة، من غير أي قياس أو إجبار
+     تخطيط. ده بيلغي كل الحركة اللي كانت تحت دي (تعطيل انتقالات، إضافة
+     hdr-collapsed بالعافية، قراءة offsetHeight) لأن سببها اختفى. */
   if(stickyTopGroup){
+    const gh = stickyTopGroup.getBoundingClientRect().height;
+    const shift = stickyTopGroup.classList.contains('hdr-collapsed')
+      ? (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hdrUtilH')) || 0)
+      : 0;
+    headerHeight = Math.max(0, gh - shift);
+  }
+  if(false && stickyTopGroup){
     // The collapse itself (max-height/opacity/padding going to 0) is
     // defined on the INNER elements — .header-utility, #softLaunchBanner,
     // .search-box — each with its own independent 280ms transition. Killing
@@ -3731,32 +3742,77 @@ function scrollToSectionBelowHeader(el){
 }
 const HEADER_COLLAPSE_THRESHOLD = 72;
 let lastHeaderScrollY = window.scrollY || 0;
+
+/* الهيدر sticky وارتفاعه بيقلّ لما يتطوى — يعني كل المحتوى تحته بيتحرك
+   لفوق بنفس الفرق. قياس أثناء السكرول أعطى CLS = 0.73 (المقبول 0.1)، وده
+   بالظبط الاهتزاز اللي بيتشاف أول ما تنزل.
+
+   العلاج مش تبطيء الحركة — العلاج إنها ما تبقاش موجودة أصلًا: نقيس ارتفاع
+   الهيدر قبل وبعد التبديل في نفس الإطار، ونزحزح موضع السكرول بنفس الفرق.
+   المحتوى بيتحرك 52px لفوق وإحنا بنرجّع السكرول 52px، فالنتيجة صفر حركة
+   مرئية. والأنيميشن بيتوقف أثناء التبديل عشان الارتفاع اللي نقيسه يكون
+   النهائي مش نقطة في نص انتقال 280ms. */
+/* المسافة اللي المجموعة بتتزحلقها = ارتفاع الشريط العلوي بالظبط. بتتقاس
+   مرة بعد ما الصفحة تستقر، وتتحدّث عند تغيير حجم الشاشة بس — عمرها ما
+   بتتقاس أثناء السكرول، عشان مانجبرش المتصفح يعمل تخطيط في نص الحركة. */
+function measureHeaderCollapse(){
+  if(!stickyTopGroup) return;
+  const strip = stickyTopGroup.querySelector('.header-utility');
+  const h = strip ? Math.round(strip.getBoundingClientRect().height) : 0;
+  document.documentElement.style.setProperty('--hdrUtilH', h + 'px');
+}
+window.addEventListener('resize', measureHeaderCollapse);
+window.addEventListener('load', ()=>{ measureHeaderCollapse(); });
+setTimeout(measureHeaderCollapse, 800);
+
+function setHeaderCollapsed(on){
+  if(!stickyTopGroup) return;
+  stickyTopGroup.classList.toggle('hdr-collapsed', on);
+}
+
 function updateHeaderCollapse(){
   if(!stickyTopGroup) return;
   const scrollTop = window.scrollY || document.documentElement.scrollTop;
   if(scrollTop <= HEADER_COLLAPSE_THRESHOLD){
-    stickyTopGroup.classList.remove('hdr-collapsed');
+    setHeaderCollapsed(false);
   }else if(scrollTop > lastHeaderScrollY){
-    // scrolling down past the threshold
-    stickyTopGroup.classList.add('hdr-collapsed');
+    setHeaderCollapsed(true);
   }else if(scrollTop < lastHeaderScrollY - 4){
-    // scrolling up (small buffer so tiny jitter doesn't flicker it)
-    stickyTopGroup.classList.remove('hdr-collapsed');
+    setHeaderCollapsed(false);
   }
-  lastHeaderScrollY = scrollTop;
+  lastHeaderScrollY = window.scrollY || document.documentElement.scrollTop;
 }
 window.addEventListener('scroll', updateHeaderCollapse, { passive:true });
+
+/* كانت بتكتب style.display وبعدها تقرا clientHeight مرتين — في كل حدث
+   سكرول. الكتابة بعدها قراءة تخطيط بتجبر المتصفح يعمل reflow متزامن في نص
+   السكرول (layout thrashing)، وده بيضيّع إطارات. دلوقتي المقاسات بتتقاس مرة
+   وتتحدّث عند تغيير حجم الشاشة بس، والكتابة بتحصل لما القيمة تتغير فعلًا. */
+let _rulerTrackH = 0, _rulerThumbH = 0, _backTopShown = null, _lastThumbTop = -1;
+function measureScrollChrome(){
+  if(!scrollRulerTrack || !scrollRulerThumb) return;
+  _rulerTrackH = scrollRulerTrack.clientHeight;
+  _rulerThumbH = scrollRulerThumb.clientHeight;
+}
+window.addEventListener('resize', measureScrollChrome);
 
 function updateScrollChrome(){
   const scrollTop = window.scrollY || document.documentElement.scrollTop;
   const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
   const ratio = scrollHeight > 0 ? Math.min(1, scrollTop / scrollHeight) : 0;
 
-  backToTopBtn.style.display = scrollTop > 400 ? 'flex' : 'none';
+  const show = scrollTop > 400;
+  if(show !== _backTopShown){
+    _backTopShown = show;
+    backToTopBtn.style.display = show ? 'inline-flex' : 'none';
+  }
 
-  const trackHeight = scrollRulerTrack.clientHeight;
-  const thumbHeight = scrollRulerThumb.clientHeight;
-  scrollRulerThumb.style.top = (ratio * (trackHeight - thumbHeight)) + 'px';
+  if(!_rulerTrackH) measureScrollChrome();
+  const top = Math.round(ratio * (_rulerTrackH - _rulerThumbH));
+  if(top !== _lastThumbTop){
+    _lastThumbTop = top;
+    scrollRulerThumb.style.top = top + 'px';
+  }
 }
 window.addEventListener('scroll', updateScrollChrome, { passive: true });
 window.addEventListener('resize', updateScrollChrome);
