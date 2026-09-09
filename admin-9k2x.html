@@ -131,10 +131,11 @@
     var manifestLink = document.getElementById('__pwaManifestLink');
     if(manifestLink) manifestLink.setAttribute('href', '/admin-manifest.json');
     reveal();
-    return;
   }
   var fallback = setTimeout(reveal, 1200);
-  fetch('https://miga-photobook-api.magdyfarouk380.workers.dev/site-config')
+  // no-store: من غير كده المتصفح بيخزّن /site-config بتخمينه الخاص، فبتغيّر
+  // إعداد من اللوحة وتعمل تحديث وتلاقيه "مش اتغيّر" — وهو اتغيّر على السيرفر.
+  fetch('https://miga-photobook-api.magdyfarouk380.workers.dev/site-config', { cache: 'no-store' })
     .then(function(r){ return r.json(); })
     .then(function(data){
       clearTimeout(fallback);
@@ -144,7 +145,9 @@
       if(data && data.headerMode === 'compact'){
         document.documentElement.setAttribute('data-header-mode', 'compact');
       }
-      if(data && data.activeDesign && data.activeDesign !== MY_DESIGN_ID){
+      // الإعدادات فوق بتتطبّق في كل الحالات. الـredirect بس هو اللي ممنوع
+      // على مدخل الأدمن — لأن اللوحة موجودة على الصفحة دي وحدها.
+      if(!isAdminEntry && data && data.activeDesign && data.activeDesign !== MY_DESIGN_ID){
         var target = (data.availableDesigns || []).filter(function(d){ return d.id === data.activeDesign; })[0];
         var folder = target ? target.folder : '';
         var myFolder = MY_DESIGN_ID === 'v1' ? '' : MY_DESIGN_ID;
@@ -161,7 +164,7 @@
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Miga-Photobook — لوحة الإدارة</title>
-<meta name="description" content="ارفع صورتك واختر المكان والأسلوب اللي عايزه، ونحوّلها لك تلقائيًا بجودة استوديو باستخدام الذكاء الاصطناعي — خلال دقائق.">
+<meta name="description" content="ارفع صورتك واختر المكان والأسلوب اللي عايزه، ونحوّلها لك تلقائيًا بجودة استوديو بتقنيات ميجا المتطوّرة القائمة على الذكاء الاصطناعي — خلال دقائق، وبسعر الافتتاح 25 جنيه بدل 50.">
 <meta name="keywords" content="تحويل الصور بالذكاء الاصطناعي, AI Photo Transformation, صور شخصية احترافية, تعديل صور بالذكاء الاصطناعي">
 <meta property="og:site_name" content="Miga-Photobook">
 
@@ -183,7 +186,7 @@
      old URL. Bumping this string (e.g. 20260906a -> 20260906b) any time
      app.js or styles.css changes forces every visitor to fetch the new file
      immediately, no manual cache-clearing needed on their end. -->
-<link rel="stylesheet" href="styles.css?v=20260909c">
+<link rel="stylesheet" href="styles.css?v=20260909i">
 
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
@@ -241,8 +244,8 @@
 <div id="appRoot">
 <div class="promo-marquee" aria-hidden="true">
   <div class="promo-marquee-track">
-    <span data-i18n="promoMarqueeText">حوّل أي صورة عادية إلى بورتريه استوديو احترافي بالذكاء الاصطناعي خلال دقائق — عرض الافتتاح: كل صورة بـ 25 جنيه بدلاً من 50 جنيه لفترة محدودة.</span>
-    <span data-i18n="promoMarqueeText" aria-hidden="true">حوّل أي صورة عادية إلى بورتريه استوديو احترافي بالذكاء الاصطناعي خلال دقائق — عرض الافتتاح: كل صورة بـ 25 جنيه بدلاً من 50 جنيه لفترة محدودة.</span>
+    <span class="mq-line"><span data-i18n="promoMarqueePre">🎉 عرض الافتتاح: صورتك بورتريه احترافي بـ </span><span class="mq-price" data-i18n="promoMarqueePrice">25 جنيه بدل 50</span><span data-i18n="promoMarqueeMid"> — بتقنيات </span><span class="mq-mega" data-i18n="promoMarqueeBrand">ميجا</span><span data-i18n="promoMarqueePost">، وخلال دقائق. يلا، مستني إيه؟</span></span>
+    <span class="mq-line"><span data-i18n="promoMarqueePre">🎉 عرض الافتتاح: صورتك بورتريه احترافي بـ </span><span class="mq-price" data-i18n="promoMarqueePrice">25 جنيه بدل 50</span><span data-i18n="promoMarqueeMid"> — بتقنيات </span><span class="mq-mega" data-i18n="promoMarqueeBrand">ميجا</span><span data-i18n="promoMarqueePost">، وخلال دقائق. يلا، مستني إيه؟</span></span>
   </div>
 </div>
 <div class="sticky-top-group">
@@ -315,12 +318,20 @@
       </div>
     </div>
 
+    <div class="search-row">
     <div class="search-box" id="searchBox">
       <button type="button" class="search-icon-btn" id="searchIconBtn" data-i18n-title="a11ySearch" data-i18n-aria="a11ySearch" aria-label="بحث" title="بحث">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><circle cx="10.3" cy="10.3" r="6.6" stroke-width="2.1"/><path d="M8 6.6a4 4 0 0 0-2.7 3.9" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/><line x1="15.2" y1="15.2" x2="21" y2="21" stroke-width="2.6" stroke-linecap="round"/></svg>
       </button>
       <input type="text" id="searchInput" data-i18n-ph="searchPlaceholder" placeholder="ابحث في الموقع...">
       <div class="search-dropdown" id="searchDropdown"></div>
+    </div>
+    <!-- البانر اتنقل هنا جنب البحث بدل ما كان صف لوحده تحت الهيدر:
+         مربع البحث كان واخد عرض الشاشة كله والبانر صف كامل تحته، فالاتنين
+         مع بعض كانوا بياكلوا ~90px من أول شاشة. دلوقتي صف واحد ~44px. -->
+    <div id="softLaunchBanner" class="soft-launch-banner">
+      <span data-i18n="launchPromoBannerShort">🎉 صورتك بـ 25 بدل 50 جنيه</span>
+    </div>
     </div>
 
     <button class="admin-btn admin-btn-primary" id="accountOpenBtn" data-i18n="accountBtnGuest">تسجيل الدخول</button>
@@ -347,9 +358,6 @@
   </div>
 </header>
 
-<div id="softLaunchBanner" class="soft-launch-banner">
-  <span data-i18n="launchPromoBannerText">🎉 عرض افتتاح الموقع — كل صورة بـ 25 جنيه فقط!</span>
-</div>
 </div><!-- /.sticky-top-group -->
 
 <!-- Permanent showcase slider — always the interactive drag slider, in this
@@ -563,7 +571,9 @@
   }
   .slider-card-compact{ aspect-ratio:4/5; max-width:none; }
   .hero-with-slider .slider-handle{ width:30px; height:30px; font-size:12.5px; }
-  .hero-with-slider .slider-nav{ width:24px; height:24px; font-size:13px; }
+  /* كانت 24px — الأسهم مكانتش بتتشاف بالعين المجردة. 40px هو أصغر
+     مقاس بيتلمس بإصبع من غير خطأ، والخط 22px عشان السهم نفسه يبان. */
+  .hero-with-slider .slider-nav{ width:40px; height:40px; font-size:22px; }
   .hero-with-slider .slider-card .tag{ font-size:12.5px; padding:3px 7px; top:6px; }
   .hero-with-slider .slider-controls-row{ margin-top:6px; gap:8px; }
   .hero-with-slider .slider-dots{ gap:5px; }
@@ -663,7 +673,7 @@
     <div class="how-step">
       <div class="how-step-num">4</div>
       <h3 data-i18n="how4Title">استلم النتيجة</h3>
-      <p data-i18n="how4Desc">هنطبّق الأسلوب اللي اخترته بالذكاء الاصطناعي، وتستلم صورتك الاحترافية خلال دقايق.</p>
+      <p data-i18n="how4Desc">هنطبّق الأسلوب اللي اخترته بتقنيات ميجا المتطوّرة، وتستلم صورتك الاحترافية خلال دقايق.</p>
     </div>
   </div>
   <div class="hero-ctas" style="margin-top:22px; justify-content:center;">
@@ -892,7 +902,7 @@
 </section>
 
 <section class="cat-section tab-panel" id="aboutUs">
-  <p class="sub" style="max-width:680px; font-size:15px;" data-i18n="aboutUsText">Miga-Photobook مشروع مصري بدأ بفكرة بسيطة: خلي جلسة التصوير الاحترافية متاحة لأي حد وبسعر معقول. بنحوّل صورتك الشخصية لتحفة فنية بجودة استوديو باستخدام الذكاء الاصطناعي — ارفع صورتك واختار الأسلوب، وإحنا نتولى الباقي بعناية عشان تضمن نتيجة تستحق اسمك.</p>
+  <p class="sub" style="max-width:680px; font-size:15px;" data-i18n="aboutUsText">Miga-Photobook مشروع مصري بدأ بفكرة بسيطة: خلي جلسة التصوير الاحترافية متاحة لأي حد وبسعر معقول. بنحوّل صورتك الشخصية لتحفة فنية بجودة استوديو بتقنيات ميجا المتطوّرة — ارفع صورتك واختار الأسلوب، وإحنا نتولى الباقي بعناية عشان تضمن نتيجة تستحق اسمك.</p>
 </section>
 
 <section class="cat-section tab-panel" id="faq">
@@ -1011,16 +1021,31 @@
       <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M21.5 3.5L2.7 10.8c-1.2.5-1.2 1.2-.2 1.5l4.8 1.5 1.8 5.7c.2.6.4.8.9.8s.7-.2 1-.5l2.4-2.3 4.9 3.6c.9.5 1.5.2 1.8-.9l3.2-15c.3-1.4-.4-1.9-1.5-1.4zM8.5 14.3L18 8.1c.4-.3.8-.1.5.2l-8.1 7.3-.3 3.2-1.6-4.5z"/></svg>
     </a>
   </div>
-  <button class="contact-fab" id="contactFabBtn" data-i18n-title="a11yContact" data-i18n-aria="a11yContact" aria-label="تواصل معنا" title="تواصل معنا">
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2C6.5 2 2 6 2 11c0 2.6 1.2 4.9 3.1 6.6L4 22l4.6-1.5c1.1.3 2.2.5 3.4.5 5.5 0 10-4 10-9S17.5 2 12 2z"/></svg>
-    <span class="fab-copy"><span data-i18n="contactFabWord">تواصل مع</span> <span class="fab-mega" data-i18n="contactFabBrand">ميجا</span></span>
-  </button>
+  <div class="fab-wrap">
+    <button class="contact-fab" id="contactFabBtn" data-i18n-title="a11yContact" data-i18n-aria="a11yContact" aria-label="تواصل معنا" title="تواصل معنا">
+      <svg class="fab-ring" viewBox="0 0 64 64" aria-hidden="true">
+        <path id="fabArcContact" d="M 8.5 32 A 23.5 23.5 0 0 1 55.5 32" fill="none"/>
+        <text class="fab-arc-text"><textPath href="#fabArcContact" startOffset="50%" text-anchor="middle" data-i18n="contactFabWord">تواصل مع</textPath></text>
+      </svg>
+      <span class="fab-core">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2C6.5 2 2 6 2 11c0 2.6 1.2 4.9 3.1 6.6L4 22l4.6-1.5c1.1.3 2.2.5 3.4.5 5.5 0 10-4 10-9S17.5 2 12 2z"/></svg>
+        <span class="fab-mega" data-i18n="contactFabBrand">ميجا</span>
+      </span>
+    </button>
+  </div>
 </div>
 
-<button class="back-to-top-fab" id="backToTopBtn" data-i18n-title="a11yBackToTop" data-i18n-aria="a11yBackToTop" aria-label="العودة لأعلى الصفحة" title="العودة لأعلى الصفحة" style="display:none;">
-  <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true"><path d="M12 5l-7 7h4v7h6v-7h4z"/></svg>
-  <span data-i18n="backHomeLabel">الصفحة الرئيسية</span>
-</button>
+<div class="fab-wrap fab-wrap-home" id="backToTopWrap" style="display:none;">
+  <button class="back-to-top-fab" id="backToTopBtn" data-i18n-title="a11yBackToTop" data-i18n-aria="a11yBackToTop" aria-label="العودة لأعلى الصفحة" title="العودة لأعلى الصفحة">
+    <svg class="fab-ring" viewBox="0 0 64 64" aria-hidden="true">
+      <path id="fabArcHome" d="M 8.5 32 A 23.5 23.5 0 0 1 55.5 32" fill="none"/>
+      <text class="fab-arc-text"><textPath href="#fabArcHome" startOffset="50%" text-anchor="middle" data-i18n="backHomeLabel">الرئيسية</textPath></text>
+    </svg>
+    <span class="fab-core">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true"><path d="M12 5l-7 7h4v7h6v-7h4z"/></svg>
+    </span>
+  </button>
+</div>
 
 <div class="scroll-ruler" id="scrollRuler" aria-hidden="true">
   <button class="scroll-ruler-arrow" id="scrollRulerUp" data-i18n-title="a11yScrollUp" data-i18n-aria="a11yScrollUp" aria-label="لأعلى" title="لأعلى">▲</button>
@@ -1987,7 +2012,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260909c"></script>
+<script src="app.js?v=20260909i"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){

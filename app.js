@@ -179,7 +179,7 @@ const translations = {
     themeDayLabel:'الوضع النهاري', themeNightLabel:'الوضع الليلي',
     themeToggleTitle:'التبديل بين الوضع النهاري والوضع الليلي',
     heroEyebrow:'Miga-Photobook',
-    promoMarqueeText:'حوّل أي صورة عادية إلى بورتريه استوديو احترافي بالذكاء الاصطناعي خلال دقائق — عرض الافتتاح: كل صورة بـ 25 جنيه بدلاً من 50 جنيه لفترة محدودة.',
+    promoMarqueePre:'🎉 عرض الافتتاح: صورتك بورتريه احترافي بـ ', promoMarqueePrice:'25 جنيه بدل 50', promoMarqueeMid:' — بتقنيات ', promoMarqueeBrand:'ميجا', promoMarqueePost:'، وخلال دقائق. يلا، مستني إيه؟',
     heroSlogan:'لقطتك... تتحول لتحفة فنية',
     promoVideoTitle:'شوف Miga-Photobook وهو شغال', promoVideoSub:'دقائق معدودة، وصورتك العادية بتتحول لتحفة فنية احترافية.',
     trustCheck1:'✅ نتيجة خلال دقائق', trustCheck2:'✅ دفع آمن', trustCheck3:'✅ دعم فني مباشر', trustCheck4:'✅ تحديثات مستمرة',
@@ -195,7 +195,7 @@ const translations = {
     how1Title:'اختار الستايل', how1Desc:'تصفح المكتبة واختر الأسلوب اللي يعجبك من أي قسم.',
     how2Title:'ادفع', how2Desc:'حوّل قيمة الطلب عن طريق InstaPay أو فودافون كاش، وسجّل رقم العملية.',
     how3Title:'ارفع صورتك', how3Desc:'بعد تأكيد التحويل (عادةً خلال دقائق)، ارفع صورتك بجودة واضحة.',
-    how4Title:'استلم النتيجة', how4Desc:'هنطبّق الأسلوب اللي اخترته بالذكاء الاصطناعي، وتستلم صورتك الاحترافية خلال دقايق.',
+    how4Title:'استلم النتيجة', how4Desc:'هنطبّق الأسلوب اللي اخترته بتقنيات ميجا المتطوّرة، وتستلم صورتك الاحترافية خلال دقايق.',
     howItWorksCta:'ابدأ دلوقتي',
     seeAllStylesCta:'شاهد 50+ ستايل',
     pricingTrust1:'دفعك في أمان', pricingTrust2:'نتائج حقيقية موثّقة', pricingTrust3:'دعم واتساب سريع',
@@ -206,7 +206,7 @@ const translations = {
     trustBadge1:'جودة احترافية في كل صورة', trustBadge2:'تحديث مستمر للأساليب الفنية المتاحة',
     trustBadge3:'دعم فني سريع ومباشر', trustBadge4:'أمان وخصوصية في كل عملية',
     aboutUsTitle:'من نحن',
-    aboutUsText:'Miga-Photobook مشروع مصري بدأ بفكرة بسيطة: خلي جلسة التصوير الاحترافية متاحة لأي حد وبسعر معقول. بنحوّل صورتك الشخصية لتحفة فنية بجودة استوديو باستخدام الذكاء الاصطناعي — ارفع صورتك واختار الأسلوب، وإحنا نتولى الباقي بعناية عشان تضمن نتيجة تستحق اسمك.',
+    aboutUsText:'Miga-Photobook مشروع مصري بدأ بفكرة بسيطة: خلي جلسة التصوير الاحترافية متاحة لأي حد وبسعر معقول. بنحوّل صورتك الشخصية لتحفة فنية بجودة استوديو بتقنيات ميجا المتطوّرة — ارفع صورتك واختار الأسلوب، وإحنا نتولى الباقي بعناية عشان تضمن نتيجة تستحق اسمك.',
     faqTitle:'أسئلة شائعة',
     faqQ1:'إزاي تتم عملية التحويل؟', faqA1:'بعد الدفع، بترفع صورتك، وإحنا نحوّلها تلقائيًا بالأسلوب اللي اخترته، وتستلم النتيجة جاهزة على الموقع مباشرة.',
     faqQ2:'قد إيه بتاخد وقت؟', faqA2:'في خطوتين: تأكيد التحويل البنكي بياخد عادةً دقائق (بنراجعه بنفسنا)، وبعد التأكيد، التحويل بالذكاء الاصطناعي نفسه بياخد دقائق وهتشوف النتيجة على نفس الصفحة.',
@@ -393,7 +393,6 @@ const translations = {
     whatsappPromptMessageTemplate:'مرحبًا 👋 تحويلك تم تأكيده — ده البرومبت الاحترافي الخاص بـ "{title}":\n\n{prompt}\n\nشكرًا لثقتك في Miga-Photobook 🙏',
     orderApproveBtn:'موافقة وتفعيل التحويل',
     softLaunchBanner:'🎉 إطلاق تجريبي — كل التحويلات متاحة مجانًا الآن لفترة محدودة',
-    launchPromoBannerText:'🎉 عرض افتتاح الموقع — كل صورة بـ 25 جنيه فقط!',
     freeLabel:'مجانًا', claimFreeBtn:'احصل عليه مجانًا',
     toastFreeUnlocked:'تم الفتح مجانًا — جاهز تحوّل صورتك! (فترة الإطلاق التجريبي)',
     transformBtn:'حوّل صورتك', viewResultBtn:'شاهد نتيجتك ✅', transformModalTitle:'حوّل صورتك',
@@ -418,7 +417,8 @@ const translations = {
     trustVisitors:'زائر', trustPhotos:'صورة',
     a11yResult:'نتيجة', a11yExample:'مثال', a11ySearch:'بحث', a11yPrev:'السابق', a11yNext:'التالي',
     a11yContact:'تواصل معنا', a11yBackToTop:'العودة لأعلى الصفحة',
-    backHomeLabel:'الصفحة الرئيسية', contactFabWord:'تواصل مع', contactFabBrand:'ميجا',
+    backHomeLabel:'الرئيسية', contactFabWord:'تواصل مع', contactFabBrand:'ميجا',
+    launchPromoBannerShort:'🎉 صورتك بـ 25 بدل 50 جنيه',
     a11yScrollUp:'لأعلى', a11yScrollDown:'لأسفل',
     a11yOriginalPhoto:'الصورة الأصلية', a11yChangeAvatar:'تغيير صورة البروفايل',
     sliderHint:'اسحب يمين وشمال، ودوس ‹ › تتنقل بين أمثلة مختلفة',
@@ -493,7 +493,7 @@ const translations = {
     themeDayLabel:'Day Mode', themeNightLabel:'Night Mode',
     themeToggleTitle:'Switch between day mode and night mode',
     heroEyebrow:'Miga-Photobook',
-    promoMarqueeText:'Turn any ordinary photo into a professional studio portrait with AI, in minutes — launch offer: every photo for 25 EGP instead of 50 EGP, for a limited time.',
+    promoMarqueePre:"🎉 Launch offer: a professional portrait for ", promoMarqueePrice:"25 EGP instead of 50", promoMarqueeMid:" — powered by ", promoMarqueeBrand:"Miga", promoMarqueePost:", in minutes. What are you waiting for?",
     heroSlogan:'Your shot... becomes a masterpiece',
     promoVideoTitle:'See Miga-Photobook in action', promoVideoSub:'A few minutes, and your ordinary photo becomes a professional work of art.',
     trustCheck1:'✅ Result within minutes', trustCheck2:'✅ Secure payment', trustCheck3:'✅ Direct support', trustCheck4:'✅ Ongoing updates',
@@ -707,7 +707,6 @@ const translations = {
     whatsappPromptMessageTemplate:'Hi 👋 your payment is confirmed — here\\u2019s the professional prompt for "{title}":\\n\\n{prompt}\\n\\nThanks for choosing Miga-Photobook 🙏',
     orderApproveBtn:'Approve & Enable Transform',
     softLaunchBanner:'🎉 Soft Launch — all transformations are free right now for a limited time',
-    launchPromoBannerText:'🎉 Launch Offer — every photo for just 25 EGP!',
     freeLabel:'Free', claimFreeBtn:'Get It Free',
     toastFreeUnlocked:'Unlocked for free — ready to transform your photo! (soft launch period)',
     transformBtn:'Transform Your Photo', viewResultBtn:'View Your Result ✅', transformModalTitle:'Transform Your Photo',
@@ -731,6 +730,7 @@ const translations = {
     a11yResult:'Result', a11yExample:'Example', a11ySearch:'Search', a11yPrev:'Previous', a11yNext:'Next',
     a11yContact:'Contact us', a11yBackToTop:'Back to top',
     backHomeLabel:'Home', contactFabWord:'Contact', contactFabBrand:'Miga',
+    launchPromoBannerShort:'🎉 25 EGP instead of 50',
     a11yScrollUp:'Scroll up', a11yScrollDown:'Scroll down',
     a11yOriginalPhoto:'Original photo', a11yChangeAvatar:'Change profile photo',
     sliderHint:'Drag left and right, and tap \u2039 \u203a to move between examples',
@@ -1129,6 +1129,7 @@ function applyLanguage(lang){
     const n = el.getAttribute('data-i18n-aria-n');
     el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria')) + (n ? ' ' + n : ''));
   });
+  if(typeof tuneMarqueeSpeed === 'function') setTimeout(tuneMarqueeSpeed, 0);
   document.querySelectorAll('[data-i18n-alt]').forEach(el=>{
     // data-i18n-alt-n بيضيف رقم بعد النص: "نتيجة 3" / "Result 3".
     // كل صورة لازم يبقى ليها وصف مختلف — 8 صور بنفس الـalt بتبان لجوجل
@@ -1315,7 +1316,7 @@ async function loadProducts(){
 async function loadPromptLibraryMode(){
   if(!BACKEND_BASE) return;
   try{
-    const res = await fetch(`${BACKEND_BASE}/site-config`);
+    const res = await fetch(`${BACKEND_BASE}/site-config`, { cache: 'no-store' });
     const data = await res.json();
     PROMPT_LIBRARY_MODE = !!(data && data.promptLibraryMode);
   }catch(e){ /* network hiccup — keep default (off) */ }
@@ -3755,6 +3756,28 @@ let lastHeaderScrollY = window.scrollY || 0;
 /* المسافة اللي المجموعة بتتزحلقها = ارتفاع الشريط العلوي بالظبط. بتتقاس
    مرة بعد ما الصفحة تستقر، وتتحدّث عند تغيير حجم الشاشة بس — عمرها ما
    بتتقاس أثناء السكرول، عشان مانجبرش المتصفح يعمل تخطيط في نص الحركة. */
+/* سرعة الشريط الإعلاني.
+   الحركة بتزحزح المسار نص عرضه (نسختين من النص = نسخة واحدة مسافة). فلو
+   ثبّتنا المدة، أي نص أطول بيمشي أسرع تلقائيًا وبيبقى صعب القراءة. بنقيس
+   عرض نسخة واحدة وبنقسمه على سرعة ثابتة، فالسرعة المرئية ما بتتغيرش أبدًا.
+   45 بكسل/ثانية اتختارت عشان الجملة تعدّي قدام العين في وقت يكفي لقراءتها. */
+const MARQUEE_PX_PER_SEC = 45;
+function tuneMarqueeSpeed(){
+  const track = document.querySelector('.promo-marquee-track');
+  if(!track) return;
+  const one = track.querySelector('.mq-line');
+  if(!one) return;
+  const w = one.getBoundingClientRect().width + 64; // + الفراغ بين النسختين
+  if(!w) return;
+  track.style.animationDuration = Math.max(12, Math.round(w / MARQUEE_PX_PER_SEC)) + 's';
+}
+window.addEventListener('resize', tuneMarqueeSpeed);
+window.addEventListener('load', ()=>{
+  tuneMarqueeSpeed();
+  // الخط بيوصل بعد الصفحة، وعرض النص بيتغير لما يوصل — فنعيد القياس بعده.
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(tuneMarqueeSpeed);
+});
+
 function measureHeaderCollapse(){
   if(!stickyTopGroup) return;
   const strip = stickyTopGroup.querySelector('.header-utility');
@@ -3804,7 +3827,10 @@ function updateScrollChrome(){
   const show = scrollTop > 400;
   if(show !== _backTopShown){
     _backTopShown = show;
-    backToTopBtn.style.display = show ? 'inline-flex' : 'none';
+    // العمود (الدايرة + الكلمة) هو اللي بيتخفى، مش الدايرة لوحدها —
+    // وإلا الكلمة كانت هتفضل سايبة في الهوا من غير زرارها.
+    const wrap = document.getElementById('backToTopWrap') || backToTopBtn;
+    wrap.style.display = show ? 'inline-flex' : 'none';
   }
 
   if(!_rulerTrackH) measureScrollChrome();
@@ -5529,7 +5555,7 @@ elById('tabBtnSiteDesign').onclick = async ()=>{
 async function loadSiteDesignIntoAdmin(){
   if(!BACKEND_BASE) return;
   try{
-    const res = await fetch(`${BACKEND_BASE}/site-config`);
+    const res = await fetch(`${BACKEND_BASE}/site-config`, { cache: 'no-store' });
     const data = await res.json();
     const select = document.getElementById('siteDesignSelect');
     const lang = document.documentElement.lang === 'en' ? 'nameEn' : 'nameAr';
@@ -5582,7 +5608,13 @@ elById('saveColorThemeBtn').onclick = async ()=>{
       body: JSON.stringify({ theme })
     });
     const data = await res.json().catch(()=>({}));
-    if(res.ok && data.ok) showToast(t('toastColorThemeSaved'));
+    if(res.ok && data.ok){
+      // تطبيق فوري: من غير ده لازم تعمل تحديث عشان تشوف النتيجة، ومع
+      // التخزين المؤقت للمتصفح ممكن التحديث نفسه ما يوريهاش.
+      if(theme && theme !== 'black') document.documentElement.setAttribute('data-accent', theme);
+      else document.documentElement.removeAttribute('data-accent');
+      showToast(t('toastColorThemeSaved'));
+    }
     else showToast(t('toastAdminServerError'));
   }catch(e){
     showToast(t('toastAdminServerError'));
@@ -5597,7 +5629,12 @@ elById('saveHeaderModeBtn').onclick = async ()=>{
       body: JSON.stringify({ mode })
     });
     const data = await res.json().catch(()=>({}));
-    if(res.ok && data.ok) showToast(t('toastHeaderModeSaved'));
+    if(res.ok && data.ok){
+      if(mode === 'compact') document.documentElement.setAttribute('data-header-mode', 'compact');
+      else document.documentElement.removeAttribute('data-header-mode');
+      if(typeof measureHeaderCollapse === 'function') measureHeaderCollapse();
+      showToast(t('toastHeaderModeSaved'));
+    }
     else showToast(t('toastAdminServerError'));
   }catch(e){
     showToast(t('toastAdminServerError'));
@@ -7431,7 +7468,7 @@ function initSliderInstance(rootId){
 async function applyHeroModeForThisDesign(){
   let mode = 'circle';
   try{
-    const res = await fetch(`${BACKEND_BASE}/site-config`);
+    const res = await fetch(`${BACKEND_BASE}/site-config`, { cache: 'no-store' });
     const data = await res.json();
     if(data && data.heroModes && data.heroModes.v1) mode = data.heroModes.v1;
   }catch(e){ /* network hiccup — keep this design's original default */ }

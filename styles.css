@@ -15,9 +15,10 @@
     --paper-dim:#cfc8bf;
     --brass:#e8b64a;
     --brass-dim:#c8992f;
-    --sage:#2fe6b0;
-    --steel:#3ea7ff;
-    --rose:#ff5c96;
+    /* الأخضر 12.9:1 والوردي 8.7:1 على الأرضية الجديدة — كانوا 11.5 و6.4 */
+    --sage:#4ff0c0;
+    --steel:#5cb8ff;
+    --rose:#ff8fb8;
     --line:rgba(244,241,234,0.15);
   }
   /* ===== Day mode — same variable names, repainted for a light surface.
@@ -218,14 +219,40 @@
   .promo-marquee{
     position:relative; z-index:49; overflow:hidden;
     background:linear-gradient(90deg, var(--brass-dim), var(--brass), var(--brass-dim));
-    padding:4px 0; white-space:nowrap;
+    /* الارتفاع كان 36px. الشريط ده مش محتوى — دعاية بتعدّي — فماينفعش
+       ياخد المساحة دي من أول شاشة. 2px حشو + سطر مضبوط = 21px. */
+    padding:2px 0; white-space:nowrap; line-height:1.3;
   }
   .promo-marquee-track{
-    display:inline-flex; gap:64px; animation:marqueeScroll 22s linear infinite;
+    display:inline-flex; gap:64px;
+    /* 22s هنا قيمة احتياطية بس — الجافاسكريبت بيحسب المدة من عرض النص
+       الفعلي عشان السرعة المرئية تفضل ثابتة مهما طال النص أو اتغيّرت اللغة.
+       شوف tuneMarqueeSpeed() في app.js. */
+    animation:marqueeScroll 22s linear infinite;
     will-change:transform;
   }
-  .promo-marquee-track span{
-    font-size:13px; font-weight:700; color:#1a1305; letter-spacing:0.4px; padding-inline-end:64px;
+
+  /* الشريط أرضيته ذهبية فاتحة، فالأحمر لازم يبقى غامق عشان يتقرا:
+     ‎#c40d0d‎ تباينه 3.3:1 (تحت المعيار)، ‎#8f0c0c‎ تباينه 5.0:1. */
+  /* السعر هو أهم كلمة في الجملة — شريحة داكنة خفيفة بتخليه يتلقط بالعين
+     وهو ماشي. الحشو على عنصر inline مابيزوّدش ارتفاع السطر، فالشريط
+     بيفضل 25px. */
+  .promo-marquee-track .mq-price{
+    background:rgba(26,19,5,0.14); padding:1px 7px; border-radius:6px;
+    font-weight:700; letter-spacing:0;
+  }
+  .promo-marquee-track .mq-mega{
+    color:#8f0c0c; font-weight:700; font-size:1.12em;
+    animation:megaBlink 1.5s ease-in-out infinite;
+  }
+  @media(prefers-reduced-motion: reduce){ .promo-marquee-track .mq-mega{ animation:none; } }
+  /* القاعدة دي كانت متكتبة لـ`span` عام، والنص القديم كان span واحد. النص
+     الجديد بقى تلات spans (الجملة + «ميجا» + باقي الجملة)، فكل واحد فيهم كان
+     بياخد padding 64px — يعني **192px فراغ ميت جوه الجملة الواحدة**، بيطوّل
+     الشريط ويبطّئه من غير أي سبب. دلوقتي الحشو على السطر كله مرة واحدة. */
+  .promo-marquee-track .mq-line{
+    font-size:12.5px; font-weight:700; color:#1a1305; letter-spacing:0.3px;
+    padding-inline-end:64px; line-height:1.3;
     font-family:'Readex Pro', sans-serif;
     text-shadow:0 1px 0 rgba(255,255,255,0.25);
   }
@@ -690,9 +717,11 @@
     white-space:nowrap;   /* Readex أعرض من الخط القديم فكانت بتلف على سطرين */
   }
   .eyebrow::before{content:""; width:26px; height:1px; background:var(--brass);}
+  /* كانت بخط Rakkas — خط زخرفي رفيع مخصوص للشعارات، حروفه رفيعة بطبعها،
+     فالجملة كانت بتبان مغبّشة مهما كان لونها فاتح. */
   .tagline{
-    font-family:'Rakkas','Readex Pro',serif; font-size:22px; color:var(--rose);
-    margin-bottom:14px; letter-spacing:0.3px;
+    font-family:'Readex Pro', sans-serif; font-size:20px; font-weight:600;
+    color:var(--rose); margin-bottom:14px; letter-spacing:0;
   }
   .hero h1{font-size:52px; line-height:1.25; color:var(--paper); margin-bottom:20px;}
   .hero h1 em{font-style:normal; color:var(--brass);}
@@ -986,13 +1015,13 @@
     font-size:13px; padding:6px 13px; border-radius:100px; font-weight:700;
     letter-spacing:0.5px;
   }
-  .tag-children{background:rgba(47,230,176,0.24); color:var(--sage);}
-  .tag-male{background:rgba(62,167,255,0.24); color:var(--steel);}
-  .tag-female{background:rgba(255,92,150,0.24); color:var(--rose);}
-  .tag-business{background:rgba(62,167,255,0.24); color:var(--steel);}
-  .tag-cinematic{background:rgba(255,92,150,0.24); color:var(--rose);}
+  .tag-children{background:rgba(79,240,192,0.32); color:var(--sage);}
+  .tag-male{background:rgba(92,184,255,0.32); color:var(--steel);}
+  .tag-female{background:rgba(255,143,184,0.32); color:var(--rose);}
+  .tag-business{background:rgba(92,184,255,0.32); color:var(--steel);}
+  .tag-cinematic{background:rgba(255,143,184,0.32); color:var(--rose);}
   .tag-luxury{background:rgba(255,201,77,0.26); color:var(--brass);}
-  .tag-artistic{background:rgba(47,230,176,0.24); color:var(--sage);}
+  .tag-artistic{background:rgba(79,240,192,0.32); color:var(--sage);}
   .tag-magazine{background:rgba(227,164,41,0.26); color:var(--brass-dim);}
 
   /* ===== Category tiles: one icon per section, built from that section's own
@@ -1433,7 +1462,7 @@
   .reject-btn{border-color:rgba(224,122,122,0.4); color:#e07a7a;}
   .reject-btn:hover{border-color:#e07a7a; background:rgba(224,122,122,0.08);}
   .owned-pill{
-    font-size:12.5px; color:var(--sage); border:1px solid rgba(47,230,176,0.35);
+    font-size:12.5px; color:var(--sage); border:1px solid rgba(79,240,192,0.45);
     padding:3px 10px; border-radius:100px; align-self:flex-start; font-weight:600; letter-spacing:0.2px;
   }
 
@@ -1531,7 +1560,7 @@
   .order-row .oline b{color:var(--paper); font-weight:600;}
   .order-status{font-size:12.5px; padding:2px 8px; border-radius:100px; font-weight:600;}
   .status-pending{background:rgba(255,201,77,0.15); color:var(--brass);}
-  .status-approved{background:rgba(47,230,176,0.15); color:var(--sage);}
+  .status-approved{background:rgba(79,240,192,0.22); color:var(--sage);}
   .status-rejected{background:rgba(224,122,122,0.15); color:#e07a7a;}
   .order-actions{display:flex; gap:8px; margin-top:8px;}
   .order-actions button{flex:1; padding:7px; border-radius:6px; font-size:12.5px;}
@@ -1565,7 +1594,7 @@
     .toast{ bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
   }
 
-  .contact-widget{position:fixed; bottom:26px; left:26px; z-index:200; display:flex; flex-direction:column; align-items:flex-start; gap:12px;}
+  .contact-widget{position:fixed; bottom:26px; left:26px; z-index:200; display:flex; flex-direction:column; align-items:center; gap:12px;}
 
   /* ===== Admin: floating launcher + collapsible panel =====
      The admin panel is a working surface, not a one-shot dialog: it can be
@@ -1737,26 +1766,60 @@
      نفس لغة أزرار الموقع بالظبط: نصف قطر 9px، نحاسي، نص غامق، وزن 700،
      مقاس 15px، وحافة سفلية صلبة بتنضغط لتحت عند اللمس. الفرق الوحيد إنهم
      ثابتين في مكانهم على الشاشة. */
+  /* نفس لبس زرار لوحة الإدارة بالظبط: أرضية داكنة، إطار نحاسي، أيقونة
+     ونص نحاسي. الأصفر الصلب كان بياخد العين من محتوى الصفحة نفسه. */
+  /* كل الكلام جوه الدايرة: اللي حوالين الحافة ماشي على قوس (SVG textPath)،
+     و«ميجا» أفقية في المركز. القوس بيدّي مساحة تلات أضعاف السطر الأفقي —
+     محيط دايرة 64px = 200px، والقوس العلوي 100px. */
   .back-to-top-fab, .contact-fab{
-    height:48px; padding:0 20px; border-radius:9px;
-    background:var(--brass); color:var(--ink);
-    display:inline-flex; align-items:center; gap:9px;
-    font-family:inherit; font-size:15px; font-weight:700; white-space:nowrap;
-    box-shadow:0 4px 0 color-mix(in srgb, var(--brass) 60%, black), 0 7px 18px rgba(0,0,0,0.42);
-    transition:transform .12s ease, box-shadow .12s ease, background .22s ease;
+    position:relative;
+    width:64px; height:64px; padding:0; border-radius:50%;
+    background:var(--ink-2); border:2px solid var(--brass); color:var(--brass);
+    display:inline-flex; align-items:center; justify-content:center;
+    font-family:inherit; white-space:nowrap;
+    box-shadow:0 3px 0 color-mix(in srgb, var(--brass) 55%, black), 0 6px 16px rgba(0,0,0,0.45);
+    transition:transform .12s ease, box-shadow .12s ease, background .18s ease;
   }
+  .fab-ring{
+    position:absolute; inset:0; width:100%; height:100%;
+    pointer-events:none; overflow:visible;
+  }
+  .fab-arc-text{
+    font-family:inherit; font-size:9px; font-weight:700;
+    fill:var(--brass); letter-spacing:0.2px;
+  }
+  .fab-core{
+    position:relative; z-index:1;
+    display:inline-flex; flex-direction:column; align-items:center; gap:1px;
+    line-height:1; margin-top:5px;
+  }
+  .fab-core svg{ display:block; }
+  .fab-wrap{ display:inline-flex; }
+  .fab-wrap-home{ position:fixed; bottom:26px; right:26px; z-index:200; }
   .back-to-top-fab:hover, .contact-fab:hover{
-    background:#ffd873;
-    box-shadow:0 5px 0 color-mix(in srgb, var(--brass) 60%, black), 0 9px 22px rgba(0,0,0,0.46);
+    background:rgba(232,182,74,0.14);
+    box-shadow:0 4px 0 color-mix(in srgb, var(--brass) 55%, black), 0 8px 20px rgba(0,0,0,0.5);
   }
   .back-to-top-fab:active, .contact-fab:active{
-    transform:translateY(3px);
-    box-shadow:0 1px 0 color-mix(in srgb, var(--brass) 60%, black), 0 2px 7px rgba(0,0,0,0.28);
+    transform:translateY(2px);
+    box-shadow:0 1px 0 color-mix(in srgb, var(--brass) 55%, black), 0 2px 6px rgba(0,0,0,0.3);
   }
-  .back-to-top-fab{ position:fixed; bottom:26px; right:26px; z-index:200; }
+
   @media(max-width:520px){
-    .back-to-top-fab, .contact-fab{ height:44px; padding:0 16px; font-size:14px; gap:7px; }
-    .back-to-top-fab{ bottom:20px; right:16px; }
+    .back-to-top-fab, .contact-fab{ width:60px; height:60px; }
+    .fab-arc-text{ font-size:8.6px; }
+    .fab-wrap-home{ bottom:20px; right:16px; }
+  }
+  /* الموقع رايح تطبيق أندرويد وiOS: على أجهزة النوتش الشريط السفلي بياكل من
+     أسفل الشاشة، فالأزرار العائمة لازم ترتفع عنه. env() بترجع صفر على أي
+     جهاز من غير نوتش، فالسطر ده مالوش أي أثر جانبي. */
+  .fab-wrap-home{ bottom:calc(26px + env(safe-area-inset-bottom, 0px)); }
+  .contact-widget{ bottom:calc(26px + env(safe-area-inset-bottom, 0px)); }
+  .admin-fab{ bottom:calc(104px + env(safe-area-inset-bottom, 0px)); }
+  @media(max-width:520px){
+    .fab-wrap-home{ bottom:calc(20px + env(safe-area-inset-bottom, 0px)); }
+    .contact-widget{ bottom:calc(20px + env(safe-area-inset-bottom, 0px)); }
+    .admin-fab{ bottom:calc(92px + env(safe-area-inset-bottom, 0px)); }
   }
 
   .scroll-ruler{
@@ -1781,6 +1844,22 @@
   }
 
   /* ===== Search (with per-visitor search history) ===== */
+  /* البحث والبانر صف واحد. البحث بياخد أقل من نصف العرض — كان واخد العرض
+     كله وهو مش محتاجه، والبانر كان صف كامل تحته. */
+  .search-row{ display:flex; align-items:stretch; gap:8px; min-width:0; }
+  .search-row .search-box{ flex:0 1 47%; min-width:0; }
+  .search-row .soft-launch-banner{
+    flex:1 1 auto; min-width:0; display:flex; align-items:center;
+    justify-content:center; padding:0 12px; border-radius:12px;
+    font-size:12.5px; white-space:nowrap; overflow:hidden;
+  }
+  .search-row .soft-launch-banner span{
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  @media(max-width:400px){
+    .search-row .search-box{ flex:0 1 44%; }
+    .search-row .soft-launch-banner{ font-size:12px; padding:0 8px; }
+  }
   .search-box{position:relative; display:flex; align-items:center;}
   .search-box .search-icon-btn{
     position:absolute; inset-inline-start:10px; color:var(--brass);
@@ -1822,17 +1901,27 @@
     .search-box input{width:150px;}
   }
   @media(max-width:700px){
-    .search-box{order:4; width:100%;}
-    .search-box input{width:100%;}
+    /* الصف كله (بحث + بانر) هو اللي بياخد سطر كامل ويتأخر للآخر — مش
+       صندوق البحث لوحده. من غير كده زرار الدخول كان بينط لسطر تالت
+       والهيدر بيرجع طويل زي ما كان. */
+    .search-row{order:4; width:100%; flex:1 1 100%;}
+    .search-box{width:auto;}
+    .search-box input{width:100%; min-width:0;}
   }
   /* «ميجا» بنفس وميض الاسم اللي في الهيرو، بس بأحمر أغمق شوية: الأحمر الفاتح
      على الأصفر الذهبي تباينه ضعيف ومش بيتقرا — الأغمق ده تباينه 8.6:1. */
+  /* الأحمر الغامق كان مضبوط على الأصفر الصلب (5:1). على الأرضية الداكنة
+     الجديدة تباينه بينزل لـ1.8:1 — يعني شبه مختفي. الفاتح ده 5.2:1. */
+  /* «ميجا» جوه الدايرة تحت الأيقونة. 9.5px هو أكبر مقاس بيخلي الكلمة
+     تدخل جوه دايرة 52px من غير ما تلمس الإطار. */
   .contact-fab .fab-mega{
-    color:#8f0c0c; font-weight:700; font-size:1.08em; line-height:1;
+    color:#ff4d4d; font-weight:700; font-size:11px; line-height:1;
     animation:megaBlink 1.5s ease-in-out infinite;
   }
   @media(prefers-reduced-motion: reduce){ .contact-fab .fab-mega{ animation:none; } }
-  @media(max-width:520px){ .contact-widget{ bottom:20px; left:16px; } }
+  /* الكلمة أعرض من الدايرة، فلو الزرار ملزّق في حافة الشاشة الكلمة
+     بتتقص. 24px بتسيب فراغ كفاية لنص عرض الكلمة الزيادة. */
+  @media(max-width:520px){ .contact-widget{ bottom:20px; left:24px; } }
   .contact-menu{
     display:flex; flex-direction:column; gap:8px;
     opacity:0; pointer-events:none; transform:translateY(10px) scale(0.9); transform-origin:bottom left;
