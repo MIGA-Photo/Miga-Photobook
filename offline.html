@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>مفيش نت — Miga-Photobook</title>
+<!-- الصفحة دي بتتخزّن في الكاش وقت تنصيب الـservice worker، فبتشتغل من غير
+     نت. مقصود إنها ملف واحد بالكامل — مفيش CSS ولا خط ولا صورة من بره،
+     لأن أي طلب خارجي هيفشل وهي أصلاً بتتعرض وقت انقطاع الشبكة. -->
+<style>
+  :root{ --ink:#17161d; --paper:#fff8ec; --brass:#ffc94d; --dim:#9a95a8; }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background:var(--ink); color:var(--paper); padding:24px;
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, Arial, sans-serif;
+    text-align:center;
+  }
+  .box{ max-width:400px; }
+  svg{ margin-bottom:20px; }
+  h1{ font-size:22px; font-weight:800; margin:0 0 10px; }
+  p{ font-size:15px; line-height:1.75; color:var(--dim); margin:0 0 24px; }
+  button{
+    background:var(--brass); color:var(--ink); border:0; border-radius:10px;
+    padding:13px 30px; font-size:15px; font-weight:700; cursor:pointer;
+    min-height:46px; font-family:inherit;
+  }
+  .brand{ margin-top:28px; font-size:13px; color:var(--dim); direction:ltr; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ffc94d" stroke-width="1.6"
+         stroke-linecap="round" aria-hidden="true">
+      <path d="M2 8.8a16 16 0 0 1 20 0"/><path d="M5 12.5a11 11 0 0 1 14 0"/>
+      <path d="M8.5 16a6 6 0 0 1 7 0"/><circle cx="12" cy="19.5" r="0.9" fill="#ffc94d"/>
+      <path d="M3 3l18 18" stroke="#e07a7a"/>
+    </svg>
+    <h1>مفيش اتصال بالإنترنت</h1>
+    <p>الصفحة مش قادرة تحمّل دلوقتي. اتأكد إن الشبكة شغالة وجرّب تاني — شغلك محفوظ وهتلاقيه زي ما هو.</p>
+    <button type="button" onclick="location.reload()">حاول تاني</button>
+    <div class="brand">miga-photobook.com</div>
+  </div>
+</body>
+</html>

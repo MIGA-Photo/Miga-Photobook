@@ -411,7 +411,15 @@ const translations = {
     toastGenerating:'جاري توليد الصورة... ممكن يستغرق دقايق',
     toastGenerateFailed:'حصل خطأ أثناء التوليد، حاول تاني',
     toastOrderFailed:'تعذّر إرسال طلبك حاليًا — تأكد من اتصالك بالإنترنت وحاول تاني، أو تواصل معنا مباشرة.',
-    toastDownloadFailed:'تعذّر تحميل الصورة تلقائيًا'
+    toastDownloadFailed:'تعذّر تحميل الصورة تلقائيًا',
+    // تسميات لقارئ الشاشة والـtooltips — كانت مكتوبة ثابتة في الـHTML
+    // فمكانتش بتترجم أبدًا. زائر إنجليزي أعمى كان بيسمعها بالعربي.
+    a11yResult:'نتيجة', a11yExample:'مثال', a11ySearch:'بحث', a11yPrev:'السابق', a11yNext:'التالي',
+    a11yContact:'تواصل معنا', a11yBackToTop:'العودة لأعلى الصفحة',
+    a11yScrollUp:'لأعلى', a11yScrollDown:'لأسفل',
+    a11yOriginalPhoto:'الصورة الأصلية', a11yChangeAvatar:'تغيير صورة البروفايل',
+    sliderHint:'اسحب يمين وشمال، ودوس ‹ › تتنقل بين أمثلة مختلفة',
+    trackCodePh:'مثال: A1B2C3', registerPasswordPh:'6 أحرف على الأقل'
   },
   en: {
     categoriesLabel:'Categories',
@@ -717,7 +725,13 @@ const translations = {
     toastGenerating:'Generating your image... this can take a few minutes',
     toastGenerateFailed:'Something went wrong while generating, please try again',
     toastOrderFailed:"Couldn't send your order right now — check your connection and try again, or contact us directly.",
-    toastDownloadFailed:'Could not download the image automatically'
+    toastDownloadFailed:'Could not download the image automatically',
+    a11yResult:'Result', a11yExample:'Example', a11ySearch:'Search', a11yPrev:'Previous', a11yNext:'Next',
+    a11yContact:'Contact us', a11yBackToTop:'Back to top',
+    a11yScrollUp:'Scroll up', a11yScrollDown:'Scroll down',
+    a11yOriginalPhoto:'Original photo', a11yChangeAvatar:'Change profile photo',
+    sliderHint:'Drag left and right, and tap \u2039 \u203a to move between examples',
+    trackCodePh:'e.g. A1B2C3', registerPasswordPh:'At least 6 characters'
   }
 };
 let currentLang = 'ar';
@@ -1054,6 +1068,22 @@ function applyLanguage(lang){
   });
   document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
     el.setAttribute('placeholder', t(el.getAttribute('data-i18n-ph')));
+  });
+  // السمات دي مش نص مرئي، فمحدش واخد باله إنها مكانتش بتترجم — لكنها
+  // بالظبط اللي قارئ الشاشة بينطقه، واللي بيظهر في tooltip الماوس.
+  document.querySelectorAll('[data-i18n-title]').forEach(el=>{
+    el.setAttribute('title', t(el.getAttribute('data-i18n-title')));
+  });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el=>{
+    const n = el.getAttribute('data-i18n-aria-n');
+    el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria')) + (n ? ' ' + n : ''));
+  });
+  document.querySelectorAll('[data-i18n-alt]').forEach(el=>{
+    // data-i18n-alt-n بيضيف رقم بعد النص: "نتيجة 3" / "Result 3".
+    // كل صورة لازم يبقى ليها وصف مختلف — 8 صور بنفس الـalt بتبان لجوجل
+    // محتوى مكرر وبيتجاهل أغلبهم.
+    const n = el.getAttribute('data-i18n-alt-n');
+    el.setAttribute('alt', t(el.getAttribute('data-i18n-alt')) + (n ? ' ' + n : ''));
   });
 
   // Must run BEFORE the active-category dropdown-label sync just below —
@@ -1627,7 +1657,7 @@ function renderHeroStrip(){
   const doubled = [...sample, ...sample];
   track.innerHTML = doubled.map((p,i) => `
     <div class="frame">
-      <img src="${p.image}" alt="" loading="lazy" decoding="async">
+      <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" loading="lazy" decoding="async">
     </div>`).join('');
 
   // ---- Constant on-screen speed regardless of catalog size ----
@@ -1689,7 +1719,10 @@ function renderWatermarkBackground(){
     let html = '';
     for(let i=0; i<slots; i++){
       const p = source[i % source.length];
-      html += `<img src="${p.image}" alt="" loading="lazy">`;
+      // خلفية زخرفية باهتة (opacity 0.10) — alt فاضي + aria-hidden هو الصح
+      // هنا: قارئ الشاشة يتجاهلها تمامًا، وجوجل مايفهرسش 8 صور مكررة
+      // بنفس أسماء المنتجات اللي أصلاً معروضة في البطاقات تحت.
+      html += `<img src="${p.image}" alt="" aria-hidden="true" loading="lazy">`;
     }
     photosEl.innerHTML = html;
   }
@@ -2199,7 +2232,7 @@ function catTileHtml(cat){
     // own job is to open the category, so nothing else about it moves.
     const pool = categoryTopPhotos(items, COVER_POOL_SIZE);
     const coverHtml = cover
-      ? `<img src="${cover.image}" alt="" loading="lazy" decoding="async">`
+      ? `<img src="${cover.image}" alt="${escapeHtml(productTitle(cover))}" loading="lazy" decoding="async">`
         + (pool.length > 1
             ? `<span class="ct-cycle" role="button" tabindex="0" data-cycle="${cat}" title="${t('cycleCoverTitle')}" aria-label="${t('cycleCoverTitle')}">&#8635;</span>`
             : '')
@@ -3938,7 +3971,7 @@ function renderSearchDropdown(query){
     html += `<div class="sd-section-label">${t('searchResultsLabel')}</div>` +
       productMatches.map(p => `
         <div class="sd-result" data-product="${p.id}">
-          <img src="${p.image}" alt="">
+          <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" loading="lazy" decoding="async">
           <div>
             <div class="sd-title">${escapeHtml(productTitle(p))}</div>
             <div class="sd-cat">${catLabel(p.category)}</div>
@@ -7060,7 +7093,7 @@ function renderAdminProductsList(){
     items.forEach((p, idx)=>{
       html += `
       <div class="admin-product-row">
-        <img src="${p.image}" alt="">
+        <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" loading="lazy" decoding="async">
         <div class="admin-product-info">
           <b>${escapeHtml(p.title)}</b>
           <span>${p.price} ${CURRENCY}</span>
@@ -7209,7 +7242,8 @@ function initSliderInstance(rootId){
 
   function renderDots(){
     if(!els.dots) return;
-    els.dots.innerHTML = state.pairs.map((_,i)=>`<button type="button" class="slider-dot" aria-label="مثال ${i+1}"></button>`).join('');
+    // aria-label كان مكتوب عربي ثابت — قارئ الشاشة لزائر إنجليزي كان بينطقه عربي
+    els.dots.innerHTML = state.pairs.map((_,i)=>`<button type="button" class="slider-dot" data-i18n-aria="a11yExample" data-i18n-aria-n="${i+1}" aria-label="${t('a11yExample')} ${i+1}"></button>`).join('');
     [...els.dots.children].forEach((d,i)=> d.onclick = ()=> renderPair(i));
   }
   function renderPair(index){
@@ -7332,7 +7366,12 @@ async function applyHeroModeForThisDesign(){
   }catch(e){}
 
   applyTheme(prefs?.theme || 'dark');
-  applyLanguage(prefs?.lang || 'ar');
+  // اللغة الافتراضية بتيجي من <html lang> بتاع الصفحة نفسها: صفحة /en/
+  // بتفتح إنجليزي على طول، والجذر بيفتح عربي. تفضيل الزائر المحفوظ بيغلب
+  // الاتنين — لو اختار لغة قبل كده بتفضل معاه على أي صفحة.
+  // من غير ده كانت /en/ هتترسم إنجليزي في الـHTML وبعدين app.js يرجّعها
+  // عربي بعد ثانية — أوحش من إنها تبقى عربي من الأول.
+  applyLanguage(prefs?.lang || (document.documentElement.lang === 'en' ? 'en' : 'ar'));
   // Defaults to 'mobile' for a first-time visitor with no saved preference —
   // most customers land here from their phones, and the mobile layout is
   // now the intended default first impression (per explicit request).

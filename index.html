@@ -162,6 +162,12 @@
 })();
 </script>
 <link rel="canonical" href="https://miga-photobook.com/">
+<!-- بيقول لجوجل إن في نسختين للصفحة دي بلغتين، وإن كل واحدة لمين.
+     من غيرهم النسخة الإنجليزية مبتتفهرسش أصلاً — التبديل بالجافاسكريبت
+     مش بيعمل رابط تاني يقدر جوجل يفهرسه. -->
+<link rel="alternate" hreflang="ar" href="https://miga-photobook.com/">
+<link rel="alternate" hreflang="en" href="https://miga-photobook.com/en/">
+<link rel="alternate" hreflang="x-default" href="https://miga-photobook.com/">
 
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://miga-photobook.com/">
@@ -234,6 +240,12 @@
 </script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<!-- ملفات الخط الحقيقية بتيجي من gstatic مش googleapis — من غير السطر ده
+     الزائر بيدفع رحلة DNS + TLS كاملة زيادة قبل ما أول حرف يتشاف. -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- أول طلب بيانات (المنتجات وإعدادات الموقع) بيروح للووركر، فنفتح
+     الاتصال بدري بدل ما نستنى لحد ما app.js يشتغل. -->
+<link rel="preconnect" href="https://miga-photobook-api.magdyfarouk380.workers.dev">
 <link href="https://fonts.googleapis.com/css2?family=Rakkas&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <!-- The "?v=..." on styles.css and app.js below (near the closing </body>) is a
      cache-buster. Cloudflare/browsers otherwise cache these files under their
@@ -243,7 +255,7 @@
      old URL. Bumping this string (e.g. 20260906a -> 20260906b) any time
      app.js or styles.css changes forces every visitor to fetch the new file
      immediately, no manual cache-clearing needed on their end. -->
-<link rel="stylesheet" href="styles.css?v=20260908j">
+<link rel="stylesheet" href="styles.css?v=20260909a">
 
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
@@ -338,7 +350,7 @@
     <button type="button" class="util-link" id="trackOpenBtn" data-i18n="trackBtn">تتبع طلبي</button>
   </div>
   <div class="nav-wrap">
-    <button type="button" id="hamburgerBtn" class="hamburger-btn" aria-label="القائمة" aria-haspopup="true" aria-expanded="false">
+    <button type="button" id="hamburgerBtn" data-i18n-aria="menuTitle" class="hamburger-btn" aria-label="القائمة" aria-haspopup="true" aria-expanded="false">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg>
     </button>
     <div class="logo">
@@ -376,14 +388,14 @@
     </div>
 
     <div class="search-box" id="searchBox">
-      <button type="button" class="search-icon-btn" id="searchIconBtn" aria-label="بحث" title="بحث">
+      <button type="button" class="search-icon-btn" id="searchIconBtn" data-i18n-title="a11ySearch" data-i18n-aria="a11ySearch" aria-label="بحث" title="بحث">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><circle cx="10.3" cy="10.3" r="6.6" stroke-width="2.1"/><path d="M8 6.6a4 4 0 0 0-2.7 3.9" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/><line x1="15.2" y1="15.2" x2="21" y2="21" stroke-width="2.6" stroke-linecap="round"/></svg>
       </button>
       <input type="text" id="searchInput" data-i18n-ph="searchPlaceholder" placeholder="ابحث في الموقع...">
       <div class="search-dropdown" id="searchDropdown"></div>
     </div>
 
-    <button class="admin-btn admin-btn-primary" id="accountOpenBtn">تسجيل الدخول</button>
+    <button class="admin-btn admin-btn-primary" id="accountOpenBtn" data-i18n="accountBtnGuest">تسجيل الدخول</button>
     <button class="admin-btn" id="adminOpenBtn" data-i18n="adminBtn" style="display:none;">لوحة الإدارة</button>
   </div>
 
@@ -439,17 +451,17 @@
   <div class="fixed-slider-frame">
     <div class="slider-wrap-instance" id="bafSliderFixed">
       <div class="slider-card slider-card-compact" data-slider-card>
-        <img data-slider-before alt="قبل">
-        <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد"></div>
+        <img data-slider-before alt="قبل" data-i18n-alt="beforeLabel">
+        <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد" data-i18n-alt="afterLabel"></div>
         <div class="slider-line" data-slider-line></div>
         <button type="button" class="slider-handle" data-slider-handle>↔</button>
-        <span class="tag tag-before">قبل</span>
-        <span class="tag tag-after">بعد</span>
+        <span class="tag tag-before" data-i18n="beforeLabel">قبل</span>
+        <span class="tag tag-after" data-i18n="afterLabel">بعد</span>
       </div>
       <div class="slider-controls-row">
-        <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق">‹</button>
+        <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق" data-i18n-aria="a11yPrev">‹</button>
         <div class="slider-dots" data-slider-dots></div>
-        <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي">›</button>
+        <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي" data-i18n-aria="a11yNext">›</button>
       </div>
     </div>
   </div>
@@ -623,17 +635,17 @@
         <div class="baf-connector" style="--angle:225deg; --radius:clamp(120px,36vw,225px);"></div>
         <div class="baf-connector" style="--angle:270deg; --radius:clamp(120px,36vw,225px);"></div>
         <div class="baf-connector" style="--angle:315deg; --radius:clamp(120px,36vw,225px);"></div>
-        <div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-1.jpg" alt="نتيجة 1" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-2.jpg" alt="نتيجة 2" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-3.jpg" alt="نتيجة 3" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-4.jpg" alt="نتيجة 4" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-5.jpg" alt="نتيجة 5" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-6.jpg" alt="نتيجة 6" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-7.jpg" alt="نتيجة 7" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-8.jpg" alt="نتيجة 8" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-1.jpg" alt="نتيجة 1" data-i18n-alt="a11yResult" data-i18n-alt-n="1" loading="eager" fetchpriority="high" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-2.jpg" alt="نتيجة 2" data-i18n-alt="a11yResult" data-i18n-alt-n="2" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-3.jpg" alt="نتيجة 3" data-i18n-alt="a11yResult" data-i18n-alt-n="3" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-4.jpg" alt="نتيجة 4" data-i18n-alt="a11yResult" data-i18n-alt-n="4" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-5.jpg" alt="نتيجة 5" data-i18n-alt="a11yResult" data-i18n-alt-n="5" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-6.jpg" alt="نتيجة 6" data-i18n-alt="a11yResult" data-i18n-alt-n="6" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-7.jpg" alt="نتيجة 7" data-i18n-alt="a11yResult" data-i18n-alt-n="7" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-8.jpg" alt="نتيجة 8" data-i18n-alt="a11yResult" data-i18n-alt-n="8" loading="eager" decoding="async"></div></div>
       </div>
       <div class="baf-center">
-        <img src="before-after/before-after/before.jpg" alt="الصورة الأصلية">
+        <img src="before-after/before-after/before.jpg" alt="الصورة الأصلية" data-i18n-alt="a11yOriginalPhoto">
         <span class="baf-center-label" data-i18n="bafCenterLabel">صورتك الأصلية</span>
       </div>
     </div>
@@ -645,19 +657,19 @@
   <div class="hero-showcase-variant" id="heroVariantSlider" hidden>
     <div class="slider-wrap-instance" id="bafSliderV1">
       <div class="slider-card" data-slider-card>
-        <img data-slider-before alt="قبل">
-        <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد"></div>
+        <img data-slider-before alt="قبل" data-i18n-alt="beforeLabel">
+        <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد" data-i18n-alt="afterLabel"></div>
         <div class="slider-line" data-slider-line></div>
         <button type="button" class="slider-handle" data-slider-handle>↔</button>
-        <span class="tag tag-before">قبل</span>
-        <span class="tag tag-after">بعد</span>
+        <span class="tag tag-before" data-i18n="beforeLabel">قبل</span>
+        <span class="tag tag-after" data-i18n="afterLabel">بعد</span>
       </div>
       <div class="slider-controls-row">
-        <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق">‹</button>
+        <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق" data-i18n-aria="a11yPrev">‹</button>
         <div class="slider-dots" data-slider-dots></div>
-        <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي">›</button>
+        <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي" data-i18n-aria="a11yNext">›</button>
       </div>
-      <p class="slider-hint">اسحب يمين وشمال، ودوس ‹ › تتنقل بين أمثلة مختلفة</p>
+      <p class="slider-hint" data-i18n="sliderHint">اسحب يمين وشمال، ودوس ‹ › تتنقل بين أمثلة مختلفة</p>
     </div>
   </div>
 
@@ -976,14 +988,14 @@
   </div>
   <div class="testimonials-grid" id="testimonialsGrid">
     <div class="proof-results-grid" style="grid-column:1/-1;" id="testimonialsProofGrid">
-      <div class="proof-tile"><img src="before-after/before-after/after-1.jpg" alt="نتيجة حقيقية 1" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-2.jpg" alt="نتيجة حقيقية 2" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-3.jpg" alt="نتيجة حقيقية 3" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-4.jpg" alt="نتيجة حقيقية 4" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-5.jpg" alt="نتيجة حقيقية 5" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-6.jpg" alt="نتيجة حقيقية 6" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-7.jpg" alt="نتيجة حقيقية 7" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-8.jpg" alt="نتيجة حقيقية 8" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-1.jpg" alt="نتيجة حقيقية 1" data-i18n-alt="a11yResult" data-i18n-alt-n="1" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-2.jpg" alt="نتيجة حقيقية 2" data-i18n-alt="a11yResult" data-i18n-alt-n="2" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-3.jpg" alt="نتيجة حقيقية 3" data-i18n-alt="a11yResult" data-i18n-alt-n="3" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-4.jpg" alt="نتيجة حقيقية 4" data-i18n-alt="a11yResult" data-i18n-alt-n="4" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-5.jpg" alt="نتيجة حقيقية 5" data-i18n-alt="a11yResult" data-i18n-alt-n="5" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-6.jpg" alt="نتيجة حقيقية 6" data-i18n-alt="a11yResult" data-i18n-alt-n="6" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-7.jpg" alt="نتيجة حقيقية 7" data-i18n-alt="a11yResult" data-i18n-alt-n="7" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-8.jpg" alt="نتيجة حقيقية 8" data-i18n-alt="a11yResult" data-i18n-alt-n="8" loading="lazy"></div>
     </div>
   </div>
   <p class="sub" style="margin-top:16px; opacity:0.7; font-size:12.5px;" id="testimonialsNoteEl" data-i18n="testimonialsNote">* نماذج حقيقية من نتائج Miga-Photobook الفعلية.</p>
@@ -1041,21 +1053,21 @@
       <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M21.5 3.5L2.7 10.8c-1.2.5-1.2 1.2-.2 1.5l4.8 1.5 1.8 5.7c.2.6.4.8.9.8s.7-.2 1-.5l2.4-2.3 4.9 3.6c.9.5 1.5.2 1.8-.9l3.2-15c.3-1.4-.4-1.9-1.5-1.4zM8.5 14.3L18 8.1c.4-.3.8-.1.5.2l-8.1 7.3-.3 3.2-1.6-4.5z"/></svg>
     </a>
   </div>
-  <button class="contact-fab" id="contactFabBtn" aria-label="تواصل معنا" title="تواصل معنا">
+  <button class="contact-fab" id="contactFabBtn" data-i18n-title="a11yContact" data-i18n-aria="a11yContact" aria-label="تواصل معنا" title="تواصل معنا">
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M12 2C6.5 2 2 6 2 11c0 2.6 1.2 4.9 3.1 6.6L4 22l4.6-1.5c1.1.3 2.2.5 3.4.5 5.5 0 10-4 10-9S17.5 2 12 2z"/></svg>
   </button>
 </div>
 
-<button class="back-to-top-fab" id="backToTopBtn" aria-label="العودة لأعلى الصفحة" title="العودة لأعلى الصفحة" style="display:none;">
+<button class="back-to-top-fab" id="backToTopBtn" data-i18n-title="a11yBackToTop" data-i18n-aria="a11yBackToTop" aria-label="العودة لأعلى الصفحة" title="العودة لأعلى الصفحة" style="display:none;">
   <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 5l-7 7h4v7h6v-7h4z"/></svg>
 </button>
 
 <div class="scroll-ruler" id="scrollRuler" aria-hidden="true">
-  <button class="scroll-ruler-arrow" id="scrollRulerUp" aria-label="لأعلى" title="لأعلى">▲</button>
+  <button class="scroll-ruler-arrow" id="scrollRulerUp" data-i18n-title="a11yScrollUp" data-i18n-aria="a11yScrollUp" aria-label="لأعلى" title="لأعلى">▲</button>
   <div class="scroll-ruler-track" id="scrollRulerTrack">
     <div class="scroll-ruler-thumb" id="scrollRulerThumb"></div>
   </div>
-  <button class="scroll-ruler-arrow" id="scrollRulerDown" aria-label="لأسفل" title="لأسفل">▼</button>
+  <button class="scroll-ruler-arrow" id="scrollRulerDown" data-i18n-title="a11yScrollDown" data-i18n-aria="a11yScrollDown" aria-label="لأسفل" title="لأسفل">▼</button>
 </div>
 
 </div><!-- /appRoot -->
@@ -1273,7 +1285,7 @@
     <p class="sub" data-i18n="trackModalSub">أدخل كود المتابعة الذي حصلت عليه بعد إرسال طلب الشراء.</p>
     <div class="field">
       <label data-i18n="trackCodeLabel">كود المتابعة</label>
-      <input type="text" id="trackCode" placeholder="مثال: A1B2C3" style="text-transform:uppercase;">
+      <input type="text" id="trackCode" data-i18n-ph="trackCodePh" placeholder="مثال: A1B2C3" style="text-transform:uppercase;">
     </div>
     <div class="modal-actions">
       <button class="btn-primary" id="trackCheckBtn" data-i18n="trackCheckBtn">تحقّق من الحالة</button>
@@ -1300,11 +1312,11 @@
       </svg>
       <span>Miga<span class="logo-accent">-Photobook</span></span>
     </div>
-    <button type="button" class="close-x" id="sideDrawerClose" aria-label="إغلاق">×</button>
+    <button type="button" class="close-x" id="sideDrawerClose" data-i18n-aria="closeBtn" aria-label="إغلاق">×</button>
   </div>
 
   <div class="side-drawer-profile">
-    <button type="button" id="drawerAvatarBtn" class="drawer-avatar" aria-label="تغيير صورة البروفايل">
+    <button type="button" id="drawerAvatarBtn" data-i18n-aria="a11yChangeAvatar" class="drawer-avatar" aria-label="تغيير صورة البروفايل">
       <img id="drawerAvatarImg" src="" alt="" style="display:none;">
       <svg id="drawerAvatarPlaceholder" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"/></svg>
       <span class="drawer-avatar-edit-badge" aria-hidden="true">
@@ -1421,7 +1433,7 @@
         </div>
         <div class="field">
           <label data-i18n="passwordLabel">كلمة المرور</label>
-          <input type="password" id="registerPassword" placeholder="6 أحرف على الأقل">
+          <input type="password" id="registerPassword" data-i18n-ph="registerPasswordPh" placeholder="6 أحرف على الأقل">
         </div>
         <div class="modal-actions">
           <button class="btn-primary" id="registerSubmitBtn" data-i18n="registerBtn">إنشاء الحساب</button>
@@ -1432,7 +1444,7 @@
     <div id="accountLoggedInView" style="display:none;">
       <h3 data-i18n="accountWelcome">أهلاً بيك!</h3>
       <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
-        <button type="button" id="accountAvatarBtn" aria-label="تغيير صورة البروفايل" style="position:relative; width:64px; height:64px; border-radius:50%; border:1.5px solid var(--brass); background:var(--ink-2); overflow:hidden; flex-shrink:0; padding:0;">
+        <button type="button" id="accountAvatarBtn" data-i18n-aria="a11yChangeAvatar" aria-label="تغيير صورة البروفايل" style="position:relative; width:64px; height:64px; border-radius:50%; border:1.5px solid var(--brass); background:var(--ink-2); overflow:hidden; flex-shrink:0; padding:0;">
           <img id="accountAvatarImg" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover;">
           <span id="accountAvatarPlaceholder" style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:var(--brass);">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"/></svg>
@@ -1500,7 +1512,7 @@
   </div>
 </div>
 <div class="stay-nudge" id="stayNudge" role="dialog" aria-live="polite">
-  <button type="button" class="stay-nudge-close" id="stayNudgeClose" aria-label="إغلاق">&times;</button>
+  <button type="button" class="stay-nudge-close" id="stayNudgeClose" data-i18n-aria="closeBtn" aria-label="إغلاق">&times;</button>
   <h4 data-i18n="nudgeTitle">لسه مستني إيه؟</h4>
   <p data-i18n="nudgeBody">عرض الافتتاح لسه شغال — صورتك بـ 25 جنيه بدل 50. لو محتار في الاختيار، ابعتلنا واتساب ونساعدك تختار الأنسب لك.</p>
   <div class="stay-nudge-actions">
@@ -2015,7 +2027,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260908j"></script>
+<script src="app.js?v=20260909a"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){

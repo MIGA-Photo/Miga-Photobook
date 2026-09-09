@@ -2360,3 +2360,46 @@
     .admin-modal tbody td .order-status{ white-space:nowrap; }
   }
 
+
+  /* ===== مساحة اللمس: 44 بكسل من غير ما شكل حاجة يتغير =====
+     معيار أبل وجوجل الحد الأدنى 44×44. عندنا أزرار أيقونات 18×18 و24×24
+     و13×22 — الزائر بيدوس ومش بيحصل حاجة، فيدوس تاني وتالت. الإحساس ده
+     بالظبط اللي بيخلي الموقع يبان "مش مظبوط".
+
+     الحل هنا **مش** تكبير الأزرار — ده كان هيبوّظ التصميم. بدلها طبقة
+     شفافة (::after) متمركزة على الزرار وبتاخد 44×44 كحد أدنى. البكسلات
+     المرسومة زي ما هي حرفيًا؛ اللي كبر هو منطقة الاستقبال بس.
+
+     الأزرار اللي في صفوف متلاصقة بتتوسّع طوليًا بس — لو وسّعناها عرضيًا
+     كانت هتسرق دوسات جارها، وده أسوأ من المشكلة الأصلية. */
+  /* ملاحظة: نقاط السلايدر (.slider-dot) مستثناة عن قصد. قياسها 6×6 والمسافة
+     بينها ~10px، فمنطقة 44px حوالين كل واحدة كانت بتغطي جارتها — الاختبار
+     أثبت إن الدوسة على نقطة كانت بتروح للنقطة اللي جنبها. ده أسوأ من هدف
+     صغير. النقط دي تحكّم ثانوي أصلاً (السحب بالإصبع بيعمل نفس الحاجة). */
+  /* .search-icon-btn مستثناة كمان: عليها pointer-events:none — دي أيقونة
+     زينة جوه خانة البحث مش زرار، والدوسة عليها بتروّح للخانة وده الصح. */
+  .slider-nav, .close-x, .stay-nudge-close,
+  .fav-btn, .ct-cycle, .slider-handle, .cat-fav-btn{
+    position:relative;
+  }
+  .slider-nav::after, .close-x::after,
+  .stay-nudge-close::after, .fav-btn::after, .ct-cycle::after,
+  .slider-handle::after, .cat-fav-btn::after{
+    content:''; position:absolute; top:50%; left:50%;
+    transform:translate(-50%, -50%);
+    width:100%; height:100%; min-width:44px; min-height:44px;
+    /* مافيش خلفية ولا حدود — طبقة استقبال لمس بس */
+  }
+
+  /* عناصر في صفوف: الارتفاع بس، عشان ما تتداخلش مع جارها */
+  .util-link, .drawer-text-link, .why-edge-link, .theme-toggle-sm,
+  .contact-item, .cat-nav button, #catNav button{
+    position:relative;
+  }
+  .util-link::after, .drawer-text-link::after, .why-edge-link::after,
+  .theme-toggle-sm::after, .contact-item::after,
+  .cat-nav button::after, #catNav button::after{
+    content:''; position:absolute; top:50%; left:0; right:0;
+    transform:translateY(-50%);
+    height:100%; min-height:44px;
+  }

@@ -20,10 +20,20 @@
 
 const CACHE_NAME = 'miga-photobook-v1';
 
+const OFFLINE_URL = '/offline.html';
+
 self.addEventListener('install', function (event) {
   // Activate a newly-installed worker immediately instead of waiting for
   // all open tabs of the old version to close.
   self.skipWaiting();
+  // Pre-cache the offline page NOW, while we still have a network. It can't
+  // be fetched at the moment it's actually needed — that moment is, by
+  // definition, when there is no network.
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(function (cache) {
+      return cache.add(new Request(OFFLINE_URL, { cache: 'reload' }));
+    }).catch(function () { /* لو فشل التخزين، الـSW يفضل يشتغل عادي */ })
+  );
 });
 
 self.addEventListener('activate', function (event) {
@@ -63,7 +73,12 @@ self.addEventListener('fetch', function (event) {
       })
       .catch(function () {
         return caches.match(req).then(function (cached) {
-          return cached || Response.error();
+          if (cached) return cached;
+          // مفيش نسخة مخزّنة للطلب ده. لو الزائر بيفتح صفحة (مش صورة أو
+          // ملف)، نوريه صفحة "مفيش نت" بدل شاشة الديناصور بتاعة المتصفح —
+          // دي أول انطباع عن الموقع لو النت قطع في نص التصفح.
+          if (req.mode === 'navigate') return caches.match(OFFLINE_URL);
+          return Response.error();
         });
       })
   );
