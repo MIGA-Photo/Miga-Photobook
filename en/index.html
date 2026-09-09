@@ -29,7 +29,7 @@
      root (same reasoning as the favicon files) and are shared by all three
      design folders via this root-absolute link + registration script. -->
 <link href="/manifest.json" id="__pwaManifestLink" rel="manifest"/>
-<meta content="#0c0c10" name="theme-color"/>
+<meta content="#131316" name="theme-color"/>
 <!-- Design-switch bootstrap. IMPORTANT FIX: an earlier version of this used
      a synchronous XHR with `.timeout` set — browsers throw an
      InvalidAccessError the instant that combination runs (timeout is
@@ -56,22 +56,22 @@
   html{visibility:hidden;}
   #__bootLoader{
     visibility:visible; position:fixed; inset:0; z-index:999999;
-    background:#0c0c10; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:#131316; display:flex; flex-direction:column; align-items:center; justify-content:center;
     gap:14px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;
   }
   #__bootLoader svg{ animation:__bootPulse 1.3s ease-in-out infinite; }
   @keyframes __bootPulse{ 0%,100%{opacity:.5;} 50%{opacity:1;} }
-  #__bootLoader .__bl-name-en{ color:#ffc94d; font-size:20px; font-weight:800; letter-spacing:0.3px; margin:0; }
+  #__bootLoader .__bl-name-en{ color:#ffc94d; font-size:20px; font-weight:700; letter-spacing:0.3px; margin:0; }
   #__bootLoader .__bl-name-ar{ color:#ffc94d; font-size:15px; font-weight:700; margin:-8px 0 0; }
-  #__bootLoader .__bl-url{ color:#9a95a8; font-size:12px; margin:2px 0 0; direction:ltr; }
+  #__bootLoader .__bl-url{ color:#9a95a8; font-size:12.5px; margin:2px 0 0; direction:ltr; }
 </style>
 <div id="__bootLoader">
 <svg height="56" viewbox="0 0 48 48" width="56" xmlns="http://www.w3.org/2000/svg">
 <path d="M24 14 C19 10 10 9 5 11 V37 C10 35 19 36 24 40 V14 Z" fill="none" stroke="#ffc94d" stroke-linejoin="round" stroke-width="2"></path>
 <path d="M24 14 C29 10 38 9 43 11 V37 C38 35 29 36 24 40 V14 Z" fill="none" stroke="#ffc94d" stroke-linejoin="round" stroke-width="2"></path>
 <path d="M24 14 V40" opacity="0.5" stroke="#ffc94d" stroke-width="1.5"></path>
-<rect fill="#0c0c10" height="14" rx="3" stroke="#ffc94d" stroke-width="2" width="20" x="14" y="18"></rect>
-<rect fill="#0c0c10" height="5" rx="1.5" stroke="#ffc94d" stroke-width="2" width="8" x="20" y="14"></rect>
+<rect fill="#131316" height="14" rx="3" stroke="#ffc94d" stroke-width="2" width="20" x="14" y="18"></rect>
+<rect fill="#131316" height="5" rx="1.5" stroke="#ffc94d" stroke-width="2" width="8" x="20" y="14"></rect>
 <circle cx="24" cy="25" fill="none" r="4.5" stroke="#ffc94d" stroke-width="2"></circle>
 <circle cx="24" cy="25" fill="#ffc94d" r="1.6"></circle>
 </svg>
@@ -247,7 +247,7 @@
 <!-- أول طلب بيانات (المنتجات وإعدادات الموقع) بيروح للووركر، فنفتح
      الاتصال بدري بدل ما نستنى لحد ما app.js يشتغل. -->
 <link href="https://miga-photobook-api.magdyfarouk380.workers.dev" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Rakkas&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Rakkas&amp;family=Readex+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <!-- The "?v=..." on styles.css and app.js below (near the closing </body>) is a
      cache-buster. Cloudflare/browsers otherwise cache these files under their
      bare filename for a while, so a freshly-uploaded app.js/styles.css can look
@@ -256,7 +256,7 @@
      old URL. Bumping this string (e.g. 20260906a -> 20260906b) any time
      app.js or styles.css changes forces every visitor to fetch the new file
      immediately, no manual cache-clearing needed on their end. -->
-<link href="/styles.css?v=20260909b" rel="stylesheet"/>
+<link href="/styles.css?v=20260909c" rel="stylesheet"/>
 <!-- Google Analytics 4 -->
 <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
 <script>
@@ -500,7 +500,7 @@
   .trust-row .tr-dim{ opacity:0.75; }
   .vc-star{ color:#ffc94d; font-size:15px; line-height:1; }
   .vc-cam{ font-size:14px; line-height:1; }
-  .visitor-counter .vc-number{ color:var(--brass); font-weight:800; font-size:15px; }
+  .visitor-counter .vc-number{ color:var(--brass); font-weight:700; font-size:15px; }
   .vc-dot{
     position:relative; width:8px; height:8px; border-radius:50%;
     background:#3ddc84; flex-shrink:0;
@@ -517,7 +517,7 @@
   }
   @media(prefers-reduced-motion: reduce){ .vc-dot::after{ animation:none; } }
   @media(max-width:480px){
-    .visitor-counter{ font-size:12px; padding:8px 14px; gap:6px; margin-bottom:20px; }
+    .visitor-counter{ font-size:12.5px; padding:8px 14px; gap:6px; margin-bottom:20px; }
     .visitor-counter .vc-number{ font-size:13px; }
     .trust-row .tr-part{ gap:4px; }
   }
@@ -538,7 +538,7 @@
   @media(prefers-reduced-motion:reduce){ .baf-orbit, .baf-item-spin{ animation:none; } }
   .baf-center{ position:absolute; top:50%; left:50%; width:clamp(120px,32vw,190px); height:clamp(120px,32vw,190px); transform:translate(-50%,-50%); border-radius:50%; overflow:hidden; border:2px solid #3b8ef0; box-shadow:0 0 0 6px var(--ink), 0 0 18px rgba(59,142,240,0.4), 0 8px 24px rgba(0,0,0,0.4); z-index:5; }
   .baf-center img{ width:100%; height:100%; object-fit:cover; object-position:center 18%; display:block; }
-  .baf-center-label{ position:absolute; bottom:-14px; left:50%; transform:translateX(-50%); background:var(--brass); color:var(--ink); font-size:11px; font-weight:700; padding:3px 12px; border-radius:20px; white-space:nowrap; z-index:6; }
+  .baf-center-label{ position:absolute; bottom:-14px; left:50%; transform:translateX(-50%); background:var(--brass); color:var(--ink); font-size:12.5px; font-weight:700; padding:3px 12px; border-radius:20px; white-space:nowrap; z-index:6; }
   .baf-item{ --radius:clamp(120px,36vw,225px); position:absolute; top:50%; left:50%; width:clamp(70px,21vw,112px); height:clamp(70px,21vw,112px); margin-top:calc(clamp(70px,21vw,112px) / -2); margin-left:calc(clamp(70px,21vw,112px) / -2); transform:rotate(var(--angle)) translate(0, calc(-1 * var(--radius))) rotate(calc(-1 * var(--angle))); border-radius:50%; overflow:hidden; border:2.5px solid var(--brass); box-shadow:0 4px 14px rgba(0,0,0,0.35); transition:transform 0.25s ease, border-color 0.25s ease; }
   .baf-item:active img, .baf-item:hover img{ transform:scale(1.08); }
   .baf-item img{ width:100%; height:100%; object-fit:cover; object-position:center 15%; display:block; transition:transform 0.25s ease; }
@@ -559,10 +559,10 @@
   .slider-handle{
     position:absolute; top:50%; right:var(--posR,50%); transform:translate(50%,-50%);
     width:44px; height:44px; border-radius:50%; background:var(--brass); color:var(--ink);
-    display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:800;
+    display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:700;
     box-shadow:0 6px 18px rgba(0,0,0,0.5); cursor:ew-resize; border:none;
   }
-  .slider-card .tag{ position:absolute; top:14px; font-size:12px; font-weight:800; padding:5px 12px; border-radius:999px; background:rgba(11,11,13,0.72); backdrop-filter:blur(4px); border:1px solid var(--line); }
+  .slider-card .tag{ position:absolute; top:14px; font-size:12.5px; font-weight:700; padding:5px 12px; border-radius:999px; background:rgba(11,11,13,0.72); backdrop-filter:blur(4px); border:1px solid var(--line); }
   .slider-card .tag-before{ left:14px; } .slider-card .tag-after{ right:14px; color:var(--brass); }
   .slider-nav{
     position:static; z-index:5;
@@ -604,10 +604,10 @@
      overrides win with !important since several older, narrower-purpose
      rules already target .hero h1 at various breakpoints/view-modes. */
   .hero-with-slider h1{ font-size:clamp(13px,4vw,22px) !important; margin-bottom:6px !important; line-height:1.22 !important; }
-  .hero-with-slider .eyebrow{ font-size:11px !important; margin-bottom:6px !important; }
-  .hero-with-slider .tagline{ font-size:12px !important; }
+  .hero-with-slider .eyebrow{ font-size:12.5px !important; margin-bottom:6px !important; }
+  .hero-with-slider .tagline{ font-size:12.5px !important; }
   .hero-with-slider p{ font-size:clamp(11px,2.6vw,14.5px) !important; margin-bottom:0 !important; }
-  .hero-with-slider .trust-checks{ font-size:10.5px !important; gap:6px !important; margin-bottom:14px !important; }
+  .hero-with-slider .trust-checks{ font-size:12.5px !important; gap:6px !important; margin-bottom:14px !important; }
   .hero-with-slider .hero-ctas{ gap:8px !important; flex-wrap:wrap; }
   .hero-with-slider .hero-ctas a{ font-size:12.5px !important; padding:10px 14px !important; }
   @media(max-width:480px){
@@ -621,9 +621,9 @@
     width:100%; max-width:100%; margin-inline:auto;
   }
   .slider-card-compact{ aspect-ratio:4/5; max-width:none; }
-  .hero-with-slider .slider-handle{ width:30px; height:30px; font-size:12px; }
+  .hero-with-slider .slider-handle{ width:30px; height:30px; font-size:12.5px; }
   .hero-with-slider .slider-nav{ width:24px; height:24px; font-size:13px; }
-  .hero-with-slider .slider-card .tag{ font-size:9px; padding:3px 7px; top:6px; }
+  .hero-with-slider .slider-card .tag{ font-size:12.5px; padding:3px 7px; top:6px; }
   .hero-with-slider .slider-controls-row{ margin-top:6px; gap:8px; }
   .hero-with-slider .slider-dots{ gap:5px; }
   .hero-with-slider .slider-dot{ width:6px; height:6px; }
@@ -1358,7 +1358,7 @@
 <span data-i18n="continueFacebook">Continue with Facebook</span>
 </button>
 </div>
-<div class="account-tabs-divider" data-i18n="orDivider" style="display:none; text-align:center; font-size:12px; color:var(--paper-dim); margin-bottom:14px;">Or with email</div>
+<div class="account-tabs-divider" data-i18n="orDivider" style="display:none; text-align:center; font-size:12.5px; color:var(--paper-dim); margin-bottom:14px;">Or with email</div>
 <div class="account-tabs">
 <button class="account-tab active" data-i18n="loginTab" id="tabLoginBtn">Log In</button>
 <button class="account-tab" data-i18n="registerTab" id="tabRegisterBtn">New Account</button>
@@ -1406,7 +1406,7 @@
 <span id="accountAvatarPlaceholder" style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:var(--brass);">
 <svg fill="none" height="28" stroke="currentColor" stroke-width="1.6" viewbox="0 0 24 24" width="28"><circle cx="12" cy="8" r="3.6"></circle><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"></path></svg>
 </span>
-<span style="position:absolute; inset-inline-end:0; bottom:0; width:20px; height:20px; border-radius:50%; background:var(--brass); color:var(--ink); display:flex; align-items:center; justify-content:center; font-size:11px;">
+<span style="position:absolute; inset-inline-end:0; bottom:0; width:20px; height:20px; border-radius:50%; background:var(--brass); color:var(--ink); display:flex; align-items:center; justify-content:center; font-size:12.5px;">
 <svg fill="none" height="12" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24" width="12"><path d="M4 7h3l1.5-2h7L17 7h3v12H4z"></path><circle cx="12" cy="13" r="3.2"></circle></svg>
 </span>
 </button>
@@ -1460,7 +1460,7 @@
 </label>
 <div id="reviewPhotoPicker" style="display:none; gap:10px; flex-wrap:wrap; margin-top:10px;"></div>
 </div>
-<p class="sub" data-i18n="reviewModerationNote" style="font-size:12px;">Your review will appear after our team reviews it.</p>
+<p class="sub" data-i18n="reviewModerationNote" style="font-size:12.5px;">Your review will appear after our team reviews it.</p>
 <div class="modal-actions">
 <button class="btn-primary" data-i18n="submitReviewBtn" id="reviewSubmitBtn">Submit Review</button>
 <button class="btn-ghost" data-i18n="cancelBtn" id="reviewCancelBtn">Cancel</button>
@@ -1957,7 +1957,7 @@
 </div>
 </div>
 <div class="toast" id="toast"></div>
-<script src="/app.js?v=20260909b"></script>
+<script src="/app.js?v=20260909c"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
