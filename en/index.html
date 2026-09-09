@@ -259,7 +259,7 @@
      old URL. Bumping this string (e.g. 20260906a -> 20260906b) any time
      app.js or styles.css changes forces every visitor to fetch the new file
      immediately, no manual cache-clearing needed on their end. -->
-<link href="/styles.css?v=20260909m" rel="stylesheet"/>
+<link href="/styles.css?v=20260909n" rel="stylesheet"/>
 <!-- Google Analytics 4 -->
 <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
 <script>
@@ -352,6 +352,7 @@
 <button class="util-link" data-i18n="trackBtn" id="trackOpenBtn" type="button">Track Order</button>
 </div>
 <div class="nav-wrap">
+<div class="nav-top">
 <button aria-expanded="false" aria-haspopup="true" aria-label="Menu" class="hamburger-btn" data-i18n-aria="menuTitle" id="hamburgerBtn" type="button">
 <svg fill="none" height="22" stroke="currentColor" stroke-linecap="round" stroke-width="1.8" viewbox="0 0 24 24" width="22"><path d="M4 6.5h16M4 12h16M4 17.5h16"></path></svg>
 </button>
@@ -391,6 +392,9 @@
 <button data-i18n="adminLogoutBtn" id="adminQuickLogout" role="menuitem" style="color:#e07a7a;" type="button">Logout</button>
 </div>
 </div>
+<button aria-label="Log In" class="admin-btn admin-btn-primary" data-i18n-aria="accountBtnGuest" id="accountOpenBtn"><span aria-hidden="true" class="icon-badge"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><circle cx="12" cy="8" r="3.6"></circle><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"></path></svg></span><span data-i18n="accountBtnGuest">Log In</span></button>
+<button class="admin-btn" data-i18n="adminBtn" id="adminOpenBtn" style="display:none;">Admin Panel</button>
+</div><!-- /.nav-top -->
 <div class="search-row">
 <div class="search-box" id="searchBox">
 <button aria-label="Search" class="search-icon-btn" data-i18n-aria="a11ySearch" data-i18n-title="a11ySearch" id="searchIconBtn" title="Search" type="button">
@@ -406,8 +410,6 @@
 <span data-i18n="launchPromoBannerShort">🎉 25 EGP instead of 50</span>
 </div>
 </div>
-<button aria-label="Log In" class="admin-btn admin-btn-primary" data-i18n-aria="accountBtnGuest" id="accountOpenBtn"><span aria-hidden="true" class="icon-badge"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><circle cx="12" cy="8" r="3.6"></circle><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"></path></svg></span><span data-i18n="accountBtnGuest">Log In</span></button>
-<button class="admin-btn" data-i18n="adminBtn" id="adminOpenBtn" style="display:none;">Admin Panel</button>
 </div>
 <div class="cat-dropdown cat-pills-mode" id="catDropdown">
 <button aria-expanded="false" aria-haspopup="true" class="cat-dropdown-btn" id="catDropdownBtn" style="display:none;" type="button">
@@ -1053,12 +1055,9 @@
 </div>
 <div class="fab-wrap">
 <button aria-label="Contact us" class="contact-fab" data-i18n-aria="a11yContact" data-i18n-title="a11yContact" id="contactFabBtn" title="Contact us">
-<svg aria-hidden="true" class="fab-ring" viewbox="0 0 64 64">
-<path d="M 8.5 32 A 23.5 23.5 0 0 1 55.5 32" fill="none" id="fabArcContact"></path>
-<text class="fab-arc-text"><textpath data-i18n="contactFabWord" href="#fabArcContact" startoffset="50%" text-anchor="middle">Contact</textpath></text>
-</svg>
 <span class="fab-core">
-<svg aria-hidden="true" fill="currentColor" height="15" viewbox="0 0 24 24" width="15"><path d="M12 2C6.5 2 2 6 2 11c0 2.6 1.2 4.9 3.1 6.6L4 22l4.6-1.5c1.1.3 2.2.5 3.4.5 5.5 0 10-4 10-9S17.5 2 12 2z"></path></svg>
+<svg aria-hidden="true" fill="currentColor" height="14" viewbox="0 0 24 24" width="14"><path d="M12 2C6.5 2 2 6 2 11c0 2.6 1.2 4.9 3.1 6.6L4 22l4.6-1.5c1.1.3 2.2.5 3.4.5 5.5 0 10-4 10-9S17.5 2 12 2z"></path></svg>
+<span class="fab-word" data-i18n="contactFabWord">Contact</span>
 <span class="fab-mega" data-i18n="contactFabBrand">Miga</span>
 </span>
 </button>
@@ -1066,12 +1065,9 @@
 </div>
 <div class="fab-wrap fab-wrap-home" id="backToTopWrap" style="display:none;">
 <button aria-label="Back to top" class="back-to-top-fab" data-i18n-aria="a11yBackToTop" data-i18n-title="a11yBackToTop" id="backToTopBtn" title="Back to top">
-<svg aria-hidden="true" class="fab-ring" viewbox="0 0 64 64">
-<path d="M 8.5 32 A 23.5 23.5 0 0 1 55.5 32" fill="none" id="fabArcHome"></path>
-<text class="fab-arc-text"><textpath data-i18n="backHomeLabel" href="#fabArcHome" startoffset="50%" text-anchor="middle">Home</textpath></text>
-</svg>
 <span class="fab-core">
-<svg aria-hidden="true" fill="currentColor" height="19" viewbox="0 0 24 24" width="19"><path d="M12 5l-7 7h4v7h6v-7h4z"></path></svg>
+<svg aria-hidden="true" fill="currentColor" height="17" viewbox="0 0 24 24" width="17"><path d="M12 5l-7 7h4v7h6v-7h4z"></path></svg>
+<span class="fab-word" data-i18n="backHomeLabel">Home</span>
 </span>
 </button>
 </div>
@@ -1986,7 +1982,7 @@
 </div>
 </div>
 <div class="toast" id="toast"></div>
-<script src="/app.js?v=20260909m"></script>
+<script src="/app.js?v=20260909n"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
