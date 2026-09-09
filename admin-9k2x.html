@@ -9,7 +9,6 @@
      Multiple formats/sizes cover browser tabs, bookmarks, bookmarklets,
      and "Add to Home Screen" on iOS/Android — including what Google shows
      next to search results instead of the generic globe icon. -->
-<meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -43,6 +42,28 @@
 <meta name="apple-mobile-web-app-title" content="إدارة ميجا">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0c0c10">
+<!-- Design-switch bootstrap. IMPORTANT FIX: an earlier version of this used
+     a synchronous XHR with `.timeout` set — browsers throw an
+     InvalidAccessError the instant that combination runs (timeout is
+     invalid on synchronous requests per the XHR spec), which our own
+     try/catch was silently swallowing. That meant the redirect check never
+     actually ran, on any page, ever — visitors always just saw whatever
+     page they'd navigated to directly. This version uses a normal async
+     fetch instead, hiding the page with `visibility:hidden` until the
+     check resolves (or a 1.2s fallback fires) so there's still no flash of
+     the wrong design, without hitting that spec restriction. MY_DESIGN_ID
+     is the only line that differs between this file and each design's own
+     copy of this same script.
+
+     SECOND FIX: the secret admin entry point (visiting this exact root page
+     with #mega-admin-9k2x in the URL) lives ONLY here — Design MIGA 2/3
+     have no admin panel at all. But this redirect used to fire before that
+     hash was ever checked, so whenever a design other than MIGA 1 was
+     active, opening the admin link just bounced straight to that design's
+     visitor page (silently dropping the hash along the way) — the admin
+     became completely unreachable. The admin entry must always work from
+     this page regardless of which design is currently active for
+     customers, so it's now checked FIRST and skips the redirect entirely. -->
 <style id="__bootHide">
   html{visibility:hidden;}
   #__bootLoader{
@@ -72,6 +93,7 @@
 </div>
 <script>
 (function(){
+  var MY_DESIGN_ID = 'v1';
   var revealed = false;
   function reveal(){
     if(revealed) return;
@@ -80,6 +102,36 @@
     if(s) s.remove();
     var l = document.getElementById('__bootLoader');
     if(l) l.remove();
+  }
+  // Admin entry point — never redirect away from this, no matter which
+  // design is active for customers. The admin panel only exists here.
+  //
+  // THIRD FIX (Sep 2026): iOS "Add to Home Screen" was found to drop the
+  // URL fragment entirely from the installed icon's launch URL — an
+  // icon installed while on "/#mega-admin-9k2x" actually launched to
+  // plain "/" (confirmed live: the install sheet showed
+  // "https://miga-photobook.com/", no hash, and the installed icon opened
+  // the customer homepage). Hash-based routing can never survive iOS's
+  // install flow. Query strings are part of the real URL (sent to the
+  // server, not a client-only fragment) and are preserved by iOS install,
+  // so "?admin=9k2x" is now accepted as an equivalent, install-safe way in
+  // — the old hash form still works too for any existing bookmarks/links.
+  // الملف ده نفسه مدخل أدمن — لازم يتعرف قبل أي حاجة تانية عشان
+  // مايتعملش redirect لتصميم العملاء لو التصميم النشط اتغيّر.
+  var isAdminEntry = /\/admin-9k2x\.html$/.test(window.location.pathname) ||
+    (window.location.hash === '#mega-admin-9k2x') ||
+    /(^|&)admin=9k2x(&|$)/.test(window.location.search.replace(/^\?/, ''));
+  if(isAdminEntry){
+    // Swap the page's manifest to the admin one BEFORE reveal(), so that if
+    // the owner taps "Add to Home Screen" while on this admin URL, the
+    // installed icon launches straight back into the admin panel
+    // (start_url "/?admin=9k2x") instead of the customer homepage.
+    // Swapping the existing <link rel="manifest"> element's href like this
+    // is picked up by the browser's install flow same as a static manifest.
+    var manifestLink = document.getElementById('__pwaManifestLink');
+    if(manifestLink) manifestLink.setAttribute('href', '/admin-manifest.json');
+    reveal();
+    return;
   }
   var fallback = setTimeout(reveal, 1200);
   fetch('https://miga-photobook-api.magdyfarouk380.workers.dev/site-config')
@@ -92,6 +144,16 @@
       if(data && data.headerMode === 'compact'){
         document.documentElement.setAttribute('data-header-mode', 'compact');
       }
+      if(data && data.activeDesign && data.activeDesign !== MY_DESIGN_ID){
+        var target = (data.availableDesigns || []).filter(function(d){ return d.id === data.activeDesign; })[0];
+        var folder = target ? target.folder : '';
+        var myFolder = MY_DESIGN_ID === 'v1' ? '' : MY_DESIGN_ID;
+        var dest = null;
+        if(myFolder === '' && folder !== ''){ dest = './' + folder + '/'; }
+        else if(myFolder !== '' && folder === ''){ dest = '../'; }
+        else if(myFolder !== '' && folder !== ''){ dest = '../' + folder + '/'; }
+        if(dest){ window.location.replace(dest); return; }
+      }
       reveal();
     })
     .catch(function(){ clearTimeout(fallback); reveal(); });
@@ -103,9 +165,25 @@
 <meta name="keywords" content="تحويل الصور بالذكاء الاصطناعي, AI Photo Transformation, صور شخصية احترافية, تعديل صور بالذكاء الاصطناعي">
 <meta property="og:site_name" content="Miga-Photobook">
 
+
+<meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<!-- ملفات الخط الحقيقية بتيجي من gstatic مش googleapis — من غير السطر ده
+     الزائر بيدفع رحلة DNS + TLS كاملة زيادة قبل ما أول حرف يتشاف. -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- أول طلب بيانات (المنتجات وإعدادات الموقع) بيروح للووركر، فنفتح
+     الاتصال بدري بدل ما نستنى لحد ما app.js يشتغل. -->
+<link rel="preconnect" href="https://miga-photobook-api.magdyfarouk380.workers.dev">
 <link href="https://fonts.googleapis.com/css2?family=Rakkas&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260908j">
+<!-- The "?v=..." on styles.css and app.js below (near the closing </body>) is a
+     cache-buster. Cloudflare/browsers otherwise cache these files under their
+     bare filename for a while, so a freshly-uploaded app.js/styles.css can look
+     "not applied yet" to a visitor even though the correct file is already on
+     GitHub — because they're still being served the old cached copy from the
+     old URL. Bumping this string (e.g. 20260906a -> 20260906b) any time
+     app.js or styles.css changes forces every visitor to fetch the new file
+     immediately, no manual cache-clearing needed on their end. -->
+<link rel="stylesheet" href="styles.css?v=20260909a">
 
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
@@ -200,7 +278,7 @@
     <button type="button" class="util-link" id="trackOpenBtn" data-i18n="trackBtn">تتبع طلبي</button>
   </div>
   <div class="nav-wrap">
-    <button type="button" id="hamburgerBtn" class="hamburger-btn" aria-label="القائمة" aria-haspopup="true" aria-expanded="false">
+    <button type="button" id="hamburgerBtn" data-i18n-aria="menuTitle" class="hamburger-btn" aria-label="القائمة" aria-haspopup="true" aria-expanded="false">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg>
     </button>
     <div class="logo">
@@ -238,14 +316,14 @@
     </div>
 
     <div class="search-box" id="searchBox">
-      <button type="button" class="search-icon-btn" id="searchIconBtn" aria-label="بحث" title="بحث">
+      <button type="button" class="search-icon-btn" id="searchIconBtn" data-i18n-title="a11ySearch" data-i18n-aria="a11ySearch" aria-label="بحث" title="بحث">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"><circle cx="10.3" cy="10.3" r="6.6" stroke-width="2.1"/><path d="M8 6.6a4 4 0 0 0-2.7 3.9" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/><line x1="15.2" y1="15.2" x2="21" y2="21" stroke-width="2.6" stroke-linecap="round"/></svg>
       </button>
       <input type="text" id="searchInput" data-i18n-ph="searchPlaceholder" placeholder="ابحث في الموقع...">
       <div class="search-dropdown" id="searchDropdown"></div>
     </div>
 
-    <button class="admin-btn admin-btn-primary" id="accountOpenBtn">تسجيل الدخول</button>
+    <button class="admin-btn admin-btn-primary" id="accountOpenBtn" data-i18n="accountBtnGuest">تسجيل الدخول</button>
     <button class="admin-btn" id="adminOpenBtn" data-i18n="adminBtn" style="display:none;">لوحة الإدارة</button>
   </div>
 
@@ -271,7 +349,6 @@
 
 <div id="softLaunchBanner" class="soft-launch-banner">
   <span data-i18n="launchPromoBannerText">🎉 عرض افتتاح الموقع — كل صورة بـ 25 جنيه فقط!</span>
-  <span id="promoCountdown" class="promo-countdown"></span>
 </div>
 </div><!-- /.sticky-top-group -->
 
@@ -301,25 +378,46 @@
   <div class="fixed-slider-frame">
     <div class="slider-wrap-instance" id="bafSliderFixed">
       <div class="slider-card slider-card-compact" data-slider-card>
-        <img data-slider-before alt="قبل">
-        <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد"></div>
+        <img data-slider-before alt="قبل" data-i18n-alt="beforeLabel">
+        <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد" data-i18n-alt="afterLabel"></div>
         <div class="slider-line" data-slider-line></div>
         <button type="button" class="slider-handle" data-slider-handle>↔</button>
-        <span class="tag tag-before">قبل</span>
-        <span class="tag tag-after">بعد</span>
-        <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق">‹</button>
-        <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي">›</button>
+        <span class="tag tag-before" data-i18n="beforeLabel">قبل</span>
+        <span class="tag tag-after" data-i18n="afterLabel">بعد</span>
       </div>
-      <div class="slider-dots" data-slider-dots></div>
+      <div class="slider-controls-row">
+        <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق" data-i18n-aria="a11yPrev">‹</button>
+        <div class="slider-dots" data-slider-dots></div>
+        <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي" data-i18n-aria="a11yNext">›</button>
+      </div>
     </div>
   </div>
 </section>
 
-<div class="visitor-counter" id="visitorCounter" style="display:none;">
-  <span class="vc-dot"></span>
-  <span data-i18n="visitorCounterPrefix">انضم إلينا</span>
-  <span class="vc-number" id="visitorCounterNumber">0</span>
-  <span data-i18n="visitorCounterSuffix">زائر لحد دلوقتي</span>
+<!-- شريط الثقة: كبسولة واحدة فيها تلات أجزاء مفصولة بنقطة.
+     كل جزء بيظهر لوحده لما يبقى عنده رقم حقيقي، وبيفضل مخفي غير كده —
+     فمفيش رقم مكتوب بالإيد ولا ادعاء مش مدعوم ببيانات. -->
+<div class="visitor-counter trust-row" id="trustRow" style="display:none;">
+  <span class="tr-part" id="visitorCounter" style="display:none;">
+    <span class="vc-dot"></span>
+    <span class="vc-number" id="visitorCounterNumber">0</span>
+    <span data-i18n="trustVisitors">زائر</span>
+  </span>
+
+  <span class="tr-sep" data-for="ratingBadge" style="display:none;">·</span>
+  <span class="tr-part" id="ratingBadge" style="display:none;">
+    <span class="vc-star">★</span>
+    <span class="vc-number" id="ratingAvg">5</span>
+    <span class="tr-dim">(<span id="ratingCount">0</span>)</span>
+  </span>
+
+  <!-- الصور المحوّلة: مخفية لحد ما توصل العتبة (TRANSFORM_BADGE_MIN) -->
+  <span class="tr-sep" data-for="transformBadge" style="display:none;">·</span>
+  <span class="tr-part" id="transformBadge" style="display:none;">
+    <span class="vc-cam">✨</span>
+    <span class="vc-number" id="transformCount">0</span>
+    <span data-i18n="trustPhotos">صورة</span>
+  </span>
 </div>
 
 <section class="wrap">
@@ -331,10 +429,17 @@
 <style>
   .visitor-counter{
     display:flex; align-items:center; justify-content:center; gap:8px;
-    max-width:fit-content; margin:0 auto 28px; padding:10px 22px;
+    max-width:fit-content; margin:0 auto 28px; padding:10px 20px;
     background:var(--ink-2); border:1px solid var(--brass-dim);
     border-radius:100px; font-size:14px; color:var(--paper-dim);
   }
+  /* الأجزاء التلاتة جوه كبسولة واحدة — سطر واحد دايمًا، مايلفّش */
+  .trust-row{ flex-wrap:nowrap; white-space:nowrap; }
+  .trust-row .tr-part{ display:inline-flex; align-items:center; gap:5px; }
+  .trust-row .tr-sep{ color:var(--brass-dim); opacity:0.6; margin:0 2px; }
+  .trust-row .tr-dim{ opacity:0.75; }
+  .vc-star{ color:#ffc94d; font-size:15px; line-height:1; }
+  .vc-cam{ font-size:14px; line-height:1; }
   .visitor-counter .vc-number{ color:var(--brass); font-weight:800; font-size:15px; }
   .vc-dot{
     width:8px; height:8px; border-radius:50%; background:#3ddc84;
@@ -348,8 +453,9 @@
   }
   @media(prefers-reduced-motion: reduce){ .vc-dot{ animation:none; } }
   @media(max-width:480px){
-    .visitor-counter{ font-size:12.5px; padding:8px 16px; gap:6px; margin-bottom:20px; }
-    .visitor-counter .vc-number{ font-size:13.5px; }
+    .visitor-counter{ font-size:12px; padding:8px 14px; gap:6px; margin-bottom:20px; }
+    .visitor-counter .vc-number{ font-size:13px; }
+    .trust-row .tr-part{ gap:4px; }
   }
 </style>
 
@@ -382,7 +488,7 @@
     position:relative; border-radius:16px; overflow:hidden;
     border:1px solid var(--line); box-shadow:0 20px 60px rgba(0,0,0,0.45);
     aspect-ratio:4/5; max-width:420px; margin:0 auto; touch-action:none; user-select:none;
-    background:var(--ink-2, #151317);
+    background:var(--ink-2, #151317); cursor:ew-resize;
   }
   .slider-card img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
   .slider-after-wrap{ position:absolute; inset:0; overflow:hidden; clip-path:inset(0 0 0 var(--pos,50%)); }
@@ -396,14 +502,15 @@
   .slider-card .tag{ position:absolute; top:14px; font-size:12px; font-weight:800; padding:5px 12px; border-radius:999px; background:rgba(11,11,13,0.72); backdrop-filter:blur(4px); border:1px solid var(--line); }
   .slider-card .tag-before{ left:14px; } .slider-card .tag-after{ right:14px; color:var(--brass); }
   .slider-nav{
-    position:absolute; top:50%; transform:translateY(-50%); z-index:5;
+    position:static; z-index:5;
     width:36px; height:36px; border-radius:50%; border:1px solid var(--line);
     background:rgba(11,11,13,0.55); backdrop-filter:blur(4px); color:var(--paper);
     font-size:19px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+    flex-shrink:0;
   }
   .slider-nav:hover{ background:var(--brass); color:var(--ink); border-color:var(--brass); }
-  .slider-nav-prev{ left:8px; } .slider-nav-next{ right:8px; }
-  .slider-dots{ display:flex; justify-content:center; gap:8px; margin-top:12px; }
+  .slider-controls-row{ display:flex; align-items:center; justify-content:center; gap:14px; margin-top:12px; }
+  .slider-dots{ display:flex; justify-content:center; gap:8px; }
   .slider-dot{ width:8px; height:8px; border-radius:50%; background:var(--line); border:none; cursor:pointer; padding:0; }
   .slider-dot.active{ background:var(--brass); width:20px; border-radius:5px; }
   .slider-hint{ text-align:center; font-size:12.5px; color:var(--paper-dim); margin-top:10px; }
@@ -448,17 +555,18 @@
     padding:6px; border:2px solid var(--brass); border-radius:18px;
     box-shadow:0 0 0 3px rgba(255,201,77,0.12), 0 12px 30px rgba(0,0,0,0.5);
     background:linear-gradient(180deg, rgba(255,201,77,0.06), transparent 60%);
-    width:100%; max-width:250px; margin-inline-start:auto;
+    width:100%; max-width:100%; margin-inline:auto;
   }
   .slider-card-compact{ aspect-ratio:4/5; max-width:none; }
   .hero-with-slider .slider-handle{ width:30px; height:30px; font-size:12px; }
   .hero-with-slider .slider-nav{ width:24px; height:24px; font-size:13px; }
   .hero-with-slider .slider-card .tag{ font-size:9px; padding:3px 7px; top:6px; }
-  .hero-with-slider .slider-dots{ margin-top:6px; gap:5px; }
+  .hero-with-slider .slider-controls-row{ margin-top:6px; gap:8px; }
+  .hero-with-slider .slider-dots{ gap:5px; }
   .hero-with-slider .slider-dot{ width:6px; height:6px; }
-  @media(min-width:860px){ .fixed-slider-frame{ max-width:280px; } }
+  @media(min-width:860px){ .fixed-slider-frame{ max-width:340px; } }
   @media(max-width:480px){
-    .fixed-slider-frame{ max-width:130px; padding:4px; border-radius:14px; }
+    .fixed-slider-frame{ max-width:210px; padding:4px; border-radius:14px; }
     .hero-with-slider{ gap:8px !important; }
   }
   .hero-showcase-variant[hidden]{ display:none !important; }
@@ -481,17 +589,17 @@
         <div class="baf-connector" style="--angle:225deg; --radius:clamp(120px,36vw,225px);"></div>
         <div class="baf-connector" style="--angle:270deg; --radius:clamp(120px,36vw,225px);"></div>
         <div class="baf-connector" style="--angle:315deg; --radius:clamp(120px,36vw,225px);"></div>
-        <div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img src="before-after/after-1.jpg" alt="نتيجة 1" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img src="before-after/after-2.jpg" alt="نتيجة 2" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img src="before-after/after-3.jpg" alt="نتيجة 3" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img src="before-after/after-4.jpg" alt="نتيجة 4" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img src="before-after/after-5.jpg" alt="نتيجة 5" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img src="before-after/after-6.jpg" alt="نتيجة 6" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img src="before-after/after-7.jpg" alt="نتيجة 7" loading="eager" decoding="async"></div></div>
-        <div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img src="before-after/after-8.jpg" alt="نتيجة 8" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-1.jpg" alt="نتيجة 1" data-i18n-alt="a11yResult" data-i18n-alt-n="1" loading="eager" fetchpriority="high" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-2.jpg" alt="نتيجة 2" data-i18n-alt="a11yResult" data-i18n-alt-n="2" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-3.jpg" alt="نتيجة 3" data-i18n-alt="a11yResult" data-i18n-alt-n="3" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-4.jpg" alt="نتيجة 4" data-i18n-alt="a11yResult" data-i18n-alt-n="4" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-5.jpg" alt="نتيجة 5" data-i18n-alt="a11yResult" data-i18n-alt-n="5" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-6.jpg" alt="نتيجة 6" data-i18n-alt="a11yResult" data-i18n-alt-n="6" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-7.jpg" alt="نتيجة 7" data-i18n-alt="a11yResult" data-i18n-alt-n="7" loading="eager" decoding="async"></div></div>
+        <div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img src="before-after/before-after/after-8.jpg" alt="نتيجة 8" data-i18n-alt="a11yResult" data-i18n-alt-n="8" loading="eager" decoding="async"></div></div>
       </div>
       <div class="baf-center">
-        <img src="before-after/before.jpg" alt="الصورة الأصلية">
+        <img src="before-after/before-after/before.jpg" alt="الصورة الأصلية" data-i18n-alt="a11yOriginalPhoto">
         <span class="baf-center-label" data-i18n="bafCenterLabel">صورتك الأصلية</span>
       </div>
     </div>
@@ -503,22 +611,59 @@
   <div class="hero-showcase-variant" id="heroVariantSlider" hidden>
     <div class="slider-wrap-instance" id="bafSliderV1">
       <div class="slider-card" data-slider-card>
-        <img data-slider-before alt="قبل">
-        <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد"></div>
+        <img data-slider-before alt="قبل" data-i18n-alt="beforeLabel">
+        <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد" data-i18n-alt="afterLabel"></div>
         <div class="slider-line" data-slider-line></div>
         <button type="button" class="slider-handle" data-slider-handle>↔</button>
-        <span class="tag tag-before">قبل</span>
-        <span class="tag tag-after">بعد</span>
-        <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق">‹</button>
-        <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي">›</button>
+        <span class="tag tag-before" data-i18n="beforeLabel">قبل</span>
+        <span class="tag tag-after" data-i18n="afterLabel">بعد</span>
       </div>
-      <div class="slider-dots" data-slider-dots></div>
-      <p class="slider-hint">اسحب يمين وشمال، ودوس ‹ › تتنقل بين أمثلة مختلفة</p>
+      <div class="slider-controls-row">
+        <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق" data-i18n-aria="a11yPrev">‹</button>
+        <div class="slider-dots" data-slider-dots></div>
+        <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي" data-i18n-aria="a11yNext">›</button>
+      </div>
+      <p class="slider-hint" data-i18n="sliderHint">اسحب يمين وشمال، ودوس ‹ › تتنقل بين أمثلة مختلفة</p>
     </div>
   </div>
 
   <div class="hero-ctas" style="margin-top:34px; justify-content:center;">
     <a href="#children" class="btn-primary" data-i18n-html="bafCta">اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي بـ25 جنيه</a>
+    <a href="#categoryTiles" class="btn-ghost" data-i18n="seeAllStylesCta">شاهد 50+ ستايل</a>
+  </div>
+</section>
+
+<section class="cat-section" id="howItWorks">
+  <div class="section-head">
+    <h2 data-i18n="howItWorksTitle">كيف يعمل؟</h2>
+  </div>
+  <div class="how-grid">
+    <div class="how-step">
+      <div class="how-step-num">1</div>
+      <h3 data-i18n="how1Title">اختار الستايل</h3>
+      <p data-i18n="how1Desc">تصفح المكتبة واختر الأسلوب اللي يعجبك من أي قسم.</p>
+      <span class="how-arrow">➜</span>
+    </div>
+    <div class="how-step">
+      <div class="how-step-num">2</div>
+      <h3 data-i18n="how2Title">ادفع</h3>
+      <p data-i18n="how2Desc">حوّل قيمة الطلب عن طريق InstaPay أو فودافون كاش، وسجّل رقم العملية.</p>
+      <span class="how-arrow">➜</span>
+    </div>
+    <div class="how-step">
+      <div class="how-step-num">3</div>
+      <h3 data-i18n="how3Title">ارفع صورتك</h3>
+      <p data-i18n="how3Desc">بعد تأكيد التحويل (عادةً خلال دقائق)، ارفع صورتك بجودة واضحة.</p>
+      <span class="how-arrow">➜</span>
+    </div>
+    <div class="how-step">
+      <div class="how-step-num">4</div>
+      <h3 data-i18n="how4Title">استلم النتيجة</h3>
+      <p data-i18n="how4Desc">هنطبّق الأسلوب اللي اخترته بالذكاء الاصطناعي، وتستلم صورتك الاحترافية خلال دقايق.</p>
+    </div>
+  </div>
+  <div class="hero-ctas" style="margin-top:22px; justify-content:center;">
+    <a href="#children" class="btn-primary" data-i18n="howItWorksCta">ابدأ دلوقتي</a>
   </div>
 </section>
 
@@ -633,6 +778,13 @@
     <h2 data-i18n="pricingTitle">الأسعار والعروض</h2>
   </div>
   <p style="color:var(--paper-dim); max-width:560px;" data-i18n="pricingSub">اختار الباقة اللي تناسبك — كل باقة بتوفّرلك سعر أقل للصورة كل ما زاد العدد.</p>
+  <div class="pricing-trust-strip">
+    <span>🔒 <span data-i18n="pricingTrust1">دفعك في أمان</span></span>
+    <span class="pts-sep">|</span>
+    <span>⭐ <span data-i18n="pricingTrust2">نتائج حقيقية موثّقة</span></span>
+    <span class="pts-sep">|</span>
+    <span>💬 <span data-i18n="pricingTrust3">دعم واتساب سريع</span></span>
+  </div>
   <div class="pricing-grid">
     <div class="plan">
       <h3 data-i18n="plan1Title">باقة Starter</h3>
@@ -735,37 +887,6 @@
   </div>
 </section>
 
-<section class="cat-section tab-panel" id="howItWorks">
-  <div class="how-grid">
-    <div class="how-step">
-      <div class="how-step-num">1</div>
-      <h3 data-i18n="how1Title">اختار الستايل</h3>
-      <p data-i18n="how1Desc">تصفح المكتبة واختر الأسلوب اللي يعجبك من أي قسم.</p>
-      <span class="how-arrow">➜</span>
-    </div>
-    <div class="how-step">
-      <div class="how-step-num">2</div>
-      <h3 data-i18n="how2Title">ادفع</h3>
-      <p data-i18n="how2Desc">حوّل قيمة الطلب عن طريق InstaPay أو فودافون كاش، وسجّل رقم العملية.</p>
-      <span class="how-arrow">➜</span>
-    </div>
-    <div class="how-step">
-      <div class="how-step-num">3</div>
-      <h3 data-i18n="how3Title">ارفع صورتك</h3>
-      <p data-i18n="how3Desc">بعد تأكيد التحويل (عادةً خلال دقائق)، ارفع صورتك بجودة واضحة.</p>
-      <span class="how-arrow">➜</span>
-    </div>
-    <div class="how-step">
-      <div class="how-step-num">4</div>
-      <h3 data-i18n="how4Title">استلم النتيجة</h3>
-      <p data-i18n="how4Desc">هنطبّق الأسلوب اللي اخترته بالذكاء الاصطناعي، وتستلم صورتك الاحترافية خلال دقايق.</p>
-    </div>
-  </div>
-  <div class="hero-ctas" style="margin-top:22px; justify-content:center;">
-    <a href="#children" class="btn-primary" data-i18n="howItWorksCta">ابدأ دلوقتي</a>
-  </div>
-</section>
-
 <section class="cat-section tab-panel" id="aboutUs">
   <p class="sub" style="max-width:680px; font-size:15px;" data-i18n="aboutUsText">Miga-Photobook مشروع مصري بدأ بفكرة بسيطة: خلي جلسة التصوير الاحترافية متاحة لأي حد وبسعر معقول. بنحوّل صورتك الشخصية لتحفة فنية بجودة استوديو باستخدام الذكاء الاصطناعي — ارفع صورتك واختار الأسلوب، وإحنا نتولى الباقي بعناية عشان تضمن نتيجة تستحق اسمك.</p>
 </section>
@@ -821,14 +942,14 @@
   </div>
   <div class="testimonials-grid" id="testimonialsGrid">
     <div class="proof-results-grid" style="grid-column:1/-1;" id="testimonialsProofGrid">
-      <div class="proof-tile"><img src="before-after/after-1.jpg" alt="نتيجة حقيقية 1" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/after-2.jpg" alt="نتيجة حقيقية 2" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/after-3.jpg" alt="نتيجة حقيقية 3" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/after-4.jpg" alt="نتيجة حقيقية 4" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/after-5.jpg" alt="نتيجة حقيقية 5" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/after-6.jpg" alt="نتيجة حقيقية 6" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/after-7.jpg" alt="نتيجة حقيقية 7" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/after-8.jpg" alt="نتيجة حقيقية 8" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-1.jpg" alt="نتيجة حقيقية 1" data-i18n-alt="a11yResult" data-i18n-alt-n="1" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-2.jpg" alt="نتيجة حقيقية 2" data-i18n-alt="a11yResult" data-i18n-alt-n="2" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-3.jpg" alt="نتيجة حقيقية 3" data-i18n-alt="a11yResult" data-i18n-alt-n="3" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-4.jpg" alt="نتيجة حقيقية 4" data-i18n-alt="a11yResult" data-i18n-alt-n="4" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-5.jpg" alt="نتيجة حقيقية 5" data-i18n-alt="a11yResult" data-i18n-alt-n="5" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-6.jpg" alt="نتيجة حقيقية 6" data-i18n-alt="a11yResult" data-i18n-alt-n="6" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-7.jpg" alt="نتيجة حقيقية 7" data-i18n-alt="a11yResult" data-i18n-alt-n="7" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-8.jpg" alt="نتيجة حقيقية 8" data-i18n-alt="a11yResult" data-i18n-alt-n="8" loading="lazy"></div>
     </div>
   </div>
   <p class="sub" style="margin-top:16px; opacity:0.7; font-size:12.5px;" id="testimonialsNoteEl" data-i18n="testimonialsNote">* نماذج حقيقية من نتائج Miga-Photobook الفعلية.</p>
@@ -876,31 +997,31 @@
     <a href="https://wa.me/201202530308" target="_blank" rel="noopener" class="contact-item" title="WhatsApp" aria-label="WhatsApp">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.8 1.1-.1.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.6-1.9-.1-.3 0-.4.1-.5l.4-.5c.1-.1.2-.3.2-.4.1-.1 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.3-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.5 4 3.5.6.2 1 .4 1.3.5.6.2 1.1.1 1.5-.1.5-.1 1.4-.6 1.6-1.1.2-.5.2-1 .1-1.1-.1-.1-.2-.2-.5-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.4c1.4.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.1.8.8-3-.2-.3C4 14.8 3.8 13.4 3.8 12c0-4.5 3.7-8.2 8.2-8.2s8.2 3.7 8.2 8.2-3.7 8.2-8.2 8.2z"/></svg>
     </a>
-    <a href="https://www.facebook.com/share/197QM3vWaE/?mibextid=wwXIfr" target="_blank" rel="noopener" class="contact-item" title="Messenger" aria-label="Messenger">
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2C6.48 2 2 6.15 2 11.25c0 2.9 1.44 5.49 3.7 7.19V22l3.38-1.86c.9.25 1.87.38 2.92.38 5.52 0 10-4.15 10-9.27S17.52 2 12 2zm1.02 12.48l-2.55-2.72-4.98 2.72 5.48-5.82 2.6 2.72 4.93-2.72-5.48 5.82z"/></svg>
+    <a href="https://www.facebook.com/share/1HyaB2xwuZ/?mibextid=wwXIfr" target="_blank" rel="noopener" class="contact-item" title="Facebook" aria-label="Facebook">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
     </a>
-    <a href="https://www.instagram.com/miiigaaaaaaa?igsh=MWI4MzI5MGZ4cnJpag%3D%3D&utm_source=qr" target="_blank" rel="noopener" class="contact-item" title="Instagram" aria-label="Instagram">
+    <a href="https://www.instagram.com/migaphotobook/" target="_blank" rel="noopener" class="contact-item" title="Instagram" aria-label="Instagram">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2.2c3.2 0 3.6 0 4.9.07 3.3.15 4.8 1.7 5 5 .06 1.3.07 1.6.07 4.8s0 3.6-.07 4.8c-.15 3.3-1.7 4.8-5 5-1.3.06-1.6.07-4.9.07s-3.6 0-4.9-.07c-3.3-.15-4.8-1.7-5-5C2 15.6 2 15.3 2 12s0-3.6.07-4.8c.15-3.3 1.7-4.8 5-5C8.4 2.2 8.7 2.2 12 2.2zm0 1.8c-3.15 0-3.5 0-4.8.07-2.4.1-3.5 1.2-3.6 3.6C3.5 8.5 3.5 8.85 3.5 12s0 3.5.06 4.8c.1 2.4 1.2 3.5 3.6 3.6 1.3.06 1.65.06 4.8.06s3.5 0 4.8-.06c2.4-.1 3.5-1.2 3.6-3.6.06-1.3.06-1.65.06-4.8s0-3.5-.06-4.8c-.1-2.4-1.2-3.5-3.6-3.6-1.3-.06-1.65-.07-4.8-.07zm0 3.5a5 5 0 110 10 5 5 0 010-10zm0 1.8a3.2 3.2 0 100 6.4 3.2 3.2 0 000-6.4zm5.2-2.1a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"/></svg>
     </a>
     <a href="https://t.me/+201202530308" target="_blank" rel="noopener" class="contact-item" title="Telegram" aria-label="Telegram">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M21.5 3.5L2.7 10.8c-1.2.5-1.2 1.2-.2 1.5l4.8 1.5 1.8 5.7c.2.6.4.8.9.8s.7-.2 1-.5l2.4-2.3 4.9 3.6c.9.5 1.5.2 1.8-.9l3.2-15c.3-1.4-.4-1.9-1.5-1.4zM8.5 14.3L18 8.1c.4-.3.8-.1.5.2l-8.1 7.3-.3 3.2-1.6-4.5z"/></svg>
     </a>
   </div>
-  <button class="contact-fab" id="contactFabBtn" aria-label="تواصل معنا" title="تواصل معنا">
+  <button class="contact-fab" id="contactFabBtn" data-i18n-title="a11yContact" data-i18n-aria="a11yContact" aria-label="تواصل معنا" title="تواصل معنا">
     <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M12 2C6.5 2 2 6 2 11c0 2.6 1.2 4.9 3.1 6.6L4 22l4.6-1.5c1.1.3 2.2.5 3.4.5 5.5 0 10-4 10-9S17.5 2 12 2z"/></svg>
   </button>
 </div>
 
-<button class="back-to-top-fab" id="backToTopBtn" aria-label="العودة لأعلى الصفحة" title="العودة لأعلى الصفحة" style="display:none;">
+<button class="back-to-top-fab" id="backToTopBtn" data-i18n-title="a11yBackToTop" data-i18n-aria="a11yBackToTop" aria-label="العودة لأعلى الصفحة" title="العودة لأعلى الصفحة" style="display:none;">
   <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 5l-7 7h4v7h6v-7h4z"/></svg>
 </button>
 
 <div class="scroll-ruler" id="scrollRuler" aria-hidden="true">
-  <button class="scroll-ruler-arrow" id="scrollRulerUp" aria-label="لأعلى" title="لأعلى">▲</button>
+  <button class="scroll-ruler-arrow" id="scrollRulerUp" data-i18n-title="a11yScrollUp" data-i18n-aria="a11yScrollUp" aria-label="لأعلى" title="لأعلى">▲</button>
   <div class="scroll-ruler-track" id="scrollRulerTrack">
     <div class="scroll-ruler-thumb" id="scrollRulerThumb"></div>
   </div>
-  <button class="scroll-ruler-arrow" id="scrollRulerDown" aria-label="لأسفل" title="لأسفل">▼</button>
+  <button class="scroll-ruler-arrow" id="scrollRulerDown" data-i18n-title="a11yScrollDown" data-i18n-aria="a11yScrollDown" aria-label="لأسفل" title="لأسفل">▼</button>
 </div>
 
 </div><!-- /appRoot -->
@@ -1118,7 +1239,7 @@
     <p class="sub" data-i18n="trackModalSub">أدخل كود المتابعة الذي حصلت عليه بعد إرسال طلب الشراء.</p>
     <div class="field">
       <label data-i18n="trackCodeLabel">كود المتابعة</label>
-      <input type="text" id="trackCode" placeholder="مثال: A1B2C3" style="text-transform:uppercase;">
+      <input type="text" id="trackCode" data-i18n-ph="trackCodePh" placeholder="مثال: A1B2C3" style="text-transform:uppercase;">
     </div>
     <div class="modal-actions">
       <button class="btn-primary" id="trackCheckBtn" data-i18n="trackCheckBtn">تحقّق من الحالة</button>
@@ -1145,11 +1266,11 @@
       </svg>
       <span>Miga<span class="logo-accent">-Photobook</span></span>
     </div>
-    <button type="button" class="close-x" id="sideDrawerClose" aria-label="إغلاق">×</button>
+    <button type="button" class="close-x" id="sideDrawerClose" data-i18n-aria="closeBtn" aria-label="إغلاق">×</button>
   </div>
 
   <div class="side-drawer-profile">
-    <button type="button" id="drawerAvatarBtn" class="drawer-avatar" aria-label="تغيير صورة البروفايل">
+    <button type="button" id="drawerAvatarBtn" data-i18n-aria="a11yChangeAvatar" class="drawer-avatar" aria-label="تغيير صورة البروفايل">
       <img id="drawerAvatarImg" src="" alt="" style="display:none;">
       <svg id="drawerAvatarPlaceholder" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"/></svg>
       <span class="drawer-avatar-edit-badge" aria-hidden="true">
@@ -1266,7 +1387,7 @@
         </div>
         <div class="field">
           <label data-i18n="passwordLabel">كلمة المرور</label>
-          <input type="password" id="registerPassword" placeholder="6 أحرف على الأقل">
+          <input type="password" id="registerPassword" data-i18n-ph="registerPasswordPh" placeholder="6 أحرف على الأقل">
         </div>
         <div class="modal-actions">
           <button class="btn-primary" id="registerSubmitBtn" data-i18n="registerBtn">إنشاء الحساب</button>
@@ -1277,7 +1398,7 @@
     <div id="accountLoggedInView" style="display:none;">
       <h3 data-i18n="accountWelcome">أهلاً بيك!</h3>
       <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
-        <button type="button" id="accountAvatarBtn" aria-label="تغيير صورة البروفايل" style="position:relative; width:64px; height:64px; border-radius:50%; border:1.5px solid var(--brass); background:var(--ink-2); overflow:hidden; flex-shrink:0; padding:0;">
+        <button type="button" id="accountAvatarBtn" data-i18n-aria="a11yChangeAvatar" aria-label="تغيير صورة البروفايل" style="position:relative; width:64px; height:64px; border-radius:50%; border:1.5px solid var(--brass); background:var(--ink-2); overflow:hidden; flex-shrink:0; padding:0;">
           <img id="accountAvatarImg" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover;">
           <span id="accountAvatarPlaceholder" style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:var(--brass);">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"/></svg>
@@ -1345,7 +1466,7 @@
   </div>
 </div>
 <div class="stay-nudge" id="stayNudge" role="dialog" aria-live="polite">
-  <button type="button" class="stay-nudge-close" id="stayNudgeClose" aria-label="إغلاق">&times;</button>
+  <button type="button" class="stay-nudge-close" id="stayNudgeClose" data-i18n-aria="closeBtn" aria-label="إغلاق">&times;</button>
   <h4 data-i18n="nudgeTitle">لسه مستني إيه؟</h4>
   <p data-i18n="nudgeBody">عرض الافتتاح لسه شغال — صورتك بـ 25 جنيه بدل 50. لو محتار في الاختيار، ابعتلنا واتساب ونساعدك تختار الأنسب لك.</p>
   <div class="stay-nudge-actions">
@@ -1860,7 +1981,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260908j"></script>
+<script src="app.js?v=20260909a"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
