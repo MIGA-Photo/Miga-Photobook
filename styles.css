@@ -781,14 +781,14 @@
   .promo-video-copy h2{
     margin-bottom:10px; font-family:'Georgia','Times New Roman',serif; font-weight:700;
     background:linear-gradient(90deg, var(--brass) 0%, #fff8e1 45%, var(--brass) 90%);
-    background-size:200% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
+    background-size:100% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
     text-shadow:0 0 22px rgba(227,164,41,0.45);
-    animation:promoShimmer 3.2s linear infinite;
   }
-  @keyframes promoShimmer{
-    0%{background-position:0% center;}
-    100%{background-position:200% center;}
-  }
+  /* اللمعة المتحركة اتشالت من هنا: كانت بتحرّك background-position على عنوان
+     مساحته ~26,000px² مع ظل نصّي — يعني المتصفح بيعيد رسم العنوان كله ٦٠ مرة
+     في الثانية طول ما الصفحة مفتوحة. التدرّج الذهبي الثابت بيدّي نفس الإحساس
+     الفخم من غير أي تكلفة. (لمعة اللوجو فضلت لأن مساحتها 2,554px² — واحد
+     من عشرة، وتكلفتها مش محسوسة.) */
   /* Frame matches the source clip's real 9:16 (1080x1920) portrait shape.
      It used to be locked to a wide landscape ratio, which forced object-fit:cover
      to crop away most of the top/bottom of every frame to fill the wrong box —
@@ -799,12 +799,16 @@
     position:relative; flex:0 1 380px; width:380px; max-width:380px; aspect-ratio:9/16;
     border-radius:22px; border:4px solid var(--brass); overflow:hidden; box-sizing:border-box;
     box-shadow:0 0 50px rgba(255,201,77,0.3), 0 20px 60px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.15);
-    animation:promoFrameGlow 3.4s ease-in-out infinite;
   }
-  @keyframes promoFrameGlow{
-    0%,100%{box-shadow:0 0 50px rgba(255,201,77,0.3), 0 20px 60px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.15);}
-    50%{box-shadow:0 0 82px rgba(255,201,77,0.52), 0 20px 60px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.22);}
+  /* الوهج النابض: طبقة ورا الإطار بضبابة ثابتة، والحركة على opacity بس. */
+  .promo-video-frame::after{
+    content:''; position:absolute; inset:0; border-radius:inherit;
+    pointer-events:none; z-index:-1;
+    box-shadow:0 0 82px rgba(255,201,77,0.52);
+    opacity:0; animation:promoFrameGlow 3.4s ease-in-out infinite;
+    will-change:opacity;
   }
+  @keyframes promoFrameGlow{ 0%,100%{opacity:0;} 50%{opacity:1;} }
   .promo-video{
     width:100%; height:100%; object-fit:cover; border-radius:18px; display:block; background:#000;
   }
@@ -1640,10 +1644,12 @@
   .stay-nudge-close:hover{color:var(--paper);}
   @media(max-width:560px){ .stay-nudge.show{bottom:92px;} }
 
+  /* زرار لوحة الإدارة: دايرة صغيرة داكنة بإطار ذهبي. مقصود إنه يبان مختلف
+     وأهدى من زراري العميل — دي أداة صاحب الموقع، مش دعوة لحد. */
   .admin-fab{
     position:fixed; bottom:96px; left:26px; z-index:210;
-    display:none; align-items:center; gap:8px;
-    height:48px; padding:0 16px 0 14px; border-radius:26px;
+    display:none; align-items:center; justify-content:center;
+    width:46px; height:46px; padding:0; border-radius:50%;
     background:var(--ink-2); border:2px solid var(--brass); color:var(--brass);
     font-size:14px; font-weight:800; font-family:inherit; cursor:grab;
     box-shadow:0 8px 24px rgba(0,0,0,0.45);
@@ -1651,6 +1657,10 @@
     touch-action:none; user-select:none; -webkit-user-select:none;
   }
   .admin-fab.show{display:inline-flex;}
+  .admin-fab .af-label{ display:none; }
+  @media(max-width:520px){
+    .admin-fab{ width:44px; height:44px; bottom:78px; left:16px; }
+  }
   .admin-fab:hover{transform:translateY(-3px); background:rgba(255,201,77,0.12);}
   /* While being dragged, drop the hover lift and the transition so the
      button tracks the finger/pointer exactly instead of easing behind it. */
@@ -1659,10 +1669,13 @@
     box-shadow:0 12px 30px rgba(0,0,0,0.55);
   }
   .admin-fab.dragging:hover{transform:none;}
-  .admin-fab .af-icon{font-size:18px; line-height:1;}
+  .admin-fab .af-icon{font-size:20px; line-height:1;}
+  /* الشارة بقت على حرف الدايرة بدل ما كانت جنب الكلمة */
   .admin-fab .af-badge{
-    min-width:20px; height:20px; padding:0 6px; border-radius:10px;
-    background:var(--brass); color:var(--ink); font-size:12px; font-weight:800;
+    position:absolute; top:-5px; inset-inline-end:-5px;
+    min-width:19px; height:19px; padding:0 5px; border-radius:10px;
+    background:var(--brass); color:var(--ink); font-size:11px; font-weight:800;
+    box-shadow:0 2px 6px rgba(0,0,0,0.5);
     display:none; align-items:center; justify-content:center;
   }
   .admin-fab .af-badge.show{display:inline-flex;}
@@ -1704,15 +1717,23 @@
      with a plain "right" (not the logical inset-inline-end), which in RTL
      was flipping to the same left edge as the contact widget above and
      landing right on top of it. */
+  /* ===== الأزرار العائمة =====
+     الزرارين اللي العميل بيشوفهم بنفس الشكل بالظبط — نفس الارتفاع ونفس نصف
+     القطر ونفس الخط — عشان يبانوا من نفس العيلة. وكل واحد فيهم عليه كلمة،
+     مش أيقونة لوحدها: الأيقونة بتخلي الزائر يفكّر، والكلمة بتجاوب عليه. */
   .back-to-top-fab{
     position:fixed; bottom:26px; right:26px; z-index:200;
-    width:48px; height:48px; border-radius:50%;
+    height:46px; padding:0 18px; border-radius:23px;
     background:var(--brass); color:var(--ink);
-    display:flex; align-items:center; justify-content:center;
-    box-shadow:0 8px 24px rgba(0,0,0,0.4);
-    transition:opacity .2s, transform .2s;
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:inherit; font-size:14px; font-weight:800; white-space:nowrap;
+    box-shadow:0 8px 24px rgba(0,0,0,0.42);
+    transition:opacity .2s ease, transform .2s ease, box-shadow .2s ease;
   }
-  .back-to-top-fab:hover{transform:translateY(-3px);}
+  .back-to-top-fab:hover{transform:translateY(-3px); box-shadow:0 12px 30px rgba(0,0,0,0.5);}
+  @media(max-width:520px){
+    .back-to-top-fab{ height:44px; padding:0 15px; border-radius:22px; font-size:13px; gap:6px; bottom:20px; right:16px; }
+  }
 
   .scroll-ruler{
     position:fixed; top:50%; right:16px; transform:translateY(-50%); z-index:190;
@@ -1781,11 +1802,23 @@
     .search-box input{width:100%;}
   }
   .contact-fab{
-    width:56px; height:56px; border-radius:50%; background:var(--brass); color:var(--ink);
-    display:flex; align-items:center; justify-content:center;
+    height:46px; padding:0 18px; border-radius:23px; background:var(--brass); color:var(--ink);
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:inherit; font-size:14px; font-weight:800; white-space:nowrap;
     box-shadow:0 8px 24px rgba(255,201,77,0.35); transition:transform .25s ease, box-shadow .25s ease;
   }
-  .contact-fab:hover{transform:scale(1.08) rotate(8deg); box-shadow:0 10px 30px rgba(255,201,77,0.5);}
+  .contact-fab:hover{transform:translateY(-3px); box-shadow:0 12px 30px rgba(255,201,77,0.55);}
+  /* «ميجا» بنفس وميض الاسم اللي في الهيرو، بس بأحمر أغمق شوية: الأحمر الفاتح
+     على الأصفر الذهبي تباينه ضعيف ومش بيتقرا — الأغمق ده تباينه 8.6:1. */
+  .contact-fab .fab-mega{
+    color:#a80f0f; font-weight:900; font-size:1.08em; line-height:1;
+    animation:megaBlink 1.5s ease-in-out infinite;
+  }
+  @media(prefers-reduced-motion: reduce){ .contact-fab .fab-mega{ animation:none; } }
+  @media(max-width:520px){
+    .contact-fab{ height:44px; padding:0 15px; border-radius:22px; font-size:13px; gap:6px; }
+    .contact-widget{ bottom:20px; left:16px; }
+  }
   .contact-menu{
     display:flex; flex-direction:column; gap:8px;
     opacity:0; pointer-events:none; transform:translateY(10px) scale(0.9); transform-origin:bottom left;
@@ -1828,15 +1861,27 @@
   .admin-product-actions button:hover{border-color:var(--brass);}
 
   .soft-launch-banner{
+    position:relative; overflow:hidden; isolation:isolate;
     background:linear-gradient(90deg, var(--brass), #ffe08a, var(--brass));
-    background-size:200% 100%;
-    animation:bannerShimmer 3.5s ease-in-out infinite;
+    background-size:200% 100%; background-position:50% 50%;
+    box-shadow:0 0 14px rgba(255,201,77,0.28);
     color:var(--ink); text-align:center; font-weight:700; font-size:14px;
     padding:10px 16px; letter-spacing:0.2px;
   }
-  @keyframes bannerShimmer{
-    0%, 100%{ background-position:0% 50%; box-shadow:0 0 0 rgba(255,201,77,0); }
-    50%{ background-position:100% 50%; box-shadow:0 0 18px rgba(255,201,77,0.55); }
+  /* اللمعة: طبقة بتعدّي بالـtransform بدل ما نحرّك background-position.
+     نفس المنظر بالظبط، بس من غير ما المتصفح يعيد رسم البانر كل إطار. */
+  .soft-launch-banner::before{
+    content:''; position:absolute; top:0; bottom:0; left:0; width:60%;
+    pointer-events:none; z-index:-1;
+    background:linear-gradient(90deg,
+      rgba(255,255,255,0) 0%, rgba(255,255,255,0.32) 50%, rgba(255,255,255,0) 100%);
+    transform:translate3d(-180%,0,0);
+    animation:bannerSheen 3.5s ease-in-out infinite;
+    will-change:transform;
+  }
+  @keyframes bannerSheen{
+    0%{ transform:translate3d(-180%,0,0); }
+    100%{ transform:translate3d(280%,0,0); }
   }
   .promo-countdown{
     display:inline-block; margin-inline-start:10px; background:rgba(12,12,16,0.35);

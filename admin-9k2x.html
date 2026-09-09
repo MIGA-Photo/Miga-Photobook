@@ -183,7 +183,7 @@
      old URL. Bumping this string (e.g. 20260906a -> 20260906b) any time
      app.js or styles.css changes forces every visitor to fetch the new file
      immediately, no manual cache-clearing needed on their end. -->
-<link rel="stylesheet" href="styles.css?v=20260909a">
+<link rel="stylesheet" href="styles.css?v=20260909b">
 
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
@@ -442,16 +442,20 @@
   .vc-cam{ font-size:14px; line-height:1; }
   .visitor-counter .vc-number{ color:var(--brass); font-weight:800; font-size:15px; }
   .vc-dot{
-    width:8px; height:8px; border-radius:50%; background:#3ddc84;
-    box-shadow:0 0 0 0 rgba(61,220,132,0.6);
+    position:relative; width:8px; height:8px; border-radius:50%;
+    background:#3ddc84; flex-shrink:0;
+  }
+  .vc-dot::after{
+    content:''; position:absolute; inset:0; border-radius:50%;
+    background:rgba(61,220,132,0.5); z-index:-1;
     animation:vcPulse 2s ease-out infinite;
+    will-change:transform, opacity;
   }
   @keyframes vcPulse{
-    0%{ box-shadow:0 0 0 0 rgba(61,220,132,0.55); }
-    70%{ box-shadow:0 0 0 7px rgba(61,220,132,0); }
-    100%{ box-shadow:0 0 0 0 rgba(61,220,132,0); }
+    0%{ transform:scale(1); opacity:0.55; }
+    70%,100%{ transform:scale(2.75); opacity:0; }
   }
-  @media(prefers-reduced-motion: reduce){ .vc-dot{ animation:none; } }
+  @media(prefers-reduced-motion: reduce){ .vc-dot::after{ animation:none; } }
   @media(max-width:480px){
     .visitor-counter{ font-size:12px; padding:8px 14px; gap:6px; margin-bottom:20px; }
     .visitor-counter .vc-number{ font-size:13px; }
@@ -1008,12 +1012,14 @@
     </a>
   </div>
   <button class="contact-fab" id="contactFabBtn" data-i18n-title="a11yContact" data-i18n-aria="a11yContact" aria-label="تواصل معنا" title="تواصل معنا">
-    <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M12 2C6.5 2 2 6 2 11c0 2.6 1.2 4.9 3.1 6.6L4 22l4.6-1.5c1.1.3 2.2.5 3.4.5 5.5 0 10-4 10-9S17.5 2 12 2z"/></svg>
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 2C6.5 2 2 6 2 11c0 2.6 1.2 4.9 3.1 6.6L4 22l4.6-1.5c1.1.3 2.2.5 3.4.5 5.5 0 10-4 10-9S17.5 2 12 2z"/></svg>
+    <span class="fab-copy"><span data-i18n="contactFabWord">تواصل مع</span> <span class="fab-mega" data-i18n="contactFabBrand">ميجا</span></span>
   </button>
 </div>
 
 <button class="back-to-top-fab" id="backToTopBtn" data-i18n-title="a11yBackToTop" data-i18n-aria="a11yBackToTop" aria-label="العودة لأعلى الصفحة" title="العودة لأعلى الصفحة" style="display:none;">
-  <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 5l-7 7h4v7h6v-7h4z"/></svg>
+  <svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor" aria-hidden="true"><path d="M12 5l-7 7h4v7h6v-7h4z"/></svg>
+  <span data-i18n="backHomeLabel">الصفحة الرئيسية</span>
 </button>
 
 <div class="scroll-ruler" id="scrollRuler" aria-hidden="true">
@@ -1477,7 +1483,7 @@
 
 <button type="button" class="admin-fab" id="adminFab" aria-label="لوحة الإدارة">
   <span class="af-icon" aria-hidden="true">&#9881;</span>
-  <span data-i18n="adminFabLabel">لوحة الإدارة</span>
+  <span class="af-label" data-i18n="adminFabLabel">لوحة الإدارة</span>
   <span class="af-badge" id="adminFabBadge"></span>
 </button>
 
@@ -1981,7 +1987,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260909a"></script>
+<script src="app.js?v=20260909b"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
