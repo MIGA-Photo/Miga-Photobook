@@ -259,7 +259,7 @@
      old URL. Bumping this string (e.g. 20260906a -> 20260906b) any time
      app.js or styles.css changes forces every visitor to fetch the new file
      immediately, no manual cache-clearing needed on their end. -->
-<link href="/styles.css?v=20260909i" rel="stylesheet"/>
+<link href="/styles.css?v=20260909m" rel="stylesheet"/>
 <!-- Google Analytics 4 -->
 <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
 <script>
@@ -356,6 +356,9 @@
 <svg fill="none" height="22" stroke="currentColor" stroke-linecap="round" stroke-width="1.8" viewbox="0 0 24 24" width="22"><path d="M4 6.5h16M4 12h16M4 17.5h16"></path></svg>
 </button>
 <div class="logo">
+<!-- الترتيب مقصود: في RTL أول عنصر بيظهر أقصى اليمين. فالعربي يمين،
+           العلامة في النص، والإنجليزي شمال. -->
+<span class="lg-ar" data-i18n="brandNameAr">ميجا فوتوبوك</span>
 <svg class="logo-mark" height="32" viewbox="0 0 48 48" width="32" xmlns="http://www.w3.org/2000/svg">
 <!-- open book -->
 <path d="M24 14 C19 10 10 9 5 11 V37 C10 35 19 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-linejoin="round" stroke-width="2"></path>
@@ -367,7 +370,7 @@
 <circle cx="24" cy="25" fill="none" r="4.5" stroke="var(--brass)" stroke-width="2"></circle>
 <circle cx="24" cy="25" fill="var(--brass)" r="1.6"></circle>
 </svg>
-<span>Miga<span class="logo-accent">-Photobook</span></span>
+<span class="lg-en">Miga<span class="logo-accent">-Photobook</span></span>
 </div>
 <div class="cat-dropdown" id="adminQuickAccess" style="display:none;">
 <button aria-expanded="false" aria-haspopup="true" class="cat-dropdown-btn admin-bell-btn" id="adminBellBtn" type="button">
@@ -403,7 +406,7 @@
 <span data-i18n="launchPromoBannerShort">🎉 25 EGP instead of 50</span>
 </div>
 </div>
-<button class="admin-btn admin-btn-primary" data-i18n="accountBtnGuest" id="accountOpenBtn">Log In</button>
+<button aria-label="Log In" class="admin-btn admin-btn-primary" data-i18n-aria="accountBtnGuest" id="accountOpenBtn"><span aria-hidden="true" class="icon-badge"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><circle cx="12" cy="8" r="3.6"></circle><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"></path></svg></span><span data-i18n="accountBtnGuest">Log In</span></button>
 <button class="admin-btn" data-i18n="adminBtn" id="adminOpenBtn" style="display:none;">Admin Panel</button>
 </div>
 <div class="cat-dropdown cat-pills-mode" id="catDropdown">
@@ -1289,6 +1292,7 @@
 <aside aria-hidden="true" class="side-drawer" id="sideDrawer">
 <div class="side-drawer-head">
 <div class="side-drawer-logo">
+<span class="lg-ar" data-i18n="brandNameAr">ميجا فوتوبوك</span>
 <svg class="logo-mark" height="28" viewbox="0 0 48 48" width="28" xmlns="http://www.w3.org/2000/svg">
 <!-- open book -->
 <path d="M24 14 C19 10 10 9 5 11 V37 C10 35 19 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-linejoin="round" stroke-width="2"></path>
@@ -1300,7 +1304,7 @@
 <circle cx="24" cy="25" fill="none" r="4.5" stroke="var(--brass)" stroke-width="2"></circle>
 <circle cx="24" cy="25" fill="var(--brass)" r="1.6"></circle>
 </svg>
-<span>Miga<span class="logo-accent">-Photobook</span></span>
+<span class="lg-en">Miga<span class="logo-accent">-Photobook</span></span>
 </div>
 <button aria-label="Close" class="close-x" data-i18n-aria="closeBtn" id="sideDrawerClose" type="button">×</button>
 </div>
@@ -1982,7 +1986,7 @@
 </div>
 </div>
 <div class="toast" id="toast"></div>
-<script src="/app.js?v=20260909i"></script>
+<script src="/app.js?v=20260909m"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
