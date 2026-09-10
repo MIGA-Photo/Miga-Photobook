@@ -258,7 +258,7 @@
      old URL. Bumping this string (e.g. 20260906a -> 20260906b) any time
      app.js or styles.css changes forces every visitor to fetch the new file
      immediately, no manual cache-clearing needed on their end. -->
-<link rel="stylesheet" href="styles.css?v=20260910a">
+<link rel="stylesheet" href="styles.css?v=20260910f">
 
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
@@ -358,6 +358,9 @@
     <button type="button" id="hamburgerBtn" data-i18n-aria="menuTitle" class="hamburger-btn" aria-label="القائمة" aria-haspopup="true" aria-expanded="false">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg>
     </button>
+    <!-- مخفي دايمًا؛ موجود عشان كود الأدمن بينده عليه. مكانه هنا عشان
+         مايضيفش خانة تالتة تزحزح توسيط الاسم. -->
+    <button class="admin-btn" id="adminOpenBtn" data-i18n="adminBtn" style="display:none;">لوحة الإدارة</button>
     </div>
     <div class="logo">
       <!-- الترتيب مقصود: في RTL أول عنصر بيظهر أقصى اليمين. فالعربي يمين،
@@ -379,10 +382,9 @@
     <!-- كان هنا زرار «لوحة التحكم». اتشال لأنه كان راكب على اسم الموقع
          (تداخل مقيس 120–136 بكسل على كل العروض). بديله الأيقونة العائمة
          #adminFab — وشارة الطلبات الحية اتنقلت عليها. -->
-    <div class="nav-side nav-side-end">
-    <button class="admin-btn admin-btn-primary" id="accountOpenBtn" data-i18n-aria="accountBtnGuest" aria-label="تسجيل الدخول"><span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"/></svg></span><span data-i18n="accountBtnGuest">تسجيل الدخول</span></button>
-    <button class="admin-btn" id="adminOpenBtn" data-i18n="adminBtn" style="display:none;">لوحة الإدارة</button>
-    </div>
+    <!-- زرار «تسجيل الدخول» اتشال من هنا: الهامبرجر جواه نفس الحاجات
+         (البروفايل، الدخول، الخروج) فكان تكرار بياخد مساحة من اسم الموقع.
+         نافذة الحساب نفسها زي ما هي — بتتفتح من «عندك حساب؟» جوه الدرج. -->
     </div><!-- /.nav-top -->
 
     <div class="search-row">
@@ -1072,16 +1074,16 @@
 
 <div class="contact-widget" id="contactWidget">
   <div class="contact-menu" id="contactMenu">
-    <a href="https://wa.me/201202530308" target="_blank" rel="noopener" class="contact-item" title="WhatsApp" aria-label="WhatsApp">
+    <a href="https://wa.me/201202530308" target="_blank" rel="noopener" class="contact-item ci-wa" title="WhatsApp" aria-label="WhatsApp">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.8 1.1-.1.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.6-1.9-.1-.3 0-.4.1-.5l.4-.5c.1-.1.2-.3.2-.4.1-.1 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.3-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.5 4 3.5.6.2 1 .4 1.3.5.6.2 1.1.1 1.5-.1.5-.1 1.4-.6 1.6-1.1.2-.5.2-1 .1-1.1-.1-.1-.2-.2-.5-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.4c1.4.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.1.8.8-3-.2-.3C4 14.8 3.8 13.4 3.8 12c0-4.5 3.7-8.2 8.2-8.2s8.2 3.7 8.2 8.2-3.7 8.2-8.2 8.2z"/></svg>
     </a>
-    <a href="https://www.facebook.com/share/1HyaB2xwuZ/?mibextid=wwXIfr" target="_blank" rel="noopener" class="contact-item" title="Facebook" aria-label="Facebook">
+    <a href="https://www.facebook.com/share/1HyaB2xwuZ/?mibextid=wwXIfr" target="_blank" rel="noopener" class="contact-item ci-fb" title="Facebook" aria-label="Facebook">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
     </a>
-    <a href="https://www.instagram.com/migaphotobook/" target="_blank" rel="noopener" class="contact-item" title="Instagram" aria-label="Instagram">
+    <a href="https://www.instagram.com/migaphotobook/" target="_blank" rel="noopener" class="contact-item ci-ig" title="Instagram" aria-label="Instagram">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2.2c3.2 0 3.6 0 4.9.07 3.3.15 4.8 1.7 5 5 .06 1.3.07 1.6.07 4.8s0 3.6-.07 4.8c-.15 3.3-1.7 4.8-5 5-1.3.06-1.6.07-4.9.07s-3.6 0-4.9-.07c-3.3-.15-4.8-1.7-5-5C2 15.6 2 15.3 2 12s0-3.6.07-4.8c.15-3.3 1.7-4.8 5-5C8.4 2.2 8.7 2.2 12 2.2zm0 1.8c-3.15 0-3.5 0-4.8.07-2.4.1-3.5 1.2-3.6 3.6C3.5 8.5 3.5 8.85 3.5 12s0 3.5.06 4.8c.1 2.4 1.2 3.5 3.6 3.6 1.3.06 1.65.06 4.8.06s3.5 0 4.8-.06c2.4-.1 3.5-1.2 3.6-3.6.06-1.3.06-1.65.06-4.8s0-3.5-.06-4.8c-.1-2.4-1.2-3.5-3.6-3.6-1.3-.06-1.65-.07-4.8-.07zm0 3.5a5 5 0 110 10 5 5 0 010-10zm0 1.8a3.2 3.2 0 100 6.4 3.2 3.2 0 000-6.4zm5.2-2.1a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"/></svg>
     </a>
-    <a href="https://t.me/+201202530308" target="_blank" rel="noopener" class="contact-item" title="Telegram" aria-label="Telegram">
+    <a href="https://t.me/+201202530308" target="_blank" rel="noopener" class="contact-item ci-tg" title="Telegram" aria-label="Telegram">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M21.5 3.5L2.7 10.8c-1.2.5-1.2 1.2-.2 1.5l4.8 1.5 1.8 5.7c.2.6.4.8.9.8s.7-.2 1-.5l2.4-2.3 4.9 3.6c.9.5 1.5.2 1.8-.9l3.2-15c.3-1.4-.4-1.9-1.5-1.4zM8.5 14.3L18 8.1c.4-.3.8-.1.5.2l-8.1 7.3-.3 3.2-1.6-4.5z"/></svg>
     </a>
   </div>
@@ -2071,7 +2073,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260910a"></script>
+<script src="app.js?v=20260910f"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){

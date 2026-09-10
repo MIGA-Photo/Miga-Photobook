@@ -113,6 +113,7 @@ const translations = {
   ar: {
     categoriesLabel:'الأقسام',
     searchPlaceholder:'ابحث في الموقع...', searchHistoryLabel:'بحثك السابق', searchNoHistory:'لا يوجد بحث سابق',
+    searchClearHistory:'مسح الكل', toastSearchHistoryCleared:'تم مسح سجل البحث',
     searchResultsLabel:'نتائج البحث', searchNoResults:'لا توجد نتائج', searchSectionsLabel:'أقسام الموقع',
     navAll:'الكل', navChildren:'أطفال', navMale:'رجالي', navFemale:'نسائي',
     navBusiness:'أعمال', navCinematic:'سينمائي', navLuxury:'فاخر', navArtistic:'فني', navMagazine:'مجلات',
@@ -262,6 +263,8 @@ const translations = {
     detailBuyBtn:'احصل عليها الآن',
     cropModalTitle:'اضبط إطار الصورة', cropModalSub:'حرّك الصورة في أي اتجاه، وكبّر/صغّر بإصبعين على الموبايل أو بشريط التكبير على الكمبيوتر — كل صور المنتجات هتخرج بنفس المقاس بالظبط بعد كده.',
     cropConfirmBtn:'تأكيد القص',
+    cropAvatarTitle:'اظبط صورتك الشخصية',
+    cropAvatarSub:'حرّك الصورة بصباعك وكبّرها لحد ما الوش يبقى جوه الدايرة — اللي جوه الدايرة بس هو اللي هيظهر.',
     trackModalTitle:'تتبع طلبك', trackModalSub:'أدخل كود المتابعة الذي حصلت عليه بعد إرسال طلب الشراء.',
     myOrdersTitle:'طلباتك السابقة', loadingLabel:'جاري التحميل...',
     trackCodeLabel:'كود المتابعة', trackCheckBtn:'تحقّق من الحالة', closeBtn:'إغلاق',
@@ -427,6 +430,7 @@ const translations = {
   en: {
     categoriesLabel:'Categories',
     searchPlaceholder:'Search the site...', searchHistoryLabel:'Recent Searches', searchNoHistory:'No recent searches',
+    searchClearHistory:'Clear all', toastSearchHistoryCleared:'Search history cleared',
     searchResultsLabel:'Results', searchNoResults:'No results found', searchSectionsLabel:'Site Sections',
     navAll:'All', navChildren:'Children', navMale:'Men', navFemale:'Women',
     navBusiness:'Business', navCinematic:'Cinematic', navLuxury:'Luxury', navArtistic:'Artistic', navMagazine:'Magazine',
@@ -576,6 +580,8 @@ const translations = {
     detailBuyBtn:'Get It Now',
     cropModalTitle:'Adjust the Photo Frame', cropModalSub:'Drag the photo in any direction, and pinch with two fingers on mobile or use the zoom slider on desktop — every product photo will come out at exactly the same size after this.',
     cropConfirmBtn:'Confirm Crop',
+    cropAvatarTitle:'Adjust your profile photo',
+    cropAvatarSub:'Drag to move and pinch or use the slider to zoom until your face sits inside the circle — only what is inside the circle will show.',
     trackModalTitle:'Track Your Order', trackModalSub:'Enter the tracking code you received after sending a purchase request.',
     myOrdersTitle:'Your Past Orders', loadingLabel:'Loading...',
     trackCodeLabel:'Tracking Code', trackCheckBtn:'Check Status', closeBtn:'Close',
@@ -3006,7 +3012,15 @@ function applyFilmGrain(ctx, w, h, intensity){
 
 // ---------- Image crop tool (forces every admin-uploaded product photo to
 // the same output size, no matter how the source photo was framed) ----------
-const CROP_OUTPUT_W = 1000, CROP_OUTPUT_H = 1250; // matches the product card's 4:5 aspect ratio
+/* وضعين للقص. المنتجات زي ما هي بالظبط؛ الأفاتار مربع بإطار دائري.
+   canvas = مقاس المعاينة على الشاشة، out = مقاس الصورة الخارجة. */
+const CROP_MODES = {
+  product: { canvasW:400, canvasH:500, outW:1000, outH:1250, round:false,
+             title:'cropModalTitle',  sub:'cropModalSub' },
+  avatar:  { canvasW:340, canvasH:340, outW:512,  outH:512,  round:true,
+             title:'cropAvatarTitle', sub:'cropAvatarSub' },
+};
+let cropMode = CROP_MODES.product;
 const cropModalBg = document.getElementById('cropModalBg');
 const cropCanvas = document.getElementById('cropCanvas');
 const cropCtx = cropCanvas.getContext('2d');
@@ -3023,6 +3037,24 @@ function drawCrop(){
   cropCtx.scale(scale, scale);
   cropCtx.drawImage(img, -img.width/2, -img.height/2);
   cropCtx.restore();
+  if(cropMode.round){
+    // تعتيم كل حاجة بره الدايرة + خط ذهبي على حدّها. الفتحة بتتعمل برسم
+    // مستطيل كامل وجواه قوس بعكس عقارب الساعة — قاعدة التعبئة الافتراضية
+    // بتعتبر ده «ثقب». كده الزائر شايف بالظبط اللي هيطلع، مش بيخمّن.
+    const r = Math.min(w, h) / 2 - 2;
+    cropCtx.save();
+    cropCtx.fillStyle = 'rgba(0,0,0,0.55)';
+    cropCtx.beginPath();
+    cropCtx.rect(0, 0, w, h);
+    cropCtx.arc(w/2, h/2, r, 0, Math.PI*2, true);
+    cropCtx.fill();
+    cropCtx.beginPath();
+    cropCtx.arc(w/2, h/2, r, 0, Math.PI*2);
+    cropCtx.strokeStyle = '#ffc94d';
+    cropCtx.lineWidth = 2;
+    cropCtx.stroke();
+    cropCtx.restore();
+  }
 }
 
 function clampCropOffset(){
@@ -3040,12 +3072,20 @@ function clampCropOffset(){
  * source photo's own framing (close-up vs full body vs a wide scene) can't
  * be guessed reliably by any algorithm, so the admin repositions/zooms once
  * — but the OUTPUT size is then always identical no matter what they upload. */
-function openCropModal(file){
+function openCropModal(file, mode){
+  cropMode = CROP_MODES[mode] || CROP_MODES.product;
   return new Promise((resolve)=>{
     const reader = new FileReader();
     reader.onload = ()=>{
       const img = new Image();
       img.onload = ()=>{
+        // مقاس الكانفاس بيتغيّر حسب الوضع — لازم قبل أي حساب مقياس.
+        cropCanvas.width  = cropMode.canvasW;
+        cropCanvas.height = cropMode.canvasH;
+        const ttl = document.querySelector('#cropModalBg h3');
+        const sub = document.querySelector('#cropModalBg .sub');
+        if(ttl){ ttl.textContent = t(cropMode.title); ttl.setAttribute('data-i18n', cropMode.title); }
+        if(sub){ sub.textContent = t(cropMode.sub);   sub.setAttribute('data-i18n', cropMode.sub); }
         const w = cropCanvas.width, h = cropCanvas.height;
         const baseScale = Math.max(w / img.width, h / img.height);
         cropState = { img, scale: baseScale, offsetX: 0, offsetY: 0, resolve };
@@ -3173,9 +3213,9 @@ function closeCropModal(result){
 elById('cropConfirmBtn').onclick = ()=>{
   if(!cropState) return;
   const out = document.createElement('canvas');
-  out.width = CROP_OUTPUT_W; out.height = CROP_OUTPUT_H;
+  out.width = cropMode.outW; out.height = cropMode.outH;
   const octx = out.getContext('2d');
-  const scaleUp = CROP_OUTPUT_W / cropCanvas.width; // display canvas size -> real output size
+  const scaleUp = cropMode.outW / cropCanvas.width; // display canvas size -> real output size
   octx.save();
   octx.translate(out.width/2 + cropState.offsetX * scaleUp, out.height/2 + cropState.offsetY * scaleUp);
   octx.scale(cropState.scale * scaleUp, cropState.scale * scaleUp);
@@ -3948,6 +3988,13 @@ function addSearchHistory(term){
   list.unshift(term);
   saveSearchHistory(list);
 }
+/** بتفضّي سجل البحث كله. المفتاح نفسه بيتشال من التخزين مش بيتحط قايمة
+ *  فاضية — أنضف، ومابيسيبش أثر في تخزين المتصفح. */
+function clearSearchHistory(){
+  try{ localStorage.removeItem(SEARCH_HISTORY_KEY); }catch(e){}
+  renderSearchDropdown(searchInput.value);
+  showToast(t('toastSearchHistoryCleared'));
+}
 function removeSearchHistoryItem(term){
   saveSearchHistory(getSearchHistory().filter(t => t !== term));
   renderSearchDropdown(searchInput.value);
@@ -4094,7 +4141,10 @@ function renderSearchDropdown(query){
       return;
     }
     searchDropdown.innerHTML =
-      `<div class="sd-section-label">${t('searchHistoryLabel')}</div>` +
+      `<div class="sd-history-head">
+         <span class="sd-section-label">${t('searchHistoryLabel')}</span>
+         <button type="button" class="sd-clear-all" data-clear-history>${t('searchClearHistory')}</button>
+       </div>` +
       history.map(term => `
         <div class="sd-history-item" data-term="${escapeHtml(term)}">
           <span>🕘 ${escapeHtml(term)}</span>
@@ -4159,6 +4209,12 @@ document.addEventListener('click', (e)=>{
   if(!searchBox.contains(e.target)) searchBox.classList.remove('open');
 });
 searchDropdown.addEventListener('click', (e)=>{
+  // قبل [data-remove] عشان الاتنين جوه نفس القايمة والترتيب بيفرق.
+  if(e.target.closest('[data-clear-history]')){
+    e.stopPropagation();
+    clearSearchHistory();
+    return;
+  }
   const removeBtn = e.target.closest('[data-remove]');
   if(removeBtn){
     e.stopPropagation();
@@ -4613,6 +4669,9 @@ async function checkLoggedInUser(){
 }
 
 function updateAccountButton(){
+  // بيانات الدرج بتتحدّث **الأول** — قبل أي شرط بيخص الزرار. الزرار اتشال
+  // من الهيدر، ولو الشرط اللي تحت فضل قبلها كان بيمنع تحديث البروفايل خالص.
+  populateDrawerProfileFields();
   const btn = document.getElementById('accountOpenBtn');
   if(!btn) return;
   const personIcon = '<span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"/></svg></span>';
@@ -4622,7 +4681,6 @@ function updateAccountButton(){
   // الزرار بيبقى من غير أي اسم لقارئ الشاشة.
   btn.setAttribute('aria-label', label);
   btn.setAttribute('title', label);
-  populateDrawerProfileFields();
 }
 
 let pendingAvatarFile = null; // a photo picked before the guest has an account yet
@@ -4682,7 +4740,7 @@ function initSideDrawer(){
   if(drawerLoginLink){
     drawerLoginLink.onclick = ()=>{
       closeDrawer();
-      document.getElementById('accountOpenBtn').click();
+      openAccountModal();
       document.getElementById('tabLoginBtn').click();
     };
   }
@@ -4707,7 +4765,7 @@ function initSideDrawer(){
         document.getElementById('registerName').value = name;
         document.getElementById('registerPhone').value = phone;
         closeDrawer();
-        document.getElementById('accountOpenBtn').click();
+        openAccountModal();
         document.getElementById('tabRegisterBtn').click();
       }
     };
@@ -4812,7 +4870,9 @@ async function saveProfileDetails(name, phone){
 }
 
 const accountModalBg = document.getElementById('accountModalBg');
-elById('accountOpenBtn').onclick = ()=>{
+/** بتفتح نافذة الحساب. كانت متعلّقة على زرار في الهيدر، والزرار اتشال —
+ *  فبقت دالة بتتنادى من الدرج ومن أي مكان تاني محتاجها. */
+function openAccountModal(){
   accountModalBg.classList.add('show');
   document.getElementById('accountLoggedOutView').style.display = currentUser ? 'none' : 'block';
   document.getElementById('accountLoggedInView').style.display = currentUser ? 'block' : 'none';
@@ -4832,7 +4892,7 @@ elById('accountOpenBtn').onclick = ()=>{
     }
   }
   checkBiometricAvailability();
-};
+}
 elById('accountModalClose').onclick = ()=> accountModalBg.classList.remove('show');
 
 elById('tabLoginBtn').onclick = ()=>{
@@ -4897,9 +4957,14 @@ elById('accountAvatarBtn').onclick = ()=>{
   document.getElementById('accountAvatarFile').click();
 };
 document.getElementById('accountAvatarFile').onchange = async (e)=>{
-  const file = e.target.files && e.target.files[0];
+  const raw = e.target.files && e.target.files[0];
   e.target.value = '';
-  if(!file) return;
+  if(!raw) return;
+  // القص بيحصل هنا مرة واحدة — قبل أي فرع. كده الضيف والمسجّل الاتنين
+  // بياخدوا نفس الصورة المقصوصة بالظبط، ومفيش مسار بيفوته القص.
+  const cropped = await openCropModal(raw, 'avatar');
+  if(!cropped) return; // لغى — مانرفعش الأصل من غير قص أبدًا
+  const file = new File([cropped], 'avatar.jpg', { type: 'image/jpeg' });
   if(!currentUser){
     // Guest — nothing to attach this to yet. Keep it in memory and show a
     // local preview; it uploads automatically once they finish registering
@@ -4918,9 +4983,9 @@ document.getElementById('accountAvatarFile').onchange = async (e)=>{
   const token = localStorage.getItem('megaPromptAuthToken');
   if(!token || !BACKEND_BASE) return;
   try{
-    const resizedBlob = await resizeImageToBlob(file, 320, 0.85);
+    // مفيش تصغير تاني — القاص طلّعها 512×512 خلاص.
     const form = new FormData();
-    form.append('avatar', resizedBlob, 'avatar.jpg');
+    form.append('avatar', file, 'avatar.jpg');
     const res = await fetch(`${BACKEND_BASE}/account/upload-avatar`, {
       method:'POST', headers:{ 'Authorization': `Bearer ${token}` }, body: form
     });
@@ -4989,9 +5054,9 @@ async function uploadPendingAvatarIfAny(){
   const token = localStorage.getItem('megaPromptAuthToken');
   if(!token || !BACKEND_BASE) return;
   try{
-    const resizedBlob = await resizeImageToBlob(file, 320, 0.85);
+    // الصورة دي اتقصّت وقت الاختيار (512×512) — بتترفع زي ما هي.
     const form = new FormData();
-    form.append('avatar', resizedBlob, 'avatar.jpg');
+    form.append('avatar', file, 'avatar.jpg');
     const res = await fetch(`${BACKEND_BASE}/account/upload-avatar`, {
       method:'POST', headers:{ 'Authorization': `Bearer ${token}` }, body: form
     });
@@ -5334,7 +5399,7 @@ elById('reviewPhotoConsent').addEventListener('change', function(){
 elById('writeReviewBtn').onclick = ()=>{
   if(!currentUser){
     showToast(t('toastLoginRequired'));
-    document.getElementById('accountOpenBtn').click();
+    openAccountModal();
     return;
   }
   populateReviewPhotoPicker();

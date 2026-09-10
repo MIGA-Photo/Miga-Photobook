@@ -415,12 +415,17 @@
      that swaps the always-visible utility strip for a hamburger button
      opening a side drawer, so the header takes up less permanent screen
      height. Classic mode (default) keeps the old behavior exactly. */
+  /* أعرض شوية (52 بدل 38) عشان يبقى هدف لمس مريح وهو بقى الزرار الوحيد
+     في جنب الصف. الارتفاع زي ما هو. */
   .hamburger-btn{
-    display:none; background:transparent; border:1px solid var(--line); color:var(--paper);
-    width:38px; height:38px; border-radius:10px; align-items:center; justify-content:center;
+    display:flex; background:transparent; border:1px solid var(--line); color:var(--paper);
+    width:52px; height:38px; border-radius:10px; align-items:center; justify-content:center;
     flex-shrink:0;
   }
-  html[data-header-mode="compact"] .hamburger-btn{ display:flex; }
+  /* ⚠ كان بيظهر في الوضع المطوي بس. بقى الباب **الوحيد** للحساب بعد شيل
+     زرار التسجيل — وشريط وضع «الشكل الحالي» مافيهوش أي مدخل للحساب خالص،
+     فلو فضل مشروط كان أي تحويل للوضع التاني هيقفل التسجيل نهائيًا.
+     باب الحساب مايتعلّقش على إعداد شكل. */
   html[data-header-mode="compact"] .header-utility{ display:none !important; }
   .side-drawer-backdrop{
     position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:98;
@@ -559,14 +564,22 @@
      بتزقه بدل ما تركب عليه. */
   .nav-top{
     position:relative; width:100%;
-    display:flex; align-items:center; gap:10px;
+    display:flex; align-items:center;
+    /* gap:0 مقصود. لو فيه فجوة بين الهامبرجر وخانة الاسم، خانة الاسم
+       بتبدأ بعد الفجوة — فنص الخانة بيبقى مزاح نص الفجوة عن نص «باقي
+       السطر» اللي العين بتشوفه (اتقاس: 5px). بصفر، الخانة بتغطي باقي
+       السطر بالظبط والاسم بيتمركز فيه تمامًا. الفراغ حوالين الاسم جاي
+       من إنه أضيق من الخانة أصلاً. */
+    gap:0;
   }
+  /* بعد ما زرار التسجيل اتشال، الصف بقى خانتين: الهامبرجر بعرضه الطبيعي،
+     والاسم بياخد **باقي السطر** ومتمركز فيه هو. مش توسيط على عرض الصف كله
+     — ده كان هيخلّيه مزاح ناحية الهامبرجر. */
   .nav-side{
-    flex:1 1 0; min-width:0;
+    flex:0 0 auto; min-width:0;
     display:flex; align-items:center; gap:8px;
   }
-  .nav-side-end{ justify-content:flex-end; }
-  .nav-top > .logo{ flex:0 0 auto; margin:0; }
+  .nav-top > .logo{ flex:1 1 auto; min-width:0; justify-content:center; margin:0; }
   .logo .lg-en, .side-drawer-logo .lg-en{
     font-size:18px; font-weight:700; letter-spacing:0.2px; white-space:nowrap;
   }
@@ -1195,8 +1208,16 @@
     padding:8px; text-align:center; transition:transform .15s ease, border-color .15s ease;
   }
   .cat-tile:hover{
-    border-color:rgba(255,201,77,0.55); transform:translateY(-2px);
+    border-color:rgba(255,201,77,0.55);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.34), 0 16px 34px rgba(0,0,0,0.48);
+  }
+  /* نفس علاج .card:hover بالظبط — والتايل ده كان فاضل.
+     صف الأقسام (.cat-tiles-grid) عليه overflow-y:hidden، والرفعة دي كانت
+     بتطلّع التايل 2px فوق حافة الصف فيتقص من فوق. وعلى الآيفون اللمس
+     بيفعّل :hover وبيفضل عالق، فالقص بيحصل بالظبط وانت بتسحب الصف.
+     أول مرة صلّحت .card ونسيت التوأم ده — نفس الغلطة نوعًا. */
+  @media (hover:hover) and (pointer:fine){
+    .cat-tile:hover{ transform:translateY(-2px); }
   }
   .cat-tile:focus-visible{ outline:2px solid var(--brass); outline-offset:2px; }
   .cat-tile.open{ border-color:var(--brass); }
@@ -1451,8 +1472,23 @@
     .card:hover{ transform:translateY(-4px); }
   }
   /* 3/4 بدل 4/5: صورة أطول = شغل أكتر وإطار أقل. الصورة هي المنتج. */
+  /* الخلفية اللونية اللي بتتحدّد من لوحة التحكم بقت شايلة علامة الموقع —
+     نفس شكل خلفية الصفحة (اسم مكرّر مايل بلون نحاسي خفيف). بتبان في اللحظة
+     اللي الصورة لسه بتتحمّل فيها، ودي لحظة حقيقية على شبكة موبايل: فالمستطيل
+     اللوني الفاضي بقى لحظة علامة تجارية بدل فراغ ميت.
+
+     ليه صورة خلفية (SVG) مش عنصر ::before؟ عشان الخلفية بترسم **تحت كل
+     المحتوى** تلقائيًا — الصورة، الشارات، القلب، لمعة الزجاج — من غير ما
+     نلمس ترتيب الطبقات (z-index) بتاع أي حاجة فيهم. أي حل بعنصر كان
+     هيحتاج نعيد ترتيب أربع طبقات، وده مخاطرة مالهاش لزوم.
+     اللون النحاسي مكتوب صراحةً لأن متغيّرات CSS مابتشتغلش جوه data URI —
+     وهو ثابت على كل الثيمات (الثيمات بتغيّر --header-bg و--media-bg بس). */
   .card-media{
-    position:relative; aspect-ratio:3/4; background:var(--media-bg); overflow:hidden;
+    position:relative; aspect-ratio:3/4; overflow:hidden;
+    background-color:var(--media-bg);
+    background-image:url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%22340%22%20height=%22150%22%3E%3Cg%20transform=%22rotate(-13%20170%2075)%22%3E%3Ctext%20x=%2216%22%20y=%2282%22%20font-family=%22Rakkas,serif%22%20font-size=%2219%22%20letter-spacing=%222%22%20fill=%22%23e8b64a%22%20fill-opacity=%220.14%22%20text-anchor=%22start%22%3EMiga-Photobook%3C/text%3E%3Cg%20transform=%22translate(176,50)%20scale(0.62)%22%20fill=%22none%22%20stroke=%22%23e8b64a%22%20stroke-opacity=%220.16%22%20stroke-width=%222.4%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M24%2014%20C19%2010%2010%209%205%2011%20V37%20C10%2035%2019%2036%2024%2040%20V14%20Z%22/%3E%3Cpath%20d=%22M24%2014%20C29%2010%2038%209%2043%2011%20V37%20C38%2035%2029%2036%2024%2040%20V14%20Z%22/%3E%3Crect%20x=%2214%22%20y=%2218%22%20width=%2220%22%20height=%2214%22%20rx=%223%22/%3E%3Crect%20x=%2220%22%20y=%2214%22%20width=%228%22%20height=%225%22%20rx=%221.5%22/%3E%3Ccircle%20cx=%2224%22%20cy=%2225%22%20r=%224.5%22/%3E%3C/g%3E%3Ctext%20x=%22324%22%20y=%2282%22%20font-family=%22Rakkas,serif%22%20font-size=%2218%22%20letter-spacing=%221%22%20fill=%22%23e8b64a%22%20fill-opacity=%220.14%22%20text-anchor=%22end%22%3E%D9%85%D9%8A%D8%AC%D8%A7%20%D9%81%D9%88%D8%AA%D9%88%D8%A8%D9%88%D9%83%3C/text%3E%3C/g%3E%3C/svg%3E");
+    background-repeat:repeat;
+    background-position:center;
     box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10), inset 0 -14px 26px -18px rgba(0,0,0,0.8);
   }
   /* انعكاس ضوء مائل خفيف — بيدي إحساس الزجاج من غير ما يغسل الصورة */
@@ -2013,6 +2049,21 @@
   .search-dropdown .sd-section-label{
     font-size:12.5px; color:var(--paper-dim); padding:8px 10px 4px; text-transform:uppercase; letter-spacing:0.5px;
   }
+  .search-dropdown .sd-history-head{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+  }
+  .search-dropdown .sd-clear-all{
+    background:transparent; border:none; cursor:pointer;
+    font-family:inherit; font-size:12.5px; font-weight:700;
+    color:var(--paper-dim); padding:8px 10px 4px;
+    /* هدف لمس 44px من غير ما ياخد مساحة بصرية زيادة */
+    position:relative;
+  }
+  .search-dropdown .sd-clear-all::after{
+    content:''; position:absolute; top:50%; left:50%;
+    transform:translate(-50%,-50%); min-width:44px; min-height:44px;
+  }
+  .search-dropdown .sd-clear-all:hover{ color:#e07a7a; }
   .search-dropdown .sd-history-item{
     display:flex; align-items:center; justify-content:space-between; gap:8px;
     padding:9px 10px; border-radius:8px; font-size:13.5px; color:var(--paper-dim); cursor:pointer;
@@ -2055,12 +2106,27 @@
     transition:opacity .22s ease, transform .22s ease;
   }
   .contact-menu.show{opacity:1; pointer-events:auto; transform:translateY(0) scale(1);}
+  /* كل أيقونة بلونها الرسمي. الزائر بيتعرّف على واتساب من الأخضر قبل ما
+     يقرا أي حاجة — اللون المميز بيوفّر خطوة كاملة على العين.
+     المقاس ما اتغيرش: 46×46 زي ما كان. */
   .contact-item{
-    width:46px; height:46px; border-radius:50%; background:var(--ink-2); border:1px solid var(--line);
-    color:var(--paper); display:flex; align-items:center; justify-content:center;
-    transition:transform .2s ease, background .2s ease, border-color .2s ease;
+    width:46px; height:46px; border-radius:50%;
+    border:1px solid rgba(0,0,0,0.22);
+    color:#fff; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 2px 8px rgba(0,0,0,0.45);
+    transition:transform .2s ease, filter .2s ease;
   }
-  .contact-item:hover{transform:scale(1.1); background:var(--brass); color:var(--ink); border-color:var(--brass);}
+  .contact-item.ci-wa{ background:#25D366; }
+  .contact-item.ci-fb{ background:#1877F2; }
+  .contact-item.ci-tg{ background:linear-gradient(180deg, #37BBFE, #007DBB); }
+  /* علامة إنستجرام تدرّج قُطري مش لون واحد — ده التقريب المتعارف عليه. */
+  .contact-item.ci-ig{
+    background:radial-gradient(circle at 30% 107%,
+      #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+  }
+  /* الهوفر كان بيقلب الخلفية لذهبي — وده كان بيلغي اللون المميز وقت ما
+     المستخدم بيوصل للزرار بالظبط. دلوقتي بيكبّر ويضوّي واللون بيفضل. */
+  .contact-item:hover{ transform:scale(1.1); filter:brightness(1.12); }
 
   .lightbox{
     position:fixed; inset:0; background:rgba(5,3,12,0.92); z-index:400;
