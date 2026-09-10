@@ -204,17 +204,17 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Organization","name":"Miga-Photobook","alternateName":"ميجا فوتوبوك","description":"نحوّل صورتك الشخصية تلقائيًا لتحفة فنية احترافية بتقنيات ميجا المتطوّرة القائمة على الذكاء الاصطناعي — ارفع صورتك واختر المكان والأسلوب.","url":"https://miga-photobook.com/","logo":"https://miga-photobook.com/logo-watermark.png","image":"https://miga-photobook.com/og-image.png","email":"migaphotobook@gmail.com","telephone":"+201202530308","founder":{"@type":"Person","name":"Magdy Farouk Soliman","alternateName":"مجدي فاروق سليمان"},"areaServed":{"@type":"Country","name":"Egypt"},"address":{"@type":"PostalAddress","addressCountry":"EG"},"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"migaphotobook@gmail.com","telephone":"+201202530308","availableLanguage":["ar","en"],"areaServed":"EG"}],"sameAs":["https://www.facebook.com/share/1HyaB2xwuZ/?mibextid=wwXIfr","https://www.instagram.com/migaphotobook/"]}
 </script>
-<!-- Star-rating rich snippet: the numbers below (5.0 average, 21 reviews)
-     are a manual snapshot of the real, currently-approved reviews shown in
-     the "تقييمات وآراء عملائنا" section further down this page (verified
-     against /reviews/list on 6 Sep 2026) — Google requires aggregateRating
-     to reflect genuine reviews that are actually visible on the page, which
-     this now is. There's no live backend rendering this file, so update
-     ratingValue/reviewCount here by hand every so often as new reviews come
-     in — a snapshot going stale for a while isn't a violation, but leaving
-     it untouched for months while the real count grows a lot would drift
-     noticeably from what visitors actually see in that section. -->
-<script type="application/ld+json">
+<!-- ⚠ الأرقام اللي تحت **مش** هي المصدر — دي قيمة احتياطية بس.
+     `syncProductRatingLd()` في app.js بتكتب فوقها من نفس الاستجابة اللي
+     بتملا بادج التقييم المعروض على الصفحة، فالمكتوب هنا واللي الزائر
+     شايفه مستحيل يختلفوا.
+
+     ليه ده مهم: جوجل بيشترط إن aggregateRating يطابق مراجعات حقيقية
+     معروضة فعلًا، وبيوقّع **عقوبة يدوية** لو اختلفوا — والعقوبة بتشيل
+     النجوم والسعر من نتيجة البحث كلها.
+
+     القيمة اللي هنا بتظهر بس لو السيرفر مش شغّال وقت التحميل. -->
+<script type="application/ld+json" id="productLd">
 {
   "@context": "https://schema.org",
   "@type": "Product",
@@ -253,7 +253,7 @@
      old URL. Bumping this string (e.g. 20260906a -> 20260906b) any time
      app.js or styles.css changes forces every visitor to fetch the new file
      immediately, no manual cache-clearing needed on their end. -->
-<link href="/styles.css?v=20260910i" rel="stylesheet"/>
+<link href="/styles.css?v=20260910j" rel="stylesheet"/>
 <!-- Google Analytics 4 -->
 <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
 <script>
@@ -2018,7 +2018,7 @@
 </div>
 </div>
 <div class="toast" id="toast"></div>
-<script src="/app.js?v=20260910i"></script>
+<script src="/app.js?v=20260910j"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
