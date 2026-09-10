@@ -1,0 +1,1982 @@
+<!DOCTYPE html>
+<!-- ==========================================================
+     مولَّد آليًا من /index.html — متعدلش الملف ده بالإيد.
+     أي تعديل هنا هيضيع أول مرة الصفحة تتولد تاني، والأسوأ إنه
+     هيخلي النسختين مختلفتين من غير ما حد ياخد باله (نفس مشكلة
+     /v2/ و/v3/). عدّل index.html وأعد التوليد.
+     النصوص بتيجي من نفس قاموس translations اللي في app.js.
+     ========================================================== -->
+
+
+<html dir="ltr" lang="en">
+<head>
+<meta charset="utf-8"/>
+<!-- Favicon — the same open-book-with-camera mark used in the header logo,
+     baked out as standalone image files with fixed colors (the header's
+     own SVG uses var(--brass)/var(--ink) CSS variables, which aren't
+     available to a favicon loaded as a bare image file outside the page).
+     Multiple formats/sizes cover browser tabs, bookmarks, bookmarklets,
+     and "Add to Home Screen" on iOS/Android — including what Google shows
+     next to search results instead of the generic globe icon. -->
+<link href="/favicon.ico" rel="icon" sizes="any"/>
+<link href="/favicon.svg" rel="icon" type="image/svg+xml"/>
+<link href="/apple-touch-icon.png" rel="apple-touch-icon"/>
+<link href="/icon-192.png" rel="icon" sizes="192x192" type="image/png"/>
+<link href="/icon-512.png" rel="icon" sizes="512x512" type="image/png"/>
+<!-- PWA — lets visitors add the site to their phone's home screen as a
+     standalone, full-screen "app" with no App Store/Google Play review or
+     commission. manifest.json and service-worker.js live once at the repo
+     root (same reasoning as the favicon files) and are shared by all three
+     design folders via this root-absolute link + registration script. -->
+<link href="/manifest.json" id="__pwaManifestLink" rel="manifest"/>
+<meta content="#131316" name="theme-color"/>
+<!-- Design-switch bootstrap. IMPORTANT FIX: an earlier version of this used
+     a synchronous XHR with `.timeout` set — browsers throw an
+     InvalidAccessError the instant that combination runs (timeout is
+     invalid on synchronous requests per the XHR spec), which our own
+     try/catch was silently swallowing. That meant the redirect check never
+     actually ran, on any page, ever — visitors always just saw whatever
+     page they'd navigated to directly. This version uses a normal async
+     fetch instead, hiding the page with `visibility:hidden` until the
+     check resolves (or a 1.2s fallback fires) so there's still no flash of
+     the wrong design, without hitting that spec restriction. MY_DESIGN_ID
+     is the only line that differs between this file and each design's own
+     copy of this same script.
+
+     SECOND FIX: the secret admin entry point (visiting this exact root page
+     with #mega-admin-9k2x in the URL) lives ONLY here — Design MIGA 2/3
+     have no admin panel at all. But this redirect used to fire before that
+     hash was ever checked, so whenever a design other than MIGA 1 was
+     active, opening the admin link just bounced straight to that design's
+     visitor page (silently dropping the hash along the way) — the admin
+     became completely unreachable. The admin entry must always work from
+     this page regardless of which design is currently active for
+     customers, so it's now checked FIRST and skips the redirect entirely. -->
+<style id="__bootHide">
+  html{visibility:hidden;}
+  #__bootLoader{
+    visibility:visible; position:fixed; inset:0; z-index:999999;
+    background:#131316; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:14px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;
+  }
+  #__bootLoader svg{ animation:__bootPulse 1.3s ease-in-out infinite; }
+  @keyframes __bootPulse{ 0%,100%{opacity:.5;} 50%{opacity:1;} }
+  #__bootLoader .__bl-name-en{ color:#ffc94d; font-size:20px; font-weight:700; letter-spacing:0.3px; margin:0; }
+  #__bootLoader .__bl-name-ar{ color:#ffc94d; font-size:15px; font-weight:700; margin:-8px 0 0; }
+  #__bootLoader .__bl-url{ color:#9a95a8; font-size:12.5px; margin:2px 0 0; direction:ltr; }
+</style>
+<div id="__bootLoader">
+<svg height="56" viewbox="0 0 48 48" width="56" xmlns="http://www.w3.org/2000/svg">
+<path d="M24 14 C19 10 10 9 5 11 V37 C10 35 19 36 24 40 V14 Z" fill="none" stroke="#ffc94d" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M24 14 C29 10 38 9 43 11 V37 C38 35 29 36 24 40 V14 Z" fill="none" stroke="#ffc94d" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M24 14 V40" opacity="0.5" stroke="#ffc94d" stroke-width="1.5"></path>
+<rect fill="#131316" height="14" rx="3" stroke="#ffc94d" stroke-width="2" width="20" x="14" y="18"></rect>
+<rect fill="#131316" height="5" rx="1.5" stroke="#ffc94d" stroke-width="2" width="8" x="20" y="14"></rect>
+<circle cx="24" cy="25" fill="none" r="4.5" stroke="#ffc94d" stroke-width="2"></circle>
+<circle cx="24" cy="25" fill="#ffc94d" r="1.6"></circle>
+</svg>
+<p class="__bl-name-en">Miga-Photobook</p>
+<p class="__bl-name-ar">ميجا فوتوبوك</p>
+<p class="__bl-url">miga-photobook.com</p>
+</div>
+<script>
+(function(){
+  var MY_DESIGN_ID = 'v1';
+  var revealed = false;
+  function reveal(){
+    if(revealed) return;
+    revealed = true;
+    var s = document.getElementById('__bootHide');
+    if(s) s.remove();
+    var l = document.getElementById('__bootLoader');
+    if(l) l.remove();
+  }
+  // Admin entry point — never redirect away from this, no matter which
+  // design is active for customers. The admin panel only exists here.
+  //
+  // THIRD FIX (Sep 2026): iOS "Add to Home Screen" was found to drop the
+  // URL fragment entirely from the installed icon's launch URL — an
+  // icon installed while on "/#mega-admin-9k2x" actually launched to
+  // plain "/" (confirmed live: the install sheet showed
+  // "https://miga-photobook.com/", no hash, and the installed icon opened
+  // the customer homepage). Hash-based routing can never survive iOS's
+  // install flow. Query strings are part of the real URL (sent to the
+  // server, not a client-only fragment) and are preserved by iOS install,
+  // so "?admin=9k2x" is now accepted as an equivalent, install-safe way in
+  // — the old hash form still works too for any existing bookmarks/links.
+  var isAdminEntry = (window.location.hash === '#mega-admin-9k2x') ||
+    /(^|&)admin=9k2x(&|$)/.test(window.location.search.replace(/^\?/, ''));
+  if(isAdminEntry){
+    // Swap the page's manifest to the admin one BEFORE reveal(), so that if
+    // the owner taps "Add to Home Screen" while on this admin URL, the
+    // installed icon launches straight back into the admin panel
+    // (start_url "/?admin=9k2x") instead of the customer homepage.
+    // Swapping the existing <link rel="manifest"> element's href like this
+    // is picked up by the browser's install flow same as a static manifest.
+    var manifestLink = document.getElementById('__pwaManifestLink');
+    if(manifestLink) manifestLink.setAttribute('href', '/admin-manifest.json');
+    reveal();
+  }
+  var fallback = setTimeout(reveal, 1200);
+  // no-store: من غير كده المتصفح بيخزّن /site-config بتخمينه الخاص، فبتغيّر
+  // إعداد من اللوحة وتعمل تحديث وتلاقيه "مش اتغيّر" — وهو اتغيّر على السيرفر.
+  fetch('https://miga-photobook-api.magdyfarouk380.workers.dev/site-config', { cache: 'no-store' })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      clearTimeout(fallback);
+      if(data && data.colorTheme && data.colorTheme !== 'black'){
+        document.documentElement.setAttribute('data-accent', data.colorTheme);
+      }
+      if(data && data.headerMode === 'compact'){
+        document.documentElement.setAttribute('data-header-mode', 'compact');
+      }
+      // الإعدادات فوق بتتطبّق في كل الحالات. الـredirect بس هو اللي ممنوع
+      // على مدخل الأدمن — لأن اللوحة موجودة على الصفحة دي وحدها.
+      if(!isAdminEntry && data && data.activeDesign && data.activeDesign !== MY_DESIGN_ID){
+        var target = (data.availableDesigns || []).filter(function(d){ return d.id === data.activeDesign; })[0];
+        var folder = target ? target.folder : '';
+        var myFolder = MY_DESIGN_ID === 'v1' ? '' : MY_DESIGN_ID;
+        var dest = null;
+        if(myFolder === '' && folder !== ''){ dest = './' + folder + '/'; }
+        else if(myFolder !== '' && folder === ''){ dest = '../'; }
+        else if(myFolder !== '' && folder !== ''){ dest = '../' + folder + '/'; }
+        if(dest){ window.location.replace(dest); return; }
+      }
+      reveal();
+    })
+    .catch(function(){ clearTimeout(fallback); reveal(); });
+})();
+</script>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Miga-Photobook — Turn Your Photo Into a Work of Art in Minutes</title>
+<meta content="Upload your photo, pick the setting and style you want, and we turn it into a studio-quality image automatically using AI — in minutes." name="description"/>
+<meta content="تحويل الصور بالذكاء الاصطناعي, AI Photo Transformation, صور شخصية احترافية, تعديل صور بالذكاء الاصطناعي" name="keywords"/>
+<meta content="Miga-Photobook" property="og:site_name"/>
+<meta content="index, follow" id="__robotsMeta" name="robots"/>
+<script>
+// This exact file is also served, byte-for-byte, from GitHub Pages' own
+// default project URL (miga-photo.github.io/Miga-Photobook/) — once a
+// custom domain is attached, GitHub gives no way to turn that default URL
+// off, so it stays live and reachable forever, serving identical content.
+// The canonical tag below already tells Google the real page is
+// miga-photobook.com, but a static "index, follow" robots tag served on
+// BOTH hosts undercuts that hint and invites duplicate-content dilution.
+// This flips the on-page robots directive to noindex,nofollow whenever the
+// page isn't actually being served from the real domain, so only
+// miga-photobook.com is ever offered to search engines for indexing.
+(function(){
+  var host = location.hostname;
+  if(host !== 'miga-photobook.com' && host !== 'www.miga-photobook.com'){
+    document.getElementById('__robotsMeta').setAttribute('content', 'noindex, nofollow');
+  }
+})();
+</script>
+<link href="https://miga-photobook.com/en/" rel="canonical"/>
+<!-- بيقول لجوجل إن في نسختين للصفحة دي بلغتين، وإن كل واحدة لمين.
+     من غيرهم النسخة الإنجليزية مبتتفهرسش أصلاً — التبديل بالجافاسكريبت
+     مش بيعمل رابط تاني يقدر جوجل يفهرسه. -->
+<link href="https://miga-photobook.com/" hreflang="ar" rel="alternate"/>
+<link href="https://miga-photobook.com/en/" hreflang="en" rel="alternate"/>
+<link href="https://miga-photobook.com/" hreflang="x-default" rel="alternate"/>
+<meta content="website" property="og:type"/>
+<meta content="https://miga-photobook.com/en/" property="og:url"/>
+<meta content="Miga-Photobook — Turn Your Photo Into a Work of Art in Minutes" property="og:title"/>
+<meta content="Upload your photo, pick the setting and style you want, and we turn it into a studio-quality image automatically using AI — in minutes." property="og:description"/>
+<meta content="en_US" property="og:locale"/><meta content="ar_AR" property="og:locale:alternate"/>
+<meta content="https://miga-photobook.com/og-image.png" property="og:image"/>
+<meta content="https://miga-photobook.com/og-image.png" property="og:image:secure_url"/>
+<meta content="image/png" property="og:image:type"/>
+<meta content="1200" property="og:image:width"/>
+<meta content="630" property="og:image:height"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Miga-Photobook — Turn Your Photo Into a Work of Art in Minutes" name="twitter:title"/>
+<meta content="Upload your photo, pick the setting and style you want, and we turn it into a studio-quality image automatically using AI — in minutes." name="twitter:description"/>
+<meta content="https://miga-photobook.com/og-image.png" name="twitter:image"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Miga-Photobook",
+  "alternateName": ["ميجا فوتوبوك", "Miga Photobook"],
+  "url": "https://miga-photobook.com/"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Miga-Photobook",
+  "description": "نحوّل صورتك الشخصية تلقائيًا لتحفة فنية احترافية بتقنيات ميجا المتطوّرة القائمة على الذكاء الاصطناعي — ارفع صورتك واختر المكان والأسلوب.",
+  "url": "https://miga-photobook.com/"
+}
+</script>
+<!-- Star-rating rich snippet: the numbers below (5.0 average, 21 reviews)
+     are a manual snapshot of the real, currently-approved reviews shown in
+     the "تقييمات وآراء عملائنا" section further down this page (verified
+     against /reviews/list on 6 Sep 2026) — Google requires aggregateRating
+     to reflect genuine reviews that are actually visible on the page, which
+     this now is. There's no live backend rendering this file, so update
+     ratingValue/reviewCount here by hand every so often as new reviews come
+     in — a snapshot going stale for a while isn't a violation, but leaving
+     it untouched for months while the real count grows a lot would drift
+     noticeably from what visitors actually see in that section. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Miga-Photobook",
+  "description": "خدمة تحويل الصور الشخصية تلقائيًا لصور احترافية بجودة استوديو بتقنيات ميجا المتطوّرة القائمة على الذكاء الاصطناعي.",
+  "image": "https://miga-photobook.com/og-image.png",
+  "brand": { "@type": "Brand", "name": "Miga-Photobook" },
+  "offers": {
+    "@type": "Offer",
+    "priceCurrency": "EGP",
+    "price": "25",
+    "url": "https://miga-photobook.com/",
+    "availability": "https://schema.org/InStock"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5.0",
+    "bestRating": "5",
+    "reviewCount": "21"
+  }
+}
+</script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<!-- ملفات الخط الحقيقية بتيجي من gstatic مش googleapis — من غير السطر ده
+     الزائر بيدفع رحلة DNS + TLS كاملة زيادة قبل ما أول حرف يتشاف. -->
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<!-- أول طلب بيانات (المنتجات وإعدادات الموقع) بيروح للووركر، فنفتح
+     الاتصال بدري بدل ما نستنى لحد ما app.js يشتغل. -->
+<link href="https://miga-photobook-api.magdyfarouk380.workers.dev" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Rakkas&amp;family=Readex+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- The "?v=..." on styles.css and app.js below (near the closing </body>) is a
+     cache-buster. Cloudflare/browsers otherwise cache these files under their
+     bare filename for a while, so a freshly-uploaded app.js/styles.css can look
+     "not applied yet" to a visitor even though the correct file is already on
+     GitHub — because they're still being served the old cached copy from the
+     old URL. Bumping this string (e.g. 20260906a -> 20260906b) any time
+     app.js or styles.css changes forces every visitor to fetch the new file
+     immediately, no manual cache-clearing needed on their end. -->
+<link href="/styles.css?v=20260909p" rel="stylesheet"/>
+<!-- Google Analytics 4 -->
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-98HS77F9E9');
+</script>
+<!-- Meta Pixel — live Pixel ID (dataset "Magdy Farouk's Pixel" in Meta
+     Events Manager). -->
+<script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+  document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '317880457219719');
+  fbq('track', 'PageView');
+</script>
+</head>
+<body>
+<script>
+/* Early theme/view-mode bootstrap — runs synchronously as the very first
+   thing in the page body, before any header/nav content is parsed or
+   painted. Without this, the page always rendered with its bare defaults
+   (light theme, desktop-style header) for a brief instant, then visibly
+   snapped to the visitor's actual saved dark/mobile preference once the
+   full app.js file finished loading and ran its own (much later) init
+   logic — a classic flash-of-wrong-content. Reading the same localStorage
+   key here and applying the same classes/attribute the real
+   applyTheme()/applyViewMode() functions use later means the correct look
+   is already in place on the very first paint; app.js's own calls to
+   those functions further down simply confirm/no-op on what's already
+   correct. */
+(function(){
+  try{
+    var raw = localStorage.getItem('megaPromptUiPrefs');
+    var prefs = raw ? JSON.parse(raw) : null;
+    var theme = (prefs && prefs.theme === 'light') ? 'light' : 'dark';
+    var view = (prefs && prefs.view === 'desktop') ? 'desktop' : 'mobile';
+    document.documentElement.setAttribute('data-theme', theme);
+    document.body.className = 'view-mode-' + view;
+  }catch(e){
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.body.className = 'view-mode-mobile';
+  }
+})();
+</script>
+<div aria-hidden="true" class="site-watermark-bg" id="siteWatermarkBg">
+<div class="wm-photos" id="wmPhotos"></div>
+<div class="wm-logo-layer" id="wmLogoLayer"></div>
+</div>
+<div id="appRoot">
+<div aria-hidden="true" class="promo-marquee">
+<div class="promo-marquee-track">
+<span class="mq-line"><span data-i18n="promoMarqueePre">🎉 Launch offer: a professional portrait for </span><span class="mq-price" data-i18n="promoMarqueePrice">25 EGP instead of 50</span><span data-i18n="promoMarqueeMid"> — powered by </span><span class="mq-mega" data-i18n="promoMarqueeBrand">Miga</span><span data-i18n="promoMarqueePost">, in minutes. What are you waiting for?</span></span>
+<span class="mq-line"><span data-i18n="promoMarqueePre">🎉 Launch offer: a professional portrait for </span><span class="mq-price" data-i18n="promoMarqueePrice">25 EGP instead of 50</span><span data-i18n="promoMarqueeMid"> — powered by </span><span class="mq-mega" data-i18n="promoMarqueeBrand">Miga</span><span data-i18n="promoMarqueePost">, in minutes. What are you waiting for?</span></span>
+</div>
+</div>
+<div class="sticky-top-group">
+<header>
+<div class="header-utility">
+<div class="ctrl-group ctrl-group-sm" id="langToggle">
+<button class="active" data-lang="ar">عربي</button>
+<button data-lang="en">English</button>
+</div>
+<button aria-pressed="true" class="theme-toggle theme-toggle-sm" type="button">
+<span aria-hidden="true" class="tt-stars">
+<span class="tt-star" style="inset-inline-start:8px; top:6px;"></span>
+<span class="tt-star" style="inset-inline-start:16px; top:14px;"></span>
+<span class="tt-star" style="inset-inline-start:24px; top:5px;"></span>
+</span>
+<span aria-hidden="true" class="tt-icon tt-sun"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" fill="currentColor" r="4.2" stroke="none"></circle><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"></path></svg></span>
+<span aria-hidden="true" class="tt-icon tt-moon"><svg fill="currentColor" stroke="none" viewbox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"></path></svg></span>
+<span aria-hidden="true" class="tt-knob">
+<span class="tt-knob-sun"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" fill="currentColor" r="4.2" stroke="none"></circle><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"></path></svg></span>
+<span class="tt-knob-moon"><svg fill="currentColor" stroke="none" viewbox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"></path></svg></span>
+</span>
+</button>
+<div class="ctrl-group ctrl-group-sm" id="viewToggle">
+<button class="active" data-view="desktop" id="viewBtnDesktop">
+<span aria-hidden="true" class="icon-badge"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><rect height="12" rx="1.5" width="18" x="3" y="4.5"></rect><path d="M8 20h8M12 16.5V20"></path></svg></span>
+<span data-i18n="viewDesktopLabel">Computer</span>
+</button>
+<button data-view="mobile" id="viewBtnMobile">
+<span aria-hidden="true" class="icon-badge"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><rect height="19" rx="2.2" width="10" x="7" y="2.5"></rect><path d="M11 18.5h2"></path></svg></span>
+<span data-i18n="viewMobileLabel">Mobile</span>
+</button>
+</div>
+<button class="util-link" data-i18n="trackBtn" id="trackOpenBtn" type="button">Track Order</button>
+</div>
+<div class="nav-wrap">
+<div class="nav-top">
+<div class="nav-side">
+<button aria-expanded="false" aria-haspopup="true" aria-label="Menu" class="hamburger-btn" data-i18n-aria="menuTitle" id="hamburgerBtn" type="button">
+<svg fill="none" height="22" stroke="currentColor" stroke-linecap="round" stroke-width="1.8" viewbox="0 0 24 24" width="22"><path d="M4 6.5h16M4 12h16M4 17.5h16"></path></svg>
+</button>
+</div>
+<div class="logo">
+<!-- الترتيب مقصود: في RTL أول عنصر بيظهر أقصى اليمين. فالعربي يمين،
+           العلامة في النص، والإنجليزي شمال. -->
+<span class="lg-ar" data-i18n="brandNameAr">ميجا فوتوبوك</span>
+<svg class="logo-mark" height="32" viewbox="0 0 48 48" width="32" xmlns="http://www.w3.org/2000/svg">
+<!-- open book -->
+<path d="M24 14 C19 10 10 9 5 11 V37 C10 35 19 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M24 14 C29 10 38 9 43 11 V37 C38 35 29 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M24 14 V40" opacity="0.5" stroke="var(--brass)" stroke-width="1.5"></path>
+<!-- camera resting on the book -->
+<rect fill="var(--ink)" height="14" rx="3" stroke="var(--brass)" stroke-width="2" width="20" x="14" y="18"></rect>
+<rect fill="var(--ink)" height="5" rx="1.5" stroke="var(--brass)" stroke-width="2" width="8" x="20" y="14"></rect>
+<circle cx="24" cy="25" fill="none" r="4.5" stroke="var(--brass)" stroke-width="2"></circle>
+<circle cx="24" cy="25" fill="var(--brass)" r="1.6"></circle>
+</svg>
+<span class="lg-en">Miga<span class="logo-accent">-Photobook</span></span>
+</div>
+<!-- كان هنا زرار «لوحة التحكم». اتشال لأنه كان راكب على اسم الموقع
+         (تداخل مقيس 120–136 بكسل على كل العروض). بديله الأيقونة العائمة
+         #adminFab — وشارة الطلبات الحية اتنقلت عليها. -->
+<div class="nav-side nav-side-end">
+<button aria-label="Log In" class="admin-btn admin-btn-primary" data-i18n-aria="accountBtnGuest" id="accountOpenBtn"><span aria-hidden="true" class="icon-badge"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><circle cx="12" cy="8" r="3.6"></circle><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"></path></svg></span><span data-i18n="accountBtnGuest">Log In</span></button>
+<button class="admin-btn" data-i18n="adminBtn" id="adminOpenBtn" style="display:none;">Admin Panel</button>
+</div>
+</div><!-- /.nav-top -->
+<div class="search-row">
+<div class="search-box" id="searchBox">
+<button aria-label="Search" class="search-icon-btn" data-i18n-aria="a11ySearch" data-i18n-title="a11ySearch" id="searchIconBtn" title="Search" type="button">
+<svg fill="none" height="18" stroke="currentColor" viewbox="0 0 24 24" width="18"><circle cx="10.3" cy="10.3" r="6.6" stroke-width="2.1"></circle><path d="M8 6.6a4 4 0 0 0-2.7 3.9" opacity="0.55" stroke-linecap="round" stroke-width="1.3"></path><line stroke-linecap="round" stroke-width="2.6" x1="15.2" x2="21" y1="15.2" y2="21"></line></svg>
+</button>
+<input data-i18n-ph="searchPlaceholder" id="searchInput" placeholder="Search the site..." type="text"/>
+<div class="search-dropdown" id="searchDropdown"></div>
+</div>
+<!-- البانر اتنقل هنا جنب البحث بدل ما كان صف لوحده تحت الهيدر:
+         مربع البحث كان واخد عرض الشاشة كله والبانر صف كامل تحته، فالاتنين
+         مع بعض كانوا بياكلوا ~90px من أول شاشة. دلوقتي صف واحد ~44px. -->
+<div class="soft-launch-banner" id="softLaunchBanner">
+<span data-i18n="launchPromoBannerShort">🎉 25 EGP instead of 50</span>
+</div>
+</div>
+</div>
+<div class="cat-dropdown cat-pills-mode" id="catDropdown">
+<button aria-expanded="false" aria-haspopup="true" class="cat-dropdown-btn" id="catDropdownBtn" style="display:none;" type="button">
+<span aria-hidden="true" class="cdi"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8" viewbox="0 0 24 24"><path d="M4 6.5h16M4 12h16M4 17.5h16"></path></svg></span>
+<span data-i18n="categoriesLabel" id="catDropdownLabel">Categories</span>
+<span aria-hidden="true" class="cdc">▼</span>
+</button>
+<div class="cat-dropdown-menu" id="catNav" role="menu">
+<button class="active" data-cat="all" data-i18n="navAll" role="menuitem">All</button>
+<button data-cat="children" data-i18n="navChildren" role="menuitem">Children</button>
+<button data-cat="male" data-i18n="navMale" role="menuitem">Men</button>
+<button data-cat="female" data-i18n="navFemale" role="menuitem">Women</button>
+<button data-cat="business" data-i18n="navBusiness" role="menuitem">Business</button>
+<button data-cat="cinematic" data-i18n="navCinematic" role="menuitem">Cinematic</button>
+<button data-cat="luxury" data-i18n="navLuxury" role="menuitem">Luxury</button>
+<button data-cat="artistic" data-i18n="navArtistic" role="menuitem">Artistic</button>
+<button data-cat="magazine" data-i18n="navMagazine" role="menuitem">Magazine</button>
+</div>
+</div>
+</header>
+</div><!-- /.sticky-top-group -->
+<!-- Permanent showcase slider — always the interactive drag slider, in this
+     exact spot, regardless of whichever mode (circle/slider) the admin has
+     chosen for the hero's own toggle-able showcase further down. Framed in
+     the site's brass gold to read as a distinct, deliberate feature. -->
+<section class="hero hero-with-slider">
+<div>
+<div class="eyebrow" data-i18n="heroEyebrow">Miga-Photobook</div>
+<div class="tagline" data-i18n="heroSlogan">Your shot... becomes a masterpiece</div>
+<h1 data-i18n-html="heroTitle" id="heroTitle">Turn your photo into a professional,<br/>studio-quality portrait with <span class="brand-mark">Miga-Photobook</span><br/>in minutes.</h1>
+<p data-i18n="heroP">A library of professional, ready-to-use prompts for transforming personal photos — for children, men, and women — carefully written and tested. Buy, unlock instantly, and use right away.</p>
+<div class="trust-checks">
+<span data-i18n="trustCheck1">✅ Result within minutes</span>
+<span data-i18n="trustCheck2">✅ Secure payment</span>
+<span data-i18n="trustCheck3">✅ Direct support</span>
+<span data-i18n="trustCheck4">✅ Ongoing updates</span>
+</div>
+</div>
+<!-- Permanent showcase slider — always the interactive drag slider here,
+       right beside the hero text in the same row (per explicit request:
+       side-by-side even on mobile, each shrinking to fit), regardless of
+       whichever mode (circle/slider) the admin has chosen for the
+       toggle-able showcase further down the page. -->
+<div class="fixed-slider-frame">
+<div class="slider-wrap-instance" id="bafSliderFixed">
+<div class="slider-card slider-card-compact" data-slider-card="">
+<img alt="Before" data-i18n-alt="beforeLabel" data-slider-before=""/>
+<div class="slider-after-wrap" data-slider-afterwrap=""><img alt="After" data-i18n-alt="afterLabel" data-slider-after=""/></div>
+<div class="slider-line" data-slider-line=""></div>
+<button class="slider-handle" data-slider-handle="" type="button">↔</button>
+<span class="tag tag-before" data-i18n="beforeLabel">Before</span>
+<span class="tag tag-after" data-i18n="afterLabel">After</span>
+</div>
+<div class="slider-controls-row">
+<button aria-label="Previous" class="slider-nav slider-nav-prev" data-i18n-aria="a11yPrev" data-slider-prev="" type="button">‹</button>
+<div class="slider-dots" data-slider-dots=""></div>
+<button aria-label="Next" class="slider-nav slider-nav-next" data-i18n-aria="a11yNext" data-slider-next="" type="button">›</button>
+</div>
+</div>
+</div>
+</section>
+<!-- شريط الثقة: كبسولة واحدة فيها تلات أجزاء مفصولة بنقطة.
+     كل جزء بيظهر لوحده لما يبقى عنده رقم حقيقي، وبيفضل مخفي غير كده —
+     فمفيش رقم مكتوب بالإيد ولا ادعاء مش مدعوم ببيانات. -->
+<div class="visitor-counter trust-row" id="trustRow" style="display:none;">
+<span class="tr-part" id="visitorCounter" style="display:none;">
+<span class="vc-dot"></span>
+<span class="vc-number" id="visitorCounterNumber">0</span>
+<span data-i18n="trustVisitors">visitors</span>
+</span>
+<span class="tr-sep" data-for="ratingBadge" style="display:none;">·</span>
+<span class="tr-part" id="ratingBadge" style="display:none;">
+<span class="vc-star">★</span>
+<span class="vc-number" id="ratingAvg">5</span>
+<span class="tr-dim">(<span id="ratingCount">0</span>)</span>
+</span>
+<!-- الصور المحوّلة: مخفية لحد ما توصل العتبة (TRANSFORM_BADGE_MIN) -->
+<span class="tr-sep" data-for="transformBadge" style="display:none;">·</span>
+<span class="tr-part" id="transformBadge" style="display:none;">
+<span class="vc-cam">✨</span>
+<span class="vc-number" id="transformCount">0</span>
+<span data-i18n="trustPhotos">photos</span>
+</span>
+</div>
+<section class="wrap">
+<div class="contact-sheet">
+<div class="strip-track" id="heroStrip"></div>
+</div>
+</section>
+<style>
+  .visitor-counter{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    max-width:fit-content; margin:0 auto 28px; padding:10px 20px;
+    background:var(--ink-2); border:1px solid var(--brass-dim);
+    border-radius:100px; font-size:14px; color:var(--paper-dim);
+  }
+  /* الأجزاء التلاتة جوه كبسولة واحدة — سطر واحد دايمًا، مايلفّش */
+  .trust-row{ flex-wrap:nowrap; white-space:nowrap; }
+  .trust-row .tr-part{ display:inline-flex; align-items:center; gap:5px; }
+  .trust-row .tr-sep{ color:var(--brass-dim); opacity:0.6; margin:0 2px; }
+  .trust-row .tr-dim{ opacity:0.75; }
+  .vc-star{ color:#ffc94d; font-size:15px; line-height:1; }
+  .vc-cam{ font-size:14px; line-height:1; }
+  .visitor-counter .vc-number{ color:var(--brass); font-weight:700; font-size:15px; }
+  .vc-dot{
+    position:relative; width:8px; height:8px; border-radius:50%;
+    background:#3ddc84; flex-shrink:0;
+  }
+  .vc-dot::after{
+    content:''; position:absolute; inset:0; border-radius:50%;
+    background:rgba(61,220,132,0.5); z-index:-1;
+    animation:vcPulse 2s ease-out infinite;
+    will-change:transform, opacity;
+  }
+  @keyframes vcPulse{
+    0%{ transform:scale(1); opacity:0.55; }
+    70%,100%{ transform:scale(2.75); opacity:0; }
+  }
+  @media(prefers-reduced-motion: reduce){ .vc-dot::after{ animation:none; } }
+  @media(max-width:480px){
+    .visitor-counter{ font-size:12.5px; padding:8px 14px; gap:6px; margin-bottom:20px; }
+    .visitor-counter .vc-number{ font-size:13px; }
+    .trust-row .tr-part{ gap:4px; }
+  }
+</style>
+<style>
+  .baf-section{ padding:36px 16px 44px; text-align:center; }
+  .baf-title{ font-size:clamp(20px,4.5vw,28px); margin:0 0 6px; }
+  .baf-sub{ color:var(--paper-dim); max-width:520px; margin:0 auto 28px; font-size:14.5px; }
+  .baf-wrap{ position:relative; width:min(94%,560px); aspect-ratio:1/1; margin:0 auto; }
+  /* Slowed from 22s to 90s — the circle stays as the site's one distinctive
+     visual, but no longer spins fast enough to compete for attention with
+     everything else on the page. A near-static circle still reads as "alive"
+     without feeling busy. */
+  .baf-orbit{ position:absolute; inset:0; animation:bafOrbitSpin 32s linear infinite; }
+  @keyframes bafOrbitSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+  .baf-item-spin{ width:100%; height:100%; animation:bafOrbitCounterSpin 32s linear infinite; }
+  @keyframes bafOrbitCounterSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(-360deg); } }
+  @media(prefers-reduced-motion:reduce){ .baf-orbit, .baf-item-spin{ animation:none; } }
+  .baf-center{ position:absolute; top:50%; left:50%; width:clamp(120px,32vw,190px); height:clamp(120px,32vw,190px); transform:translate(-50%,-50%); border-radius:50%; overflow:hidden; border:2px solid #3b8ef0; box-shadow:0 0 0 6px var(--ink), 0 0 18px rgba(59,142,240,0.4), 0 8px 24px rgba(0,0,0,0.4); z-index:5; }
+  .baf-center img{ width:100%; height:100%; object-fit:cover; object-position:center 18%; display:block; }
+  .baf-center-label{ position:absolute; bottom:-14px; left:50%; transform:translateX(-50%); background:var(--brass); color:var(--ink); font-size:12.5px; font-weight:700; padding:3px 12px; border-radius:20px; white-space:nowrap; z-index:6; }
+  .baf-item{ --radius:clamp(120px,36vw,225px); position:absolute; top:50%; left:50%; width:clamp(70px,21vw,112px); height:clamp(70px,21vw,112px); margin-top:calc(clamp(70px,21vw,112px) / -2); margin-left:calc(clamp(70px,21vw,112px) / -2); transform:rotate(var(--angle)) translate(0, calc(-1 * var(--radius))) rotate(calc(-1 * var(--angle))); border-radius:50%; overflow:hidden; border:2.5px solid var(--brass); box-shadow:0 4px 14px rgba(0,0,0,0.35); transition:transform 0.25s ease, border-color 0.25s ease; }
+  .baf-item:active img, .baf-item:hover img{ transform:scale(1.08); }
+  .baf-item img{ width:100%; height:100%; object-fit:cover; object-position:center 15%; display:block; transition:transform 0.25s ease; }
+  .baf-connector{ position:absolute; top:50%; left:50%; width:1px; height:1px; z-index:1; }
+  .baf-connector::before{ content:''; position:absolute; top:0; left:0; width:2px; background:var(--line); opacity:0.35; height:var(--radius); transform-origin:top center; transform:rotate(var(--angle)); }
+
+  /* ---------- Slider variant (alternative to the circle, chosen per-design
+     from the admin panel — "لوحة التحكم → تصميم الموقع → وضع الهيرو") ---------- */
+  .slider-card{
+    position:relative; border-radius:16px; overflow:hidden;
+    border:1px solid var(--line); box-shadow:0 20px 60px rgba(0,0,0,0.45);
+    aspect-ratio:4/5; max-width:420px; margin:0 auto; touch-action:none; user-select:none;
+    background:var(--ink-2, #151317); cursor:ew-resize;
+  }
+  .slider-card img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
+  .slider-after-wrap{ position:absolute; inset:0; overflow:hidden; clip-path:inset(0 0 0 var(--pos,50%)); }
+  .slider-line{ position:absolute; top:0; bottom:0; right:var(--posR,50%); width:2px; background:var(--brass); pointer-events:none; }
+  .slider-handle{
+    position:absolute; top:50%; right:var(--posR,50%); transform:translate(50%,-50%);
+    width:44px; height:44px; border-radius:50%; background:var(--brass); color:var(--ink);
+    display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:700;
+    box-shadow:0 6px 18px rgba(0,0,0,0.5); cursor:ew-resize; border:none;
+  }
+  .slider-card .tag{ position:absolute; top:14px; font-size:12.5px; font-weight:700; padding:5px 12px; border-radius:999px; background:rgba(11,11,13,0.72); backdrop-filter:blur(4px); border:1px solid var(--line); }
+  .slider-card .tag-before{ left:14px; } .slider-card .tag-after{ right:14px; color:var(--brass); }
+  .slider-nav{
+    position:static; z-index:5;
+    width:36px; height:36px; border-radius:50%; border:1px solid var(--line);
+    background:rgba(11,11,13,0.55); backdrop-filter:blur(4px); color:var(--paper);
+    font-size:19px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+    flex-shrink:0;
+  }
+  .slider-nav:hover{ background:var(--brass); color:var(--ink); border-color:var(--brass); }
+  .slider-controls-row{ display:flex; align-items:center; justify-content:center; gap:14px; margin-top:12px; }
+  .slider-dots{ display:flex; justify-content:center; gap:8px; }
+  .slider-dot{ width:8px; height:8px; border-radius:50%; background:var(--line); border:none; cursor:pointer; padding:0; }
+  .slider-dot.active{ background:var(--brass); width:20px; border-radius:5px; }
+  .slider-hint{ text-align:center; font-size:12.5px; color:var(--paper-dim); margin-top:10px; }
+
+  /* ---------- Permanent showcase slider frame — now lives inside the hero
+     row itself (second grid column), right beside the hero text, instead
+     of being a separate full-width strip above it. Sized to shrink and
+     stay usable even at narrow widths, per explicit request that it stays
+     side-by-side with the hero text rather than stacking on mobile. ---------- */
+  .hero-with-slider{
+    grid-template-columns:1fr 1fr !important;
+    gap:14px !important;
+    align-items:start;
+  }
+  /* The slider's own column is centered independently — the hero copy is
+     naturally taller than the slider frame at most screen widths, and a
+     lone block of empty space below a top-aligned slider read as "something
+     is missing" more than the same leftover space split evenly above and
+     below it does. */
+  .hero-with-slider .fixed-slider-frame{ align-self:center; }
+  /* CSS Grid items default to min-width:auto, refusing to shrink below
+     their content's natural width — exactly what was pushing the row past
+     the viewport edge once the columns got this narrow. This is the fix. */
+  .hero-with-slider > *{ min-width:0; }
+  .hero-with-slider h1, .hero-with-slider p{ overflow-wrap:break-word; }
+  /* Decisive, unambiguous sizing for the hero text now that it shares its
+     row with the slider instead of having the full width to itself —
+     overrides win with !important since several older, narrower-purpose
+     rules already target .hero h1 at various breakpoints/view-modes. */
+  .hero-with-slider h1{ font-size:clamp(13px,4vw,22px) !important; margin-bottom:6px !important; line-height:1.22 !important; }
+  .hero-with-slider .eyebrow{ font-size:12.5px !important; margin-bottom:6px !important; }
+  .hero-with-slider .tagline{ font-size:12.5px !important; }
+  .hero-with-slider p{ font-size:clamp(11px,2.6vw,14.5px) !important; margin-bottom:0 !important; }
+  .hero-with-slider .trust-checks{ font-size:12.5px !important; gap:6px !important; margin-bottom:14px !important; }
+  .hero-with-slider .hero-ctas{ gap:8px !important; flex-wrap:wrap; }
+  .hero-with-slider .hero-ctas a{ font-size:12.5px !important; padding:10px 14px !important; }
+  @media(max-width:480px){
+    .hero-with-slider h1{ font-size:clamp(11px,3.6vw,16px) !important; }
+    .hero-with-slider .trust-checks{ display:none; } /* first to go when truly tight on space */
+  }
+  .fixed-slider-frame{
+    padding:6px; border:2px solid var(--brass); border-radius:18px;
+    box-shadow:0 0 0 3px rgba(255,201,77,0.12), 0 12px 30px rgba(0,0,0,0.5);
+    background:linear-gradient(180deg, rgba(255,201,77,0.06), transparent 60%);
+    width:100%; max-width:100%; margin-inline:auto;
+  }
+  .slider-card-compact{ aspect-ratio:4/5; max-width:none; }
+  .hero-with-slider .slider-handle{ width:30px; height:30px; font-size:12.5px; }
+  /* كانت 24px — الأسهم مكانتش بتتشاف بالعين المجردة. 40px هو أصغر
+     مقاس بيتلمس بإصبع من غير خطأ، والخط 22px عشان السهم نفسه يبان. */
+  .hero-with-slider .slider-nav{ width:40px; height:40px; font-size:22px; }
+  .hero-with-slider .slider-card .tag{ font-size:12.5px; padding:3px 7px; top:6px; }
+  .hero-with-slider .slider-controls-row{ margin-top:6px; gap:8px; }
+  .hero-with-slider .slider-dots{ gap:5px; }
+  .hero-with-slider .slider-dot{ width:6px; height:6px; }
+  @media(min-width:860px){ .fixed-slider-frame{ max-width:340px; } }
+  @media(max-width:480px){
+    .fixed-slider-frame{ max-width:210px; padding:4px; border-radius:14px; }
+    .hero-with-slider{ gap:8px !important; }
+  }
+  .hero-showcase-variant[hidden]{ display:none !important; }
+</style>
+<section class="baf-section" id="beforeAfterShowcase">
+<h2 class="baf-title" data-i18n="bafTitle">One Photo From You... Turned Into Your Favorite Style</h2>
+<p class="baf-sub" data-i18n="bafSub">This is the same photo, after Miga-Photobook transformed it into different styles. Pick one you like and try it on your own photo.</p>
+<!-- Circle variant — Design MIGA 1's original visual. Shown by default;
+       hidden via JS if the admin has chosen "slider" mode for this design. -->
+<div class="hero-showcase-variant" id="heroVariantCircle">
+<div class="baf-wrap">
+<div class="baf-orbit">
+<div class="baf-connector" style="--angle:0deg; --radius:clamp(120px,36vw,225px);"></div>
+<div class="baf-connector" style="--angle:45deg; --radius:clamp(120px,36vw,225px);"></div>
+<div class="baf-connector" style="--angle:90deg; --radius:clamp(120px,36vw,225px);"></div>
+<div class="baf-connector" style="--angle:135deg; --radius:clamp(120px,36vw,225px);"></div>
+<div class="baf-connector" style="--angle:180deg; --radius:clamp(120px,36vw,225px);"></div>
+<div class="baf-connector" style="--angle:225deg; --radius:clamp(120px,36vw,225px);"></div>
+<div class="baf-connector" style="--angle:270deg; --radius:clamp(120px,36vw,225px);"></div>
+<div class="baf-connector" style="--angle:315deg; --radius:clamp(120px,36vw,225px);"></div>
+<div class="baf-item" style="--angle:0deg;"><div class="baf-item-spin"><img alt="Result 1" data-i18n-alt="a11yResult" data-i18n-alt-n="1" decoding="async" fetchpriority="high" loading="eager" src="/before-after/before-after/after-1.jpg"/></div></div>
+<div class="baf-item" style="--angle:45deg;"><div class="baf-item-spin"><img alt="Result 2" data-i18n-alt="a11yResult" data-i18n-alt-n="2" decoding="async" loading="eager" src="/before-after/before-after/after-2.jpg"/></div></div>
+<div class="baf-item" style="--angle:90deg;"><div class="baf-item-spin"><img alt="Result 3" data-i18n-alt="a11yResult" data-i18n-alt-n="3" decoding="async" loading="eager" src="/before-after/before-after/after-3.jpg"/></div></div>
+<div class="baf-item" style="--angle:135deg;"><div class="baf-item-spin"><img alt="Result 4" data-i18n-alt="a11yResult" data-i18n-alt-n="4" decoding="async" loading="eager" src="/before-after/before-after/after-4.jpg"/></div></div>
+<div class="baf-item" style="--angle:180deg;"><div class="baf-item-spin"><img alt="Result 5" data-i18n-alt="a11yResult" data-i18n-alt-n="5" decoding="async" loading="eager" src="/before-after/before-after/after-5.jpg"/></div></div>
+<div class="baf-item" style="--angle:225deg;"><div class="baf-item-spin"><img alt="Result 6" data-i18n-alt="a11yResult" data-i18n-alt-n="6" decoding="async" loading="eager" src="/before-after/before-after/after-6.jpg"/></div></div>
+<div class="baf-item" style="--angle:270deg;"><div class="baf-item-spin"><img alt="Result 7" data-i18n-alt="a11yResult" data-i18n-alt-n="7" decoding="async" loading="eager" src="/before-after/before-after/after-7.jpg"/></div></div>
+<div class="baf-item" style="--angle:315deg;"><div class="baf-item-spin"><img alt="Result 8" data-i18n-alt="a11yResult" data-i18n-alt-n="8" decoding="async" loading="eager" src="/before-after/before-after/after-8.jpg"/></div></div>
+</div>
+<div class="baf-center">
+<img alt="Original photo" data-i18n-alt="a11yOriginalPhoto" src="/before-after/before-after/before.jpg"/>
+<span class="baf-center-label" data-i18n="bafCenterLabel">Your Original Photo</span>
+</div>
+</div>
+</div>
+<!-- Slider variant — the interactive drag before/after, same as Design
+       MIGA 2/3. Hidden by default; shown via JS if the admin has chosen
+       "slider" mode for this design. -->
+<div class="hero-showcase-variant" hidden="" id="heroVariantSlider">
+<div class="slider-wrap-instance" id="bafSliderV1">
+<div class="slider-card" data-slider-card="">
+<img alt="Before" data-i18n-alt="beforeLabel" data-slider-before=""/>
+<div class="slider-after-wrap" data-slider-afterwrap=""><img alt="After" data-i18n-alt="afterLabel" data-slider-after=""/></div>
+<div class="slider-line" data-slider-line=""></div>
+<button class="slider-handle" data-slider-handle="" type="button">↔</button>
+<span class="tag tag-before" data-i18n="beforeLabel">Before</span>
+<span class="tag tag-after" data-i18n="afterLabel">After</span>
+</div>
+<div class="slider-controls-row">
+<button aria-label="Previous" class="slider-nav slider-nav-prev" data-i18n-aria="a11yPrev" data-slider-prev="" type="button">‹</button>
+<div class="slider-dots" data-slider-dots=""></div>
+<button aria-label="Next" class="slider-nav slider-nav-next" data-i18n-aria="a11yNext" data-slider-next="" type="button">›</button>
+</div>
+<p class="slider-hint" data-i18n="sliderHint">Drag left and right, and tap ‹ › to move between examples</p>
+</div>
+</div>
+<div class="hero-ctas" style="margin-top:34px; justify-content:center;">
+<a class="btn-primary" data-i18n-html="bafCta" href="#children">Make Your <b class="brand-mega">Mega</b> Photo Now — 25 EGP</a>
+<a class="btn-ghost" data-i18n="seeAllStylesCta" href="#categoryTiles">See 50+ Styles</a>
+</div>
+</section>
+<section class="cat-section" id="howItWorks">
+<div class="section-head">
+<h2 data-i18n="howItWorksTitle">How does it work?</h2>
+</div>
+<div class="how-grid">
+<div class="how-step">
+<div class="how-step-num">1</div>
+<h3 data-i18n="how1Title">Pick a style</h3>
+<p data-i18n="how1Desc">Browse the library and pick the look you like from any section.</p>
+<span class="how-arrow">➜</span>
+</div>
+<div class="how-step">
+<div class="how-step-num">2</div>
+<h3 data-i18n="how2Title">Pay</h3>
+<p data-i18n="how2Desc">Transfer the amount via InstaPay or Vodafone Cash, and note the transaction reference.</p>
+<span class="how-arrow">➜</span>
+</div>
+<div class="how-step">
+<div class="how-step-num">3</div>
+<h3 data-i18n="how3Title">Upload your photo</h3>
+<p data-i18n="how3Desc">Once your transfer is confirmed (usually within minutes), upload a clear photo.</p>
+<span class="how-arrow">➜</span>
+</div>
+<div class="how-step">
+<div class="how-step-num">4</div>
+<h3 data-i18n="how4Title">Get your result</h3>
+<p data-i18n="how4Desc">We'll apply the style you picked using AI, and you'll receive your professional photo within minutes.</p>
+</div>
+</div>
+<div class="hero-ctas" style="margin-top:22px; justify-content:center;">
+<a class="btn-primary" data-i18n="howItWorksCta" href="#children">Start Now</a>
+</div>
+</section>
+<section class="sprockets"></section>
+<section class="cat-section" id="favorites" style="display:none;">
+<div class="section-head">
+<h2 data-i18n="favSectionTitle">My Favorites</h2>
+</div>
+<div class="cat-tiles-grid" id="favoritesCats" style="display:none; margin-bottom:18px;"></div>
+<div class="grid-nav-wrap">
+<div class="grid" id="favoritesGrid"></div>
+</div>
+<div class="grid-page-dots" id="gridDots-favorites"></div>
+</section>
+<section class="cat-section" id="categoryTiles">
+<div class="section-head">
+<h2 data-i18n="categoriesLabel">Categories</h2>
+</div>
+<div class="grid-nav-wrap">
+<div class="cat-tiles-grid" id="categoryTilesGrid"></div>
+</div>
+<div class="grid-page-dots" id="gridDots-categoryTiles"></div>
+</section>
+<section class="cat-section" id="mostRequested" style="display:none;">
+<div class="section-head">
+<h2 data-i18n="mostRequestedTitle">Most Ordered</h2>
+</div>
+<div class="grid" id="mostRequestedGrid"></div>
+<div class="grid-page-dots" id="gridDots-mostRequested"></div>
+</section>
+<section class="cat-section collapsible" id="children">
+<div class="cs-body">
+<div class="grid-nav-wrap">
+<div class="grid" id="grid-children"></div>
+</div>
+<div class="grid-page-dots" id="gridDots-children"></div>
+</div>
+</section>
+<section class="cat-section collapsible" id="male">
+<div class="cs-body">
+<div class="grid-nav-wrap">
+<div class="grid" id="grid-male"></div>
+</div>
+<div class="grid-page-dots" id="gridDots-male"></div>
+</div>
+</section>
+<section class="cat-section collapsible" id="female">
+<div class="cs-body">
+<div class="grid-nav-wrap">
+<div class="grid" id="grid-female"></div>
+</div>
+<div class="grid-page-dots" id="gridDots-female"></div>
+</div>
+</section>
+<section class="cat-section collapsible" id="business">
+<div class="cs-body">
+<h2 class="cat-section-heading" data-i18n="businessHeading">Get a LinkedIn photo that boosts your professionalism in 5 minutes</h2>
+<div class="grid-nav-wrap">
+<div class="grid" id="grid-business"></div>
+</div>
+<div class="grid-page-dots" id="gridDots-business"></div>
+</div>
+</section>
+<section class="cat-section collapsible" id="cinematic">
+<div class="cs-body">
+<div class="grid-nav-wrap">
+<div class="grid" id="grid-cinematic"></div>
+</div>
+<div class="grid-page-dots" id="gridDots-cinematic"></div>
+</div>
+</section>
+<section class="cat-section collapsible" id="luxury">
+<div class="cs-body">
+<h2 class="cat-section-heading" data-i18n="promptLibraryHeading" id="luxurySectionHeading" style="display:none;">Prompt Library for Professionals — buy the professional prompt on its own, no photo transformation needed</h2>
+<div class="grid-nav-wrap">
+<div class="grid" id="grid-luxury"></div>
+</div>
+<div class="grid-page-dots" id="gridDots-luxury"></div>
+</div>
+</section>
+<section class="cat-section collapsible" id="artistic">
+<div class="cs-body">
+<div class="grid-nav-wrap">
+<div class="grid" id="grid-artistic"></div>
+</div>
+<div class="grid-page-dots" id="gridDots-artistic"></div>
+</div>
+</section>
+<section class="cat-section collapsible" id="magazine">
+<div class="cs-body">
+<div class="grid-nav-wrap">
+<div class="grid" id="grid-magazine"></div>
+</div>
+<div class="grid-page-dots" id="gridDots-magazine"></div>
+</div>
+</section>
+<section class="pricing" id="pricing">
+<div class="section-head" style="border:none; margin-bottom:6px;">
+<h2 data-i18n="pricingTitle">Pricing &amp; Offers</h2>
+</div>
+<p data-i18n="pricingSub" style="color:var(--paper-dim); max-width:560px;">Pick the package that fits — the more photos, the lower the price per photo.</p>
+<div class="pricing-trust-strip">
+<span>🔒 <span data-i18n="pricingTrust1">Secure payment</span></span>
+<span class="pts-sep">|</span>
+<span>⭐ <span data-i18n="pricingTrust2">Verified real results</span></span>
+<span class="pts-sep">|</span>
+<span>💬 <span data-i18n="pricingTrust3">Fast WhatsApp support</span></span>
+</div>
+<div class="pricing-grid">
+<div class="plan">
+<h3 data-i18n="plan1Title">Starter Package</h3>
+<div class="price">59 <span data-i18n="currencyLabel">EGP</span> <span data-i18n="plan1Unit">/ 3 photos</span></div>
+<ul>
+<li data-i18n="plan1Li1">About 20 EGP per photo</li>
+<li data-i18n="plan1Li2">Free choice from any section</li>
+<li data-i18n="plan1Li3">Good for a first try</li>
+</ul>
+<button class="btn-ghost" data-i18n="planBuyBtn" onclick="openPackageBuyModal(3)" type="button">Order this package now</button>
+</div>
+<div class="plan featured">
+<h3 data-i18n="plan2Title">Pro Package</h3>
+<div class="price">259 <span data-i18n="currencyLabel">EGP</span> <span data-i18n="plan2Unit">/ 15 photos</span></div>
+<ul>
+<li data-i18n="plan2Li1">Under 18 EGP per photo</li>
+<li data-i18n="plan2Li2">Free choice from any section</li>
+<li data-i18n="plan2Li3">Priority support</li>
+</ul>
+<button class="btn-primary" data-i18n="planBuyBtn" onclick="openPackageBuyModal(15)" type="button">Order this package now</button>
+</div>
+<div class="plan">
+<h3 data-i18n="plan3Title">Premium Package</h3>
+<div class="price">419 <span data-i18n="currencyLabel">EGP</span> <span data-i18n="plan3Unit">/ 30 photos</span></div>
+<ul>
+<li data-i18n="plan3Li1">Under 14 EGP per photo</li>
+<li data-i18n="plan3Li2">Free style library updates</li>
+<li data-i18n="plan3Li3">Great for studios and agencies</li>
+</ul>
+<button class="btn-ghost" data-i18n="planBuyBtn" onclick="openPackageBuyModal(30)" type="button">Order this package now</button>
+</div>
+</div>
+<div class="pricing-guarantee">
+<span data-i18n="pricingGuaranteeNote">❤️ Not happy with the result? We will regenerate it with a different prompt for free.</span>
+</div>
+<div class="section-head" style="border:none; margin:44px 0 6px;">
+<h2 data-i18n="subTitle">Subscribe monthly and save more</h2>
+</div>
+<p data-i18n="subSub" style="color:var(--paper-dim); max-width:560px;">A new style every month, and a credit balance that renews — the subscription renews via the same manual payment steps (not auto-billed), and we'll remind you before it's due.</p>
+<div class="pricing-grid">
+<div class="plan">
+<h3 data-i18n="subPlan1Title">Monthly Subscription — 10 photos</h3>
+<div class="price">149 <span data-i18n="currencyLabel">EGP</span> <span data-i18n="subPlan1Unit">/ month</span></div>
+<ul>
+<li data-i18n="subPlan1Li1">10 photos every month</li>
+<li data-i18n="subPlan1Li2">New styles added monthly</li>
+<li data-i18n="subPlan1Li3">Simple manual renewal each month</li>
+</ul>
+<button class="btn-ghost" data-i18n="subPlanBuyBtn" onclick="openPackageBuyModal(10)" type="button">Subscribe now</button>
+</div>
+<div class="plan featured">
+<h3 data-i18n="subPlan2Title">Monthly Subscription — 20 photos</h3>
+<div class="price">299 <span data-i18n="currencyLabel">EGP</span> <span data-i18n="subPlan2Unit">/ month</span></div>
+<ul>
+<li data-i18n="subPlan2Li1">20 photos every month</li>
+<li data-i18n="subPlan2Li2">New styles added monthly</li>
+<li data-i18n="subPlan2Li3">Best value for ongoing use</li>
+</ul>
+<button class="btn-primary" data-i18n="subPlanBuyBtn" onclick="openPackageBuyModal(20)" type="button">Subscribe now</button>
+</div>
+</div>
+</section>
+<div class="section-tabs" id="sectionTabsRow">
+<button class="section-tab-btn" data-target="whyUs" type="button">
+<span aria-hidden="true" class="icon-badge"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M8 12.3l2.6 2.6 5.4-6"></path></svg></span>
+<span data-i18n="whyUsTitle">Why Miga-Photobook?</span>
+</button>
+<button class="section-tab-btn" data-target="howItWorks" type="button">
+<span aria-hidden="true" class="icon-badge"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><circle cx="6" cy="6.5" r="1.6"></circle><circle cx="6" cy="12" r="1.6"></circle><circle cx="6" cy="17.5" r="1.6"></circle><path d="M10.5 6.5h9M10.5 12h9M10.5 17.5h9"></path></svg></span>
+<span data-i18n="howItWorksTitle">How does it work?</span>
+</button>
+<button class="section-tab-btn" data-target="testimonials" type="button">
+<span aria-hidden="true" class="icon-badge"><svg fill="currentColor" stroke="none" viewbox="0 0 24 24"><path d="M12 3.5l2.2 4.9 5.3.5-4 3.6 1.3 5.3L12 15.1l-4.8 2.7 1.3-5.3-4-3.6 5.3-.5L12 3.5z"></path></svg></span>
+<span data-i18n="testimonialsTitle">Customer Reviews &amp; Testimonials</span>
+</button>
+<button class="section-tab-btn" data-target="aboutUs" type="button">
+<span aria-hidden="true" class="icon-badge"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><circle cx="8.5" cy="8" r="2.6"></circle><path d="M3.5 18a5 5 0 0 1 10 0"></path><circle cx="16.5" cy="9" r="2.2"></circle><path d="M14.8 12.3a4 4 0 0 1 5.7 3.6"></path></svg></span>
+<span data-i18n="aboutUsTitle">About Us</span>
+</button>
+<button class="section-tab-btn" data-target="faq" type="button">
+<span aria-hidden="true" class="icon-badge"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.2a2.5 2.5 0 1 1 3.2 2.4c-.7.25-1.2.85-1.2 1.6v.3"></path><circle cx="11.9" cy="16.7" fill="currentColor" r="0.9" stroke="none"></circle></svg></span>
+<span data-i18n="faqTitle">Frequently Asked Questions</span>
+</button>
+</div>
+<!-- Tab-panel switcher: one fixed content area right below the tab row.
+     Clicking a tab instantly swaps which of these four shows here — no
+     scrolling, no animated accordion expand, just a plain visible/hidden
+     swap, so the content always appears in the same spot as the buttons. -->
+<div id="sectionTabPanel">
+<section class="cat-section tab-panel" id="whyUs">
+<div class="why-us-grid">
+<div class="why-item">✅ <span data-i18n="whyUs1">Professional results</span></div>
+<div class="why-item">✅ <span data-i18n="whyUs2">Fully automatic transformation</span></div>
+<div class="why-item">✅ <span data-i18n="whyUs3">Ready in minutes</span></div>
+<div class="why-item">✅ <span data-i18n="whyUs4">No technical experience needed</span></div>
+<div class="why-item">✅ <span data-i18n="whyUs5">Your privacy is fully protected</span></div>
+</div>
+</section>
+<section class="cat-section tab-panel" id="aboutUs">
+<p class="sub" data-i18n="aboutUsText" style="max-width:680px; font-size:15px;">Miga-Photobook is an Egyptian project that started with a simple idea: make a professional photoshoot affordable and accessible to everyone. We turn your personal photo into a studio-quality piece of art using AI — upload your photo and pick a style, and we handle the rest carefully so the result is worthy of your name.</p>
+</section>
+<section class="cat-section tab-panel" id="faq">
+<div class="faq-list">
+<details class="faq-item">
+<summary data-i18n="faqQ1">How does the transformation work?</summary>
+<p data-i18n="faqA1">After payment, you upload your photo, and we transform it automatically in the style you picked — the result appears right on the site.</p>
+</details>
+<details class="faq-item">
+<summary data-i18n="faqQ2">How long does it take?</summary>
+<p data-i18n="faqA2">Two steps: confirming your bank transfer usually takes minutes (we review it ourselves), and once confirmed the AI transformation itself takes a few minutes, shown on the same page.</p>
+</details>
+<details class="faq-item">
+<summary data-i18n="faqQ6">What if I don't like the result?</summary>
+<p data-i18n="faqA6">Contact us right away and we'll regenerate your photo with a different prompt at no extra cost, until you're happy with the result.</p>
+</details>
+<details class="faq-item">
+<summary data-i18n="faqQ3">Do I need experience?</summary>
+<p data-i18n="faqA3">Not at all — just upload your photo and pick a style, we handle everything else.</p>
+</details>
+<details class="faq-item">
+<summary data-i18n="faqQ4">Can I use it commercially?</summary>
+<p data-i18n="faqA4">The resulting image is licensed for personal use. For commercial use (resale or client projects), please contact us first for proper licensing.</p>
+</details>
+<details class="faq-item">
+<summary data-i18n="faqQ5">How do I get my result?</summary>
+<p data-i18n="faqA5">Right after payment is confirmed, upload your photo on the site and get the transformed result directly — downloadable anytime.</p>
+</details>
+<details class="faq-item">
+<summary data-i18n="faqQ7">Can I choose more than one style?</summary>
+<p data-i18n="faqA7">Of course! You can order more than one style for the same photo or for different photos — each style counts as a separate order, or use one of the bundles (10 or 25 photos) to save if you need more than one result.</p>
+</details>
+</div>
+</section>
+</div>
+<!-- These two stay always-visible below the tab panel, unaffected by which
+     tab is selected above — per explicit request. -->
+<section class="cat-section" id="whyEdge">
+<div class="why-edge">
+<h3 data-i18n="whyEdgeTitle">What about the AI tools everyone can use?</h3>
+<p class="lead" data-i18n="whyEdgeP1">The tool is not the hard part — the prompt is.</p>
+<p data-i18n="whyEdgeP3">Every image in this gallery is the result of a prompt refined dozens of times, so it delivers the first time — no guesswork.</p>
+<p data-i18n-html="whyEdgeP4">We already did all the trial and error for you — pay once and get your finished photo right away. Want to experiment yourself next time? You can buy the prompt alone for 10 EGP (optional). <a class="why-edge-link" href="#children">Browse the gallery and pick a prompt →</a></p>
+</div>
+</section>
+<section class="cat-section" id="testimonials">
+<div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+<button class="btn-ghost" data-i18n="writeReviewBtn" id="writeReviewBtn">Add Your Review Here</button>
+</div>
+<div class="testimonials-grid" id="testimonialsGrid">
+<div class="proof-results-grid" id="testimonialsProofGrid" style="grid-column:1/-1;">
+<div class="proof-tile"><img alt="Result 1" data-i18n-alt="a11yResult" data-i18n-alt-n="1" loading="lazy" src="/before-after/before-after/after-1.jpg"/></div>
+<div class="proof-tile"><img alt="Result 2" data-i18n-alt="a11yResult" data-i18n-alt-n="2" loading="lazy" src="/before-after/before-after/after-2.jpg"/></div>
+<div class="proof-tile"><img alt="Result 3" data-i18n-alt="a11yResult" data-i18n-alt-n="3" loading="lazy" src="/before-after/before-after/after-3.jpg"/></div>
+<div class="proof-tile"><img alt="Result 4" data-i18n-alt="a11yResult" data-i18n-alt-n="4" loading="lazy" src="/before-after/before-after/after-4.jpg"/></div>
+<div class="proof-tile"><img alt="Result 5" data-i18n-alt="a11yResult" data-i18n-alt-n="5" loading="lazy" src="/before-after/before-after/after-5.jpg"/></div>
+<div class="proof-tile"><img alt="Result 6" data-i18n-alt="a11yResult" data-i18n-alt-n="6" loading="lazy" src="/before-after/before-after/after-6.jpg"/></div>
+<div class="proof-tile"><img alt="Result 7" data-i18n-alt="a11yResult" data-i18n-alt-n="7" loading="lazy" src="/before-after/before-after/after-7.jpg"/></div>
+<div class="proof-tile"><img alt="Result 8" data-i18n-alt="a11yResult" data-i18n-alt-n="8" loading="lazy" src="/before-after/before-after/after-8.jpg"/></div>
+</div>
+</div>
+<p class="sub" data-i18n="testimonialsNote" id="testimonialsNoteEl" style="margin-top:16px; opacity:0.7; font-size:12.5px;">* Real samples from actual Miga-Photobook results.</p>
+</section>
+<section class="cat-section promo-video-section" id="promoVideo">
+<div class="promo-video-outer">
+<div class="promo-video-wrap">
+<div class="promo-video-copy">
+<h2 data-i18n="promoVideoTitle">See Miga-Photobook in action</h2>
+<p class="sub" data-i18n="promoVideoSub">A few minutes, and your ordinary photo becomes a professional work of art.</p>
+</div>
+<div class="promo-video-frame">
+<video class="promo-video" controls="" data-src="promo-video.mp4" id="promoVideoEl" loop="" muted="" playsinline="" poster="promo-video-poster.jpg" preload="none"></video>
+</div>
+</div>
+</div>
+</section>
+<section class="cat-section" id="trustStrip">
+<div class="trust-badges">
+<div class="trust-badge">🏆 <span data-i18n="trustBadge1">Professional quality in every photo</span></div>
+<div class="trust-badge">🔄 <span data-i18n="trustBadge2">Constantly growing prompt library</span></div>
+<div class="trust-badge">💬 <span data-i18n="trustBadge3">Fast, direct support</span></div>
+<div class="trust-badge">🔒 <span data-i18n="trustBadge4">Security and privacy on every order</span></div>
+</div>
+</section>
+<footer>
+<div data-i18n="footerText" id="footerText">© 2026 Miga-Photobook — All transformations happen only after payment is completed.</div>
+<div class="footer-links">
+<a data-i18n="footerTerms" href="/terms.html">Terms of Use</a>
+<a data-i18n="footerPrivacy" href="/privacy.html">Privacy Policy</a>
+<a data-i18n="footerRefund" href="/refund.html">Refund Policy</a>
+</div>
+</footer>
+<div class="lightbox" id="lightboxBg" onclick="closeLightbox()">
+<img alt="" id="lightboxImg" src=""/>
+</div>
+<div class="contact-widget" id="contactWidget">
+<div class="contact-menu" id="contactMenu">
+<a aria-label="WhatsApp" class="contact-item" href="https://wa.me/201202530308" rel="noopener" target="_blank" title="WhatsApp">
+<svg fill="currentColor" height="22" viewbox="0 0 24 24" width="22"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.8 1.1-.1.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.6-1.9-.1-.3 0-.4.1-.5l.4-.5c.1-.1.2-.3.2-.4.1-.1 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.3-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.5 4 3.5.6.2 1 .4 1.3.5.6.2 1.1.1 1.5-.1.5-.1 1.4-.6 1.6-1.1.2-.5.2-1 .1-1.1-.1-.1-.2-.2-.5-.3z"></path><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.4c1.4.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.1.8.8-3-.2-.3C4 14.8 3.8 13.4 3.8 12c0-4.5 3.7-8.2 8.2-8.2s8.2 3.7 8.2 8.2-3.7 8.2-8.2 8.2z"></path></svg>
+</a>
+<a aria-label="Facebook" class="contact-item" href="https://www.facebook.com/share/1HyaB2xwuZ/?mibextid=wwXIfr" rel="noopener" target="_blank" title="Facebook">
+<svg fill="currentColor" height="22" viewbox="0 0 24 24" width="22"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"></path></svg>
+</a>
+<a aria-label="Instagram" class="contact-item" href="https://www.instagram.com/migaphotobook/" rel="noopener" target="_blank" title="Instagram">
+<svg fill="currentColor" height="22" viewbox="0 0 24 24" width="22"><path d="M12 2.2c3.2 0 3.6 0 4.9.07 3.3.15 4.8 1.7 5 5 .06 1.3.07 1.6.07 4.8s0 3.6-.07 4.8c-.15 3.3-1.7 4.8-5 5-1.3.06-1.6.07-4.9.07s-3.6 0-4.9-.07c-3.3-.15-4.8-1.7-5-5C2 15.6 2 15.3 2 12s0-3.6.07-4.8c.15-3.3 1.7-4.8 5-5C8.4 2.2 8.7 2.2 12 2.2zm0 1.8c-3.15 0-3.5 0-4.8.07-2.4.1-3.5 1.2-3.6 3.6C3.5 8.5 3.5 8.85 3.5 12s0 3.5.06 4.8c.1 2.4 1.2 3.5 3.6 3.6 1.3.06 1.65.06 4.8.06s3.5 0 4.8-.06c2.4-.1 3.5-1.2 3.6-3.6.06-1.3.06-1.65.06-4.8s0-3.5-.06-4.8c-.1-2.4-1.2-3.5-3.6-3.6-1.3-.06-1.65-.07-4.8-.07zm0 3.5a5 5 0 110 10 5 5 0 010-10zm0 1.8a3.2 3.2 0 100 6.4 3.2 3.2 0 000-6.4zm5.2-2.1a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"></path></svg>
+</a>
+<a aria-label="Telegram" class="contact-item" href="https://t.me/+201202530308" rel="noopener" target="_blank" title="Telegram">
+<svg fill="currentColor" height="22" viewbox="0 0 24 24" width="22"><path d="M21.5 3.5L2.7 10.8c-1.2.5-1.2 1.2-.2 1.5l4.8 1.5 1.8 5.7c.2.6.4.8.9.8s.7-.2 1-.5l2.4-2.3 4.9 3.6c.9.5 1.5.2 1.8-.9l3.2-15c.3-1.4-.4-1.9-1.5-1.4zM8.5 14.3L18 8.1c.4-.3.8-.1.5.2l-8.1 7.3-.3 3.2-1.6-4.5z"></path></svg>
+</a>
+</div>
+<div class="fab-wrap">
+<button aria-label="Contact us" class="contact-fab" data-i18n-aria="a11yContact" data-i18n-title="a11yContact" id="contactFabBtn" title="Contact us">
+<span class="fab-core">
+<svg aria-hidden="true" fill="currentColor" height="14" viewbox="0 0 24 24" width="14"><path d="M12 2C6.5 2 2 6 2 11c0 2.6 1.2 4.9 3.1 6.6L4 22l4.6-1.5c1.1.3 2.2.5 3.4.5 5.5 0 10-4 10-9S17.5 2 12 2z"></path></svg>
+<span class="fab-word" data-i18n="contactFabWord">Contact</span>
+<span class="fab-mega" data-i18n="contactFabBrand">Miga</span>
+</span>
+</button>
+</div>
+</div>
+<div class="fab-wrap fab-wrap-home" id="backToTopWrap" style="display:none;">
+<button aria-label="Back to top" class="back-to-top-fab" data-i18n-aria="a11yBackToTop" data-i18n-title="a11yBackToTop" id="backToTopBtn" title="Back to top">
+<span class="fab-core">
+<svg aria-hidden="true" fill="currentColor" height="17" viewbox="0 0 24 24" width="17"><path d="M12 5l-7 7h4v7h6v-7h4z"></path></svg>
+<span class="fab-word" data-i18n="backHomeLabel">Home</span>
+</span>
+</button>
+</div>
+<div aria-hidden="true" class="scroll-ruler" id="scrollRuler">
+<button aria-label="Scroll up" class="scroll-ruler-arrow" data-i18n-aria="a11yScrollUp" data-i18n-title="a11yScrollUp" id="scrollRulerUp" title="Scroll up">▲</button>
+<div class="scroll-ruler-track" id="scrollRulerTrack">
+<div class="scroll-ruler-thumb" id="scrollRulerThumb"></div>
+</div>
+<button aria-label="Scroll down" class="scroll-ruler-arrow" data-i18n-aria="a11yScrollDown" data-i18n-title="a11yScrollDown" id="scrollRulerDown" title="Scroll down">▼</button>
+</div>
+</div><!-- /appRoot -->
+<!-- Product detail (quick view) modal -->
+<div class="modal-bg" id="detailModalBg">
+<div class="modal" style="max-width:480px;">
+<button class="close-x" id="detailModalClose">×</button>
+<img alt="" id="detailImg" src="" style="width:100%; aspect-ratio:4/5; object-fit:cover; border-radius:10px; border:1px solid var(--line); margin-bottom:14px;"/>
+<h3 id="detailTitle" style="margin-bottom:8px;"></h3>
+<div class="card-price" id="detailPrice" style="margin-bottom:14px;"></div>
+<ul style="list-style:none; display:flex; flex-direction:column; gap:8px; font-size:14px; color:var(--paper-dim); margin-bottom:18px;">
+<li data-i18n="detailValue1">✓ Your photo is transformed automatically right after payment</li>
+<li data-i18n="detailValue2">✓ Guaranteed professional studio quality</li>
+<li data-i18n="detailValue3">✓ Result ready to download within minutes</li>
+<li data-i18n="detailValue4">✓ Direct support if you need help</li>
+</ul>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="detailBuyBtn" id="detailBuyBtn">Get It Now</button>
+<button class="btn-ghost" data-i18n="cancelBtn" id="detailCancelBtn">Cancel</button>
+</div>
+</div>
+</div>
+<!-- Purchase modal -->
+<div class="modal-bg" id="buyModalBg">
+<div class="modal">
+<button class="close-x" id="buyModalClose">×</button>
+<h3 data-i18n="buyModalTitle">Pay via InstaPay</h3>
+<p class="sub" id="buyModalText"></p>
+<div class="account-tabs" id="paymentMethodTabs">
+<button class="account-tab active" data-method="instapay">💳 <span data-i18n="payMethodInstapay">InstaPay</span></button>
+<button class="account-tab" data-method="vodafone">📱 <span data-i18n="payMethodVodafone">Vodafone Cash</span></button>
+<button class="account-tab" data-method="card">💠 <span data-i18n="payMethodCard">Credit Card</span></button>
+<button class="account-tab" data-method="fawry">🧾 <span data-i18n="payMethodFawry">Fawry</span></button>
+</div>
+<div id="payViewInstapay">
+<div class="instapay-box">
+<div class="ip-label" data-i18n="ipLabel" id="ipLabelEl">Transfer the amount via InstaPay (from any bank or wallet that supports InstaPay transfers) to the following number</div>
+<div class="ip-number" id="ipNumber">01202530308</div>
+<button class="ip-copy" data-i18n="ipCopyBtn" id="ipCopyBtn" type="button">Copy Number</button>
+</div>
+<div id="payFormFields">
+<div class="field">
+<label data-i18n="buyerPhoneLabel">Mobile number you transferred from</label>
+<input id="buyerPhone" placeholder="01xxxxxxxxx" type="tel"/>
+</div>
+<div class="field">
+<label data-i18n="payerRefLabel">Transfer reference number (from your transfer receipt)</label>
+<input data-i18n-ph="payerRefPh" id="payerRef" inputmode="latin" placeholder="e.g. 4821960573" type="text"/>
+<button class="ref-help-toggle" data-i18n="refHelpToggle" id="refHelpToggle" type="button">Can't find the transaction number? Tap here</button>
+<div class="ref-help-box" hidden="" id="refHelpBox">
+<p data-i18n-html="refHelpInstapay">📱 <b>InstaPay:</b> open your bank or wallet app → "Transaction History" → tap the transfer you just made → you'll see a reference number, usually 10 digits.</p>
+<p data-i18n-html="refHelpVodafone">📱 <b>Vodafone Cash:</b> you'll get an SMS right after the transfer with the transaction number in it — copy it from there.</p>
+</div>
+</div>
+<div class="pay-warning" data-i18n="payWarning">🔐 To make sure your order is processed quickly, double-check the transfer reference number.</div>
+<label class="pay-confirm-row" for="payConfirmChk">
+<input id="payConfirmChk" type="checkbox"/>
+<span data-i18n="payConfirmLabel">I confirm I have actually transferred the amount, and the reference above is correct.</span>
+</label>
+<p class="sub" data-i18n="buyModalNote" style="margin-bottom:10px;">We'll review your transfer ourselves as soon as it arrives — this page stays open and updates itself once confirmed, no separate code to look for.</p>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="buyConfirmBtn" disabled="" id="buyConfirmBtn">I've Paid</button>
+<button class="btn-ghost" data-i18n="cancelBtn" id="buyCancelBtn">Cancel</button>
+</div>
+</div>
+<div id="payStatusPanel" style="display:none; text-align:center; padding:10px 0;">
+<div aria-hidden="true" class="order-status-spinner"></div>
+<p class="sub" data-i18n="statusPendingText" id="payStatusText" style="font-size:15px; margin:14px 0 4px;">We're reviewing your transfer... this page will update itself once it's confirmed.</p>
+<p class="sub" data-i18n="statusCodeNote" style="font-size:12.5px; opacity:0.7;">Your order code (keep it just in case):</p>
+<div class="ip-number" id="payStatusCode" style="font-size:18px; margin:4px 0 16px;"></div>
+<p class="sub" data-i18n="statusSafeCloseNote" style="font-size:12.5px; opacity:0.8;">You can close this page now — we'll review your order and update you as soon as it's confirmed.</p>
+<div class="modal-actions">
+<button class="btn-ghost" data-i18n="closeBtn" id="payStatusCloseBtn">Close</button>
+</div>
+</div>
+</div>
+<div id="payViewCardFawry" style="display:none;">
+<div class="field">
+<label data-i18n="payerNameLabel">Name</label>
+<input id="payerName" type="text"/>
+</div>
+<div class="field">
+<label data-i18n="payerPhoneLabel">Mobile Number</label>
+<input id="payerPhone" placeholder="01xxxxxxxxx" type="tel"/>
+</div>
+<div class="field">
+<label data-i18n="payerEmailLabel">Email (optional)</label>
+<input id="payerEmail" type="email"/>
+</div>
+<div id="fawryRefResult" style="display:none; text-align:center; margin:14px 0;">
+<p class="sub" data-i18n="fawryRefNote">Go to any Fawry outlet and pay using this code:</p>
+<div class="ip-number" id="fawryRefNumber"></div>
+</div>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="payNowBtn" id="payCardFawryBtn">Pay Now</button>
+<button class="btn-ghost" data-i18n="cancelBtn" id="payCardFawryCancelBtn">Cancel</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Photo transform modal -->
+<div class="modal-bg" id="transformModalBg">
+<div class="modal" style="max-width:520px;">
+<button class="close-x" id="transformModalClose">×</button>
+<h3 data-i18n="transformModalTitle">Transform Your Photo</h3>
+<p class="sub" id="transformModalText"></p>
+<div class="field" id="transformUploadField">
+<label data-i18n="uploadPhotoLabel">Choose your photo</label>
+<input accept="image/*" id="transformFileInput" type="file"/>
+</div>
+<p class="sub" data-i18n="transformAlreadyDoneNote" id="transformAlreadyDoneNote" style="display:none;">Your photo was already transformed with this order — this is your saved result.</p>
+<div id="transformPreviewWrap" style="display:none; margin:14px 0;">
+<div id="transformPreviewGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+<div id="transformBeforeCol">
+<div class="sub" data-i18n="beforeLabel" style="margin-bottom:6px;">Before</div>
+<canvas id="transformSrcCanvas" style="width:100%; border-radius:10px; border:1px solid var(--line);"></canvas>
+</div>
+<div>
+<div class="sub" data-i18n="afterLabel" style="margin-bottom:6px;">After</div>
+<canvas id="transformOutCanvas" style="width:100%; border-radius:10px; border:1px solid var(--line);"></canvas>
+</div>
+</div>
+</div>
+<div id="transformFreshFlowControls">
+<label style="display:flex; align-items:flex-start; gap:8px; margin:12px 0; font-size:13px; color:var(--paper-dim); cursor:pointer;">
+<input id="transformConsent" style="margin-top:3px;" type="checkbox"/>
+<span data-i18n="consentLabel">I confirm I own this photo or am its legal guardian, and consent to using it to generate the requested artistic result.</span>
+</label>
+<p class="sub" data-i18n="transformPrivacyNote" id="transformPrivacyNoteEl" style="margin-bottom:10px;">Your photo is used only to fulfill your order and is never shared with anyone else.</p>
+<p class="sub" data-i18n="transformLikenessNote" id="transformLikenessNoteEl" style="margin-bottom:10px; opacity:0.85;">We keep your core facial features as close to the original as possible, but the result's quality depends on how clear the original photo is.</p>
+</div>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="generateBtn" id="transformGenerateBtn">Transform Photo</button>
+<button class="btn-ghost" data-i18n="downloadResultBtn" id="transformDownloadBtn" style="display:none;">Download Result</button>
+<button class="btn-ghost" data-i18n="shareResultBtn" id="transformShareBtn" style="display:none;">Share result</button>
+<div class="thanks-panel" id="thanksPanel">
+<h4 data-i18n="thanksTitle">Thank you for trying us 🙏</h4>
+<p data-i18n="thanksBody">If you like your photo, sharing it with friends or leaving a quick review helps us a lot.</p>
+<div class="thanks-actions">
+<button class="btn-primary" data-i18n="thanksShareBtn" id="thanksShareBtn">Share your photo</button>
+<button class="btn-ghost" data-i18n="thanksReviewBtn" id="thanksReviewBtn">Write a review</button>
+</div>
+</div>
+<button class="btn-ghost" data-i18n="cancelBtn" id="transformCancelBtn">Cancel</button>
+</div>
+</div>
+</div>
+<div class="modal-bg" id="cropModalBg">
+<div class="modal">
+<button class="close-x" id="cropModalClose">×</button>
+<h3 data-i18n="cropModalTitle">Adjust the Photo Frame</h3>
+<p class="sub" data-i18n="cropModalSub">Drag the photo in any direction, and pinch with two fingers on mobile or use the zoom slider on desktop — every product photo will come out at exactly the same size after this.</p>
+<div class="crop-stage" id="cropStage">
+<canvas height="500" id="cropCanvas" width="400"></canvas>
+</div>
+<div class="crop-zoom-row">
+<span aria-hidden="true">🔍</span>
+<input id="cropZoomSlider" max="3" min="1" step="0.01" type="range" value="1"/>
+</div>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="cropConfirmBtn" id="cropConfirmBtn">Confirm Crop</button>
+<button class="btn-ghost" data-i18n="cancelBtn" id="cropCancelBtn">Cancel</button>
+</div>
+</div>
+</div>
+<div class="modal-bg" id="dailyReportModalBg">
+<div class="modal" style="max-width:460px;">
+<button class="close-x" id="dailyReportModalClose">×</button>
+<h3 data-i18n="dailyReportTitle">📊 Performance Report</h3>
+<p class="sub" id="dailyReportSubtitle" style="font-size:12.5px; margin-top:-6px;"></p>
+<div class="report-period-tabs" id="reportPeriodTabs">
+<button class="report-period-btn active" data-i18n="periodDailyBtn" data-period="daily" type="button">Today</button>
+<button class="report-period-btn" data-i18n="periodWeeklyBtn" data-period="weekly" type="button">Last 7 days</button>
+<button class="report-period-btn" data-i18n="periodCustomBtn" data-period="custom" type="button">Custom range</button>
+</div>
+<div class="report-custom-range" id="reportCustomRange" style="display:none;">
+<input id="reportFromDate" type="date"/>
+<input id="reportToDate" type="date"/>
+<button class="btn-ghost" data-i18n="periodApplyBtn" id="reportApplyRangeBtn" type="button">Apply</button>
+</div>
+<div id="dailyReportBody" style="display:flex; flex-direction:column; gap:14px; margin-top:10px;"></div>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="dailyReportDownloadBtn" id="dailyReportDownloadBtn">⬇️ Export Excel</button>
+<button class="btn-ghost" data-i18n="reportDownloadChartBtn" id="reportDownloadChartBtn">⬇️ Chart image</button>
+<button class="btn-ghost" data-i18n="cancelBtn" id="dailyReportCloseBtn">Cancel</button>
+</div>
+</div>
+</div>
+<div class="modal-bg" id="trackModalBg">
+<div class="modal">
+<button class="close-x" id="trackModalClose">×</button>
+<h3 data-i18n="trackModalTitle">Track Your Order</h3>
+<div id="myOrdersHistory" style="display:none; margin-bottom:18px;">
+<div class="sub" data-i18n="myOrdersTitle" style="margin-bottom:8px; font-weight:700;">Your Past Orders</div>
+<div id="myOrdersHistoryList"></div>
+</div>
+<p class="sub" data-i18n="trackModalSub">Enter the tracking code you received after sending a purchase request.</p>
+<div class="field">
+<label data-i18n="trackCodeLabel">Tracking Code</label>
+<input data-i18n-ph="trackCodePh" id="trackCode" placeholder="e.g. A1B2C3" style="text-transform:uppercase;" type="text"/>
+</div>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="trackCheckBtn" id="trackCheckBtn">Check Status</button>
+<button class="btn-ghost" data-i18n="closeBtn" id="trackCancelBtn">Close</button>
+</div>
+</div>
+</div>
+<!-- Account modal (login/register) -->
+<div class="side-drawer-backdrop" id="sideDrawerBackdrop"></div>
+<aside aria-hidden="true" class="side-drawer" id="sideDrawer">
+<div class="side-drawer-head">
+<div class="side-drawer-logo">
+<span class="lg-ar" data-i18n="brandNameAr">ميجا فوتوبوك</span>
+<svg class="logo-mark" height="28" viewbox="0 0 48 48" width="28" xmlns="http://www.w3.org/2000/svg">
+<!-- open book -->
+<path d="M24 14 C19 10 10 9 5 11 V37 C10 35 19 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M24 14 C29 10 38 9 43 11 V37 C38 35 29 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M24 14 V40" opacity="0.5" stroke="var(--brass)" stroke-width="1.5"></path>
+<!-- camera resting on the book -->
+<rect fill="var(--ink)" height="14" rx="3" stroke="var(--brass)" stroke-width="2" width="20" x="14" y="18"></rect>
+<rect fill="var(--ink)" height="5" rx="1.5" stroke="var(--brass)" stroke-width="2" width="8" x="20" y="14"></rect>
+<circle cx="24" cy="25" fill="none" r="4.5" stroke="var(--brass)" stroke-width="2"></circle>
+<circle cx="24" cy="25" fill="var(--brass)" r="1.6"></circle>
+</svg>
+<span class="lg-en">Miga<span class="logo-accent">-Photobook</span></span>
+</div>
+<button aria-label="Close" class="close-x" data-i18n-aria="closeBtn" id="sideDrawerClose" type="button">×</button>
+</div>
+<div class="side-drawer-profile">
+<button aria-label="Change profile photo" class="drawer-avatar" data-i18n-aria="a11yChangeAvatar" id="drawerAvatarBtn" type="button">
+<img alt="" id="drawerAvatarImg" src="" style="display:none;"/>
+<svg fill="none" height="26" id="drawerAvatarPlaceholder" stroke="currentColor" stroke-width="1.6" viewbox="0 0 24 24" width="26"><circle cx="12" cy="8" r="3.6"></circle><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"></path></svg>
+<span aria-hidden="true" class="drawer-avatar-edit-badge">
+<svg fill="none" height="12" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24" width="12"><path d="M4 7h3l1.5-2h7L17 7h3v12H4z"></path><circle cx="12" cy="13" r="3.2"></circle></svg>
+</span>
+</button>
+<input class="drawer-input" data-i18n-ph="nameLabel" id="drawerNameInput" placeholder="Name" type="text"/>
+<input class="drawer-input" data-i18n-ph="phoneLabel" dir="ltr" id="drawerPhoneInput" placeholder="Phone number" type="tel"/>
+<button class="btn-primary" data-i18n="saveProfileBtn" id="drawerSaveBtn" style="width:100%;" type="button">Save details</button>
+<button class="drawer-text-link" data-i18n="drawerHaveAccount" id="drawerLoginLink" type="button">Already have an account? Log in</button>
+<button class="drawer-text-link" data-i18n="logoutBtn" id="drawerLogoutLink" style="display:none;" type="button">Log Out</button>
+</div>
+<div class="side-drawer-body" id="sideDrawerBody">
+<div class="side-drawer-row">
+<span class="side-drawer-row-label" data-i18n="drawerLangLabel">Language</span>
+<select class="drawer-select" id="drawerLangSelect">
+<option value="ar">عربي</option>
+<option value="en">English</option>
+</select>
+</div>
+<div class="side-drawer-row">
+<span class="side-drawer-row-label" data-i18n="drawerThemeLabel">Appearance</span>
+<button aria-pressed="true" class="drawer-switch" id="drawerThemeSwitch" type="button">
+<span class="drawer-switch-knob"></span>
+</button>
+</div>
+<div class="side-drawer-row">
+<span class="side-drawer-row-label" data-i18n="drawerViewLabel">View mode</span>
+<select class="drawer-select" id="drawerViewSelect">
+<option data-i18n="viewDesktopLabel" value="desktop">Computer</option>
+<option data-i18n="viewMobileLabel" value="mobile">Mobile</option>
+</select>
+</div>
+<button class="drawer-link-row" id="drawerFavBtn" style="display:none;" type="button">
+<span><span data-i18n="favSectionTitle">My Favorites</span> <span class="drawer-fav-count" id="drawerFavCount"></span></span>
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M15 6l-6 6 6 6"></path></svg>
+</button>
+<button class="drawer-link-row" id="drawerTrackBtn" type="button">
+<span data-i18n="trackBtn">Track Order</span>
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M15 6l-6 6 6 6"></path></svg>
+</button>
+</div>
+<a class="side-drawer-footer" href="https://miga-photobook.com/">
+<svg class="logo-mark" height="20" viewbox="0 0 48 48" width="20" xmlns="http://www.w3.org/2000/svg">
+<path d="M24 14 C19 10 10 9 5 11 V37 C10 35 19 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M24 14 C29 10 38 9 43 11 V37 C38 35 29 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M24 14 V40" opacity="0.5" stroke="var(--brass)" stroke-width="1.5"></path>
+<rect fill="var(--ink)" height="14" rx="3" stroke="var(--brass)" stroke-width="2" width="20" x="14" y="18"></rect>
+<rect fill="var(--ink)" height="5" rx="1.5" stroke="var(--brass)" stroke-width="2" width="8" x="20" y="14"></rect>
+<circle cx="24" cy="25" fill="none" r="4.5" stroke="var(--brass)" stroke-width="2"></circle>
+<circle cx="24" cy="25" fill="var(--brass)" r="1.6"></circle>
+</svg>
+<span>miga-photobook.com</span>
+</a>
+</aside>
+<div class="modal-bg" id="accountModalBg">
+<div class="modal" style="max-width:420px;">
+<button class="close-x" id="accountModalClose">×</button>
+<div id="accountLoggedOutView">
+<button class="btn-ghost social-btn" id="biometricLoginBtn" style="display:none; width:100%; margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:8px; border-color:var(--brass-dim);">
+<svg fill="none" height="16" stroke="var(--brass)" stroke-width="1.8" viewbox="0 0 24 24" width="16"><path d="M12 2a5 5 0 0 0-5 5v2a5 5 0 0 0 .4 2M7 15c0 2 1 4 5 5M17 9v2c0 1.5-.3 2.7-.8 3.6M12 7a2 2 0 0 1 2 2v3a6 6 0 0 1-1 3.4M9 9v2c0 3 1.5 5 4 6"></path></svg>
+<span data-i18n="biometricLoginBtn">Sign in with Face ID / fingerprint</span>
+</button>
+<div class="social-login-row" style="display:none; flex-direction:column; gap:8px; margin-bottom:16px;">
+<button class="btn-ghost social-btn" id="googleLoginBtn" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+<svg height="16" viewbox="0 0 48 48" width="16"><path d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.5 5.1 29.5 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.4-.1-2.5-.4-3.5z" fill="#FFC107"></path><path d="M6.3 14.7l6.6 4.8C14.5 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l6-6C34.5 5.1 29.5 3 24 3c-7.6 0-14.1 4.3-17.4 10.7z" fill="#FF3D00"></path><path d="M24 45c5.3 0 10.1-2 13.7-5.4l-6.3-5.3C29.4 35.9 26.9 37 24 37c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.8 40.6 16.3 45 24 45z" fill="#4CAF50"></path><path d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.3 5.3C39.5 37.1 43 31 43 24c0-1.4-.1-2.5-.4-3.5z" fill="#1976D2"></path></svg>
+<span data-i18n="continueGoogle">Continue with Google</span>
+</button>
+<button class="btn-ghost social-btn" id="appleLoginBtn" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+<svg fill="currentColor" height="16" viewbox="0 0 24 24" width="16"><path d="M16.365 1.43c0 1.14-.446 2.06-1.13 2.79-.75.79-1.94 1.4-2.95 1.32-.13-1.1.44-2.24 1.11-2.95.75-.8 2.03-1.4 2.97-1.16zm4.05 16.53c-.4.93-.87 1.83-1.53 2.7-.9 1.19-1.83 2.38-3.28 2.4-1.42.03-1.88-.83-3.5-.83-1.63 0-2.14.8-3.48.86-1.4.05-2.47-1.28-3.38-2.47-1.85-2.42-3.26-6.84-1.37-9.83.94-1.48 2.61-2.42 4.43-2.44 1.4-.03 2.71.94 3.56.94.84 0 2.44-1.16 4.12-.99.7.03 2.67.28 3.93 2.13-.1.06-2.35 1.37-2.32 4.08.03 3.24 2.84 4.32 2.87 4.33-.02.08-.45 1.54-1.05 3.02z"></path></svg>
+<span data-i18n="continueApple">Continue with Apple</span>
+</button>
+<button class="btn-ghost social-btn" id="facebookLoginBtn" style="display:flex; align-items:center; justify-content:center; gap:8px;">
+<svg fill="#1877F2" height="16" viewbox="0 0 24 24" width="16"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"></path></svg>
+<span data-i18n="continueFacebook">Continue with Facebook</span>
+</button>
+</div>
+<div class="account-tabs-divider" data-i18n="orDivider" style="display:none; text-align:center; font-size:12.5px; color:var(--paper-dim); margin-bottom:14px;">Or with email</div>
+<div class="account-tabs">
+<button class="account-tab active" data-i18n="loginTab" id="tabLoginBtn">Log In</button>
+<button class="account-tab" data-i18n="registerTab" id="tabRegisterBtn">New Account</button>
+</div>
+<div id="loginFormView">
+<div class="field">
+<label data-i18n="emailLabel">Email</label>
+<input id="loginEmail" placeholder="you@example.com" type="email"/>
+</div>
+<div class="field">
+<label data-i18n="passwordLabel">Password</label>
+<input id="loginPassword" type="password"/>
+</div>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="loginBtn" id="loginSubmitBtn">Log In</button>
+</div>
+</div>
+<div id="registerFormView" style="display:none;">
+<div class="field">
+<label data-i18n="nameLabel">Name</label>
+<input id="registerName" type="text"/>
+</div>
+<div class="field">
+<label data-i18n="phoneLabel">Phone number</label>
+<input id="registerPhone" placeholder="01xxxxxxxxx" type="tel"/>
+</div>
+<div class="field">
+<label data-i18n="emailLabel">Email</label>
+<input id="registerEmail" placeholder="you@example.com" type="email"/>
+</div>
+<div class="field">
+<label data-i18n="passwordLabel">Password</label>
+<input data-i18n-ph="registerPasswordPh" id="registerPassword" placeholder="At least 6 characters" type="password"/>
+</div>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="registerBtn" id="registerSubmitBtn">Create Account</button>
+</div>
+</div>
+</div>
+<div id="accountLoggedInView" style="display:none;">
+<h3 data-i18n="accountWelcome">Welcome!</h3>
+<div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+<button aria-label="Change profile photo" data-i18n-aria="a11yChangeAvatar" id="accountAvatarBtn" style="position:relative; width:64px; height:64px; border-radius:50%; border:1.5px solid var(--brass); background:var(--ink-2); overflow:hidden; flex-shrink:0; padding:0;" type="button">
+<img alt="" id="accountAvatarImg" src="" style="display:none; width:100%; height:100%; object-fit:cover;"/>
+<span id="accountAvatarPlaceholder" style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:var(--brass);">
+<svg fill="none" height="28" stroke="currentColor" stroke-width="1.6" viewbox="0 0 24 24" width="28"><circle cx="12" cy="8" r="3.6"></circle><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"></path></svg>
+</span>
+<span style="position:absolute; inset-inline-end:0; bottom:0; width:20px; height:20px; border-radius:50%; background:var(--brass); color:var(--ink); display:flex; align-items:center; justify-content:center; font-size:12.5px;">
+<svg fill="none" height="12" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24" width="12"><path d="M4 7h3l1.5-2h7L17 7h3v12H4z"></path><circle cx="12" cy="13" r="3.2"></circle></svg>
+</span>
+</button>
+<input accept="image/*" id="accountAvatarFile" style="display:none;" type="file"/>
+<p class="sub" id="accountUserInfo" style="margin:0;"></p>
+</div>
+<div class="field">
+<label data-i18n="nameLabel">Name</label>
+<input id="accountProfileName" type="text"/>
+</div>
+<div class="field">
+<label data-i18n="phoneLabel">Phone number</label>
+<input id="accountProfilePhone" placeholder="01xxxxxxxxx" type="tel"/>
+</div>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="saveProfileBtn" id="saveAccountProfileBtn">Save details</button>
+</div>
+<button class="btn-ghost social-btn" id="registerBiometricBtn" style="display:none; width:100%; margin-bottom:14px; display:flex; align-items:center; justify-content:center; gap:8px;">
+<svg fill="none" height="16" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24" width="16"><path d="M12 2a5 5 0 0 0-5 5v2a5 5 0 0 0 .4 2M7 15c0 2 1 4 5 5M17 9v2c0 1.5-.3 2.7-.8 3.6M12 7a2 2 0 0 1 2 2v3a6 6 0 0 1-1 3.4M9 9v2c0 3 1.5 5 4 6"></path></svg>
+<span data-i18n="registerBiometricBtn">Enable Face ID/fingerprint sign-in on this device</span>
+</button>
+<div class="modal-actions">
+<button class="btn-ghost" data-i18n="logoutBtn" id="accountLogoutBtn">Log Out</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Review submission modal -->
+<div class="modal-bg" id="reviewModalBg">
+<div class="modal" style="max-width:420px;">
+<button class="close-x" id="reviewModalClose">×</button>
+<h3 data-i18n="writeReviewTitle">Share Your Feedback</h3>
+<div class="field">
+<label data-i18n="ratingLabel">Your Rating</label>
+<select id="reviewRating">
+<option value="5">⭐⭐⭐⭐⭐</option>
+<option value="4">⭐⭐⭐⭐</option>
+<option value="3">⭐⭐⭐</option>
+<option value="2">⭐⭐</option>
+<option value="1">⭐</option>
+</select>
+</div>
+<div class="field">
+<label data-i18n="commentLabel">Your Comment</label>
+<textarea id="reviewComment"></textarea>
+</div>
+<div class="field" id="reviewPhotoField" style="display:none;">
+<label class="review-photo-consent" for="reviewPhotoConsent">
+<input id="reviewPhotoConsent" type="checkbox"/>
+<span data-i18n="reviewPhotoConsentLabel">Publish my result photo with the review</span>
+</label>
+<div id="reviewPhotoPicker" style="display:none; gap:10px; flex-wrap:wrap; margin-top:10px;"></div>
+</div>
+<p class="sub" data-i18n="reviewModerationNote" style="font-size:12.5px;">Your review will appear after our team reviews it.</p>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="submitReviewBtn" id="reviewSubmitBtn">Submit Review</button>
+<button class="btn-ghost" data-i18n="cancelBtn" id="reviewCancelBtn">Cancel</button>
+</div>
+</div>
+</div>
+<div aria-live="polite" class="stay-nudge" id="stayNudge" role="dialog">
+<button aria-label="Close" class="stay-nudge-close" data-i18n-aria="closeBtn" id="stayNudgeClose" type="button">×</button>
+<h4 data-i18n="nudgeTitle">Still deciding?</h4>
+<p data-i18n="nudgeBody">The launch offer is still on — your photo for 25 EGP instead of 50. Not sure which style suits you? Message us on WhatsApp and we will help you pick.</p>
+<div class="stay-nudge-actions">
+<a class="btn-primary" data-i18n="nudgeBrowseBtn" href="#children" id="nudgeBrowseBtn">Browse photos</a>
+<a class="btn-ghost" data-i18n="nudgeAskBtn" href="https://wa.me/201202530308?text=%D9%85%D8%AD%D8%AA%D8%A7%D8%B1%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%A7%D8%AE%D8%AA%D9%8A%D8%A7%D8%B1%D8%8C%20%D9%85%D9%85%D9%83%D9%86%20%D9%85%D8%B3%D8%A7%D8%B9%D8%AF%D8%A9%D8%9F" rel="noopener" target="_blank">Ask us on WhatsApp</a>
+</div>
+</div>
+<button aria-label="لوحة الإدارة" class="admin-fab" id="adminFab" type="button">
+<span aria-hidden="true" class="af-icon">⚙</span>
+<span class="af-label" data-i18n="adminFabLabel">Admin panel</span>
+<span class="af-badge" id="adminFabBadge"></span>
+</button>
+<div class="modal-bg" id="adminModalBg">
+<div class="modal admin-modal" id="adminModal">
+<div class="admin-head">
+<h3 data-i18n="adminTitle" id="adminTitle">Admin Login</h3>
+<div class="admin-head-actions">
+<button aria-pressed="true" class="theme-toggle theme-toggle-sm" type="button">
+<span aria-hidden="true" class="tt-stars">
+<span class="tt-star" style="inset-inline-start:8px; top:6px;"></span>
+<span class="tt-star" style="inset-inline-start:16px; top:14px;"></span>
+<span class="tt-star" style="inset-inline-start:24px; top:5px;"></span>
+</span>
+<span aria-hidden="true" class="tt-icon tt-sun"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" fill="currentColor" r="4.2" stroke="none"></circle><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"></path></svg></span>
+<span aria-hidden="true" class="tt-icon tt-moon"><svg fill="currentColor" stroke="none" viewbox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"></path></svg></span>
+<span aria-hidden="true" class="tt-knob">
+<span class="tt-knob-sun"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewbox="0 0 24 24"><circle cx="12" cy="12" fill="currentColor" r="4.2" stroke="none"></circle><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8L6 18M18 6l1.8-1.8"></path></svg></span>
+<span class="tt-knob-moon"><svg fill="currentColor" stroke="none" viewbox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 1 0 10.5 10.5z"></path></svg></span>
+</span>
+</button>
+<button aria-label="تقرير يومي" class="admin-icon-btn" id="dailyReportBtn" onclick="openDailyReport()" title="تقرير يومي" type="button">📊</button>
+<button aria-label="تنبيهات الطلبات" class="admin-icon-btn" id="adminAlertsBtn" title="تنبيهات الطلبات" type="button">🔔</button>
+<button aria-label="طي اللوحة" class="admin-icon-btn" id="adminCollapseBtn" title="طي اللوحة" type="button">–</button>
+<button aria-label="إغلاق" class="admin-icon-btn" id="adminModalClose" title="إغلاق" type="button">×</button>
+</div>
+</div>
+<p class="sub" data-i18n="adminSub">Product and order management panel.</p>
+<div id="adminLoginView">
+<div class="field">
+<label data-i18n="adminPassLabel">Password</label>
+<input id="adminPass" placeholder="••••••••" type="password"/>
+</div>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="adminLoginBtn" id="adminLoginBtn">Login</button>
+</div>
+</div>
+<div id="adminFormView" style="display:none;">
+<div class="admin-tabs">
+<button class="active" data-i18n="tabProducts" data-tab="products" id="tabBtnProducts">Add Product</button>
+<button data-tab="orders" id="tabBtnOrders"><span data-i18n="tabOrders">Orders</span> <span id="pendingCount"></span></button>
+<button data-tab="reviews" id="tabBtnReviews"><span data-i18n="tabReviews">Reviews</span> <span id="pendingReviewCount"></span></button>
+<button data-i18n="tabVisitors" data-tab="visitors" id="tabBtnVisitors">Visitors</button>
+<button data-i18n="tabShowcase" data-tab="showcase" id="tabBtnShowcase">Showcase</button>
+<button data-i18n="tabPromoImages" data-tab="promoimages" id="tabBtnPromoImages">Display Images</button>
+<button data-i18n="tabChangePassword" data-tab="changepassword" id="tabBtnChangePassword">Change password</button>
+<button data-i18n="tabSiteDesign" data-tab="sitedesign" id="tabBtnSiteDesign">Site Design</button>
+</div>
+<div id="adminTabProducts">
+<div class="field-grid-2">
+<div class="field">
+<label data-i18n="pCatLabel">Category</label>
+<select id="pCat">
+<option data-i18n="optChildren" value="children">Children</option>
+<option data-i18n="optMale" value="male">Men</option>
+<option data-i18n="optFemale" value="female">Women</option>
+<option data-i18n="optBusiness" value="business">Business</option>
+<option data-i18n="optCinematic" value="cinematic">Cinematic</option>
+<option data-i18n="optLuxury" value="luxury">Luxury</option>
+<option data-i18n="optArtistic" value="artistic">Artistic</option>
+<option data-i18n="optMagazine" value="magazine">Magazine / Poster</option>
+</select>
+</div>
+<div class="field">
+<label data-i18n="pPriceLabel">Price (EGP)</label>
+<input id="pPrice" min="0" placeholder="25" type="number" value="25"/>
+</div>
+</div>
+<div class="field-grid-2">
+<div class="field">
+<label data-i18n="pTitleLabel">Product Title</label>
+<input data-i18n-ph="pTitlePh" id="pTitle" placeholder="e.g. Cinematic Lighting Portrait" type="text"/>
+</div>
+<div class="field">
+<label data-i18n="pTitleEnLabel">Product Title (English) — optional, shown to customers when they switch to English</label>
+<input data-i18n-ph="pTitleEnPh" id="pTitleEn" placeholder="e.g. Cinematic Lighting Portrait" type="text"/>
+</div>
+</div>
+<div class="field" id="pShareLinkField" style="display:none;">
+<label data-i18n="pShareLinkLabel">Product link (for ads) — copy it into your platform post</label>
+<div style="display:flex; gap:8px; align-items:stretch;">
+<input id="pShareLink" onclick="this.select()" readonly="" style="flex:1; direction:ltr; text-align:left;" type="text"/>
+<button aria-label="نسخ الرابط" class="admin-icon-btn" id="pShareLinkCopy" title="نسخ الرابط" type="button">📋</button>
+</div>
+</div>
+<div class="field" id="pImageLinkField" style="display:none;">
+<label data-i18n="pImageLinkLabel">Original image link — to upload with your ad</label>
+<div style="display:flex; gap:8px; align-items:stretch;">
+<input id="pImageLink" onclick="this.select()" readonly="" style="flex:1; direction:ltr; text-align:left;" type="text"/>
+<button aria-label="نسخ رابط الصورة" class="admin-icon-btn" id="pImageLinkCopy" title="نسخ رابط الصورة" type="button">📋</button>
+</div>
+</div>
+<div class="field">
+<label data-i18n="pImageLabel">Product Image</label>
+<input accept="image/*" id="pImage" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="pPromptLabel">AI transformation instructions (admin only — never shown to the customer)</label>
+<textarea data-i18n-ph="pPromptPh" id="pPrompt" placeholder="Write the exact transformation instructions here..."></textarea>
+</div>
+<div id="editingBanner" style="display:none; background:rgba(227,164,41,0.14); border:1px solid var(--brass-dim); border-radius:8px; padding:10px 14px; font-size:13.5px; color:var(--brass); margin-bottom:12px;">
+<span data-i18n="editingBannerText">Edit mode: saving now will change this product — not add a new one.</span>
+</div>
+<input accept="image/*" id="adminQuickImageInput" style="display:none;" type="file"/>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="pSaveBtn" id="pSaveBtn">Add Product</button>
+<button class="btn-ghost" data-i18n="pCancelEditBtn" id="pCancelEditBtn" style="display:none;">Cancel edit / new product</button>
+</div>
+<div style="margin-top:20px; display:flex; justify-content:flex-end;">
+<button class="btn-ghost" data-i18n="downloadAllArchiveBtn" id="archiveAllBtn" onclick="downloadAllArchive()" type="button">⬇️ Download Full Archive</button>
+</div>
+<div id="adminProductsList" style="margin-top:12px;"></div>
+</div>
+<div id="adminTabOrders" style="display:none;">
+<div aria-expanded="false" class="order-stats-bar" id="orderStatsBar" role="button" tabindex="0">
+<div class="order-stat"><span class="order-stat-num" id="statTotal">0</span><span class="order-stat-label" data-i18n="statTotalLabel">Total Orders</span></div>
+<div class="order-stat"><span class="order-stat-num" id="statApproved">0</span><span class="order-stat-label" data-i18n="statApprovedLabel">Completed</span></div>
+<div class="order-stat"><span class="order-stat-num" id="statPending">0</span><span class="order-stat-label" data-i18n="statPendingLabel">Under Review</span></div>
+<div class="order-stat"><span class="order-stat-num" id="statRevenue">0</span><span class="order-stat-label" data-i18n="statRevenueLabel">Total Revenue Collected</span></div>
+<span aria-hidden="true" class="order-stats-chevron">▼</span>
+</div>
+<div id="orderStatsTable" style="display:none;"></div>
+<div style="display:flex; justify-content:flex-end; margin:10px 0;">
+<button class="btn-ghost" data-i18n="exportOrdersBtn" id="exportOrdersBtn" type="button">⬇️ Export All Orders (Excel)</button>
+</div>
+<div id="ordersList"></div>
+</div>
+<div id="adminTabReviews" style="display:none;">
+<div aria-expanded="false" class="order-stats-bar" id="reviewStatsBar" role="button" tabindex="0">
+<div class="order-stat"><span class="order-stat-num" id="reviewStatTotal">0</span><span class="order-stat-label" data-i18n="reviewStatTotalLabel">Total Reviews</span></div>
+<div class="order-stat"><span class="order-stat-num" id="reviewStatApproved">0</span><span class="order-stat-label" data-i18n="reviewStatApprovedLabel">Published</span></div>
+<div class="order-stat"><span class="order-stat-num" id="reviewStatPending">0</span><span class="order-stat-label" data-i18n="reviewStatPendingLabel">Under Review</span></div>
+<span aria-hidden="true" class="order-stats-chevron">▼</span>
+</div>
+<div id="reviewStatsTable" style="display:none;"></div>
+<div id="pendingReviewsList"></div>
+</div>
+<div id="adminTabVisitors" style="display:none;">
+<div aria-expanded="false" class="order-stats-bar" id="visitorStatsBar" role="button" tabindex="0">
+<div class="order-stat"><span class="order-stat-num" id="visitorsTotalStat">0</span><span class="order-stat-label" data-i18n="visitorsTotalLabel">Total Visits</span></div>
+<div class="order-stat"><span class="order-stat-num" id="visitorsTodayStat">0</span><span class="order-stat-label" data-i18n="visitorsTodayLabel">Today</span></div>
+<div class="order-stat"><span class="order-stat-num" id="visitorsUniqueTotalStat">0</span><span class="order-stat-label" data-i18n="visitorsUniqueTotalLabel">Unique Visitors</span></div>
+<div class="order-stat"><span class="order-stat-num" id="visitorsUniqueTodayStat">0</span><span class="order-stat-label" data-i18n="visitorsUniqueTodayLabel">Unique Today</span></div>
+<span aria-hidden="true" class="order-stats-chevron">▼</span>
+</div>
+<div id="visitorsLogList" style="display:none; max-height:360px; overflow-y:auto;"></div>
+</div>
+<div id="adminTabShowcase" style="display:none;">
+<p class="sub" data-i18n="scIntro" style="margin-bottom:14px;">Upload the original photo shown in the center of the homepage circle, and the 8 results that orbit around it.</p>
+<div class="field">
+<label data-i18n="scCenterLabel">Original Photo (Center)</label>
+<img id="scPreview-center" style="display:none; width:90px; height:90px; object-fit:cover; border-radius:50%; border:2px solid #3b8ef0; margin-bottom:8px;"/>
+<input accept="image/*" id="scInput-center" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="scItemLabel1">Result 1</label>
+<img id="scPreview-1" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;"/>
+<input accept="image/*" id="scInput-1" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="scItemLabel2">Result 2</label>
+<img id="scPreview-2" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;"/>
+<input accept="image/*" id="scInput-2" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="scItemLabel3">Result 3</label>
+<img id="scPreview-3" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;"/>
+<input accept="image/*" id="scInput-3" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="scItemLabel4">Result 4</label>
+<img id="scPreview-4" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;"/>
+<input accept="image/*" id="scInput-4" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="scItemLabel5">Result 5</label>
+<img id="scPreview-5" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;"/>
+<input accept="image/*" id="scInput-5" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="scItemLabel6">Result 6</label>
+<img id="scPreview-6" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;"/>
+<input accept="image/*" id="scInput-6" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="scItemLabel7">Result 7</label>
+<img id="scPreview-7" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;"/>
+<input accept="image/*" id="scInput-7" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="scItemLabel8">Result 8</label>
+<img id="scPreview-8" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:50%; border:2px solid var(--brass); margin-bottom:8px;"/>
+<input accept="image/*" id="scInput-8" type="file"/>
+</div>
+<div class="modal-actions" style="margin-top:14px;">
+<button class="btn-primary" data-i18n="scSaveBtn" id="scSaveBtn">Save Showcase Images</button>
+</div>
+</div>
+<div id="adminTabPromoImages" style="display:none;">
+<p class="sub" data-i18n="piIntro" style="margin-bottom:14px;">Upload up to 20 result images to replace the video with a rotating display using the same frame as the "See Miga-Photobook in action" section.</p>
+<div class="field">
+<label data-i18n="piItemLabel1">Image 1</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-1" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="1" id="piRemove-1" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-1" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel2">Image 2</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-2" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="2" id="piRemove-2" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-2" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel3">Image 3</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-3" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="3" id="piRemove-3" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-3" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel4">Image 4</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-4" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="4" id="piRemove-4" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-4" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel5">Image 5</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-5" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="5" id="piRemove-5" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-5" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel6">Image 6</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-6" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="6" id="piRemove-6" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-6" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel7">Image 7</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-7" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="7" id="piRemove-7" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-7" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel8">Image 8</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-8" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="8" id="piRemove-8" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-8" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel9">Image 9</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-9" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="9" id="piRemove-9" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-9" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel10">Image 10</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-10" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="10" id="piRemove-10" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-10" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel11">Image 11</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-11" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="11" id="piRemove-11" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-11" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel12">Image 12</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-12" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="12" id="piRemove-12" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-12" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel13">Image 13</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-13" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="13" id="piRemove-13" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-13" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel14">Image 14</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-14" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="14" id="piRemove-14" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-14" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel15">Image 15</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-15" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="15" id="piRemove-15" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-15" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel16">Image 16</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-16" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="16" id="piRemove-16" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-16" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel17">Image 17</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-17" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="17" id="piRemove-17" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-17" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel18">Image 18</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-18" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="18" id="piRemove-18" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-18" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel19">Image 19</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-19" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="19" id="piRemove-19" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-19" type="file"/>
+</div>
+<div class="field">
+<label data-i18n="piItemLabel20">Image 20</label>
+<span style="position:relative; display:inline-block;">
+<img id="piPreview-20" style="display:none; width:70px; height:70px; object-fit:cover; border-radius:10px; border:2px solid var(--brass); margin-bottom:8px;"/>
+<button class="pi-remove-btn" data-slot="20" id="piRemove-20" style="display:none; position:absolute; top:-6px; inset-inline-end:-6px; width:20px; height:20px; border-radius:50%; background:#e05252; color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.4);" title="حذف الصورة" type="button">×</button>
+</span>
+<input accept="image/*" id="piInput-20" type="file"/>
+</div>
+<div class="modal-actions" style="margin-top:14px;">
+<button class="btn-primary" data-i18n="piSaveBtn" id="piSaveBtn">Save Display Images</button>
+</div>
+</div>
+<div id="adminTabChangePassword" style="display:none;">
+<p class="sub" data-i18n="changePassIntro" style="margin-bottom:14px;">Change the password used to log in to the admin panel. You need to know the current one to change it.</p>
+<div class="field">
+<label data-i18n="currentPassLabel">Current password</label>
+<input autocomplete="off" id="currentAdminPass" placeholder="••••••••" type="password"/>
+</div>
+<div class="field-grid-2">
+<div class="field">
+<label data-i18n="newPassLabel">New password</label>
+<input autocomplete="off" id="newAdminPass" placeholder="••••••••" type="password"/>
+</div>
+<div class="field">
+<label data-i18n="confirmNewPassLabel">Confirm new password</label>
+<input autocomplete="off" id="confirmNewAdminPass" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="changePassBtn" id="changeAdminPassBtn">Change password</button>
+</div>
+</div>
+<div id="adminTabSiteDesign" style="display:none;">
+<p class="sub" data-i18n="siteDesignIntro" style="margin-bottom:14px;">Choose which look customers see when they open the site. The admin panel itself always stays the same regardless of your choice here.</p>
+<div class="admin-card">
+<div class="field">
+<label data-i18n="siteDesignLabel">Active design</label>
+<select id="siteDesignSelect"><!-- populated dynamically from /site-config so a future Design MIGA 3/4 appears automatically once added to the backend registry --></select>
+</div>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="siteDesignSaveBtn" id="saveSiteDesignBtn">Save choice</button>
+</div>
+</div>
+<div class="admin-card">
+<p class="sub" data-i18n="heroModeIntro" style="margin-bottom:14px;">For each design, choose the "before/after" showcase style on the homepage — the original orbiting circle, or the interactive drag slider. This choice is independent of Design 2's new fixed slider (that one always stays a slider regardless).</p>
+<div id="heroModeRows"><!-- populated dynamically, one row per design in the registry --></div>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="heroModeSaveBtn" id="saveHeroModesBtn">Save hero modes</button>
+</div>
+</div>
+<div class="admin-card">
+<h4 data-i18n="resolutionTitle" style="margin:0 0 8px;">Output image resolution</h4>
+<p class="sub" data-i18n="resolutionIntro" style="margin-bottom:14px;">Choose the resolution the AI generates. 4K is higher detail and costs more per image; 2K is cheaper and the difference is essentially invisible on a phone screen. Try both and compare.</p>
+<div class="field">
+<select id="outputResolutionSelect">
+<option data-i18n="resolution2K" value="2K">2K — cheaper (recommended)</option>
+<option data-i18n="resolution4K" value="4K">4K — highest detail (pricier)</option>
+</select>
+</div>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="resolutionSaveBtn" id="saveResolutionBtn">Save resolution</button>
+</div>
+</div>
+<div class="admin-card">
+<h4 data-i18n="aiModelTitle" style="margin:0 0 8px;">AI model</h4>
+<p class="sub" data-i18n="aiModelIntro" style="margin-bottom:14px;">Choose which image-generation model the site uses. Each model differs in price and result quality — try a test image with each before committing to it. Note: the resolution choice above has no effect on Flux 2 Pro (it always uses the best resolution automatically).</p>
+<div class="field">
+<select id="aiModelSelect"><!-- populated dynamically from /site-config so a future model just needs one entry added to the Worker's MODEL_REGISTRY to show up here --></select>
+</div>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="aiModelSaveBtn" id="saveAiModelBtn">Save model</button>
+</div>
+</div>
+<div class="admin-card">
+<h4 data-i18n="colorThemeTitle" style="margin:0 0 8px;">Header and image-background color</h4>
+<p class="sub" data-i18n="colorThemeIntro" style="margin-bottom:14px;">Choose the dark shade used for the header bar and the space behind product images. The rest of the site colors (gold, text) stay the same across every option.</p>
+<div class="field">
+<label data-i18n="colorThemeLabel">Header color</label>
+<select id="colorThemeSelect">
+<option data-i18n="colorThemeBlack" value="black">Black (current)</option>
+<option data-i18n="colorThemeBrown" value="brown">Warm coffee brown</option>
+<option data-i18n="colorThemeEmerald" value="emerald">Deep emerald green</option>
+<option data-i18n="colorThemeWine" value="wine">Deep wine</option>
+<option data-i18n="colorThemeNavy" value="navy">Royal navy</option>
+<option data-i18n="colorThemeRed" value="red">Deep red / rose</option>
+</select>
+</div>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="colorThemeSaveBtn" id="saveColorThemeBtn">Save color</button>
+</div>
+</div>
+<div class="admin-card">
+<h4 data-i18n="headerModeTitle" style="margin:0 0 8px;">Header layout</h4>
+<p class="sub" data-i18n="headerModeIntro" style="margin-bottom:14px;">"Current layout" shows every header button (language, dark mode, mobile/desktop preview, track order) in an always-visible strip. "Collapsed menu" moves them into a (☰) menu that opens on tap, which shortens the header.</p>
+<div class="field">
+<label data-i18n="headerModeLabel">Header layout</label>
+<select id="headerModeSelect">
+<option data-i18n="headerModeClassicOption" value="classic">Current layout</option>
+<option data-i18n="headerModeCompactOption" value="compact">Collapsed menu (☰)</option>
+</select>
+</div>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="headerModeSaveBtn" id="saveHeaderModeBtn">Save header layout</button>
+</div>
+</div>
+<div class="admin-card">
+<h4 data-i18n="promptLibraryModeTitle" style="margin:0 0 8px;">Prompt Library for Professionals mode</h4>
+<p class="sub" data-i18n="promptLibraryModeIntro" style="margin-bottom:14px;">"Current mode" leaves the empty "Luxury" category as-is. "New mode" turns that same slot into a prompt library that automatically gathers every product from every category to sell its prompt alone, and removes the "buy the prompt alone" line from other category cards (it stays visible here only). You can switch back at any time with no data loss.</p>
+<div class="field">
+<label data-i18n="promptLibraryModeLabel">Mode</label>
+<select id="promptLibraryModeSelect">
+<option data-i18n="promptLibraryModeOffOption" value="off">Current mode (Luxury — empty category)</option>
+<option data-i18n="promptLibraryModeOnOption" value="on">New mode (Prompt Library for Professionals)</option>
+</select>
+</div>
+<div class="modal-actions">
+<button class="btn-primary" data-i18n="promptLibraryModeSaveBtn" id="savePromptLibraryModeBtn">Save mode</button>
+</div>
+</div>
+</div>
+<div class="modal-actions" style="margin-top:14px;">
+<button class="btn-ghost" data-i18n="adminLogoutBtn" id="adminLogoutBtn">Logout</button>
+</div>
+</div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="/app.js?v=20260909p"></script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('/service-worker.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>
