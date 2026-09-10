@@ -806,6 +806,56 @@
   .crop-zoom-row{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
   .crop-zoom-row input[type="range"]{flex:1; accent-color:var(--brass);}
 
+  /* ═══ صفحة «من نحن» ═══ */
+  .about-wrap{ max-width:720px; display:flex; flex-direction:column; gap:18px; }
+  .about-lead{
+    font-size:16.5px; font-weight:700; color:var(--paper); line-height:1.8;
+  }
+  .about-para{ font-size:15px; color:var(--paper-dim); line-height:1.9; }
+  .about-block{
+    border:1px solid var(--line); border-radius:14px; padding:16px 18px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0));
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .about-h{
+    font-size:15.5px; font-weight:700; color:var(--brass); letter-spacing:0.2px;
+  }
+  .about-list{ list-style:none; display:flex; flex-direction:column; gap:7px; }
+  .about-list li{
+    font-size:14.5px; color:var(--paper-dim); line-height:1.75;
+    padding-inline-start:20px; position:relative;
+  }
+  /* النقطة بـ::before مش list-style عشان تفضل في الجهة الصح مع تبديل اللغة */
+  .about-list li::before{
+    content:"•"; position:absolute; inset-inline-start:2px; color:var(--brass);
+  }
+  .about-list-check li::before{ content:"✅"; font-size:12px; inset-inline-start:0; }
+  .about-founder{ font-size:16px; font-weight:700; color:var(--paper); }
+  .about-contact{ list-style:none; display:flex; flex-direction:column; gap:9px; }
+  .about-contact li{ display:flex; align-items:center; gap:9px; font-size:14.5px; }
+  .about-contact a{ color:var(--brass); text-decoration:none; word-break:break-all; }
+  .about-contact a:hover{ text-decoration:underline; }
+  .about-sign{
+    display:flex; flex-direction:column; align-items:center; gap:12px;
+    padding:22px 16px; margin-top:4px;
+    border-top:1px solid var(--line); text-align:center;
+  }
+  .about-sign img{ width:140px; height:140px; max-width:45vw; }
+  .about-sign figcaption{
+    font-size:15px; font-weight:700; color:var(--paper);
+    line-height:1.85; max-width:520px;
+    /* الزرارين العائمين (تواصل مع ميجا · الرئيسية) مثبّتين على حافتي
+       الشاشة، فأي كلام بيوصل للحافة بيتغطّى منهم عند وضع سكرول معيّن.
+       الحشو الجانبي ده بيخلي الجملة تفضل بين الزرارين مهما كان السكرول. */
+    padding-inline:74px;
+  }
+  @media(min-width:760px){ .about-sign figcaption{ padding-inline:0; } }
+  @media(max-width:520px){
+    .about-lead{ font-size:15.5px; }
+    .about-block{ padding:14px 15px; }
+    .about-sign img{ width:110px; height:110px; }
+  }
+
   .popularity-badge{
     display:inline-flex; align-items:center; gap:4px; align-self:center;
     background:rgba(255,201,77,0.14); color:var(--brass); font-weight:700; font-size:13px;
