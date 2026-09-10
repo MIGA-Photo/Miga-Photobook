@@ -1350,6 +1350,28 @@ function closeLightbox(){
 // demo products into the SHARED backend from any ordinary visitor's page load,
 // overwriting the real catalog. Only explicit admin actions (upsertProductRemote /
 // deleteProductRemote, both password-protected) are allowed to write products now.
+/** بتخلّي السعر في البيانات المنظّمة = **أرخص منتج فعلي** موجود دلوقتي.
+ *
+ *  كان مكتوب "25" بالإيد في index.html. لو السعر اتغيّر من لوحة التحكم،
+ *  جوجل كان هيفضل يعرض 25 جنيه في نتيجة البحث والعميل يدوس ويلاقي رقم
+ *  تاني — نفس فخ التقييم بالظبط، وجوجل بيعاقب على السعر المضلّل زي ما
+ *  بيعاقب على التقييم المضلّل.
+ *
+ *  ليه أرخص سعر؟ لأن الوسم بيقول "price" لمنتج واحد، والموقع فيه أسعار
+ *  مختلفة. أقل سعر هو الادعاء الوحيد اللي بيفضل صادق مهما كان اللي
+ *  الزائر هيختاره. */
+function syncProductPriceLd(){
+  const el = document.getElementById('productLd');
+  if(!el || !Array.isArray(products) || !products.length) return;
+  const prices = products.map(p=>Number(p.price)).filter(n=>Number.isFinite(n) && n > 0);
+  if(!prices.length) return;
+  try{
+    const ld = JSON.parse(el.textContent);
+    if(ld.offers) ld.offers.price = String(Math.min(...prices));
+    el.textContent = JSON.stringify(ld);
+  }catch(e){ /* الاحتياطي اللي في الملف بيفضل زي ما هو */ }
+}
+
 async function loadProducts(){
   if(!BACKEND_BASE){ products = seedProducts(); return; }
   try{
@@ -1363,6 +1385,9 @@ async function loadProducts(){
   }catch(e){
     products = [];
   }
+  // بعد ما المنتجات توصل مباشرةً — قبل أي رسم. لو الشبكة فشلت،
+  // products بتبقى فاضية والدالة بتعمل return والاحتياطي بيفضل.
+  syncProductPriceLd();
 }
 
 /** Whether the 'luxury' slot is running as the derived "Prompt Library for
