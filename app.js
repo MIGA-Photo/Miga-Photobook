@@ -2377,7 +2377,14 @@ function handleCatTilesClick(e){
   sec.classList.toggle('open', willOpen);
   tile.classList.toggle('open', willOpen);
   tile.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-  if(willOpen) sec.scrollIntoView({behavior:'smooth', block:'start'});
+  // كان scrollIntoView مباشر على القسم. والقسم مالوش scroll-margin-top —
+  // (الـ300px اللي في الـCSS متحطّة على .card و.grid، مش على القسم) — فالمتصفح
+  // كان بيحاذي أعلى القسم مع أعلى **الشاشة**، يعني تحت الهيدر اللاصق مباشرة،
+  // فيتدفن منه 95 بكسل. ده كان مسار مختلف تمامًا عن باقي مداخل الأقسام،
+  // وعشان كده كل إصلاح اتعمل في scrollToSectionBelowHeader مكانش بيوصله.
+  // دلوقتي بيمشي في نفس المساعد زي أي مدخل تاني، وهو بينتهي بتصحيح مقيس
+  // بعد الاستقرار (settleUnderHeader).
+  if(willOpen) scrollToSectionBelowHeader(firstCardOrSelf(sec));
 }
 
 // The same two handlers serve BOTH places a category tile can appear — the
@@ -3738,8 +3745,47 @@ function scrollToSectionBelowHeader(el){
     const ease = t*t*(3-2*t);
     window.scrollTo({ top: startTop + delta*ease, behavior:'instant' });
     if(t < 1) requestAnimationFrame(step);
+    // الحساب فوق تنبّؤ، والأرضية بتتحرك تحته أثناء الـ380 مللي ثانية.
+    // فبعد ما يستقر بنقيس الواقع ونصحّح — التفاصيل في settleUnderHeader.
+    else settleUnderHeader(el);
   }
   requestAnimationFrame(step);
+}
+
+/* المسافة المطلوبة بين نهاية الهيدر اللاصق وأعلى العنصر — نفس الـ12 اللي
+   الحساب التقريبي فوق بيستخدمها، عشان النتيجة تبقى واحدة. */
+const HEADER_CLEARANCE = 12;
+let _settleExpectedY = null;
+
+/** يقيس ويصحّح بدل ما يتوقّع.
+ *
+ *  كل محاولة قبل كده كانت بتحاول تتوقّع ارتفاع الهيدر النهائي قبل ما الحركة
+ *  تبدأ — وكل مرة كان فيه حاجة بتتحرك بعد الحساب (الهيدر بيطوي، القسم بيتمدد،
+ *  صورة بتتحمّل) فالكارت بيستقر تحت الهيدر. القياس كان: 95 بكسل من الصورة
+ *  مدفونة، يعني 23% منها.
+ *
+ *  الدالة دي بتشتغل **بعد** ما كل ده يخلص: بتقرا نهاية الهيدر الحقيقية وأعلى
+ *  الكارت الحقيقي، وبتزحزح بالفرق. مافيش رهان على توقيت — لو حاجة اتحركت
+ *  متأخر، النبضة اللي بعدها بتمسكها.
+ *
+ *  الحارس: لو المستخدم حرّك الصفحة بنفسه بين نبضتين، بنسيبها فورًا — تصحيح
+ *  بيتخانق مع صباع المستخدم أسوأ من الغلط الأصلي. */
+function settleUnderHeader(el, tries){
+  tries = tries || 0;
+  if(!el || !stickyTopGroup || tries > 5) return;
+  if(_settleExpectedY !== null && Math.abs(window.scrollY - _settleExpectedY) > 2){
+    _settleExpectedY = null;
+    return; // المستخدم حرّك بنفسه
+  }
+  const g = stickyTopGroup.getBoundingClientRect();
+  const r = el.getBoundingClientRect();
+  const off = Math.round(r.top - g.bottom - HEADER_CLEARANCE);
+  if(Math.abs(off) > 1) window.scrollBy({ top: off, behavior:'instant' });
+  _settleExpectedY = Math.round(window.scrollY);
+  const next = tries + 1;
+  // نبضتين على الفريم (للطي والتمدد الفوري)، وبعدها على مهل (لأي تمدد متأخر).
+  if(next <= 2) requestAnimationFrame(()=> settleUnderHeader(el, next));
+  else setTimeout(()=> settleUnderHeader(el, next), 130);
 }
 const HEADER_COLLAPSE_THRESHOLD = 72;
 let lastHeaderScrollY = window.scrollY || 0;
