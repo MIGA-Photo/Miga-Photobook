@@ -2650,8 +2650,13 @@
      صغير. النقط دي تحكّم ثانوي أصلاً (السحب بالإصبع بيعمل نفس الحاجة). */
   /* .search-icon-btn مستثناة كمان: عليها pointer-events:none — دي أيقونة
      زينة جوه خانة البحث مش زرار، والدوسة عليها بتروّح للخانة وده الصح. */
-  .slider-nav, .close-x, .stay-nudge-close,
-  .fav-btn, .ct-cycle, .slider-handle, .cat-fav-btn{
+  /* ⚠ .fav-btn و.ct-cycle و.stay-nudge-close **مش** في القايمة دي عن قصد:
+     الاتنين دول position:absolute أصلاً، وأي عنصر مثبّت مطلقًا هو نفسه مرجع
+     صالح لطبقة اللمس بتاعته — مش محتاج relative. لما كانوا هنا، القاعدة دي
+     (نفس أولوية قاعدتهم الأصلية، وبعدها في الملف) كانت بتغلب وتشيل تثبيتهم،
+     فالقلب كان بيقع في مجرى الصفحة ويتقص بـoverflow:hidden بتاع الصورة.
+     أي عنصر يتضاف هنا مستقبلاً: اتأكد الأول إنه static. */
+  .slider-nav, .close-x, .slider-handle, .cat-fav-btn{
     position:relative;
   }
   .slider-nav::after, .close-x::after,
