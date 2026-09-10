@@ -5243,6 +5243,34 @@ async function checkBiometricAvailability(){
  * ناجح — مش رقم مكتوب بالإيد. يعني اللي بيتنشر حقيقي دايمًا. */
 const TRANSFORM_BADGE_MIN = 1000;
 
+/** بتخلّي التقييم في البيانات المنظّمة مطابق **بالظبط** للي الزائر شايفه.
+ *
+ *  كان مكتوب بالإيد في index.html وبيبعد عن الحقيقة مع كل مراجعة جديدة.
+ *  دلوقتي بييجي من نفس الاستجابة اللي بتملا البادج المعروض — نفس المصدر،
+ *  فمفيش فرصة يختلفوا.
+ *
+ *  ولو مفيش مراجعات، التقييم بيتشال من البيانات المنظّمة خالص. تقييم
+ *  متسجّل لجوجل ومش معروض للزائر هو بالظبط اللي بيجيب العقوبة. */
+function syncProductRatingLd(avg, count){
+  const el = document.getElementById('productLd');
+  if(!el) return;
+  try{
+    const ld = JSON.parse(el.textContent);
+    if(count > 0 && avg > 0){
+      ld.aggregateRating = {
+        '@type': 'AggregateRating',
+        // String(avg) مش toFixed — عشان يطابق حرفيًا اللي معروض في البادج.
+        'ratingValue': String(avg),
+        'bestRating': '5',
+        'reviewCount': String(count)
+      };
+    }else{
+      delete ld.aggregateRating;
+    }
+    el.textContent = JSON.stringify(ld);
+  }catch(e){ /* الاحتياطي اللي في الملف بيفضل زي ما هو */ }
+}
+
 let visitorCounterTimer = null;
 async function loadVisitorCount(){
   if(!BACKEND_BASE) return;
@@ -5272,6 +5300,10 @@ async function loadVisitorCount(){
     // ٢) التقييم — يظهر بتقييم واحد معتمد على الأقل
     const rc = typeof data.reviewCount === 'number' ? data.reviewCount : 0;
     const ra = typeof data.reviewAvg === 'number' ? data.reviewAvg : 0;
+    // ⚠ برّه الشرط اللي تحت عن قصد: لو التقييم بقى صفر، البادج بيتخفي
+    // **ولازم** التقييم يتشال من البيانات المنظّمة كمان. لو النداء كان
+    // جوّه الشرط، كان هيفضل رقم قديم متسجّل لجوجل ومش معروض لحد.
+    syncProductRatingLd(ra, rc);
     if(rc > 0 && ra > 0){
       const avgEl = document.getElementById('ratingAvg');
       const cntEl = document.getElementById('ratingCount');
