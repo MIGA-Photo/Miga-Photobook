@@ -87,26 +87,35 @@
      field via the bootstrap script in index.html's <head>. */
   :root{
     --header-bg: rgba(12,12,16,0.94);
+    /* نسخة معتمة تمامًا من نفس اللون. الهيدر بيستخدم الشفاف عشان العلامة
+       المائية تبان من وراه؛ الدرج الجانبي لأ — الدرج بيقفل على الصفحة،
+       وأي شفافية بتخلي الشريط الإعلاني يطلع من خلاله ويشتبك مع الكلام. */
+    --panel-bg: #0c0c10;
     --media-bg: #150c26;
   }
   html[data-accent="brown"]{
     --header-bg:#2b1d14;
+    --panel-bg:#2b1d14;
     --media-bg:#241a12;
   }
   html[data-accent="emerald"]{
     --header-bg:#10241d;
+    --panel-bg:#10241d;
     --media-bg:#122e22;
   }
   html[data-accent="wine"]{
     --header-bg:#2a1018;
+    --panel-bg:#2a1018;
     --media-bg:#2f121a;
   }
   html[data-accent="navy"]{
     --header-bg:#10182b;
+    --panel-bg:#10182b;
     --media-bg:#121c33;
   }
   html[data-accent="red"]{
     --header-bg:#33121a;
+    --panel-bg:#33121a;
     --media-bg:#3a151f;
   }
   /* ===== Living background watermark ===== */
@@ -420,7 +429,7 @@
   .side-drawer-backdrop.open{ opacity:1; visibility:visible; }
   .side-drawer{
     position:fixed; top:0; bottom:0; inset-inline-end:0; width:300px; max-width:86vw;
-    background:var(--header-bg); border-inline-start:1px solid var(--line); z-index:99;
+    background:var(--panel-bg); border-inline-start:1px solid var(--line); z-index:99;
     transform:translateX(100%); transition:transform .26s ease;
     display:flex; flex-direction:column; overflow-y:auto; overflow-x:hidden;
   }
@@ -432,8 +441,15 @@
     padding:16px 18px; border-bottom:1px solid var(--line); font-weight:700; color:var(--paper);
   }
   .side-drawer-head .close-x{ background:transparent; border:none; color:var(--paper); font-size:22px; line-height:1; padding:4px 8px; }
-  .side-drawer-logo{ display:flex; align-items:center; gap:8px; font-weight:700; font-size:16px; color:var(--paper); }
+  /* الاسم بمقاس الهيدر عرضه 275 بكسل، والمتاح في رأس الدرج 226 — الزيادة
+     كانت بتدفع زرار (×) بره الدرج بالكامل وتلزّق الاسم الإنجليزي في الحافة.
+     المقاسات دي للدرج بس؛ الهيدر ما اتغيرش. */
+  .side-drawer-logo{
+    display:flex; align-items:center; gap:5px; font-weight:700; font-size:16px;
+    color:var(--paper); min-width:0; overflow:hidden;
+  }
   .side-drawer-logo .logo-accent{ color:var(--brass); }
+  .side-drawer-head .close-x{ flex-shrink:0; }
   .side-drawer-footer{
     margin-top:auto; display:flex; align-items:center; justify-content:center; gap:8px;
     padding:16px 18px; border-top:1px solid var(--line); color:var(--paper-dim);
@@ -533,25 +549,51 @@
     /* 7.5s بدل 4.6s — الموجة كانت سريعة، دلوقتي بتعدّي مرة كل ٧ ثواني ونص */
     animation:logoSheen 7.5s ease-in-out infinite;
   }
-  /* الاسم في نص الصف الأول بالظبط.
-     المحاولة الأولى ثبّتته مطلقًا جوه .nav-wrap — والغلط إن .nav-wrap فيه
-     **صفين** (صف الاسم وصف البحث)، فالتوسيط الرأسي حطّه في نص الاتنين مع
-     بعض وركب على صف البحث. الحل إن الصف الأول يبقى ليه غلاف خاص بيه،
-     والتوسيط يبقى بالنسبة له هو. */
+  /* الاسم في نص الصف الأول بالظبط — بتلات خانات، مش بتثبيت مطلق.
+
+     التثبيت المطلق كان بيشيل الاسم من ترتيب الصف: مش بيزق حاجة ولا حاجة
+     بتزقه. النتيجة إن أي زرار يكبر جنبه بيركب عليه في صمت — حصل ٣ مرات
+     (زرار الأدمن على الموبايل، وزرار «تسجيل الدخول» على الديسك توب بتداخل
+     94 بكسل، والاسم في الدرج). دلوقتي الجنبين بياخدوا نفس العرض بالظبط
+     (flex:1 1 0) فالاسم بيقع في النص رياضيًا وهو جوه الترتيب — الزراير
+     بتزقه بدل ما تركب عليه. */
   .nav-top{
     position:relative; width:100%;
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    display:flex; align-items:center; gap:10px;
   }
-  .nav-top > .logo{
-    position:absolute; left:50%; top:50%;
-    transform:translate(-50%, -50%);
-    margin:0; pointer-events:none;
+  .nav-side{
+    flex:1 1 0; min-width:0;
+    display:flex; align-items:center; gap:8px;
   }
+  .nav-side-end{ justify-content:flex-end; }
+  .nav-top > .logo{ flex:0 0 auto; margin:0; }
   .logo .lg-en, .side-drawer-logo .lg-en{
     font-size:18px; font-weight:700; letter-spacing:0.2px; white-space:nowrap;
   }
   .logo .lg-ar, .side-drawer-logo .lg-ar{
     font-size:16px; font-weight:700; letter-spacing:0.3px; white-space:nowrap;
+  }
+  /* رأس الدرج عرضه المتاح 226 بكسل بس (300 ناقص الحشو وزرار الإغلاق).
+     بمقاس الهيدر المحتوى بياخد 264 — الزيادة كانت بتضغط الأولاد فيطلع
+     الكلام بره صناديقه ويتراكب. flex-shrink:0 بيمنع الضغط، والمقاسات دي
+     بتخلّي المحتوى 213 بكسل فيقعد جوه براحته. */
+  .side-drawer-logo > *{ flex-shrink:0; }
+  .side-drawer-logo .lg-en{ font-size:14px; }
+  .side-drawer-logo .lg-ar{ font-size:12.5px; }
+  .side-drawer-logo .logo-mark{ width:22px; height:22px; }
+
+  /* بقى جوه ترتيب الصف، فلازم يسع جنب الزراير على الشاشة الصغيرة بدل ما
+     يزحف. المقاسات دي مقيسة: عند 360 بكسل الصف كله بيقعد جوه من غير زحف. */
+  @media(max-width:560px){
+    .logo{ gap:6px; }
+    .logo .lg-en{ font-size:14px; }
+    .logo .lg-ar{ font-size:12.5px; }
+    .logo .logo-mark{ width:26px; height:26px; }
+  }
+  @media(max-width:380px){
+    .logo .lg-en{ font-size:12.5px; }
+    .logo .lg-ar{ font-size:11.5px; }
+    .logo .logo-mark{ width:22px; height:22px; }
   }
   /* Readex Pro أقصى وزن فيه 700 وإحنا واصلينه. الزيادة في السُمك بحد رفيع
      حوالين الحروف بنفس لون التدرّج — أنضف من إن المتصفح يصنع وزن مزيّف. */
@@ -576,6 +618,19 @@
        أصلًا جوه الزرار، فبنخفي الكلمة بس. */
     #accountOpenBtn{ width:44px; height:44px; padding:0; justify-content:center; gap:0; }
     #accountOpenBtn > span:not(.icon-badge){ display:none; }
+  }
+  /* المعاينة جوه إطار الموبايل عرضها 378 بكسل مهما كان عرض المتصفح، لكن
+     استعلامات الميديا فوق بتقيس عرض **المتصفح**. فعلى شاشة عريضة الزرار
+     كان بياخد شكله الكامل بالكلام (143 بكسل) جوه خانة عرضها 38 — فيطلع
+     بره خانته ويدفن الاسم العربي تحته. القاعدة دي بتدّي جوه الإطار نفس
+     الشكل المضغوط، وبس على الشاشات العريضة عشان التليفون الحقيقي ما يتأثرش. */
+  @media(min-width:521px){
+    body.view-mode-mobile #accountOpenBtn{ width:44px; height:44px; padding:0; justify-content:center; gap:0; }
+    body.view-mode-mobile #accountOpenBtn > span:not(.icon-badge){ display:none; }
+    body.view-mode-mobile .logo{ gap:8px; }
+    body.view-mode-mobile .logo .lg-en{ font-size:16px; }
+    body.view-mode-mobile .logo .lg-ar{ font-size:14.5px; }
+    body.view-mode-mobile .logo .logo-mark{ width:26px; height:26px; }
   }
   .logo-accent{color:var(--brass);}
   nav.cats{display:flex; gap:6px; flex-wrap:wrap;}

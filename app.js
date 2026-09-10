@@ -4174,45 +4174,23 @@ elById('catNav').addEventListener('click', (e)=>{
   else{ scrollToSectionBelowHeader(firstCardOrSelf(openCatSection(cat))); }
 });
 
-// ---------- Admin quick-access bell (top of page, before categories) ----------
-// Only ever shown once adminLoggedIn is true (see admin login/logout handlers
-// below) — customers who never authenticate never see this at all, same as
-// the old hidden "لوحة الإدارة" button.
-const adminQuickAccess = document.getElementById('adminQuickAccess');
-const adminBellBtn = document.getElementById('adminBellBtn');
+// ---------- Admin entry point: the floating gear button -----------------
+// كان فيه زرار «لوحة التحكم» في الهيدر بجرس وقايمة منسدلة. اتشال لأنه كان
+// راكب على اسم الموقع، وبقى المدخل الوحيد هو الأيقونة العائمة #adminFab.
+// الأيقونة دي مايشوفهاش غير اللي عامل تسجيل دخول أدمن — الزائر العادي عمره
+// ما يشوفها، زي ما كان الزرار القديم بالظبط.
 let adminBellPollTimer = null;
 
-function closeAdminQuickMenu(){
-  adminQuickAccess.classList.remove('open');
-  adminBellBtn.setAttribute('aria-expanded', 'false');
+/** القاعدة الوحيدة لظهور الأيقونة: ظاهرة لو إنت داخل واللوحة مقفولة.
+ *  لو اللوحة مفتوحة مافيش داعي لها، ولو إنت خارج مايبقاش فيه مدخل أصلاً.
+ *  كل مسار بيفتح أو بيقفل اللوحة بيعدّي من هنا، عشان ما يحصلش إن اللوحة
+ *  تتقفل والأيقونة تكون مخفية فما يبقاش فيه طريقة ترجع تفتحها. */
+function updateAdminFabVisibility(){
+  const fab = document.getElementById('adminFab');
+  if(!fab) return;
+  const modalOpen = document.getElementById('adminModalBg').classList.contains('show');
+  fab.classList.toggle('show', !!adminLoggedIn && !modalOpen);
 }
-adminBellBtn.addEventListener('click', (e)=>{
-  e.stopPropagation();
-  const willOpen = !adminQuickAccess.classList.contains('open');
-  adminQuickAccess.classList.toggle('open', willOpen);
-  adminBellBtn.setAttribute('aria-expanded', String(willOpen));
-});
-document.addEventListener('click', (e)=>{
-  if(!adminQuickAccess.contains(e.target)) closeAdminQuickMenu();
-});
-
-elById('adminQuickMenu').addEventListener('click', (e)=>{
-  const btn = e.target.closest('button[data-admin-tab]');
-  if(!btn) return;
-  closeAdminQuickMenu();
-  const tab = btn.dataset.adminTab;
-  adminModalBg.classList.add('show');
-  document.getElementById('adminLoginView').style.display = 'none';
-  document.getElementById('adminFormView').style.display = 'block';
-  setAdminTab(tab);
-  if(tab === 'orders'){ loadOrders().then(renderOrdersList); }
-  if(tab === 'showcase'){ loadShowcaseIntoAdmin(); }
-  if(tab === 'promoimages'){ loadPromoImagesIntoAdmin(); }
-});
-elById('adminQuickLogout').addEventListener('click', ()=>{
-  closeAdminQuickMenu();
-  document.getElementById('adminLogoutBtn').click();
-});
 
 /** Refreshes just the pending-orders count for the bell badge, independent of
  * whether the orders tab (or the admin modal at all) is currently open. */
@@ -4290,11 +4268,9 @@ async function refreshAdminBellBadge(){
     const list = (data && data.value) ? JSON.parse(data.value) : [];
     const pending = list.filter(o=>o.status==='pending').length;
     announceNewOrders(pending);
-    const badge = document.getElementById('adminBellBadge');
-    const menuLabel = document.getElementById('adminQuickPendingLabel');
-    badge.style.display = pending ? '' : 'none';
-    badge.textContent = pending > 99 ? '99+' : String(pending);
-    menuLabel.textContent = pending ? `(${pending})` : '';
+    // الشارة بقت على الأيقونة العائمة بدل جرس الهيدر. دي هي نفس النبضة
+    // الحية كل ١٠ ثواني — مش لقطة بتتاخد وقت الطي زي ما كانت شارة الأيقونة.
+    setAdminFabBadge(pending);
     // If the orders tab happens to be open, keep its stats/table live too —
     // same 30s cadence, no extra timer needed.
     if(document.getElementById('adminTabOrders').style.display !== 'none'){
@@ -4312,25 +4288,31 @@ async function refreshAdminBellBadge(){
  * lands back on exactly the same tab with the same half-filled form. */
 function collapseAdminPanel(){
   document.getElementById('adminModalBg').classList.remove('show');
-  document.getElementById('adminFab').classList.add('show');
+  updateAdminFabVisibility();
 }
 
 function expandAdminPanel(){
   document.getElementById('adminModalBg').classList.add('show');
-  document.getElementById('adminFab').classList.remove('show');
+  updateAdminFabVisibility();
 }
 
-function syncAdminFabBadge(){
+/** الجهة الوحيدة اللي بتكتب في شارة الأيقونة العائمة. قبل كده كانت الشارة
+ *  بتتقرا من نص مكتوب على الشاشة (pendingCount) — رقم بيتأخر عن الحقيقة. */
+function setAdminFabBadge(pending){
   const badge = document.getElementById('adminFabBadge');
   if(!badge) return;
-  const text = (document.getElementById('pendingCount')?.innerText || '').replace(/[()]/g,'').trim();
-  badge.textContent = text;
-  badge.classList.toggle('show', !!text);
+  const n = Number(pending) || 0;
+  badge.textContent = n > 99 ? '99+' : String(n);
+  badge.classList.toggle('show', n > 0);
+}
+function syncAdminFabBadge(){
+  setAdminFabBadge(Array.isArray(orders) ? orders.filter(o=>o.status==='pending').length : 0);
 }
 
 elById('adminCollapseBtn').onclick = ()=>{
   collapseAdminPanel();
-  syncAdminFabBadge();
+  // كمان بتسأل السيرفر على طول بدل ما تستنى النبضة الجاية.
+  refreshAdminBellBadge();
 };
 
 // ---- Draggable admin FAB ----------------------------------------------
@@ -4535,7 +4517,7 @@ elById('adminCollapseBtn').onclick = ()=>{
       suppressGhostClick(startTarget);
       if(Math.abs(dx) > SWIPE_THRESHOLD){
         collapseAdminPanel();
-        syncAdminFabBadge();
+        refreshAdminBellBadge();
       }
     }
     horizontal = false;
@@ -4552,7 +4534,7 @@ elById('pImageLinkCopy').onclick = ()=>
   copyToClipboard(document.getElementById('pImageLink').value, 'toastImageLinkCopied');
 
 function showAdminQuickAccess(){
-  adminQuickAccess.style.display = '';
+  updateAdminFabVisibility();
   refreshAdminBellBadge();
   if(adminBellPollTimer) clearInterval(adminBellPollTimer);
   adminBellPollTimer = setInterval(refreshAdminBellBadge, 10000);
@@ -4560,8 +4542,9 @@ function showAdminQuickAccess(){
 function hideAdminQuickAccess(){
   lastSeenPendingCount = null;
   document.title = document.title.replace(/^\(\d+\)\s*/, '');
-  adminQuickAccess.style.display = 'none';
-  closeAdminQuickMenu();
+  const badge = document.getElementById('adminFabBadge');
+  if(badge){ badge.textContent = ''; badge.classList.remove('show'); }
+  updateAdminFabVisibility();
   if(adminBellPollTimer){ clearInterval(adminBellPollTimer); adminBellPollTimer = null; }
 }
 
@@ -6443,7 +6426,10 @@ function sendPromptViaWhatsApp(code){
 }
 elById('adminModalClose').onclick = ()=>{
   adminModalBg.classList.remove('show');
-  document.getElementById('adminFab').classList.remove('show');
+  // كان بيخفي الأيقونة العائمة كمان. ده كان مقبول وقت ما كان فيه زرار في
+  // الهيدر يرجّعك؛ دلوقتي الأيقونة هي المدخل الوحيد، فلازم تفضل ظاهرة
+  // طول ما إنت داخل — وإلا (×) بتقفل الباب وراك.
+  updateAdminFabVisibility();
   editingProductId = null;
   resetEditUI();
 };
@@ -6555,7 +6541,7 @@ elById('adminLogoutBtn').onclick = async ()=>{
   adminModalBg.classList.remove('show');
   editingProductId = null;
   resetEditUI();
-  document.getElementById('adminFab').classList.remove('show');
+  updateAdminFabVisibility();
   try{ localStorage.removeItem('megaPromptAdminToken'); }catch(e){}
   // Best-effort server-side revoke — the browser logs out locally either way,
   // but this also invalidates the token so it can't be reused if it ever leaked.
