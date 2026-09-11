@@ -1039,6 +1039,7 @@
   .why-item{
     background:var(--ink-2); border:1px solid var(--line); border-radius:10px;
     padding:16px; font-size:14.5px; color:var(--paper); display:flex; align-items:center; gap:8px;
+    box-shadow:var(--elev-1);
   }
 
   .how-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:18px;}
@@ -1178,6 +1179,7 @@
   .trust-badges{
     display:flex; flex-wrap:wrap; gap:14px; justify-content:center;
     background:var(--ink-2); border:1px solid var(--line); border-radius:14px; padding:24px;
+    box-shadow:var(--elev-1);
   }
   .trust-badge{
     display:flex; align-items:center; gap:8px; font-size:var(--text-base); color:var(--paper);
