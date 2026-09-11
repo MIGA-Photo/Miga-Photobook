@@ -253,7 +253,7 @@
      old URL. Bumping this string (e.g. 20260906a -> 20260906b) any time
      app.js or styles.css changes forces every visitor to fetch the new file
      immediately, no manual cache-clearing needed on their end. -->
-<link href="/styles.css?v=20260911d" rel="stylesheet"/>
+<link href="/styles.css?v=20260911e" rel="stylesheet"/>
 <!-- Google Analytics 4 -->
 <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
 <script>
@@ -560,6 +560,8 @@
     display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:700;
     box-shadow:0 6px 18px rgba(0,0,0,0.5); cursor:ew-resize; border:none;
   }
+  .slider-handle:hover{ box-shadow:0 6px 18px rgba(0,0,0,0.5), var(--glow-brass); }
+  .slider-handle:focus-visible{ outline:2px solid var(--brass); outline-offset:2px; }
   .slider-card .tag{ position:absolute; top:14px; font-size:12.5px; font-weight:700; padding:5px 12px; border-radius:999px; background:rgba(11,11,13,0.72); backdrop-filter:blur(4px); border:1px solid var(--line); }
   .slider-card .tag-before{ left:14px; } .slider-card .tag-after{ right:14px; color:var(--brass); }
   .slider-nav{
@@ -570,6 +572,7 @@
     flex-shrink:0;
   }
   .slider-nav:hover{ background:var(--brass); color:var(--ink); border-color:var(--brass); }
+  .slider-nav:focus-visible{ outline:2px solid var(--brass); outline-offset:2px; }
   .slider-controls-row{ display:flex; align-items:center; justify-content:center; gap:14px; margin-top:12px; }
   .slider-dots{ display:flex; justify-content:center; gap:8px; }
   .slider-dot{ width:8px; height:8px; border-radius:50%; background:var(--line); border:none; cursor:pointer; padding:0; }
@@ -614,7 +617,7 @@
   }
   .fixed-slider-frame{
     padding:6px; border:2px solid var(--brass); border-radius:18px;
-    box-shadow:0 0 0 3px rgba(255,201,77,0.12), 0 12px 30px rgba(0,0,0,0.5);
+    box-shadow:0 0 0 3px rgba(255,201,77,0.12), var(--elev-3);
     background:linear-gradient(180deg, rgba(255,201,77,0.06), transparent 60%);
     width:100%; max-width:100%; margin-inline:auto;
   }
@@ -823,11 +826,11 @@
 </div>
 <p data-i18n="pricingSub" style="color:var(--paper-dim); max-width:560px;">Pick the package that fits — the more photos, the lower the price per photo.</p>
 <div class="pricing-trust-strip">
-<span>🔒 <span data-i18n="pricingTrust1">Secure payment</span></span>
+<span><span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span> <span data-i18n="pricingTrust1">Secure payment</span></span>
 <span class="pts-sep">|</span>
-<span>⭐ <span data-i18n="pricingTrust2">Verified real results</span></span>
+<span><span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 3.5l2.2 4.9 5.3.5-4 3.6 1.3 5.3L12 15.1l-4.8 2.7 1.3-5.3-4-3.6 5.3-.5L12 3.5z"/></svg></span> <span data-i18n="pricingTrust2">Verified real results</span></span>
 <span class="pts-sep">|</span>
-<span>💬 <span data-i18n="pricingTrust3">Fast WhatsApp support</span></span>
+<span><span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-4 3.5V6z"/></svg></span> <span data-i18n="pricingTrust3">Fast WhatsApp support</span></span>
 </div>
 <div class="pricing-grid">
 <div class="plan">
