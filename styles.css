@@ -1769,7 +1769,7 @@
   }
 
   /* ===== Pricing ===== */
-  .pricing{max-width:1180px; margin:0 auto; padding:70px 24px;}
+  .pricing{max-width:1180px; margin:0 auto; padding:52px 24px 16px;}
   .pricing-trust-strip{
     display:flex; flex-wrap:wrap; align-items:center; gap:10px;
     margin-top:14px; font-size:13.5px; color:var(--paper-dim);
@@ -2493,7 +2493,7 @@
      do with body.view-mode-mobile .grid > .card. */
   body.view-mode-mobile .cat-tiles-grid{gap:14px;}
   body.view-mode-mobile .cat-tiles-grid > .cat-tile{flex:0 0 82%; scroll-snap-align:center;}
-  body.view-mode-mobile .pricing{padding:40px 16px;}
+  body.view-mode-mobile .pricing{padding:22px 16px 10px;}
   body.view-mode-mobile .pricing-grid{grid-template-columns:1fr;}
   body.view-mode-mobile .modal{padding:20px;}
   body.view-mode-mobile .frame{width:110px; height:140px;}
