@@ -1185,6 +1185,10 @@
     display:flex; align-items:center; gap:8px; font-size:var(--text-base); color:var(--paper);
     padding:8px 16px; border-radius:100px; background:rgba(255,201,77,0.06);
   }
+  /* الأيقونة الافتراضية (28px) أكبر من ارتفاع الكبسولة المضغوطة دي —
+     نفس أسلوب .ctrl-group-sm الموجود، مقاس أصغر يناسب padding:8px. */
+  .trust-badge .icon-badge{ width:22px; height:22px; }
+  .trust-badge .icon-badge svg{ width:13px; height:13px; }
 
   .faq-list{display:flex; flex-direction:column; gap:10px; max-width:760px;}
   .faq-item{
@@ -1352,7 +1356,10 @@
      portrait ratio the photos are actually produced in, so nothing is lost. */
   .cat-tile-cover{
     position:relative; aspect-ratio:3/4; border-radius:12px; overflow:hidden;
-    background:var(--ink-3);
+    background-color:var(--ink-3);
+    background-image:url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20xmlns:xlink=%22http://www.w3.org/1999/xlink%22%20width=%22340%22%20height=%22150%22%3E%3Cg%20transform=%22rotate(-13%20170%2075)%22%3E%3Ctext%20x=%2216%22%20y=%2282%22%20font-family=%22serif%22%20font-size=%2219%22%20letter-spacing=%222%22%20fill=%22%23e8b64a%22%20fill-opacity=%220.14%22%20text-anchor=%22start%22%3EMiga-Photobook%3C/text%3E%3Cg%20transform=%22translate(176,50)%20scale(0.62)%22%20fill=%22none%22%20stroke=%22%23e8b64a%22%20stroke-opacity=%220.16%22%20stroke-width=%222.4%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M24%2014%20C19%2010%2010%209%205%2011%20V37%20C10%2035%2019%2036%2024%2040%20V14%20Z%22/%3E%3Cpath%20d=%22M24%2014%20C29%2010%2038%209%2043%2011%20V37%20C38%2035%2029%2036%2024%2040%20V14%20Z%22/%3E%3Crect%20x=%2214%22%20y=%2218%22%20width=%2220%22%20height=%2214%22%20rx=%223%22/%3E%3Crect%20x=%2220%22%20y=%2214%22%20width=%228%22%20height=%225%22%20rx=%221.5%22/%3E%3Ccircle%20cx=%2224%22%20cy=%2225%22%20r=%224.5%22/%3E%3C/g%3E%3Cimage%20x=%22236%22%20y=%2266%22%20width=%2288%22%20height=%2220%22%20opacity=%220.15%22%20href=%22data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALIAAAAoBAMAAACoWb1+AAAAGFBMVEXstkjotUjntUnntUn/5RkAAADntUnntUn9k1jEAAAACHRSTlMeXtCwAwD9j2FlWcYAAATVSURBVHjapZbfbxRVFMc/M7PTqpUyLSmalqTtbpsQi8kmFmOswiDiAyVk0rQ+oVYFn/tA/Dt4NhJWpC+ltNPSEiOYLgiYSAOLATVUkvJQXgp0LD+E3pkdH+bHnd126aL3Zebee+733vs933vOUQYI2inNYv1WTM9TZVPDr3+wtRrzn+/b1SJrXcHXq0v/s761eEvtEnHPn9haxZkV/AqnWYSfoimt9FRD1bCRwq1g8fZZ0X8gohma5MyMXQ2yi7+2B12nbxI9H+5vu0ckGVZVHtTx1zb4m1QHOGHv3XoJ52GujyzsZ5UMLsIcIsLTF1Yf6nnaEHefZl4urqxp0FEnOoa1hjVm/Fd4ut6ZJ7ODGDVrG6SOTtF3PZbdnRY5U4nABHK3lyMnKlj0mSgxuZPZ5YhyVirKKUZ2s8dNsqlqXtdhUtkXeN0KwAaMhNRKdpFHEw4sxjyvjzzF57MUGZSj0yWv61K8jwLUlun9ev3Z5+l5j+3HmgXaFpPBwmqLfnUxKqOADkCnqX381yrYsXpbBfZuAFMvCEDctgFhKgHmVRtQ6AH89jzY7EGyllfAdYDts2U+El9qhgrotw3PYF4BlrtbAS2gnjO7h4BpagHN6QVD34hkzQCmgyt/suXcyeQrAUMFceGu44FTA3TzPuCTsgG/LXSXAGaoDUHz0XqT+AKpxwNfNTTKMA49KvBZ1h2GfS4IB1V63TNRgF5S4Fv4DjkQMTA5gLFvJvKxwCMyjAkUVdj6rYlJC3QfakGzIfVtpAQFgvN7QAEHZhKOroGduwZ2dOWlDEUeqDUfFFS1dgh9x65wx3G3gAHsB2DKy6dsoAdQKTDI3oK30BZHOCcUunYvwXAvMMOn+OpSNPZEB6PYwiCgYAFDF97EAGo8OC2asdFbl71sTsI4AOJCvztizywtPQaRUUBYaNlUqtCeDhT/cAUG7+eb6ubh0H0A+4ORgQM5OLQIhnK+8z0b2g9K3Vvcm4UvHlrK99adbeMAnZuVcxxyAFf5WkaYx9zJyn9oSMycj4OS8iAuETaFP+OmXBmbqVLjiQzHzRKr6WRH5ohiJAWT0vSyYsAzVQ4dgahM8QyAQmJlfDN3mLKQ5J0IFsfSZ/pWgSaZchRLrp80QO4zBeyLzBplItRzAN5xC+gN9z1hgGLqzScL2g0niDfu7CbI/NEMuK8GBG75JQ14o7sB77UVAG90U+LWmbnXuf6DBaCOuM3gjvUez3JsK1r6JWWgLJZsPpZI9m7Tkrx747jJC7TyBKy5ySpiwiNRBDj8H+TTOolq63AxIRC3YuUifgs3PZms1LpKbXpWBGL7tiC4uJoX510hMpVLyjeuBCnd/bMlWlt+5jNcgmX0wKuXErpeNisWO1zkIxvANffLSq0UWQziwI1Qnq4VSxrxqOz1JEsaC88KXpTWAdk1kMVlcMAJDMVCuAAQl7Nyl/KmGESeducQRhnPonPkWr2JSEOm5dGT1lPXiu/gCoD0yLV6E6+9Ihv36ibbADJ1bufwh6E3Yz2Lu1mAq+2AO9X7uwmwcR6g3YmDVIU22h+m7EZTTFtlbOgNQfUAkLL02wBKQMAcAMPP0W6/rNR0a5We60eBq9F4nw2MGWHRCPxowX99KbuPcqUz7u0c5dfoNfd9x9mFFwTmX14YvJfgLObsAAAAAElFTkSuQmCC%22/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat:repeat;
+    background-position:center;
     box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10), inset 0 -14px 26px -18px rgba(0,0,0,0.8);
   }
   .cat-tile-cover::before{
