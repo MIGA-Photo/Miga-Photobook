@@ -1523,6 +1523,30 @@
     animation:mp-spin 0.8s linear infinite;
   }
   @keyframes mp-spin{ to{ transform:rotate(360deg); } }
+  /* ---------- Progress أثناء توليد الصورة بالذكاء الاصطناعي ----------
+     الـWorker مالوش نداء وسيط بيرجع "استلمنا"/"شغالين دلوقتي" — نداء
+     واحد بس بيرجع لما التوليد يخلص بالكامل. فالخطوة التالتة هنا بتتفعّل
+     بعد وقت تقديري (مش حالة حقيقية جاية من السيرفر)، وده موضّح في تعليق
+     الجافاسكريبت المسؤول عن التوقيت. الهدف بصري بحت: يطمّن العميل إن
+     حاجة شغالة فعلاً بدل ما يشوف زرار معطّل وسكون تام. */
+  .transform-progress{
+    display:flex; flex-direction:column; gap:11px; margin:14px 0;
+    padding:14px 16px; border-radius:12px; background:var(--ink-2); border:1px solid var(--line);
+  }
+  .tp-step{
+    display:flex; align-items:center; gap:10px; font-size:13.5px;
+    color:var(--paper-dim); opacity:0.5; transition:opacity .2s ease, color .2s ease;
+  }
+  .tp-step.done, .tp-step.active{ opacity:1; color:var(--paper); }
+  .tp-step .tp-icon{ width:18px; flex:none; display:inline-flex; align-items:center; justify-content:center; }
+  .tp-step .tp-spin{
+    display:inline-block; width:14px; height:14px; border-radius:50%;
+    border:2px solid var(--line); border-top-color:var(--line);
+  }
+  .tp-step.active .tp-spin{
+    border-top-color:var(--brass); animation:mp-spin 0.8s linear infinite;
+  }
+  @media(prefers-reduced-motion: reduce){ .tp-step.active .tp-spin{ animation:none; border-top-color:var(--brass); } }
   /* Pagination bar: left arrow — page numbers — right arrow, replacing the
      small dots. Kept in a fixed left-to-right order (arrow, numbers, arrow)
      regardless of the page's RTL text direction, since page numbers read the
@@ -1732,6 +1756,15 @@
   }
   .card-actions{display:flex; flex-wrap:wrap; gap:8px; margin-top:auto;}
   .card-actions .buy-btn, .card-actions .copy-btn{flex:1 1 auto;}
+  /* رابط هادي تحت زرار الشراء الذهبي — فصل بصري واضح بين "شراء صورة واحدة"
+     (الزرار الذهبي البارز) و"وفّر بالباقات" (رابط ثانوي هادي)، بدل ما
+     يتلخبطوا في نفس مستوى الأهمية (طلب صريح من ماجدي 11 سبتمبر 2026). */
+  .card-package-hint{
+    display:block; width:100%; margin-top:6px; padding:4px 2px;
+    background:none; border:none; text-align:center;
+    font-size:12px; color:var(--paper-dim); cursor:pointer; font-family:inherit;
+  }
+  .card-package-hint:hover, .card-package-hint:focus-visible{ color:var(--brass); text-decoration:underline; }
   .buy-btn{
     flex:1; color:var(--ink); font-weight:700; font-size:13.5px;
     padding:11px; border-radius:8px; transition:.2s;
@@ -1975,6 +2008,17 @@
   .thanks-panel p{margin:0 0 12px; font-size:13.5px; line-height:1.7; color:var(--paper);}
   .thanks-actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:center;}
   .thanks-actions button{flex:1 1 150px; padding:11px 14px; font-size:13.5px;}
+  /* بعد ما العميل ياخد نتيجته — أكبر فرصة LTV في كل رحلة الشراء، عشان كده
+     مفصولة بخط علوي وبلون براند واضح بدل ما تختلط بزراير المشاركة/التقييم
+     اللي فوقها (طلب صريح من ماجدي 11 سبتمبر 2026). */
+  .thanks-upsell-actions{
+    display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
+    margin-top:12px; padding-top:12px; border-top:1px dashed var(--line);
+  }
+  .thanks-upsell-btn{
+    flex:1 1 150px; padding:11px 14px; font-size:13.5px;
+    border-color:var(--brass-dim); color:var(--brass);
+  }
 
   .stay-nudge{
     position:fixed; bottom:-200px; inset-inline-start:50%; transform:translateX(-50%);
@@ -3060,8 +3104,11 @@
       flex:1; text-align:center; box-shadow:0 8px 22px rgba(0,0,0,0.4), 0 4px 14px rgba(255,201,77,0.22);
     }
     /* الشريط بارتفاع تقريبي 64px+safe-area — بنبعد زرار التواصل العائم
-       عن فوقه عشان ميتغطاش. */
+       وزرار "الرئيسية" الاتنين بنفس القيمة بالظبط، عشان يفضلوا في نفس
+       المستوى (كانت المشكلة إن زرار التواصل بس اترفع فبقى الاتنين مش
+       متساويين — 11 سبتمبر 2026). */
     .contact-widget{ bottom:calc(78px + env(safe-area-inset-bottom, 0px)); }
+    .fab-wrap-home{ bottom:calc(78px + env(safe-area-inset-bottom, 0px)); }
   }
   body.view-mode-mobile .sticky-mobile-cta{ display:flex; }
 

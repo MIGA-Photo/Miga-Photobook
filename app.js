@@ -242,7 +242,7 @@ const translations = {
     faqQ3:'هل أحتاج خبرة؟', faqA3:'لأ خالص، بس بترفع صورتك وتختار الأسلوب، وإحنا بنعمل الباقي بالكامل.',
     faqQ4:'هل أستطيع استخدامه تجاريًا؟', faqA4:'الصورة الناتجة مرخّصة للاستخدام الشخصي. للاستخدام التجاري (إعادة بيع أو مشاريع عملاء)، تواصل معنا أولاً لترخيص مناسب.',
     faqQ5:'كيف أستلم النتيجة؟', faqA5:'فور تأكيد الدفع، بترفع صورتك على الموقع وتستلم النتيجة المُحوّلة مباشرة، وتقدر تحمّلها في أي وقت.',
-    faqQ7:'هل أقدر أختار أكثر من ستايل؟', faqA7:'أكيد! تقدر تطلب أكتر من ستايل لنفس الصورة أو لصور مختلفة — كل ستايل بيتحسب طلب منفصل، أو استخدم إحدى الباقات (10 أو 25 صورة) عشان توفر لو محتاج أكتر من نتيجة.',
+    faqQ7:'هل أقدر أختار أكثر من ستايل؟', faqA7:'أكيد! تقدر تطلب أكتر من ستايل لنفس الصورة أو لصور مختلفة — كل ستايل بيتحسب طلب منفصل، أو استخدم إحدى الباقات (10 أو 20 صورة) عشان توفر لو محتاج أكتر من نتيجة.',
     heroTitle:'حوّل صورتك إلى بورتريه احترافي<br>بجودة استوديو باستخدام <span class="brand-mark">Miga-Photobook ميجا فوتوبوك</span><br>خلال دقائق.',
     heroP:'ارفع صورتك الشخصية — لك أو لطفلك — واختار الأسلوب اللي يعجبك، وإحنا نحوّلها لك تلقائيًا بجودة استوديو خلال دقائق بعد تأكيد الدفع.',
     heroCta1:'اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي بـ25 جنيه', heroCta2:'الأسعار والعروض',
@@ -279,7 +279,7 @@ const translations = {
     buyerAppLabel:'اسم التطبيق/البنك الذي حوّلت منه (اختياري)', buyerAppPh:'مثال: إنستاباي، بنك مصر، CIB، فودافون كاش...',
     buyerPhoneLabel:'رقم الموبايل الذي حوّلت منه',
     buyerRefLabel:'رقم/مرجع عملية التحويل (إن وجد)', buyerRefPh:'مثال: آخر 4 أرقام أو رقم العملية',
-    statusPendingText:'بنراجع تحويلك... الصفحة هتتحدّث لوحدها أول ما نأكده.',
+    statusPendingText:'تم استلام طلبك ✅ بنراجع تحويلك دلوقتي، وصورتك هتبقى جاهزة خلال دقائق من تأكيد الدفع — الصفحة هتتحدّث لوحدها تلقائيًا.',
     statusCodeNote:'كود طلبك (احتفظ بيه احتياطيًا):',
     statusSafeCloseNote:'تقدر تقفل الصفحة دلوقتي براحتك — هنراجع طلبك ونبعتلك تحديث بمجرد ما يتأكد.',
     statusApprovedText:'تم تأكيد الدفع ✅ تقدر ترفع صورتك دلوقتي.',
@@ -310,6 +310,7 @@ const translations = {
     thanksTitle:'شكراً إنك جربتنا 🙏',
     thanksBody:'لو الصورة عجبتك، مشاركتها مع صحابك أو تقييم سريع بيساعدنا كتير.',
     thanksShareBtn:'شارك صورتك', thanksReviewBtn:'اكتب تقييمك',
+    thanksAnotherBtn:'✨ اعمل صورة تانية', thanksPackagesBtn:'وفر بالباقات 📦',
     thankCustomerBtn:'شكر عبر واتساب', thankCustomerDoneBtn:'✓ تم إرسال رسالة الشكر',
     toastThankSaveFailed:'الرسالة اتفتحت، بس تسجيلها فشل — جرّب تحدّث الصفحة.',
     whatsappThanksTemplate:'أهلاً 👋\nشكراً إنك جربت Miga-Photobook وطلبت "{title}".\nلو الصورة عجبتك، مشاركتها مع صحابك هتبقى دعم كبير لينا 🙏\nولو حبيت صورة تانية، ابعتلنا في أي وقت.',
@@ -366,7 +367,8 @@ const translations = {
     trustDesc1:'كل صورة بتتراجع بعنايه قبل ما توصلك', trustDesc2:'أساليب وتقنيات جديدة بتتضاف باستمرار',
     trustDesc3:'بترد عليك بنفسنا لو احتجت أي مساعدة', trustDesc4:'بياناتك وصورك ما بتتشاركش مع حد',
     lockOverlayText:'يتم تحويل صورتك بعد الشراء', ownedPill:'✓ تم الشراء',
-    buyBtnPrefix:'🔷 احصل عليها الآن', emptyNoteCategory:'لا توجد منتجات في هذا القسم بعد — أضِف منتجات من لوحة الإدارة.',
+    buyBtnPrefix:'✨ اعمل صورتي بهذا الستايل', emptyNoteCategory:'لا توجد منتجات في هذا القسم بعد — أضِف منتجات من لوحة الإدارة.',
+    cardPackageHint:'أو وفّر أكتر بالباقات ›',
     buyModalTextTemplate:'شراء "{title}" مقابل {price} جنيه.',
     buyPromptModalTextTemplate:'شراء البرومبت الاحترافي لـ "{title}" مقابل {price} جنيه.',
     buyPackageModalTextTemplate:'شراء "{title}" مقابل {price} جنيه — تقدر تستخدمها على أي منتجات تختارها بعد التأكيد.',
@@ -442,6 +444,7 @@ const translations = {
     toastConsentRequired:'من فضلك وافق على إقرار الصورة قبل المتابعة',
     toastTransformDone:'تم تجهيز المعاينة — يمكنك تحميلها الآن',
     toastGenerating:'جاري توليد الصورة... ممكن يستغرق دقايق',
+    tpStep1:'استلمنا صورتك', tpStep2:'"ميجا" يجري إنشاء صورتك...', tpStep3:'بنجهزلك النتيجة النهائية...',
     toastGenerateFailed:'حصل خطأ أثناء التوليد، حاول تاني',
     toastOrderFailed:'تعذّر إرسال طلبك حاليًا — تأكد من اتصالك بالإنترنت وحاول تاني، أو تواصل معنا مباشرة.',
     toastDownloadFailed:'تعذّر تحميل الصورة تلقائيًا',
@@ -590,7 +593,7 @@ const translations = {
     faqQ3:'Do I need experience?', faqA3:'Not at all — just upload your photo and pick a style, we handle everything else.',
     faqQ4:'Can I use it commercially?', faqA4:'The resulting image is licensed for personal use. For commercial use (resale or client projects), please contact us first for proper licensing.',
     faqQ5:'How do I get my result?', faqA5:'Right after payment is confirmed, upload your photo on the site and get the transformed result directly — downloadable anytime.',
-    faqQ7:'Can I choose more than one style?', faqA7:'Of course! You can order more than one style for the same photo or for different photos — each style counts as a separate order, or use one of the bundles (10 or 25 photos) to save if you need more than one result.',
+    faqQ7:'Can I choose more than one style?', faqA7:'Of course! You can order more than one style for the same photo or for different photos — each style counts as a separate order, or use one of the bundles (10 or 20 photos) to save if you need more than one result.',
     heroTitle:'Turn your photo into a professional,<br>studio-quality portrait with <span class="brand-mark">Miga-Photobook</span><br>in minutes.',
     heroP:'A library of professional, ready-to-use prompts for transforming personal photos — for children, men, and women — carefully written and tested. Buy, unlock instantly, and use right away.',
     heroCta1:'Make Your <b class="brand-mega">Mega</b> Photo Now — 25 EGP', heroCta2:'Pricing & Offers',
@@ -627,7 +630,7 @@ const translations = {
     buyerAppLabel:'App/bank you transferred from (optional)', buyerAppPh:'e.g. InstaPay, Banque Misr, CIB, Vodafone Cash...',
     buyerPhoneLabel:'Mobile number you transferred from',
     buyerRefLabel:'Transfer reference number (if any)', buyerRefPh:'e.g. last 4 digits or transaction number',
-    statusPendingText:"We're reviewing your transfer... this page will update itself once it's confirmed.",
+    statusPendingText:"Order received ✅ We're reviewing your transfer now, and your photo will be ready within minutes of payment confirmation — this page will update itself automatically.",
     statusCodeNote:'Your order code (keep it just in case):',
     statusSafeCloseNote:"You can close this page now — we'll review your order and update you as soon as it's confirmed.",
     statusApprovedText:'Payment confirmed ✅ You can upload your photo now.',
@@ -658,6 +661,7 @@ const translations = {
     thanksTitle:'Thank you for trying us 🙏',
     thanksBody:'If you like your photo, sharing it with friends or leaving a quick review helps us a lot.',
     thanksShareBtn:'Share your photo', thanksReviewBtn:'Write a review',
+    thanksAnotherBtn:'✨ Make Another Photo', thanksPackagesBtn:'Save with Bundles 📦',
     thankCustomerBtn:'Thank via WhatsApp', thankCustomerDoneBtn:'✓ Thank-you message sent',
     toastThankSaveFailed:'The message opened, but saving the note failed — try refreshing.',
     whatsappThanksTemplate:'Hi 👋\nThank you for trying Miga-Photobook and ordering "{title}".\nIf you like your photo, sharing it with friends would mean a lot to us 🙏\nAnd if you would like another one, just message us any time.',
@@ -714,7 +718,8 @@ const translations = {
     trustDesc1:'Every photo is carefully reviewed before it reaches you', trustDesc2:'New styles and techniques added all the time',
     trustDesc3:'We reply ourselves whenever you need help', trustDesc4:'Your data and photos are never shared with anyone',
     lockOverlayText:'Your photo gets transformed after purchase', ownedPill:'✓ Purchased',
-    buyBtnPrefix:'🔷 Get It Now', emptyNoteCategory:'No products in this section yet — add products from the admin panel.',
+    buyBtnPrefix:'✨ Create My Photo in This Style', emptyNoteCategory:'No products in this section yet — add products from the admin panel.',
+    cardPackageHint:'Or save more with bundles ›',
     buyModalTextTemplate:'Buy "{title}" for {price} EGP.',
     buyPromptModalTextTemplate:'Buy the professional prompt for "{title}" for {price} EGP.',
     buyPackageModalTextTemplate:'Buy "{title}" for {price} EGP — use it on any products you choose after confirmation.',
@@ -790,6 +795,7 @@ const translations = {
     toastConsentRequired:'Please agree to the photo consent statement to continue',
     toastTransformDone:'Preview ready — you can download it now',
     toastGenerating:'Generating your image... this can take a few minutes',
+    tpStep1:'We received your photo', tpStep2:'"Miga" is creating your photo...', tpStep3:"Putting the finishing touches on your result...",
     toastGenerateFailed:'Something went wrong while generating, please try again',
     toastOrderFailed:"Couldn't send your order right now — check your connection and try again, or contact us directly.",
     toastDownloadFailed:'Could not download the image automatically',
@@ -1173,6 +1179,24 @@ function switchLanguage(lang){
   location.href = languageUrlFor(lang);
 }
 
+/** "شاهد 50+ ستايل" و"أكثر من 50 نمطاً فنياً مختلفاً" كان فيهم رقم ثابت
+ *  بالإيد، بيبقى غلط أول ما ماجدي يضيف أو يشيل منتج من لوحة الإدارة.
+ *  دلوقتي الرقم بييجي من نفس مصدر الحقيقة اللي بيرسم كروت المنتجات
+ *  فعليًا — products.length، بعد ما loadProducts() تخلص (بتتنفّذ في
+ *  init() قبل أول applyLanguage() بسطر واحد، فالرقم يبقى جاهز دايمًا
+ *  وقت النداء ده). لو الشبكة فشلت وproducts فضلت فاضية، بنسيب الرقم
+ *  الافتراضي المكتوب في نص الترجمة زي ما هو بدل ما نعرض "0 ستايل". */
+function updateStyleCountTexts(){
+  const n = products.length;
+  if(!n) return;
+  document.querySelectorAll('[data-i18n="seeAllStylesCta"]').forEach(el=>{
+    el.textContent = t('seeAllStylesCta').replace(/\d+/, String(n));
+  });
+  document.querySelectorAll('[data-i18n="aboutWhy2"]').forEach(el=>{
+    el.textContent = t('aboutWhy2').replace(/\d+/, String(n));
+  });
+}
+
 function applyLanguage(lang){
   currentLang = (lang === 'en') ? 'en' : 'ar';
   document.documentElement.lang = currentLang;
@@ -1182,6 +1206,7 @@ function applyLanguage(lang){
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     el.textContent = t(el.getAttribute('data-i18n'));
   });
+  updateStyleCountTexts();
   document.querySelectorAll('[data-i18n-html]').forEach(el=>{
     el.innerHTML = t(el.getAttribute('data-i18n-html'));
   });
@@ -2234,6 +2259,9 @@ function renderProductCard(p, opts){
                </button>`
         )}
       </div>
+      ${(!owned && !SOFT_LAUNCH && !pkgAvailableHere)
+        ? `<button type="button" class="card-package-hint" onclick="scrollToSectionBelowHeader(document.getElementById('pricing'))">${t('cardPackageHint')}</button>`
+        : ''}
     </div>
   </div>`;
 }
@@ -3345,6 +3373,8 @@ function openTransformModal(id){
   document.getElementById('transformShareBtn').style.display = 'none';
   document.getElementById('thanksPanel').classList.remove('show');
   document.getElementById('transformGenerateBtn').dataset.used = '';
+  document.getElementById('transformGenerateBtn').disabled = false;
+  hideTransformProgress();
   transformImg = null;
 
   const cachedUrl = transformedResults[id];
@@ -3448,6 +3478,33 @@ function buildFullResSource(img){
   return canvas.toDataURL('image/jpeg', 0.95);
 }
 
+/** الـ3 خطوات دي شكل بصري بيطمّن العميل إن حاجة شغالة، مش حالة حقيقية
+ * جاية من السيرفر — نداء /transform واحد بس بيرجع لما التوليد يخلص
+ * بالكامل، مفيش أي رد وسيط بيقول "استلمنا" أو "شغالين دلوقتي". خطوة 1
+ * بتتفعّل فورًا (صح فعلًا: الصورة اتبعتت للسيرفر بالظبط في نفس اللحظة).
+ * خطوة 2 بتتفعّل طول وقت الانتظار. خطوة 3 بتتفعّل بعد ~14 ثانية كتقدير
+ * بصري بس (متوسط وقت التوليد الفعلي) — مش وعد بوقت دقيق ولا حالة مؤكدة. */
+let transformProgressTimer = null;
+function showTransformProgress(){
+  const panel = document.getElementById('transformProgress');
+  if(!panel) return;
+  panel.style.display = '';
+  const s1 = document.getElementById('tpStep1'), s2 = document.getElementById('tpStep2'), s3 = document.getElementById('tpStep3');
+  s1.classList.add('done'); s1.classList.remove('active');
+  s2.classList.add('active'); s2.classList.remove('done');
+  s3.classList.remove('active', 'done');
+  clearTimeout(transformProgressTimer);
+  transformProgressTimer = setTimeout(()=>{
+    s2.classList.add('done'); s2.classList.remove('active');
+    s3.classList.add('active');
+  }, 14000);
+}
+function hideTransformProgress(){
+  clearTimeout(transformProgressTimer);
+  const panel = document.getElementById('transformProgress');
+  if(panel) panel.style.display = 'none';
+}
+
 elById('transformGenerateBtn').onclick = async ()=>{
   if(!transformImg){ showToast(t('toastSelectPhoto')); return; }
   if(!document.getElementById('transformConsent').checked){ showToast(t('toastConsentRequired')); return; }
@@ -3469,6 +3526,7 @@ elById('transformGenerateBtn').onclick = async ()=>{
     }
     genBtn.disabled = true;
     showToast(t('toastGenerating'));
+    showTransformProgress();
     try{
       // Send the high-resolution render of the original upload — NOT the
       // 360px preview canvas, which is only for on-screen display.
@@ -3485,9 +3543,11 @@ elById('transformGenerateBtn').onclick = async ()=>{
         // 409 means the order was already consumed (possibly from another tab/device) —
         // keep the button locked instead of letting the customer keep retrying.
         if(res.status !== 409) genBtn.disabled = false;
+        hideTransformProgress();
         showToast(t('toastGenerateFailed'));
         return;
       }
+      hideTransformProgress();
       genBtn.dataset.used = '1';
       // If this generation was paid for out of a package's shared credits
       // (not an individually-purchased order), the server's response is the
@@ -3539,6 +3599,7 @@ elById('transformGenerateBtn').onclick = async ()=>{
       renderGrids();
     }catch(e){
       genBtn.disabled = false;
+      hideTransformProgress();
       showToast(t('toastGenerateFailed'));
     }
     return;
@@ -5468,6 +5529,22 @@ elById('thanksShareBtn').onclick = ()=>
   document.getElementById('transformShareBtn').click();
 elById('thanksReviewBtn').onclick = ()=>
   document.getElementById('writeReviewBtn').click();
+
+/** بعد ما العميل ياخد نتيجته وهو لسه مبسوط منها — أفضل لحظة تعرض عليه فيها
+ * يعمل صورة تانية. بتقفل مودال التحويل وترجّعه لنفس قسم المنتج اللي كان
+ * فيه (زي ما بيحصل بالظبط لما يقفل شاشة "بنراجع تحويلك" — نفس النمط
+ * الموجود أصلاً في payStatusCloseBtn) عشان يختار ستايل جديد بسهولة. */
+elById('thanksAnotherBtn').onclick = ()=>{
+  const p = products.find(x=>x.id===currentTransformId);
+  transformModalBg.classList.remove('show');
+  if(p && p.category) scrollToSectionBelowHeader(firstCardOrSelf(openCatSection(p.category)));
+};
+/** نفس الفكرة، لكن بتوديه لقسم الأسعار عشان يشوف باقات التوفير — طلب
+ * صريح من ماجدي: أعلى نية شراء ممكنة تكون فور استلام نتيجة عجبته. */
+elById('thanksPackagesBtn').onclick = ()=>{
+  transformModalBg.classList.remove('show');
+  scrollToSectionBelowHeader(document.getElementById('pricing'));
+};
 
 let selectedReviewPhotoUrl = null;
 let reviewResultUrls = [];
