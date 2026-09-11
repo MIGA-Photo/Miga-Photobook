@@ -1784,6 +1784,10 @@
     margin-top:14px; font-size:13.5px; color:var(--paper-dim);
   }
   .pricing-trust-strip .pts-sep{ color:var(--line); }
+  /* السطر ده نص صغير بفواصل رفيعة، مش كارت — مقاس .icon-badge الافتراضي
+     (28px) هيبان تقيل جنبه، فمقاس أصغر من حتى .ctrl-group-sm (18px). */
+  .pricing-trust-strip .icon-badge{ width:16px; height:16px; }
+  .pricing-trust-strip .icon-badge svg{ width:10px; height:10px; }
   @media(max-width:480px){ .pricing-trust-strip{ font-size:var(--text-sm); gap:7px; } }
   .pricing-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:30px;}
   .plan{
