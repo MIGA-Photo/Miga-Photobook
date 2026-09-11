@@ -204,6 +204,7 @@ const translations = {
     testimonialsTitle:'تقييمات وآراء عملائنا',
     testimonial1:'"أفضل تحويل صور جربته على الإطلاق"', testimonial2:'"حوّلت صوري إلى مستوى احترافي"',
     testimonialsNote:'* نماذج حقيقية من نتائج Miga-Photobook الفعلية.',
+    testimonialsSeeMore:'المزيد', testimonialsSeeLess:'أقل',
     trustBadge1:'جودة احترافية في كل صورة', trustBadge2:'تحديث مستمر للأساليب الفنية المتاحة',
     trustBadge3:'دعم فني سريع ومباشر', trustBadge4:'أمان وخصوصية في كل عملية',
     aboutUsTitle:'من نحن',
@@ -360,6 +361,10 @@ const translations = {
     toastProductDeleted:'تم حذف المنتج',
     footerText:'© 2026 Miga-Photobook — كل التحويلات تتم بعد إتمام الدفع فقط.',
     footerTerms:'شروط الاستخدام', footerPrivacy:'سياسة الخصوصية', footerRefund:'سياسة الاسترجاع',
+    footerQuickLinksTitle:'روابط سريعة', footerTrustTitle:'ليه تثق فينا', footerContactTitle:'تواصل معنا',
+    footerContactWa:'واتساب', footerContactIg:'إنستجرام',
+    trustDesc1:'كل صورة بتتراجع بعنايه قبل ما توصلك', trustDesc2:'أساليب وتقنيات جديدة بتتضاف باستمرار',
+    trustDesc3:'بترد عليك بنفسنا لو احتجت أي مساعدة', trustDesc4:'بياناتك وصورك ما بتتشاركش مع حد',
     lockOverlayText:'يتم تحويل صورتك بعد الشراء', ownedPill:'✓ تم الشراء',
     buyBtnPrefix:'🔷 احصل عليها الآن', emptyNoteCategory:'لا توجد منتجات في هذا القسم بعد — أضِف منتجات من لوحة الإدارة.',
     buyModalTextTemplate:'شراء "{title}" مقابل {price} جنيه.',
@@ -547,6 +552,7 @@ const translations = {
     testimonialsTitle:'Customer Reviews & Testimonials',
     testimonial1:'"Best photo transformation I have tried"', testimonial2:'"Turned my photos pro-level"',
     testimonialsNote:'* Real samples from actual Miga-Photobook results.',
+    testimonialsSeeMore:'See more', testimonialsSeeLess:'Show less',
     trustBadge1:'Professional quality in every photo', trustBadge2:'Constantly growing prompt library',
     trustBadge3:'Fast, direct support', trustBadge4:'Security and privacy on every order',
     aboutUsTitle:'About Us',
@@ -703,6 +709,10 @@ const translations = {
     toastProductDeleted:'Product deleted',
     footerText:'© 2026 Miga-Photobook — All transformations happen only after payment is completed.',
     footerTerms:'Terms of Use', footerPrivacy:'Privacy Policy', footerRefund:'Refund Policy',
+    footerQuickLinksTitle:'Quick Links', footerTrustTitle:'Why trust us', footerContactTitle:'Contact us',
+    footerContactWa:'WhatsApp', footerContactIg:'Instagram',
+    trustDesc1:'Every photo is carefully reviewed before it reaches you', trustDesc2:'New styles and techniques added all the time',
+    trustDesc3:'We reply ourselves whenever you need help', trustDesc4:'Your data and photos are never shared with anyone',
     lockOverlayText:'Your photo gets transformed after purchase', ownedPill:'✓ Purchased',
     buyBtnPrefix:'🔷 Get It Now', emptyNoteCategory:'No products in this section yet — add products from the admin panel.',
     buyModalTextTemplate:'Buy "{title}" for {price} EGP.',
@@ -5557,12 +5567,35 @@ async function renderTestimonials(){
         <div class="testimonial-card">
           <div class="stars">${starsStr}</div>
           <p>"${escapeHtml(r.comment)}"</p>
+          <button type="button" class="testimonial-more" onclick="toggleTestimonialCard(this)">${t('testimonialsSeeMore')}</button>
           <div class="testimonial-author">— ${escapeHtml(r.user_name)}</div>
         </div>`;
       }).join('');
       if(note) note.style.display = 'none';
+      requestAnimationFrame(() => initTestimonialClamp(grid));
     }
   }catch(e){ /* keep the example placeholders on failure */ }
+}
+
+/** كل كارت تقييم بارتفاع شبه ثابت (CSS -webkit-line-clamp:3 على النص) —
+ * بس زرار "المزيد" لازم يظهر بس لو النص فعلاً اتقص. لو التقييم قصير
+ * أصلاً (سطر أو سطرين) مفيش داعي لزرار زيادة ملوش لازمة جنبه. */
+function initTestimonialClamp(grid){
+  grid.querySelectorAll('.testimonial-card').forEach(card => {
+    const p = card.querySelector('p');
+    const btn = card.querySelector('.testimonial-more');
+    if(!p || !btn) return;
+    if(p.scrollHeight > p.clientHeight + 1){
+      btn.style.display = 'inline-block';
+    }
+  });
+}
+
+function toggleTestimonialCard(btn){
+  const card = btn.closest('.testimonial-card');
+  if(!card) return;
+  const expanded = card.classList.toggle('expanded');
+  btn.textContent = expanded ? t('testimonialsSeeLess') : t('testimonialsSeeMore');
 }
 
 async function loadPendingReviews(){

@@ -2939,3 +2939,147 @@
     transform:translateY(-50%);
     height:100%; min-height:44px;
   }
+
+  /* =====================================================================
+     11 سبتمبر 2026 — دفعة تحسينات بصرية موحّدة (Trust Cards + Footer
+     احترافي + تحسين الكاروسيل الحالي + Sticky CTA للموبايل + حركة الأكورديون).
+     زيرو لمس لأي business logic أو Worker أو بيانات — كله CSS + HTML ثابت،
+     وأي نص جديد اتضاف عن طريق نظام الترجمة الموجود (data-i18n) مش نص مكتوب
+     يدويًا. مفيش أي رقم أو إحصائية مُختلقة (زي "99% رضا" أو "10,000 عميل")
+     لأننا مالوش رقم حقيقي موثّق النهارده — أي حاجة زي دي لازم تتضاف بعدين
+     لما يبقى في رقم حقيقي فعلاً. */
+
+  /* ---------- Trust cards: من صف كبسولات واحد لكروت مستقلة مرتفعة ---------- */
+  .trust-badges{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:16px;
+    background:transparent; border:none; padding:0; box-shadow:none;
+  }
+  @media(max-width:980px){ .trust-badges{ grid-template-columns:repeat(2, 1fr); } }
+  @media(max-width:520px){ .trust-badges{ grid-template-columns:1fr; } }
+  .trust-badge{
+    display:flex; flex-direction:column; align-items:flex-start; text-align:start;
+    gap:10px; padding:22px 20px; border-radius:var(--radius-lg);
+    background:var(--ink-2); border:1px solid var(--line); box-shadow:var(--elev-1);
+    transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  }
+  .trust-badge .icon-badge{ width:36px; height:36px; }
+  .trust-badge .icon-badge svg{ width:19px; height:19px; }
+  .trust-badge .tb-copy{ display:flex; flex-direction:column; gap:4px; }
+  .trust-badge .tb-title{ display:block; font-weight:700; font-size:15px; color:var(--paper); }
+  .trust-badge .tb-desc{ display:block; font-size:var(--text-sm); color:var(--paper-dim); line-height:1.6; font-weight:400; }
+  @media (hover:hover) and (pointer:fine){
+    .trust-badge:hover{
+      transform:translateY(-3px); border-color:rgba(255,201,77,0.4);
+      box-shadow:var(--elev-2), 0 0 0 1px rgba(255,201,77,0.16);
+    }
+  }
+
+  /* ---------- Product cards: تسلسل بصري أوضح + zoom خفيف على الصورة ----------
+     الرفعة/الحدود/الظل على .card:hover موجودين بالفعل من قبل — دول إضافة
+     بسيطة فوقهم بس: زوم خفيف جدًا على الصورة نفسها (طبقة منفصلة، مفيش
+     تعارض مع transform الكارت اللي بيرفع الكارت كله). */
+  .card-title{ font-weight:700; letter-spacing:0.1px; }
+  .card-media img{ transition:transform .35s ease; }
+  @media (hover:hover) and (pointer:fine){
+    .card:hover .card-media img{ transform:scale(1.045); }
+  }
+  @media(prefers-reduced-motion: reduce){
+    .card-media img, .trust-badge{ transition:none !important; }
+    .card:hover .card-media img, .trust-badge:hover{ transform:none !important; }
+  }
+
+  /* ---------- الصفوف الأفقية (كاروسيل "الأكثر طلبًا"/الأقسام): تلاشي الحواف
+     + أسهم أكثر أناقة، بنفس آلية scrollRow/gp-arrow الموجودة أصلاً — بدون
+     أي لمس للجافاسكريبت. ---------- */
+  .grid-nav-wrap{
+    -webkit-mask-image:linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%);
+            mask-image:linear-gradient(to right, transparent 0, #000 28px, #000 calc(100% - 28px), transparent 100%);
+  }
+  @media(max-width:700px){
+    .grid-nav-wrap{ -webkit-mask-image:none; mask-image:none; }
+  }
+  .grid-page-dots .gp-arrow{
+    border-radius:var(--radius-pill);
+    transition:transform .18s ease, background .18s ease, box-shadow .18s ease;
+  }
+  .grid-page-dots .gp-arrow:hover:not(:disabled){ transform:translateY(-1px); box-shadow:0 4px 14px rgba(255,201,77,0.22); }
+  .grid-page-dots .gp-arrow:focus-visible{ outline:2px solid var(--brass); outline-offset:2px; }
+
+  /* ---------- FAQ: حركة سهم انسيابية بدل التبديل الفجائي +/− ---------- */
+  .faq-item summary::after{ content:"+"; display:inline-block; transition:transform .25s ease; }
+  .faq-item[open] summary::after{ content:"+"; transform:rotate(135deg); }
+  .faq-item{ transition:border-color .2s ease, background .2s ease; }
+  .faq-item[open]{ border-color:var(--brass-dim); }
+  @media(prefers-reduced-motion: reduce){ .faq-item summary::after{ transition:none; } }
+
+  /* ---------- Footer احترافي: قصة العلامة + روابط سريعة + ثقة + تواصل ---------- */
+  footer{ text-align:start; padding:44px 24px 24px; }
+  .footer-inner{
+    display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:32px;
+    max-width:1080px; margin:0 auto 28px; padding-bottom:28px;
+    border-bottom:1px solid var(--line);
+  }
+  @media(max-width:860px){ .footer-inner{ grid-template-columns:1fr 1fr; } }
+  @media(max-width:560px){ .footer-inner{ grid-template-columns:1fr; text-align:center; } }
+  .footer-col h4{ color:var(--paper); font-size:var(--text-md); font-weight:700; margin:0 0 14px; }
+  .footer-brand .footer-logo{
+    font-family:'Rakkas', serif; color:var(--brass); font-size:19px; margin-bottom:10px; letter-spacing:0.3px;
+  }
+  .footer-story{ color:var(--paper-dim); font-size:var(--text-base); line-height:1.8; max-width:34ch; margin:0; }
+  @media(max-width:560px){ .footer-story{ margin-inline:auto; } }
+  .footer-col .footer-links{ flex-direction:column; align-items:flex-start; gap:10px; margin-top:0; }
+  @media(max-width:560px){ .footer-col .footer-links{ align-items:center; } }
+  .footer-legal-links{ margin-top:14px !important; padding-top:14px; border-top:1px solid var(--line); }
+  .footer-trust-row{ display:flex; flex-wrap:wrap; gap:10px; }
+  @media(max-width:560px){ .footer-trust-row{ justify-content:center; } }
+  .footer-trust-row .icon-badge{ width:30px; height:30px; }
+  .footer-trust-row .icon-badge svg{ width:16px; height:16px; }
+  .footer-contact-col{ display:flex; flex-direction:column; gap:12px; }
+  .footer-contact-link{
+    display:inline-flex; align-items:center; gap:9px; color:var(--paper-dim);
+    font-size:var(--text-base); text-decoration:none; width:fit-content;
+  }
+  @media(max-width:560px){ .footer-contact-link{ margin-inline:auto; } }
+  .footer-contact-link svg{ width:18px; height:18px; flex:none; }
+  .footer-contact-link:hover{ color:var(--brass); }
+  footer #footerText{ text-align:center; }
+
+  /* ---------- Sticky mobile CTA: شريط شراء ثابت أسفل الشاشة على الموبايل بس.
+     برّه الـ<footer> تمامًا، عنصر مستقل. مخفي دايمًا على الديسكتوب. مساحة
+     safe-area للآيفون. z-index أقل من contact-widget (200) عشان زرار
+     التواصل يفضل هو الأعلى دايمًا، وبنرفع contact-widget فوق الشريط في
+     max-width:560px تحت (نفس القاعدة الموجودة أصلاً لـsafe-area). ---------- */
+  .sticky-mobile-cta{ display:none; }
+  @media(max-width:767px){
+    .sticky-mobile-cta{
+      display:flex; position:fixed; left:0; right:0; bottom:0; z-index:150;
+      padding:10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+      background:linear-gradient(180deg, rgba(19,19,22,0) 0%, var(--ink) 38%);
+    }
+    .sticky-mobile-cta .btn-primary{
+      flex:1; text-align:center; box-shadow:0 8px 22px rgba(0,0,0,0.4), 0 4px 14px rgba(255,201,77,0.22);
+    }
+    /* الشريط بارتفاع تقريبي 64px+safe-area — بنبعد زرار التواصل العائم
+       عن فوقه عشان ميتغطاش. */
+    .contact-widget{ bottom:calc(78px + env(safe-area-inset-bottom, 0px)); }
+  }
+  body.view-mode-mobile .sticky-mobile-cta{ display:flex; }
+
+  /* ---------- كروت التقييمات: مقاس موحّد بدل الطول المتغيّر ----------
+     التقييم القصير كان بيسيب فراغ فاضي كبير في كارت طويل، والتقييم الطويل
+     كان بيطلّع كارت أطول من جاره — فالصف كله كان شكله غير منتظم. دلوقتي كل
+     كارت بارتفاع تقريبًا ثابت، والنص بيتقص عند 3 أسطر مع زرار "المزيد"
+     بيظهر بس لو النص فعلاً أطول من 3 أسطر (مش زرار زيادة على تقييم قصير). */
+  .testimonial-card{ display:flex; flex-direction:column; min-height:172px; }
+  .testimonial-card p{
+    display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3;
+    overflow:hidden; margin:0;
+  }
+  .testimonial-card.expanded p{ -webkit-line-clamp:unset; overflow:visible; }
+  .testimonial-more{
+    background:none; border:none; color:var(--brass); font-size:var(--text-sm);
+    font-weight:700; padding:8px 0 0; cursor:pointer; align-self:flex-start;
+    display:none; font-family:inherit;
+  }
+  .testimonial-more:focus-visible{ outline:2px solid var(--brass); outline-offset:2px; }
+  .testimonial-author{ margin-top:auto; padding-top:10px; }
