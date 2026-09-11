@@ -29,7 +29,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Rakkas&family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- الملف المشترك نفسه مش نسخة مقصوصة منه: لو التصميم اتغيّر، الصفحة دي
      بتتغيّر معاه. أي نسخة مقصوصة كانت هتبعد لوحدها من غير ما حد يلاحظ. -->
-<link rel="stylesheet" href="/styles.css?v=20260911e">
+<link rel="stylesheet" href="/styles.css?v=20260911f">
 <style>
   .cat-wrap{ max-width:1080px; margin:0 auto; padding:0 18px 60px; }
   .cat-bar{ display:flex; align-items:center; justify-content:space-between;
@@ -106,13 +106,40 @@
   <a class="cat-cta" href="/">شوفي الأساليب واختاري</a>
 </div>
 
-<footer>
-  <div>© 2026 Miga-Photobook — كل التحويلات تتم بعد إتمام الدفع فقط.</div>
-  <div class="footer-links">
-    <a href="/terms.html">شروط الاستخدام</a>
-    <a href="/privacy.html">سياسة الخصوصية</a>
-    <a href="/refund.html">سياسة الاسترجاع</a>
+<section class="cat-section" id="trustStrip" style="max-width:1080px; margin:0 auto; padding:0 18px 20px;">
+  <div class="trust-badges">
+    <div class="trust-badge"><span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span><span class="tb-copy"><span class="tb-title">دفع آمن</span><span class="tb-desc">تحويل بنكي بيتراجع يدويًا قبل أي خطوة</span></span></div>
+    <div class="trust-badge"><span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 3.5l2.2 4.9 5.3.5-4 3.6 1.3 5.3L12 15.1l-4.8 2.7 1.3-5.3-4-3.6 5.3-.5L12 3.5z"/></svg></span><span class="tb-copy"><span class="tb-title">ضمان الجودة</span><span class="tb-desc">مش راضية عن النتيجة؟ بنعيدها من غير أي تكلفة</span></span></div>
+    <div class="trust-badge"><span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-4 3.5V6z"/></svg></span><span class="tb-copy"><span class="tb-title">دعم مباشر</span><span class="tb-desc">بترد عليك بنفسنا لو احتجتِ أي مساعدة</span></span></div>
   </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-col footer-brand">
+      <div class="footer-logo">Miga-Photobook ميجا فوتوبوك</div>
+      <p class="footer-story">منصة مصرية لتحويل صورك الشخصية إلى بورتريهات احترافية بجودة استوديو خلال دقائق، باستخدام أحدث تقنيات الذكاء الاصطناعي — من غير الحاجة لمصوّر أو استوديو حقيقي.</p>
+    </div>
+    <div class="footer-col">
+      <h4>روابط سريعة</h4>
+      <div class="footer-links">
+        <a href="/">الرئيسية</a>
+        <a href="/categories/male/">رجالي</a>
+        <a href="/categories/business/">أعمال</a>
+      </div>
+      <div class="footer-links footer-legal-links">
+        <a href="/terms.html">شروط الاستخدام</a>
+        <a href="/privacy.html">سياسة الخصوصية</a>
+        <a href="/refund.html">سياسة الاسترجاع</a>
+      </div>
+    </div>
+    <div class="footer-col footer-contact-col">
+      <h4>تواصل معنا</h4>
+      <a class="footer-contact-link" href="https://wa.me/201202530308" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.8 1.1-.1.2-.3.2-.5.1-.3-.1-1.2-.4-2.2-1.4-.8-.7-1.4-1.6-1.6-1.9-.1-.3 0-.4.1-.5l.4-.5c.1-.1.2-.3.2-.4.1-.1 0-.3 0-.4-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.6.3-.2.3-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.5 4 3.5.6.2 1 .4 1.3.5.6.2 1.1.1 1.5-.1.5-.1 1.4-.6 1.6-1.1.2-.5.2-1 .1-1.1-.1-.1-.2-.2-.5-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.4c1.4.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.1.8.8-3-.2-.3C4 14.8 3.8 13.4 3.8 12c0-4.5 3.7-8.2 8.2-8.2s8.2 3.7 8.2 8.2-3.7 8.2-8.2 8.2z"/></svg><span>واتساب</span></a>
+      <a class="footer-contact-link" href="https://www.instagram.com/migaphotobook/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2.2c3.2 0 3.6 0 4.9.07 3.3.15 4.8 1.7 5 5 .06 1.3.07 1.6.07 4.8s0 3.6-.07 4.8c-.15 3.3-1.7 4.8-5 5-1.3.06-1.6.07-4.9.07s-3.6 0-4.9-.07c-3.3-.15-4.8-1.7-5-5C2 15.6 2 15.3 2 12s0-3.6.07-4.8c.15-3.3 1.7-4.8 5-5C8.4 2.2 8.7 2.2 12 2.2zm0 1.8c-3.15 0-3.5 0-4.8.07-2.4.1-3.5 1.2-3.6 3.6C3.5 8.5 3.5 8.85 3.5 12s0 3.5.06 4.8c.1 2.4 1.2 3.5 3.6 3.6 1.3.06 1.65.06 4.8.06s3.5 0 4.8-.06c2.4-.1 3.5-1.2 3.6-3.6.06-1.3.06-1.65.06-4.8s0-3.5-.06-4.8c-.1-2.4-1.2-3.5-3.6-3.6-1.3-.06-1.65-.07-4.8-.07zm0 3.5a5 5 0 110 10 5 5 0 010-10zm0 1.8a3.2 3.2 0 100 6.4 3.2 3.2 0 000-6.4zm5.2-2.1a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"/></svg><span>إنستجرام</span></a>
+    </div>
+  </div>
+  <div>© 2026 Miga-Photobook — كل التحويلات تتم بعد إتمام الدفع فقط.</div>
 </footer>
 
 <script>
