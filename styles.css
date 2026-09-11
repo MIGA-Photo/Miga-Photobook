@@ -2123,8 +2123,12 @@
   }
 
   .scroll-ruler{
+    /* اتلغى بطلب صريح من ماجدي (11 سبتمبر 2026) — أداة تنقل زايدة
+       بتكرّر وظيفة السكرول الطبيعي وزرار العودة لأعلى، ولونها مخالف
+       لهوية الموقع الذهبية. إخفاء بصري بحت، صفر لمس لـHTML/JS. */
+    display:none !important;
     position:fixed; top:50%; right:16px; transform:translateY(-50%); z-index:190;
-    display:flex; flex-direction:column; align-items:center; gap:8px;
+    flex-direction:column; align-items:center; gap:8px;
   }
   .scroll-ruler-arrow{
     width:32px; height:28px; border-radius:8px;
