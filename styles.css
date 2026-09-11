@@ -947,9 +947,9 @@
   .admin-btn{
     display:inline-flex; align-items:center; gap:8px; height:38px; box-sizing:border-box;
     background:transparent; border:1.5px solid var(--brass); color:var(--paper-dim);
-    padding:0 14px; border-radius:10px; font-size:12.5px;
+    padding:0 14px; border-radius:var(--radius-sm); font-size:12.5px;
   }
-  .admin-btn:hover{background:rgba(255,201,77,0.08); color:var(--brass);}
+  .admin-btn:hover{background:rgba(255,201,77,0.08); color:var(--brass); transform:translateY(-1px);}
   /* The one filled, high-contrast control in the header — everything else
      (categories, search, utility strip) stays outlined/quiet so this is
      unmistakably the primary action, per the same "one accent per view"
@@ -1203,15 +1203,15 @@
   }
   .btn-primary{
     background:var(--brass); color:var(--ink); font-weight:700; font-size:15px;
-    padding:14px 26px; border-radius:9px; transition:.22s;
+    padding:14px 26px; border-radius:var(--radius-sm); transition:.22s;
     box-shadow:0 4px 14px rgba(255,201,77,0.18);
   }
   .btn-primary:hover{background:#ffd873; transform:translateY(-1px); box-shadow:0 6px 20px rgba(255,201,77,0.28);}
   .btn-ghost{
     background:transparent; border:1px solid var(--line); color:var(--paper);
-    padding:14px 22px; border-radius:9px; font-size:15px; transition:.22s;
+    padding:14px 22px; border-radius:var(--radius-sm); font-size:15px; transition:.22s;
   }
-  .btn-ghost:hover{border-color:var(--paper); background:rgba(255,248,236,0.04);}
+  .btn-ghost:hover{border-color:var(--paper); background:rgba(255,248,236,0.04); transform:translateY(-1px);}
 
   /* ---------- Cinema film-strip frame ---------- reuses the same perforation
      motif as .sprockets (the decorative divider elsewhere on the page) so
@@ -2566,6 +2566,33 @@
     box-shadow:0 3px 0 color-mix(in srgb, var(--brass) 55%, black), 0 5px 12px rgba(0,0,0,0.26);
   }
   .admin-btn:active{ transform:translateY(2px); box-shadow:0 1px 0 color-mix(in srgb, var(--brass) 55%, black), 0 2px 5px rgba(0,0,0,0.18); }
+
+  /* فجوة كانت حقيقية: btn-primary وحدها عندها زيادة ظل عند hover.
+     نفس معادلة الزيادة (حافة +1px، امتداد +2px، بلور +4px، شفافية +0.04)
+     بتتطبّق هنا على ghost وadmin بحافة الألوان بتاعتهم هما، مش لون جديد. */
+  .btn-ghost:hover{
+    box-shadow:0 4px 0 color-mix(in srgb, var(--line) 100%, var(--paper) 15%), 0 7px 16px rgba(0,0,0,0.26);
+  }
+  .admin-btn:hover{
+    box-shadow:0 4px 0 color-mix(in srgb, var(--brass) 55%, black), 0 7px 16px rgba(0,0,0,0.30);
+  }
+  /* توهج نحاسي خفيف عند hover — على btn-primary بس، هي الفعل الوحيد
+     المطلوب لفت النظر ليه في أي شاشة (تعليق الكود الأصلي: "توهج واحد
+     لكل شاشة"). إضافة طبقة ظل جنب الـbevel الحالي، مش بديل عنه. */
+  .btn-primary:hover{
+    box-shadow:0 5px 0 color-mix(in srgb, var(--brass) 60%, black), 0 8px 18px rgba(0,0,0,0.36), var(--glow-brass);
+  }
+
+  /* ===== المرحلة ٢ — حالة تركيز لوحة المفاتيح على أزرار التفاعل =====
+     نفس الصيغة المستخدمة أصلاً في .cat-tile/.fav-btn/.theme-toggle —
+     تعميم نمط موجود، مش نمط جديد. outline منفصل عن box-shadow الضغط
+     الثلاثي الأبعاد فمفيش أي تعارض أو تغيير في مظهر الماوس/اللمس. */
+  .btn-primary:focus-visible, .btn-ghost:focus-visible, .buy-btn:focus-visible,
+  .admin-btn:focus-visible, .nav-cta:focus-visible, .social-btn:focus-visible,
+  .account-tab:focus-visible, .plan button:focus-visible,
+  .modal-actions button:focus-visible{
+    outline:2px solid var(--brass); outline-offset:2px;
+  }
 
   .buy-btn{
     box-shadow:0 3px 0 color-mix(in srgb, var(--brass) 55%, black), 0 5px 10px rgba(0,0,0,0.24);
