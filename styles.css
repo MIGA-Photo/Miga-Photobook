@@ -3102,13 +3102,25 @@
     }
     .sticky-mobile-cta .btn-primary{
       flex:1; text-align:center; box-shadow:0 8px 22px rgba(0,0,0,0.4), 0 4px 14px rgba(255,201,77,0.22);
+      /* هامش جانبي عشان زرار الشراء ميمتدش تحت الدايرتين العائمتين —
+         12 سبتمبر 2026: ماجدي وضّح إنه عايز الدايرتين والزرار في سطر
+         واحد فعلاً (الزرار بينهم)، مش الدايرتين عائمتين فوق شريط منفصل
+         زي ما كان في الإصلاح السابق. القيمة = مسافة الدايرة عن الحافة
+         (26px) + قطرها (62px) + فراغ بسيط (10px)، مطروح منها padding
+         الشريط نفسه (14px) = 84px. */
+      margin:0 84px;
     }
-    /* الشريط بارتفاع تقريبي 64px+safe-area — بنبعد زرار التواصل العائم
-       وزرار "الرئيسية" الاتنين بنفس القيمة بالظبط، عشان يفضلوا في نفس
-       المستوى (كانت المشكلة إن زرار التواصل بس اترفع فبقى الاتنين مش
-       متساويين — 11 سبتمبر 2026). */
-    .contact-widget{ bottom:calc(78px + env(safe-area-inset-bottom, 0px)); }
-    .fab-wrap-home{ bottom:calc(78px + env(safe-area-inset-bottom, 0px)); }
+    @media(max-width:520px){
+      /* الدايرة بتصغر لـ58px تحت 520px (شوف .back-to-top-fab أعلاه)،
+         فالهامش بيتقلل بنفس النسبة: 26+58+8-14=78px. */
+      .sticky-mobile-cta .btn-primary{ margin:0 78px; }
+    }
+    /* الدايرتين بقوا على نفس مستوى (bottom) زرار الشراء بالظبط — التلاتة
+       في سطر واحد فعلي، مش دايرتين عائمتين فوق شريط منفصل (كانت المشكلة
+       القديمة: 78px كانت بترفعهم فوق الشريط بدل ما يبقوا جواه — 12 سبتمبر
+       2026، توضيح من ماجدي). */
+    .contact-widget{ bottom:calc(10px + env(safe-area-inset-bottom, 0px)); }
+    .fab-wrap-home{ bottom:calc(10px + env(safe-area-inset-bottom, 0px)); }
   }
   body.view-mode-mobile .sticky-mobile-cta{ display:flex; }
 
