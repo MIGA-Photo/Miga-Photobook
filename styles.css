@@ -475,6 +475,13 @@
     width:52px; height:38px; border-radius:10px; align-items:center; justify-content:center;
     flex-shrink:0;
   }
+  /* لما العميل يكون مسجّل دخول وعنده صورة بروفايل، #hamburgerAvatarImg
+     بيحل محل #hamburgerMenuIcon جوه نفس الزرار بنفس المقاس تمامًا (شايف
+     JS في populateDrawerProfileFields) — الزرار نفسه مابيتغيرش حجمه أو
+     مكانه، فمفيش أي خطورة على توسيط اسم الموقع بجنبه. */
+  .hamburger-btn img{
+    width:26px; height:26px; border-radius:50%; object-fit:cover; flex-shrink:0;
+  }
   /* ⚠ كان بيظهر في الوضع المطوي بس. بقى الباب **الوحيد** للحساب بعد شيل
      زرار التسجيل — وشريط وضع «الشكل الحالي» مافيهوش أي مدخل للحساب خالص،
      فلو فضل مشروط كان أي تحويل للوضع التاني هيقفل التسجيل نهائيًا.

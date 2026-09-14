@@ -5178,6 +5178,30 @@ function populateDrawerProfileFields(){
 
   if(loginLink) loginLink.style.display = currentUser ? 'none' : 'block';
   if(logoutLink) logoutLink.style.display = currentUser ? 'block' : 'none';
+
+  // Header hamburger button (2026-09-14): once a logged-in customer has a
+  // saved avatar, their photo replaces the plain hamburger icon in the
+  // always-visible header — same button, same fixed size, so this can never
+  // disturb the header's centered logo (see the header-overlap history this
+  // was deliberately kept away from). Deliberately gated on a REAL saved
+  // avatarUrl only, not pendingAvatarPreviewUrl — a guest's not-yet-uploaded
+  // preview shouldn't take over the site's main menu icon before there's
+  // even an account to attach it to. aria-label stays "القائمة"/"Menu"
+  // (set once in the HTML, never touched here) since this button's job is
+  // still to open the drawer, not to edit the photo.
+  const hamburgerImg = document.getElementById('hamburgerAvatarImg');
+  const hamburgerIcon = document.getElementById('hamburgerMenuIcon');
+  if(hamburgerImg && hamburgerIcon){
+    if(currentUser && currentUser.avatarUrl){
+      hamburgerImg.src = currentUser.avatarUrl;
+      hamburgerImg.style.display = 'block';
+      hamburgerIcon.style.display = 'none';
+    }else{
+      hamburgerImg.removeAttribute('src');
+      hamburgerImg.style.display = 'none';
+      hamburgerIcon.style.display = 'block';
+    }
+  }
 }
 
 // Shared by the drawer's save button and the account modal's save button —
@@ -5904,7 +5928,7 @@ async function loadPendingReviews(){
     }
     el.innerHTML = reviews.map(r => `
       <div class="admin-product-row">
-        ${r.resultImageUrl ? `<img src="${r.resultImageUrl}" alt="نتيجة مرفقة" style="width:44px; height:56px; object-fit:cover; border-radius:6px; flex-shrink:0;">` : ''}
+        ${r.resultImageUrl ? `<img src="${escapeHtml(r.resultImageUrl)}" alt="نتيجة مرفقة" style="width:44px; height:56px; object-fit:cover; border-radius:6px; flex-shrink:0;">` : ''}
         <div class="admin-product-info">
           <b>${'⭐'.repeat(r.rating)} — ${escapeHtml(r.user_name)}</b>
           <span>${escapeHtml(r.comment)}</span>
