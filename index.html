@@ -252,7 +252,7 @@
      old URL. Bumping this string (e.g. 20260906a -> 20260906b) any time
      app.js or styles.css changes forces every visitor to fetch the new file
      immediately, no manual cache-clearing needed on their end. -->
-<link rel="stylesheet" href="styles.css?v=20260914a">
+<link rel="stylesheet" href="styles.css?v=20260914d">
 
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
@@ -295,7 +295,20 @@
     var raw = localStorage.getItem('megaPromptUiPrefs');
     var prefs = raw ? JSON.parse(raw) : null;
     var theme = (prefs && prefs.theme === 'light') ? 'light' : 'dark';
-    var view = (prefs && prefs.view === 'desktop') ? 'desktop' : 'mobile';
+    var view;
+    if(prefs && (prefs.view === 'desktop' || prefs.view === 'mobile')){
+      // An explicit, previously-saved choice (including from the manual
+      // header toggle) always wins over screen width.
+      view = prefs.view;
+    }else{
+      // No saved preference yet — infer from the real screen width instead
+      // of always assuming mobile. 1180px is the exact width below which
+      // the desktop layout (#appRoot{min-width:1180px} in styles.css)
+      // starts forcing horizontal scroll, so anything narrower gets the
+      // mobile layout, which already renders cleanly down to very small
+      // phones.
+      view = (window.innerWidth >= 1180) ? 'desktop' : 'mobile';
+    }
     document.documentElement.setAttribute('data-theme', theme);
     document.body.className = 'view-mode-' + view;
   }catch(e){
@@ -309,9 +322,8 @@
   <div class="wm-logo-layer" id="wmLogoLayer"></div>
 </div>
 <div id="appRoot">
-<div class="promo-marquee" aria-hidden="true">
+<div class="promo-marquee">
   <div class="promo-marquee-track">
-    <span class="mq-line"><span data-i18n="promoMarqueePre">🎉 عرض الافتتاح: صورتك بورتريه احترافي بـ </span><span class="mq-price" data-i18n="promoMarqueePrice">25 جنيه بدل 50</span><span data-i18n="promoMarqueeMid"> — بتقنيات </span><span class="mq-mega" data-i18n="promoMarqueeBrand">ميجا</span><span data-i18n="promoMarqueePost">، وخلال دقائق. يلا، مستني إيه؟</span></span>
     <span class="mq-line"><span data-i18n="promoMarqueePre">🎉 عرض الافتتاح: صورتك بورتريه احترافي بـ </span><span class="mq-price" data-i18n="promoMarqueePrice">25 جنيه بدل 50</span><span data-i18n="promoMarqueeMid"> — بتقنيات </span><span class="mq-mega" data-i18n="promoMarqueeBrand">ميجا</span><span data-i18n="promoMarqueePost">، وخلال دقائق. يلا، مستني إيه؟</span></span>
   </div>
 </div>
@@ -426,31 +438,21 @@
      chosen for the hero's own toggle-able showcase further down. Framed in
      the site's brass gold to read as a distinct, deliberate feature. -->
 <section class="hero hero-with-slider">
-  <div>
-    <div class="eyebrow" data-i18n="heroEyebrow">Miga-Photobook</div>
-    <div class="tagline" data-i18n="heroSlogan">لقطتك... تتحول لتحفة فنية</div>
-    <h1 id="heroTitle" data-i18n-html="heroTitle">حوّل صورتك إلى بورتريه احترافي<br>بجودة استوديو باستخدام <span class="brand-mark">Miga-Photobook ميجا فوتوبوك</span><br>خلال دقائق.</h1>
-    <p data-i18n="heroP">ارفع صورتك الشخصية — لك أو لطفلك — واختار الأسلوب اللي يعجبك، وإحنا نحوّلها لك تلقائيًا بجودة استوديو خلال دقائق بعد تأكيد الدفع.</p>
-    <div class="trust-checks">
-      <span data-i18n="trustCheck1">✅ نتيجة خلال دقائق</span>
-      <span data-i18n="trustCheck2">✅ دفع آمن</span>
-      <span data-i18n="trustCheck3">✅ دعم فني مباشر</span>
-      <span data-i18n="trustCheck4">✅ تحديثات مستمرة</span>
-    </div>
-  </div>
-
-  <!-- Permanent showcase slider — always the interactive drag slider here,
-       right beside the hero text in the same row (per explicit request:
-       side-by-side even on mobile, each shrinking to fit), regardless of
-       whichever mode (circle/slider) the admin has chosen for the
-       toggle-able showcase further down the page. -->
+  <!-- Visual result comes FIRST in markup on purpose: in this RTL layout the
+       first DOM child lands in the right-most grid column (the natural start
+       of Arabic reading order), and on mobile (single column) it stacks on
+       top -- so the actual transformation result is the first thing seen,
+       ahead of the headline, on both desktop and mobile. Still the same
+       always-on interactive slider, populated from real data by
+       loadSliderData() (site-config showcase, falling back to real product
+       images) -- never a hardcoded/fake image. -->
   <div class="fixed-slider-frame">
     <div class="slider-wrap-instance" id="bafSliderFixed">
       <div class="slider-card slider-card-compact" data-slider-card>
         <img data-slider-before alt="قبل" data-i18n-alt="beforeLabel">
         <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد" data-i18n-alt="afterLabel"></div>
         <div class="slider-line" data-slider-line></div>
-        <button type="button" class="slider-handle" data-slider-handle>↔</button>
+        <button type="button" class="slider-handle" data-slider-handle role="slider" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-label="اسحب أو استخدم أسهم اليمين واليسار للمقارنة بين قبل وبعد" data-i18n-aria="a11ySliderHandle">↔</button>
         <span class="tag tag-before" data-i18n="beforeLabel">قبل</span>
         <span class="tag tag-after" data-i18n="afterLabel">بعد</span>
       </div>
@@ -459,6 +461,30 @@
         <div class="slider-dots" data-slider-dots></div>
         <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي" data-i18n-aria="a11yNext">›</button>
       </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="eyebrow" data-i18n="heroEyebrow">Miga-Photobook</div>
+    <div class="tagline" data-i18n="heroSlogan">لقطتك... تتحول لتحفة فنية</div>
+    <h1 id="heroTitle" data-i18n-html="heroTitle">حوّل صورتك إلى بورتريه احترافي<br>بجودة استوديو باستخدام <span class="brand-mark">Miga-Photobook ميجا فوتوبوك</span><br>خلال دقائق.</h1>
+    <!-- Primary CTA carries no hardcoded price: the base text below (no
+         number) is what shows until syncHeroPriceCta() (app.js) reads the
+         real cheapest live product price -- the exact same source
+         syncProductPriceLd() already trusts for the page's own SEO price --
+         and appends it to #heroPricePart. If that data isn't available
+         (offline, or this sandbox's blocked backend) the CTA stays valid and
+         truthful with no number, rather than showing a stale or invented one. -->
+    <div class="hero-ctas">
+      <a href="#children" class="btn-primary" id="heroPrimaryCta" data-i18n-html="heroPrimaryCta">اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي<span id="heroPricePart"></span></a>
+      <a href="#beforeAfterShowcase" class="btn-ghost" data-i18n="heroSecondaryCta">شاهد نتائج قبل/بعد</a>
+    </div>
+    <p data-i18n="heroP">ارفع صورتك الشخصية — لك أو لطفلك — واختار الأسلوب اللي يعجبك، وإحنا نحوّلها لك تلقائيًا بجودة استوديو خلال دقائق بعد تأكيد الدفع.</p>
+    <div class="trust-checks">
+      <span data-i18n="trustCheck1">✅ نتيجة خلال دقائق</span>
+      <span data-i18n="trustCheck2">✅ دفع آمن</span>
+      <span data-i18n="trustCheck3">✅ دعم فني مباشر</span>
+      <span data-i18n="trustCheck4">✅ تحديثات مستمرة</span>
     </div>
   </div>
 </section>
@@ -650,7 +676,7 @@
   .hero-showcase-variant[hidden]{ display:none !important; }
 </style>
 
-<section class="baf-section" id="beforeAfterShowcase">
+<section class="baf-section js-nudge-avoid" id="beforeAfterShowcase">
   <h2 class="baf-title" data-i18n="bafTitle">صورة واحدة منك... نحولها لأجمل صورة من اختيارك من عندنا</h2>
   <p class="baf-sub" data-i18n="bafSub">دي نفس الصورة، بعد ما Miga-Photobook حوّلها لأكتر من ستايل. اختار اللي يعجبك وجرّبه على صورتك.</p>
 
@@ -692,7 +718,7 @@
         <img data-slider-before alt="قبل" data-i18n-alt="beforeLabel">
         <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد" data-i18n-alt="afterLabel"></div>
         <div class="slider-line" data-slider-line></div>
-        <button type="button" class="slider-handle" data-slider-handle>↔</button>
+        <button type="button" class="slider-handle" data-slider-handle role="slider" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-label="اسحب أو استخدم أسهم اليمين واليسار للمقارنة بين قبل وبعد" data-i18n-aria="a11ySliderHandle">↔</button>
         <span class="tag tag-before" data-i18n="beforeLabel">قبل</span>
         <span class="tag tag-after" data-i18n="afterLabel">بعد</span>
       </div>
@@ -874,7 +900,7 @@
       </ul>
       <button type="button" class="btn-ghost" onclick="openPackageBuyModal(3)" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
     </div>
-    <div class="plan featured">
+    <div class="plan featured plan-most-popular">
       <h3 data-i18n="plan2Title">باقة Pro</h3>
       <div class="price">259 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="plan2Unit">/ 15 صورة</span></div>
       <ul>
@@ -1078,14 +1104,14 @@
   </div>
   <div class="testimonials-grid" id="testimonialsGrid">
     <div class="proof-results-grid" style="grid-column:1/-1;" id="testimonialsProofGrid">
-      <div class="proof-tile"><img src="before-after/before-after/after-1.jpg" alt="نتيجة حقيقية 1" data-i18n-alt="a11yResult" data-i18n-alt-n="1" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-2.jpg" alt="نتيجة حقيقية 2" data-i18n-alt="a11yResult" data-i18n-alt-n="2" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-3.jpg" alt="نتيجة حقيقية 3" data-i18n-alt="a11yResult" data-i18n-alt-n="3" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-4.jpg" alt="نتيجة حقيقية 4" data-i18n-alt="a11yResult" data-i18n-alt-n="4" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-5.jpg" alt="نتيجة حقيقية 5" data-i18n-alt="a11yResult" data-i18n-alt-n="5" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-6.jpg" alt="نتيجة حقيقية 6" data-i18n-alt="a11yResult" data-i18n-alt-n="6" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-7.jpg" alt="نتيجة حقيقية 7" data-i18n-alt="a11yResult" data-i18n-alt-n="7" loading="lazy"></div>
-      <div class="proof-tile"><img src="before-after/before-after/after-8.jpg" alt="نتيجة حقيقية 8" data-i18n-alt="a11yResult" data-i18n-alt-n="8" loading="lazy"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-1.jpg" alt="نتيجة حقيقية 1" data-i18n-alt="a11yResult" data-i18n-alt-n="1" loading="lazy" onerror="handleProofImgError(this)"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-2.jpg" alt="نتيجة حقيقية 2" data-i18n-alt="a11yResult" data-i18n-alt-n="2" loading="lazy" onerror="handleProofImgError(this)"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-3.jpg" alt="نتيجة حقيقية 3" data-i18n-alt="a11yResult" data-i18n-alt-n="3" loading="lazy" onerror="handleProofImgError(this)"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-4.jpg" alt="نتيجة حقيقية 4" data-i18n-alt="a11yResult" data-i18n-alt-n="4" loading="lazy" onerror="handleProofImgError(this)"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-5.jpg" alt="نتيجة حقيقية 5" data-i18n-alt="a11yResult" data-i18n-alt-n="5" loading="lazy" onerror="handleProofImgError(this)"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-6.jpg" alt="نتيجة حقيقية 6" data-i18n-alt="a11yResult" data-i18n-alt-n="6" loading="lazy" onerror="handleProofImgError(this)"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-7.jpg" alt="نتيجة حقيقية 7" data-i18n-alt="a11yResult" data-i18n-alt-n="7" loading="lazy" onerror="handleProofImgError(this)"></div>
+      <div class="proof-tile"><img src="before-after/before-after/after-8.jpg" alt="نتيجة حقيقية 8" data-i18n-alt="a11yResult" data-i18n-alt-n="8" loading="lazy" onerror="handleProofImgError(this)"></div>
     </div>
   </div>
   <p class="sub" style="margin-top:16px; opacity:0.7; font-size:12.5px;" id="testimonialsNoteEl" data-i18n="testimonialsNote">* نماذج حقيقية من نتائج Miga-Photobook الفعلية.</p>
@@ -2175,7 +2201,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260914a"></script>
+<script src="app.js?v=20260914g"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){

@@ -298,56 +298,36 @@
   }
 
   /* ===== Promo marquee ===== */
+  /* Motion audit (14 سبتمبر 2026): كانت شريط سكرول مستمر بلا توقف — أُوقفت
+     الحركة بالكامل (مش بس prefers-reduced-motion) لأنها ضجة بصرية مستمرة
+     بدون قيمة وظيفية حقيقية، عكس هدف "Premium/Clean". رسالة العرض (الخصم
+     الحقيقي) هي القيمة الفعلية، فبقيت كاملة وواضحة، ثابتة، بتلف على أكتر من
+     سطر لو احتاجت بدل ما تتحرك أو تتقص. نسخة الـHTML المكررة (كانت لازمة
+     بس عشان وهم اللفّة المستمرة) اتشالت — سطر واحد بس دلوقتي. */
   .promo-marquee{
-    position:relative; z-index:49; overflow:hidden;
+    position:relative; z-index:49;
     background:linear-gradient(90deg, var(--brass-dim), var(--brass), var(--brass-dim));
-    /* الارتفاع كان 36px. الشريط ده مش محتوى — دعاية بتعدّي — فماينفعش
-       ياخد المساحة دي من أول شاشة. 2px حشو + سطر مضبوط = 21px. */
-    padding:2px 0; white-space:nowrap; line-height:1.3;
+    padding:5px 16px; line-height:1.35; text-align:center;
   }
   .promo-marquee-track{
-    display:inline-flex; gap:64px;
-    /* 22s هنا قيمة احتياطية بس — الجافاسكريبت بيحسب المدة من عرض النص
-       الفعلي عشان السرعة المرئية تفضل ثابتة مهما طال النص أو اتغيّرت اللغة.
-       شوف tuneMarqueeSpeed() في app.js. */
-    animation:marqueeScroll 22s linear infinite;
-    will-change:transform;
+    display:block;
   }
 
   /* الشريط أرضيته ذهبية فاتحة، فالأحمر لازم يبقى غامق عشان يتقرا:
      ‎#c40d0d‎ تباينه 3.3:1 (تحت المعيار)، ‎#8f0c0c‎ تباينه 5.0:1. */
-  /* السعر هو أهم كلمة في الجملة — شريحة داكنة خفيفة بتخليه يتلقط بالعين
-     وهو ماشي. الحشو على عنصر inline مابيزوّدش ارتفاع السطر، فالشريط
-     بيفضل 25px. */
   .promo-marquee-track .mq-price{
     background:rgba(26,19,5,0.14); padding:1px 7px; border-radius:6px;
     font-weight:700; letter-spacing:0;
   }
   .promo-marquee-track .mq-mega{
     color:#8f0c0c; font-weight:700; font-size:1.12em;
-    animation:megaBlink 1.5s ease-in-out infinite;
   }
-  @media(prefers-reduced-motion: reduce){ .promo-marquee-track .mq-mega{ animation:none; } }
-  /* القاعدة دي كانت متكتبة لـ`span` عام، والنص القديم كان span واحد. النص
-     الجديد بقى تلات spans (الجملة + «ميجا» + باقي الجملة)، فكل واحد فيهم كان
-     بياخد padding 64px — يعني **192px فراغ ميت جوه الجملة الواحدة**، بيطوّل
-     الشريط ويبطّئه من غير أي سبب. دلوقتي الحشو على السطر كله مرة واحدة. */
   .promo-marquee-track .mq-line{
+    display:inline;
     font-size:var(--text-sm); font-weight:700; color:#1a1305; letter-spacing:0.3px;
-    padding-inline-end:64px; line-height:1.3;
     font-family:'Readex Pro', sans-serif;
     text-shadow:0 1px 0 rgba(255,255,255,0.25);
   }
-  @keyframes marqueeScroll{
-    0%{ transform:translateX(0); }
-    100%{ transform:translateX(-50%); }
-  }
-  html[dir="rtl"] .promo-marquee-track{ animation-name:marqueeScrollRtl; }
-  @keyframes marqueeScrollRtl{
-    0%{ transform:translateX(0); }
-    100%{ transform:translateX(50%); }
-  }
-  @media(prefers-reduced-motion: reduce){ .promo-marquee-track{animation:none;} }
 
   /* ===== Header ===== */
   .sticky-top-group{
@@ -624,8 +604,10 @@
     background-size:260% 100%;
     -webkit-background-clip:text; background-clip:text;
     color:transparent; -webkit-text-fill-color:transparent;
-    /* 7.5s بدل 4.6s — الموجة كانت سريعة، دلوقتي بتعدّي مرة كل ٧ ثواني ونص */
-    animation:logoSheen 7.5s ease-in-out infinite;
+    /* Motion audit (14 سبتمبر 2026): كانت موجة ذهبية بتتحرك على الشعار كل
+       7.5 ثانية للأبد — حركة زخرفية بحتة (مفيش حالة أو تفاعل بتوصّله)،
+       فاتشالت بالكامل. الشكل الذهبي المتدرج نفسه فضل زي ما هو، ثابت. */
+    background-position:0% 0%;
   }
   /* الاسم في نص الصف الأول بالظبط — بتلات خانات، مش بتثبيت مطلق.
 
@@ -993,20 +975,17 @@
      brand-colored treatment, wherever it appears in copy across the site —
      a small, consistent visual cue that reinforces the brand name itself
      rather than just the generic offer around it. */
-  /* Strong red + a fast blink makes "ميجا" impossible to miss, and red
-     reads clearly against BOTH the dark page background and the gold
-     buttons alike — no separate per-context override needed anymore. */
+  /* Motion audit (14 سبتمبر 2026): كان في وميض أحمر مستمر (كل 1.5 ثانية،
+     بلا توقف، في كل مكان تتكرر فيه كلمة "ميجا" — الهيدر، الشريط الإعلاني،
+     زرار التواصل العائم). القرار: الوميض المستمر بلا حد بيقرا كـ"ضجة" مش
+     "Premium"، ومالوش قيمة UX حقيقية (مفيش حالة بيتغيّر معلن عنها). اللون
+     القوي + الحجم الأكبر لوحدهم كافيين يخلوا الكلمة بارزة بصريًا من غير أي
+     حركة خالص — اللون والحجم اتسابوا زي ما هما، الحركة بس هي اللي اتشالت،
+     سيتوايد مش بس جوه الهيرو (كان أول إصلاح جزئي وقتها، ده استكماله). */
   .brand-mega{
     font-weight:700; color:#e21c1c;
     font-size:1.32em; line-height:1;
-    animation:megaBlink 1.5s ease-in-out infinite;
   }
-  @keyframes megaBlink{
-    0%, 45%{ opacity:1; }
-    55%, 95%{ opacity:0.15; }
-    100%{ opacity:1; }
-  }
-  @media(prefers-reduced-motion: reduce){ .brand-mega{ animation:none; } }
   .hero p{color:var(--paper-dim); font-size:16.5px; max-width:480px; margin-bottom:28px;}
   .hero-ctas{display:flex; flex-wrap:wrap; gap:12px;}
   .trust-checks{
@@ -1828,7 +1807,11 @@
     background:var(--media-bg); display:flex; flex-direction:column; gap:14px;
   }
   .plan.featured{border-color:var(--brass); position:relative; background:linear-gradient(180deg, rgba(255,201,77,0.12), transparent 60%);}
-  .plan.featured::before{
+  /* The "الأكثر طلبًا" ribbon is a claim about the WHOLE pricing page, so only
+     one card may ever carry it -- .plan.featured alone just gives the gold
+     highlight border/tint; the badge text needs the extra .plan-most-popular
+     class, applied to exactly one card in the markup. */
+  .plan.featured.plan-most-popular::before{
     content:"⭐ الأكثر طلبًا"; position:absolute; top:-13px; right:24px; background:var(--brass);
     color:var(--ink); font-size:var(--text-sm); font-weight:700; padding:4px 12px; border-radius:100px;
   }
@@ -2021,7 +2004,13 @@
   }
 
   .stay-nudge{
-    position:fixed; bottom:-200px; inset-inline-start:50%; transform:translateX(-50%);
+    /* عمدًا left مش inset-inline-start: العنصر ده لازم يفضل في نص الشاشة
+       بالظبط بغض النظر عن اتجاه الصفحة. inset-inline-start بيتحول لـ right
+       في RTL (الموقع كله RTL)، ومع transform:translateX(-50%) اللي فيزيائي
+       دايمًا مش بيتأثر بالاتجاه، الاتنين مع بعض كانوا بيودّوا الصندوق
+       لشمال الشاشة تمامًا (مش نصها) -- وده السبب الحقيقي وراء تغطيته لعناصر
+       تانية (زي دايرة الأساليب) بدل ما يفضل واضح في النص. */
+    position:fixed; bottom:-200px; left:50%; transform:translateX(-50%);
     z-index:205; width:min(440px, calc(100vw - 32px));
     background:var(--ink-2); border:2px solid var(--brass); border-radius:16px;
     padding:18px 20px 16px; box-shadow:0 18px 50px rgba(0,0,0,0.55);
@@ -2286,9 +2275,7 @@
      تدخل جوه دايرة 52px من غير ما تلمس الإطار. */
   .contact-fab .fab-mega{
     color:#ff4d4d; font-weight:700; font-size:11.5px; line-height:1.1;
-    animation:megaBlink 1.5s ease-in-out infinite;
   }
-  @media(prefers-reduced-motion: reduce){ .contact-fab .fab-mega{ animation:none; } }
   /* الكلمة أعرض من الدايرة، فلو الزرار ملزّق في حافة الشاشة الكلمة
      بتتقص. 24px بتسيب فراغ كفاية لنص عرض الكلمة الزيادة. */
   @media(max-width:520px){ .contact-widget{ bottom:20px; left:24px; } }
@@ -2382,21 +2369,15 @@
   }
   @media(prefers-reduced-motion: reduce){ .soft-launch-banner{animation:none;} }
 
-  /* Logo: a slow gold sheen sweeps across the wordmark every few seconds — a
-     subtle, recurring flash rather than a one-off entrance animation, so it
-     keeps catching the eye without being distracting while reading. */
+  /* Motion audit (14 سبتمبر 2026): كانت موجة ذهبية تانية (نسخة مختلفة، 4
+     ثواني) بتتكرر للأبد على نفس الشعار — نفس القرار: حركة زخرفية بحتة بلا
+     قيمة وظيفية، اتشالت بالكامل. الشكل الذهبي المتدرج الثابت فضل زي ما هو. */
   .logo > span > .logo-accent{
     background:linear-gradient(90deg, var(--brass) 0%, #fff3c4 50%, var(--brass) 100%);
     background-size:250% 100%;
     -webkit-background-clip:text; background-clip:text; color:transparent;
-    animation:logoSheen 4s ease-in-out infinite;
+    background-position:0% 0%;
   }
-  @keyframes logoSheen{
-    0%, 15%{ background-position:200% 0; }
-    50%, 65%{ background-position:0% 0; }
-    100%{ background-position:-200% 0; }
-  }
-  @media(prefers-reduced-motion: reduce){ .logo span > span.logo-accent{animation:none;} }
 
   @media(max-width:860px){
     .hero{grid-template-columns:1fr;}
@@ -2515,6 +2496,13 @@
   body.view-mode-mobile #appRoot{
     max-width:412px; width:100%; border:1px solid var(--line); border-radius:26px;
     box-shadow:0 30px 80px rgba(0,0,0,0.6);
+    /* Tablet-range real visitors (768–1179px) auto-detect into this same
+       'mobile' view-mode (the desktop layout needs >=1180px to not feel
+       cramped) — but their actual screen is far wider than a phone, so the
+       412px phone-frame mockup below wasted most of a real tablet's width.
+       Widened for this range only via the media query further down; true
+       phone widths and true desktop (>=1180px, a different body class
+       entirely) are unaffected. */
     /* overflow:hidden used to live here for the rounded-corner "phone frame"
        clipping effect, but overflow anything-other-than-visible on an
        ancestor makes IT (not the page's real scroll container) the
@@ -2527,6 +2515,14 @@
        showing through the phone-frame preview, which is why it looked
        "not working" in mobile mode. Letting it stay transparent lets the
        watermark (and its animation) show through exactly like on desktop. */
+  }
+  /* The actual tablet-width fix: use real screen space instead of the
+     ~412px phone mockup. min(94vw, 760px) keeps a small side gutter at
+     768px and caps the width before it gets uncomfortably wide right at
+     the 1179px edge of this range — same content/flow as phone mode, just
+     not artificially squeezed into a phone-sized column. */
+  @media (min-width:768px) and (max-width:1179px){
+    body.view-mode-mobile #appRoot{ max-width:min(94vw, 760px); border-radius:20px; }
   }
   body.view-mode-mobile #appRoot > header{
     border-top-left-radius:26px; border-top-right-radius:26px; overflow:hidden;

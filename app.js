@@ -246,7 +246,8 @@ const translations = {
     faqQ7:'هل أقدر أختار أكثر من ستايل؟', faqA7:'أكيد! تقدر تطلب أكتر من ستايل لنفس الصورة أو لصور مختلفة — كل ستايل بيتحسب طلب منفصل، أو استخدم إحدى الباقات (10 أو 20 صورة) عشان توفر لو محتاج أكتر من نتيجة.',
     heroTitle:'حوّل صورتك إلى بورتريه احترافي<br>بجودة استوديو باستخدام <span class="brand-mark">Miga-Photobook ميجا فوتوبوك</span><br>خلال دقائق.',
     heroP:'ارفع صورتك الشخصية — لك أو لطفلك — واختار الأسلوب اللي يعجبك، وإحنا نحوّلها لك تلقائيًا بجودة استوديو خلال دقائق بعد تأكيد الدفع.',
-    heroCta1:'اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي بـ25 جنيه', heroCta2:'الأسعار والعروض',
+    heroPrimaryCta:'اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي', heroSecondaryCta:'شاهد نتائج قبل/بعد',
+    heroPricePartTpl:' بـ{price} جنيه',
     bafTitle:'صورة واحدة منك... نحولها لأجمل صورة من اختيارك من عندنا',
     bafSub:'دي نفس الصورة، بعد ما Miga-Photobook حوّلها لأكتر من ستايل. اختار اللي يعجبك وجرّبه على صورتك.',
     bafCenterLabel:'صورتك الأصلية',
@@ -455,6 +456,7 @@ const translations = {
     ratingBadgeMid:'من 5 —', ratingBadgeSuffix:'تقييم', transformBadgeSuffix:'صورة تم تحويلها',
     trustVisitors:'زائر', trustPhotos:'صورة',
     a11yResult:'نتيجة', a11yExample:'مثال', a11ySearch:'بحث', a11yPrev:'السابق', a11yNext:'التالي',
+    a11ySliderHandle:'اسحب أو استخدم أسهم اليمين واليسار للمقارنة بين قبل وبعد',
     a11yContact:'تواصل معنا', a11yBackToTop:'العودة لأعلى الصفحة',
     brandNameAr:'ميجا فوتوبوك', backHomeLabel:'الرئيسية', contactFabWord:'تواصل مع', contactFabBrand:'ميجا',
     launchPromoBannerShort:'🎉 صورتك بـ 25 بدل 50 جنيه',
@@ -598,8 +600,9 @@ const translations = {
     faqQ5:'How do I get my result?', faqA5:'Right after payment is confirmed, upload your photo on the site and get the transformed result directly — downloadable anytime.',
     faqQ7:'Can I choose more than one style?', faqA7:'Of course! You can order more than one style for the same photo or for different photos — each style counts as a separate order, or use one of the bundles (10 or 20 photos) to save if you need more than one result.',
     heroTitle:'Turn your photo into a professional,<br>studio-quality portrait with <span class="brand-mark">Miga-Photobook</span><br>in minutes.',
-    heroP:'A library of professional, ready-to-use prompts for transforming personal photos — for children, men, and women — carefully written and tested. Buy, unlock instantly, and use right away.',
-    heroCta1:'Make Your <b class="brand-mega">Mega</b> Photo Now — 25 EGP', heroCta2:'Pricing & Offers',
+    heroP:"Upload your personal photo — yours or your child's — and pick the style you like, and we'll transform it automatically into studio quality within minutes after payment is confirmed.",
+    heroPrimaryCta:'Make Your <b class="brand-mega">Mega</b> Photo Now', heroSecondaryCta:'See Before & After Results',
+    heroPricePartTpl:' — {price} EGP',
     bafTitle:'One Photo From You... Turned Into Your Favorite Style',
     bafSub:'This is the same photo, after Miga-Photobook transformed it into different styles. Pick one you like and try it on your own photo.',
     bafCenterLabel:'Your Original Photo',
@@ -806,6 +809,7 @@ const translations = {
     ratingBadgeMid:'of 5 —', ratingBadgeSuffix:'reviews', transformBadgeSuffix:'photos transformed',
     trustVisitors:'visitors', trustPhotos:'photos',
     a11yResult:'Result', a11yExample:'Example', a11ySearch:'Search', a11yPrev:'Previous', a11yNext:'Next',
+    a11ySliderHandle:'Drag, or use the left/right arrow keys, to compare before and after',
     a11yContact:'Contact us', a11yBackToTop:'Back to top',
     brandNameAr:'ميجا فوتوبوك', backHomeLabel:'Home', contactFabWord:'Contact', contactFabBrand:'Miga',
     launchPromoBannerShort:'🎉 25 EGP instead of 50',
@@ -1411,6 +1415,20 @@ function syncProductPriceLd(){
   }catch(e){ /* الاحتياطي اللي في الملف بيفضل زي ما هو */ }
 }
 
+/** الهيرو ما بيكتبش سعر بالإيد -- زرار "اعمل صورتك ميجا دلوقتي" بينزل من
+ * غير رقم لحد ما السعر الحقيقي يوصل، وساعتها بيتضاف تلقائيًا من نفس مصدر
+ * السعر اللي syncProductPriceLd() فوق دي بتستخدمه بالظبط (أرخص منتج فعلي
+ * موجود دلوقتي). لو السعر اتغيّر من لوحة التحكم، الهيرو بيتحدّث معاه من
+ * غير أي كود إضافي -- ولو البيانات مش واصلة (شبكة، أو بيئة تجربة زي دي)،
+ * الزرار بيفضل صادق من غير رقم بدل ما يعرض رقم قديم أو مختلق. */
+function syncHeroPriceCta(){
+  const el = document.getElementById('heroPricePart');
+  if(!el || !Array.isArray(products) || !products.length) return;
+  const prices = products.map(p=>Number(p.price)).filter(n=>Number.isFinite(n) && n > 0);
+  if(!prices.length) return;
+  el.textContent = t('heroPricePartTpl').replace('{price}', Math.min(...prices).toLocaleString('en-US'));
+}
+
 async function loadProducts(){
   if(!BACKEND_BASE){ products = seedProducts(); return; }
   try{
@@ -1427,6 +1445,7 @@ async function loadProducts(){
   // بعد ما المنتجات توصل مباشرةً — قبل أي رسم. لو الشبكة فشلت،
   // products بتبقى فاضية والدالة بتعمل return والاحتياطي بيفضل.
   syncProductPriceLd();
+  syncHeroPriceCta();
 }
 
 /** Whether the 'luxury' slot is running as the derived "Prompt Library for
@@ -1565,6 +1584,10 @@ function toggleFavorite(id){
   const nowFav = i === -1;
   if(nowFav) favorites.unshift(id); else favorites.splice(i, 1);
   saveFavorites();
+  // Logged in → also push to the account so it's there on every other
+  // device/browser after logging in there too. Not logged in → this stays
+  // exactly the local-only behaviour it always was, nothing else changes.
+  if(currentUser){ nowFav ? addFavoriteOnServer(id) : removeFavoriteOnServer(id); }
 
   // Flip every heart for this product wherever it currently sits, in place —
   // re-rendering all the rows on a single tap would rebuild hundreds of card
@@ -2760,10 +2783,8 @@ function armStayNudge(){
   if(dismissed || adminLoggedIn || purchases.length) return;
 
   let scrolledEnough = false;
-  const onScroll = ()=>{
-    if(window.scrollY > window.innerHeight * 0.9) scrolledEnough = true;
-  };
-  window.addEventListener('scroll', onScroll, {passive:true});
+  let readyToTrigger = false; // becomes true once the 45s "gave it a while" delay has passed
+  let shown = false;
 
   const hide = ()=>{
     nudge.classList.remove('show');
@@ -2771,16 +2792,62 @@ function armStayNudge(){
   };
   elById('stayNudgeClose').onclick = hide;
   elById('nudgeBrowseBtn').onclick = hide;
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape' && nudge.classList.contains('show')) hide();
+  });
 
-  setTimeout(()=>{
-    // Re-check at the last moment: they may have bought, logged in as admin,
-    // or already have a modal open in the meantime.
-    if(!scrolledEnough || adminLoggedIn || purchases.length) return;
-    if(document.querySelector('.modal-bg.show')) return;
+  // The nudge is fixed to the bottom of whatever the visitor is currently
+  // looking at, so it must never land on top of a section marked
+  // "js-nudge-avoid" (e.g. the before/after showcase circle) -- if that
+  // section currently occupies the strip of viewport the nudge would use,
+  // skip showing it for now; maybeShow() re-runs on every subsequent scroll,
+  // so it appears the moment the visitor scrolls the guarded section out of
+  // the way, with no polling in between.
+  const overlapsProtectedContent = ()=>{
+    const guarded = document.querySelectorAll('.js-nudge-avoid');
+    const vh = window.innerHeight;
+    // The nudge stays in the layout (never display:none) even while hidden
+    // off-screen, so its real height is always measurable -- no need to
+    // guess a fixed box size. Only the resting "bottom" gap has to mirror
+    // the CSS breakpoint at 560px (26px desktop / 92px mobile, see .stay-nudge
+    // and its @media(max-width:560px) override in styles.css).
+    const nudgeBottomGap = window.innerWidth <= 560 ? 92 : 26;
+    const nudgeFootprint = nudgeBottomGap + nudge.offsetHeight + 20; // +20px clearance
+    for(const el of guarded){
+      const r = el.getBoundingClientRect();
+      if(r.bottom > vh - nudgeFootprint && r.top < vh) return true;
+    }
+    return false;
+  };
+
+  const show = ()=>{
+    if(shown) return;
+    shown = true;
     nudge.classList.add('show');
     try{ sessionStorage.setItem('migaNudgeSeen','1'); }catch(e){}
     setTimeout(()=> nudge.classList.remove('show'), 20000);
-  }, 45000);
+  };
+
+  const maybeShow = (ignoreOverlap)=>{
+    if(shown || !readyToTrigger || !scrolledEnough || adminLoggedIn || purchases.length) return;
+    if(document.querySelector('.modal-bg.show')) return;
+    if(overlapsProtectedContent() && !ignoreOverlap) return;
+    show();
+  };
+
+  window.addEventListener('scroll', ()=>{
+    if(window.scrollY > window.innerHeight * 0.9) scrolledEnough = true;
+    maybeShow(false);
+  }, {passive:true});
+
+  setTimeout(()=>{ readyToTrigger = true; maybeShow(false); }, 45000);
+  // Last-resort safety net: a visitor who scrolls straight into the guarded
+  // area and then never scrolls again would otherwise never see the nudge at
+  // all. Rather than suppress it forever, show it anyway after a much longer
+  // wait -- by then they've very likely moved on, and a late reminder beats
+  // none, without covering the showcase for the ~90 seconds most visitors
+  // will have already scrolled past it in.
+  setTimeout(()=> maybeShow(true), 45000 + 90000);
 }
 
 /** Central funnel-tracking helper. Sends the same event to both GA4 (gtag)
@@ -2910,7 +2977,7 @@ elById('payCardFawryBtn').onclick = async ()=>{
   try{
     // Create the underlying order first (same order system as InstaPay), then hand off to the gateway.
     const orderRes = await fetch(`${BACKEND_BASE}/orders/create`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
+      method:'POST', headers:{'Content-Type':'application/json', ...authHeader()},
       body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: amount, phone, appUsed: method==='card' ? 'Fawaterk' : 'Fawry', ref:'', buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '', orderType: currentBuyType, packageSize: currentBuyType==='package' ? currentPackageSize : undefined })
     });
     const orderData = await orderRes.json();
@@ -2986,7 +3053,7 @@ elById('buyConfirmBtn').onclick = async ()=>{
   if(!BACKEND_BASE){ showToast(t('toastOrderFailed')); return; }
   try{
     const res = await fetch(`${BACKEND_BASE}/orders/create`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
+      method:'POST', headers:{'Content-Type':'application/json', ...authHeader()},
       body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: amount, phone, appUsed: manualMethod, ref, buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '', orderType: currentBuyType, packageSize: currentBuyType==='package' ? currentPackageSize : undefined })
     });
     const data = await res.json();
@@ -4009,30 +4076,13 @@ let lastHeaderScrollY = window.scrollY || 0;
 /* المسافة اللي المجموعة بتتزحلقها = ارتفاع الشريط العلوي بالظبط. بتتقاس
    مرة بعد ما الصفحة تستقر، وتتحدّث عند تغيير حجم الشاشة بس — عمرها ما
    بتتقاس أثناء السكرول، عشان مانجبرش المتصفح يعمل تخطيط في نص الحركة. */
-/* سرعة الشريط الإعلاني.
-   الحركة بتزحزح المسار نص عرضه (نسختين من النص = نسخة واحدة مسافة). فلو
-   ثبّتنا المدة، أي نص أطول بيمشي أسرع تلقائيًا وبيبقى صعب القراءة. بنقيس
-   عرض نسخة واحدة وبنقسمه على سرعة ثابتة، فالسرعة المرئية ما بتتغيرش أبدًا.
-   45 بكسل/ثانية اتختارت عشان الجملة تعدّي قدام العين في وقت يكفي لقراءتها. */
-/* 38 بدل 45: القياس على النص الحالي كان 46.2 بكسل/ثانية — الجملة بتعدّي
-   في 13.6 ثانية. عند 38 بتاخد 16.6 ثانية، وده فرق محسوس في الراحة من غير
-   ما الدورة تطول أكتر من اللازم. */
-const MARQUEE_PX_PER_SEC = 38;
-function tuneMarqueeSpeed(){
-  const track = document.querySelector('.promo-marquee-track');
-  if(!track) return;
-  const one = track.querySelector('.mq-line');
-  if(!one) return;
-  const w = one.getBoundingClientRect().width + 64; // + الفراغ بين النسختين
-  if(!w) return;
-  track.style.animationDuration = Math.max(12, Math.round(w / MARQUEE_PX_PER_SEC)) + 's';
-}
-window.addEventListener('resize', tuneMarqueeSpeed);
-window.addEventListener('load', ()=>{
-  tuneMarqueeSpeed();
-  // الخط بيوصل بعد الصفحة، وعرض النص بيتغير لما يوصل — فنعيد القياس بعده.
-  if(document.fonts && document.fonts.ready) document.fonts.ready.then(tuneMarqueeSpeed);
-});
+/* الشريط الإعلاني كان بيتحرك سكرول مستمر بلا توقف (Premium Refinement،
+   مراجعة الحركة — 14 سبتمبر 2026): اتقرر إيقاف أي حركة مستمرة مالهاش قيمة
+   وظيفية واضحة. رسالة العرض نفسها حقيقية ومهمة للتحويل، لكن حركتها المستمرة
+   كانت "ضجة بصرية" بلا داعي. الحل: نص ثابت يلف على سطرين لو احتاج بدل ما
+   يتقص أو يتحرك — تفاصيل العرض (السعر) تفضل ظاهرة كاملة دايمًا، بدون أي حركة.
+   الدالة اللي كانت بتظبط سرعة السكرول (tuneMarqueeSpeed) اتشالت بالكامل مع
+   إزالة الأنيميشن نفسه في styles.css. */
 
 function measureHeaderCollapse(){
   if(!stickyTopGroup) return;
@@ -4820,6 +4870,16 @@ function hideAdminQuickAccess(){
 // ---------- Customer accounts (real, D1-backed via the Worker) ----------
 let currentUser = null; // { name, email, phone, avatarUrl }
 
+/** When a customer is logged in, attach their session token to a request so
+ * the Worker can link it to their real account id server-side (see
+ * createOrder's userId handling) — used for order creation so purchases made
+ * while logged in sync across every device, on top of this browser's own
+ * localStorage copy which still works exactly as before for guests. */
+function authHeader(){
+  const token = localStorage.getItem('megaPromptAuthToken');
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
 async function checkLoggedInUser(){
   const token = localStorage.getItem('megaPromptAuthToken');
   if(!token || !BACKEND_BASE) return;
@@ -4829,10 +4889,87 @@ async function checkLoggedInUser(){
       currentUser = await res.json();
       updateAccountButton();
       logVisitAsLoggedInUser();
+      syncAccountDataFromServer();
     }else{
       localStorage.removeItem('megaPromptAuthToken');
     }
   }catch(e){ /* offline or backend unreachable — stay logged out silently */ }
+}
+
+/** Cross-device sync for favorites + package credits/order history/results.
+ * Runs once right after we know someone is logged in (page load with an
+ * existing session, or a fresh login/register/social-login just now) — see
+ * the two call sites of this function. The server (keyed by this account's
+ * real, trusted user id — never by name/email/phone) is the source of truth
+ * once logged in; this only ever ADDS to what's already in this browser's
+ * localStorage, so nothing a guest already picked or bought locally is ever
+ * discarded, and everything still works exactly as before if this fails
+ * (offline, backend unreachable) or for anyone who never logs in at all. */
+async function syncAccountDataFromServer(){
+  const token = localStorage.getItem('megaPromptAuthToken');
+  if(!token || !BACKEND_BASE) return;
+  try{
+    const [favRes, ordersRes] = await Promise.all([
+      fetch(`${BACKEND_BASE}/account/favorites`, { headers: authHeader() }),
+      fetch(`${BACKEND_BASE}/account/orders`, { headers: authHeader() }),
+    ]);
+
+    if(favRes.ok){
+      const { productIds } = await favRes.json();
+      const serverIds = productIds || [];
+      const localOnlyIds = favorites.filter(id => !serverIds.includes(id));
+      favorites = Array.from(new Set([...serverIds, ...favorites]));
+      saveFavorites();
+      renderFavorites();
+      renderCatTiles();
+      // Anything favourited on this device before logging in (or offline)
+      // wasn't on the server yet — push it up now so it's on every device.
+      localOnlyIds.forEach(id => addFavoriteOnServer(id));
+    }
+
+    if(ordersRes.ok){
+      const { orders: serverOrders } = await ordersRes.json();
+      (serverOrders || []).forEach(o=>{
+        if(o.status !== 'approved') return;
+        if(o.orderType === 'prompt'){
+          if(!promptPurchases.includes(o.productId)) promptPurchases.push(o.productId);
+          promptOrderCodes[o.productId] = o.code;
+          if(o.promptText) purchasedPromptTexts[o.productId] = o.promptText;
+        }else if(o.orderType === 'package'){
+          packageCredits[o.code] = {
+            size: o.packageSize,
+            remaining: o.creditsRemaining,
+            usedProductIds: (o.usedItems || []).map(u => u.productId),
+          };
+        }else{
+          if(!purchases.includes(o.productId)) purchases.push(o.productId);
+          orderCodes[o.productId] = o.code;
+        }
+      });
+      await savePurchases();
+      renderGrids();
+    }
+  }catch(e){ /* offline or backend unreachable — this device's local copy stands as-is */ }
+}
+
+async function addFavoriteOnServer(productId){
+  if(!BACKEND_BASE) return;
+  try{
+    await fetch(`${BACKEND_BASE}/account/favorites/add`, {
+      method:'POST', headers:{ 'Content-Type':'application/json', ...authHeader() },
+      body: JSON.stringify({ productId }),
+    });
+  }catch(e){ /* best-effort — the heart already saved locally either way */ }
+}
+
+async function removeFavoriteOnServer(productId){
+  if(!BACKEND_BASE) return;
+  try{
+    await fetch(`${BACKEND_BASE}/account/favorites/remove`, {
+      method:'POST', headers:{ 'Content-Type':'application/json', ...authHeader() },
+      body: JSON.stringify({ productId }),
+    });
+  }catch(e){ /* best-effort — the heart already saved locally either way */ }
 }
 
 function updateAccountButton(){
@@ -5209,6 +5346,7 @@ function handleSocialAuthSuccess(data, successToastKey){
   checkBiometricAvailability();
   logVisitAsLoggedInUser();
   uploadPendingAvatarIfAny();
+  syncAccountDataFromServer();
 }
 
 // If the person picked a profile photo while still a guest (in the drawer
@@ -5541,6 +5679,21 @@ elById('registerBiometricBtn').onclick = async ()=>{
 };
 
 // ---------- Reviews ----------
+
+/** لو صورة حقيقية في "المعرض" فشلت في التحميل (رابط اتغيّر، ملف اتمسح...)،
+ * أحسن حل هو إخفاء الكارت ده بس -- مش سيبه صندوق أسود فاضي. ولو كل الصور
+ * فشلت مع بعض، بنشيل الجملة اللي بتقول "نماذج حقيقية من نتائجنا الفعلية"
+ * كمان، عشان ما تفضلش جملة بتوعد بحاجة مش ظاهرة فعلاً. */
+function handleProofImgError(img){
+  const tile = img.closest('.proof-tile');
+  if(tile) tile.remove();
+  const grid = document.getElementById('testimonialsProofGrid');
+  const note = document.getElementById('testimonialsNoteEl');
+  if(grid && note && !grid.querySelector('.proof-tile')){
+    note.style.display = 'none';
+  }
+}
+
 const reviewModalBg = document.getElementById('reviewModalBg');
 // The thank-you panel reuses the buttons that already exist, so there is one
 // share implementation and one review flow rather than parallel copies.
@@ -7768,18 +7921,23 @@ function initSliderInstance(rootId){
     const pair = state.pairs[state.current];
     els.imgBefore.src = pair.before;
     els.imgAfter.src = pair.after;
-    els.wrap.style.setProperty('--pos','50%'); els.line.style.setProperty('--posR','50%'); els.handle.style.setProperty('--posR','50%');
+    setPct(50);
     state.demo = true;
     if(els.dots) [...els.dots.children].forEach((d,i)=> d.classList.toggle('active', i===state.current));
+  }
+  function setPct(pct){
+    pct = Math.max(0, Math.min(100, pct));
+    els.wrap.style.setProperty('--pos', pct + '%');
+    els.line.style.setProperty('--posR', (100-pct) + '%');
+    els.handle.style.setProperty('--posR', (100-pct) + '%');
+    els.handle.setAttribute('aria-valuenow', String(Math.round(pct)));
+    return pct;
   }
   function setPos(clientX){
     const rect = els.card.getBoundingClientRect();
     let x = clientX - rect.left;
     x = Math.max(0, Math.min(rect.width, x));
-    const pct = (x / rect.width) * 100;
-    els.wrap.style.setProperty('--pos', pct + '%');
-    els.line.style.setProperty('--posR', (100-pct) + '%');
-    els.handle.style.setProperty('--posR', (100-pct) + '%');
+    setPct((x / rect.width) * 100);
   }
   function start(e){ state.dragging = true; state.demo = false; move(e); }
   function move(e){ if(!state.dragging) return; setPos(e.touches ? e.touches[0].clientX : e.clientX); }
@@ -7793,6 +7951,25 @@ function initSliderInstance(rootId){
   window.addEventListener('touchend', end);
   if(els.prev) els.prev.onclick = ()=> renderPair(state.current-1);
   if(els.next) els.next.onclick = ()=> renderPair(state.current+1);
+
+  // Keyboard access to the drag handle (Phase 21 a11y: the slider was
+  // mouse/touch-only — a keyboard-only visitor could tab to the handle
+  // button but arrow keys did nothing). Reads the current --posR custom
+  // property rather than tracking a separate variable, so this stays in
+  // sync whether the last move came from a drag or a previous key press.
+  els.handle.addEventListener('keydown', (e)=>{
+    const STEP = 5;
+    let dir = 0;
+    if(e.key === 'ArrowLeft') dir = -1;
+    else if(e.key === 'ArrowRight') dir = 1;
+    else if(e.key === 'Home'){ state.demo = false; setPct(0); e.preventDefault(); return; }
+    else if(e.key === 'End'){ state.demo = false; setPct(100); e.preventDefault(); return; }
+    else return;
+    e.preventDefault();
+    state.demo = false;
+    const current = 100 - parseFloat(els.line.style.getPropertyValue('--posR') || '50');
+    setPct(current + dir * STEP);
+  });
 
   let angle = 0;
   (function autoDemo(){
@@ -7895,10 +8072,19 @@ async function applyHeroModeForThisDesign(){
   // التفضيل بيفضل شغال على الصفحة الرئيسية زي ما هو.
   const pageIsEnglish = document.documentElement.lang === 'en';
   applyLanguage(pageIsEnglish ? 'en' : (prefs?.lang || 'ar'));
-  // Defaults to 'mobile' for a first-time visitor with no saved preference —
-  // most customers land here from their phones, and the mobile layout is
-  // now the intended default first impression (per explicit request).
-  applyViewMode(prefs?.view || 'mobile');
+  // A first-time visitor with no saved preference now gets the layout that
+  // actually fits their real screen, instead of always the mobile layout
+  // (that earlier default was an explicit decision, since reversed — desktop
+  // visitors were landing on a ~410px mobile-width column in the middle of
+  // an otherwise empty screen). 1180px is not an arbitrary guess: it's the
+  // exact width below which the desktop layout (#appRoot{min-width:1180px}
+  // in styles.css) starts forcing horizontal scroll, so anything narrower
+  // stays on the mobile layout, which already renders cleanly down to very
+  // small phones. Anyone who has an explicit saved preference — including
+  // from the manual header toggle — keeps getting exactly that, unaffected.
+  const hasExplicitViewPref = prefs?.view === 'desktop' || prefs?.view === 'mobile';
+  const widthBasedView = window.innerWidth >= 1180 ? 'desktop' : 'mobile';
+  applyViewMode(hasExplicitViewPref ? prefs.view : widthBasedView);
   await checkLoggedInUser();
   checkBiometricAvailability();
 
