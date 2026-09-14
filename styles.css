@@ -3086,6 +3086,11 @@
   @media(max-width:560px){ .footer-contact-link{ margin-inline:auto; } }
   .footer-contact-link svg{ width:18px; height:18px; flex:none; }
   .footer-contact-link:hover{ color:var(--brass); }
+  .footer-address{
+    display:flex; align-items:center; gap:9px; color:var(--paper-dim);
+    font-size:var(--text-base); width:fit-content;
+  }
+  @media(max-width:560px){ .footer-address{ margin-inline:auto; } }
   footer #footerText{ text-align:center; }
 
   /* ---------- Sticky mobile CTA: شريط شراء ثابت أسفل الشاشة على الموبايل بس.
