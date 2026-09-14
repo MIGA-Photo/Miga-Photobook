@@ -362,7 +362,12 @@
 <div class="nav-top">
 <div class="nav-side">
 <button aria-expanded="false" aria-haspopup="true" aria-label="Menu" class="hamburger-btn" data-i18n-aria="menuTitle" id="hamburgerBtn" type="button">
-<svg fill="none" height="22" stroke="currentColor" stroke-linecap="round" stroke-width="1.8" viewbox="0 0 24 24" width="22"><path d="M4 6.5h16M4 12h16M4 17.5h16"></path></svg>
+<!-- لما العميل يكون مسجّل دخول وعنده صورة بروفايل، الصورة دي بتحل محل
+           أيقونة الخطوط التلاتة (populateDrawerProfileFields بتتحكم في الاتنين
+           سوا) — الزرار برضو بيفتح نفس الدرج بالظبط، الـ aria-label فاضل
+           "القائمة" عمدًا عشان ده لسه زرار فتح القائمة مش تغيير الصورة. -->
+<img alt="" id="hamburgerAvatarImg" src="" style="display:none;"/>
+<svg fill="none" height="22" id="hamburgerMenuIcon" stroke="currentColor" stroke-linecap="round" stroke-width="1.8" viewbox="0 0 24 24" width="22"><path d="M4 6.5h16M4 12h16M4 17.5h16"></path></svg>
 </button>
 <!-- مخفي دايمًا؛ موجود عشان كود الأدمن بينده عليه. مكانه هنا عشان
          مايضيفش خانة تالتة تزحزح توسيط الاسم. -->
