@@ -246,7 +246,7 @@ const translations = {
     faqQ7:'هل أقدر أختار أكثر من ستايل؟', faqA7:'أكيد! تقدر تطلب أكتر من ستايل لنفس الصورة أو لصور مختلفة — كل ستايل بيتحسب طلب منفصل، أو استخدم إحدى الباقات (10 أو 20 صورة) عشان توفر لو محتاج أكتر من نتيجة.',
     heroTitle:'حوّل صورتك إلى بورتريه احترافي<br>بجودة استوديو باستخدام <span class="brand-mark">Miga-Photobook ميجا فوتوبوك</span><br>خلال دقائق.',
     heroP:'ارفع صورتك الشخصية — لك أو لطفلك — واختار الأسلوب اللي يعجبك، وإحنا نحوّلها لك تلقائيًا بجودة استوديو خلال دقائق بعد تأكيد الدفع.',
-    heroPrimaryCta:'اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي', heroSecondaryCta:'شاهد نتائج قبل/بعد',
+    heroPrimaryCta:'اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي<span id="heroPricePart"></span>', heroSecondaryCta:'شاهد نتائج قبل/بعد',
     heroPricePartTpl:' بـ{price} جنيه',
     bafTitle:'صورة واحدة منك... نحولها لأجمل صورة من اختيارك من عندنا',
     bafSub:'دي نفس الصورة، بعد ما Miga-Photobook حوّلها لأكتر من ستايل. اختار اللي يعجبك وجرّبه على صورتك.',
@@ -601,7 +601,7 @@ const translations = {
     faqQ7:'Can I choose more than one style?', faqA7:'Of course! You can order more than one style for the same photo or for different photos — each style counts as a separate order, or use one of the bundles (10 or 20 photos) to save if you need more than one result.',
     heroTitle:'Turn your photo into a professional,<br>studio-quality portrait with <span class="brand-mark">Miga-Photobook</span><br>in minutes.',
     heroP:"Upload your personal photo — yours or your child's — and pick the style you like, and we'll transform it automatically into studio quality within minutes after payment is confirmed.",
-    heroPrimaryCta:'Make Your <b class="brand-mega">Mega</b> Photo Now', heroSecondaryCta:'See Before & After Results',
+    heroPrimaryCta:'Make Your <b class="brand-mega">Mega</b> Photo Now<span id="heroPricePart"></span>', heroSecondaryCta:'See Before & After Results',
     heroPricePartTpl:' — {price} EGP',
     bafTitle:'One Photo From You... Turned Into Your Favorite Style',
     bafSub:'This is the same photo, after Miga-Photobook transformed it into different styles. Pick one you like and try it on your own photo.',
@@ -1277,6 +1277,12 @@ function applyLanguage(lang){
   renderHeroStrip();
   renderGrids();
   renderMostRequested();
+  // Must run AFTER the data-i18n-html pass above, not just from
+  // loadProducts() — that pass overwrites heroPrimaryCta/bafCta's innerHTML
+  // on every call (initial load AND every language toggle), which would
+  // silently wipe the price these two just got synced with. See the long
+  // comment on syncHeroPriceCta() itself for the full story.
+  syncHeroPriceCta();
   if(adminLoggedIn && document.getElementById('adminTabOrders').style.display !== 'none'){
     renderOrdersList();
   }
@@ -1420,13 +1426,35 @@ function syncProductPriceLd(){
  * السعر اللي syncProductPriceLd() فوق دي بتستخدمه بالظبط (أرخص منتج فعلي
  * موجود دلوقتي). لو السعر اتغيّر من لوحة التحكم، الهيرو بيتحدّث معاه من
  * غير أي كود إضافي -- ولو البيانات مش واصلة (شبكة، أو بيئة تجربة زي دي)،
- * الزرار بيفضل صادق من غير رقم بدل ما يعرض رقم قديم أو مختلق. */
+ * الزرار بيفضل صادق من غير رقم بدل ما يعرض رقم قديم أو مختلق.
+ *
+ * عيب حقيقي اتكشف واتصلح هنا (١٤ سبتمبر ٢٠٢٦، الفحص النهائي): الدالة دي
+ * كانت بتتنادى مرة واحدة بس من loadProducts()، واللي بيحصل في init() هو:
+ * `await loadProducts()` (بيملا الـspan بالسعر الصح) وبعدها على طول
+ * `applyLanguage(...)` — واللي بيعمل `el.innerHTML = t('heroPrimaryCta')`
+ * على العنصر اللي الـspan جواه، فبيمسحه تمامًا فورًا. يعني زائر حقيقي
+ * كان **مستحيل** يشوف السعر خالص في زرار الهيرو — مش سعر غلط، لكن السعر
+ * كان بيتمسح لحظيًا في كل مرة الصفحة تتحمّل، وكل مرة اللغة تتبدّل. نفس
+ * الفخ بالظبط اللي applyPromptLibraryLabels() موجودة عشانه فوق. الحل:
+ * الدالة بقت بتتنادى في آخر applyLanguage() (بعد الـpass اللي بيمسح
+ * الـHTML)، مش بس من loadProducts() — فبقت شغالة صح بعد أول تحميل
+ * وبعد كل تبديل لغة. نفس الدالة بقت كمان بتصلّح زرار "اعمل صورتك ميجا
+ * دلوقتي بـ25 جنيه" اللي تحت السلايدر (bafCta) واللي كان رقمه ثابت
+ * بالإيد في نص الترجمة نفسه — لو السعر اتغيّر من لوحة التحكم كان
+ * هيفضل يقول "25 جنيه" غلط للأبد، بالظبط زي فخ رقم الأسلوب اللي
+ * updateStyleCountTexts() فوق اتعمل عشانه. */
 function syncHeroPriceCta(){
-  const el = document.getElementById('heroPricePart');
-  if(!el || !Array.isArray(products) || !products.length) return;
+  if(!Array.isArray(products) || !products.length) return;
   const prices = products.map(p=>Number(p.price)).filter(n=>Number.isFinite(n) && n > 0);
   if(!prices.length) return;
-  el.textContent = t('heroPricePartTpl').replace('{price}', Math.min(...prices).toLocaleString('en-US'));
+  const cheapest = Math.min(...prices);
+
+  const el = document.getElementById('heroPricePart');
+  if(el) el.textContent = t('heroPricePartTpl').replace('{price}', cheapest.toLocaleString('en-US'));
+
+  document.querySelectorAll('[data-i18n-html="bafCta"]').forEach(node=>{
+    node.innerHTML = t('bafCta').replace(/\d+/, String(cheapest));
+  });
 }
 
 async function loadProducts(){
