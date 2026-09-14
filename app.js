@@ -2260,7 +2260,7 @@ function renderProductCard(p, opts){
         )}
       </div>
       ${(!owned && !SOFT_LAUNCH && !pkgAvailableHere)
-        ? `<button type="button" class="card-package-hint" onclick="scrollToSectionBelowHeader(document.getElementById('pricing'))">${t('cardPackageHint')}</button>`
+        ? `<button type="button" class="card-package-hint" onclick="trackPackageHintClick()">${t('cardPackageHint')}</button>`
         : ''}
     </div>
   </div>`;
@@ -2785,10 +2785,25 @@ function armStayNudge(){
  * so every call is wrapped and failures are swallowed. `gaName`/`gaParams`
  * go to GA4 as a custom event; `fbName`/`fbParams` go to Pixel as a
  * standard event (PageView, InitiateCheckout, Purchase, etc. — see
- * https://developers.facebook.com/docs/meta-pixel/reference for the list). */
-function trackFunnelEvent(gaName, gaParams, fbName, fbParams){
+ * https://developers.facebook.com/docs/meta-pixel/reference for the list).
+ * Pass `fbCustom:true` when `fbName` is NOT one of Meta's standard event
+ * names (e.g. a soft interest-signal like "clicked the packages hint") —
+ * this fires `fbq('trackCustom', ...)` instead of `fbq('track', ...)`,
+ * which is how Meta expects a non-standard event name to be sent so it
+ * shows up correctly in Events Manager for building a Custom Conversion. */
+function trackFunnelEvent(gaName, gaParams, fbName, fbParams, fbCustom){
   try{ if(typeof gtag === 'function') gtag('event', gaName, gaParams || {}); }catch(e){}
-  try{ if(typeof fbq === 'function') fbq('track', fbName, fbParams || {}); }catch(e){}
+  try{ if(typeof fbq === 'function') fbq(fbCustom ? 'trackCustom' : 'track', fbName, fbParams || {}); }catch(e){}
+}
+
+/** "أو وفّر أكتر بالباقات" on a product card — a soft interest signal, not a
+ * checkout step (it just scrolls to pricing, same as before). Custom event
+ * because it isn't in Meta's standard-event list — lets ads be optimized
+ * toward "package-curious" visitors as a distinct audience from a straight
+ * per-style buy click (which already fires InitiateCheckout via openBuyModal). */
+function trackPackageHintClick(){
+  trackFunnelEvent('view_packages_hint', {}, 'PackageHintClick', {}, true);
+  scrollToSectionBelowHeader(document.getElementById('pricing'));
 }
 
 function openBuyModal(id, type){
@@ -5535,6 +5550,9 @@ elById('thanksReviewBtn').onclick = ()=>
  * فيه (زي ما بيحصل بالظبط لما يقفل شاشة "بنراجع تحويلك" — نفس النمط
  * الموجود أصلاً في payStatusCloseBtn) عشان يختار ستايل جديد بسهولة. */
 elById('thanksAnotherBtn').onclick = ()=>{
+  // أعلى لحظة نية شراء في الرحلة كلها (نتيجة اتسلمت فعلًا وعجبته) — حدث
+  // منفصل عن InitiateCheckout العادي عشان يتفرّق عن نية شراء أولى.
+  trackFunnelEvent('post_purchase_another_click', {}, 'PostPurchaseAnotherClick', {}, true);
   const p = products.find(x=>x.id===currentTransformId);
   transformModalBg.classList.remove('show');
   if(p && p.category) scrollToSectionBelowHeader(firstCardOrSelf(openCatSection(p.category)));
@@ -5542,6 +5560,7 @@ elById('thanksAnotherBtn').onclick = ()=>{
 /** نفس الفكرة، لكن بتوديه لقسم الأسعار عشان يشوف باقات التوفير — طلب
  * صريح من ماجدي: أعلى نية شراء ممكنة تكون فور استلام نتيجة عجبته. */
 elById('thanksPackagesBtn').onclick = ()=>{
+  trackFunnelEvent('post_purchase_packages_click', {}, 'PostPurchasePackagesClick', {}, true);
   transformModalBg.classList.remove('show');
   scrollToSectionBelowHeader(document.getElementById('pricing'));
 };
