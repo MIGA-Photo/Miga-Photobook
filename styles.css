@@ -603,9 +603,24 @@
      الفوتر (.footer-lockup) — قواعد المقاس لكل واحدة تحت. */
   .logo-badge{
     flex-shrink:0; display:flex; align-items:center; justify-content:center;
-    border-radius:50%;
+    border-radius:50%; overflow:hidden; position:relative;
     background:radial-gradient(circle at 35% 30%, rgba(232,182,74,0.22), rgba(232,182,74,0.05) 70%);
     border:1px solid rgba(232,182,74,0.35);
+  }
+  /* تحديث 15 سبتمبر 2026: شارة الهيدر والفوتر (الاتنين) بقوا يحملوا صورة
+     (.logo-mark-img) بدل SVG خطي — نسخة مقصوصة من التصميم الذهبي المجسّم
+     اللي بعته ماجدي، على الأيقونة بس (من غير الحلقة ولا الاسم المطبوعين في
+     الصورة الأصلية، عشان كانوا هيبانوا غير واضحين في مقاس صغير ومكررين مع
+     اسم الموقع الحي جنبهم). الحلقة الذهبية "الواضحة" اللي طلبها ماجدي
+     اتعملت بحدّ CSS هنا (2px بدل 1px، ولون أصلب) حوالين الشارة نفسها بدل ما
+     تتولد من بكسلات الصورة — كده بتفضل حادة وواضحة في أي مقاس شاشة.
+     درج القائمة الجانبية لسه بالعلامة القديمة (SVG) — ماجدي ماطلبش تغييره. */
+  .logo .logo-badge, .footer-lockup .logo-badge{
+    border-width:2px; border-color:rgba(232,182,74,0.75);
+    box-shadow:0 0 0 1px rgba(232,182,74,0.15), 0 2px 10px -2px rgba(232,182,74,0.5);
+  }
+  .logo .logo-badge .logo-mark-img, .footer-lockup .logo-badge .logo-mark-img{
+    width:100%; height:100%; object-fit:cover; display:block; border-radius:50%;
   }
   /* الاسمين بقوا سطرين فوق بعض (العربي فوق منتصف الإنجليزي بالظبط —
      align-items:center هي اللي بتعمل التوسيط ده) بدل صف أفقي واحد. */
@@ -647,8 +662,12 @@
     0%{ background-position:190% 0%; }
     100%{ background-position:0% 0%; }
   }
+  /* 15 سبتمبر 2026: ماجدي لاحظ إن اللمعة مكنتش بتبان — كانت فعليًا 1.2
+     ثانية بس (أسرع من الـ2 ثانية المتفق عليها)، فسهل إنها تفوت لو حد
+     مركزش في نفس اللحظة. اتزودت لـ2 ثانية بالظبط، بنفس المبدأ: مرة واحدة
+     بس عند فتح الصفحة، وبتوقف نهائيًا (مش متكررة). */
   .logo, .footer-lockup{
-    animation:logoSheenOnce 1.2s cubic-bezier(.22,.61,.36,1) 0.15s 1 both;
+    animation:logoSheenOnce 2s cubic-bezier(.22,.61,.36,1) 0.15s 1 both;
   }
   /* الاسم في نص الصف الأول بالظبط — بتلات خانات، مش بتثبيت مطلق.
 
@@ -681,10 +700,10 @@
   .logo .logo-badge{ width:40px; height:40px; }
   .logo .logo-badge .logo-mark{ width:22px; height:22px; }
   .logo .lg-en, .side-drawer-logo .lg-en{
-    font-size:18px; font-weight:700; letter-spacing:0.2px; white-space:nowrap;
+    font-size:20px; font-weight:700; letter-spacing:0.2px; white-space:nowrap;
   }
   .logo .lg-ar, .side-drawer-logo .lg-ar{
-    font-size:16px; font-weight:700; letter-spacing:0.3px; white-space:nowrap;
+    font-size:18px; font-weight:700; letter-spacing:0.3px; white-space:nowrap;
   }
   /* رأس الدرج عرضه المتاح 226 بكسل بس (300 ناقص الحشو وزرار الإغلاق).
      بمقاس الهيدر المحتوى بياخد 264 — الزيادة كانت بتضغط الأولاد فيطلع
@@ -697,26 +716,30 @@
   .side-drawer-logo .logo-mark{ width:22px; height:22px; }
 
   /* بقى جوه ترتيب الصف، فلازم يسع جنب الزراير على الشاشة الصغيرة بدل ما
-     يزحف. المقاسات دي مقيسة: عند 360 بكسل الصف كله بيقعد جوه من غير زحف. */
+     يزحف. المقاسات دي مقيسة: عند 360 بكسل الصف كله بيقعد جوه من غير زحف.
+     15 سبتمبر 2026 (تحديث تاني): ماجدي أكّد إنه عايز شارة الهيدر ثابتة
+     40px في كل المقاسات — "بنفس مقاس دايرة الأفاتار بالظبط" (زرار
+     #hamburgerBtn ثابت 40px برضه من غير أي تصغير على الموبايل). فالشارة
+     بقت ثابتة 40px هنا كمان، والمساحة اتعوّضت بتصغير اسم الموقع نفسه بدل
+     الشارة — اتقاس على 360px ومفيش زحف. */
   @media(max-width:560px){
     .logo{ gap:7px; }
-    .logo .lg-en{ font-size:var(--text-base); }
-    .logo .lg-ar{ font-size:var(--text-sm); }
-    .logo .logo-badge{ width:34px; height:34px; }
-    .logo .logo-badge .logo-mark{ width:19px; height:19px; }
+    .logo .lg-en{ font-size:15px; }
+    .logo .lg-ar{ font-size:13.5px; }
   }
   @media(max-width:380px){
-    .logo .lg-en{ font-size:var(--text-sm); }
+    .logo .lg-en{ font-size:12.5px; }
     .logo .lg-ar{ font-size:11.5px; }
-    .logo .logo-badge{ width:30px; height:30px; }
-    .logo .logo-badge .logo-mark{ width:16px; height:16px; }
   }
   /* Readex Pro أقصى وزن فيه 700 وإحنا واصلينه. الزيادة في السُمك بحد رفيع
-     حوالين الحروف بنفس لون التدرّج — أنضف من إن المتصفح يصنع وزن مزيّف. */
+     حوالين الحروف بنفس لون التدرّج — أنضف من إن المتصفح يصنع وزن مزيّف.
+     15 سبتمبر 2026: الحدّ اتزوّد من 0.4px لـ0.7px بعد ملاحظة ماجدي إن سُمك
+     اسم الموقع كان لسه شكله رفيع — إحساس أوضح وأتقل من غير ما نغيّر
+     الخط نفسه. */
   .logo .lg-en, .logo .lg-ar,
   .side-drawer-logo .lg-en, .side-drawer-logo .lg-ar,
   .footer-lockup .lg-en, .footer-lockup .lg-ar{
-    -webkit-text-stroke:0.4px var(--brass);
+    -webkit-text-stroke:0.7px var(--brass);
   }
   /* الاسمين ماياخدوش تدرّج خاص بيهم — الموجة بتاعة الأب هي اللي بترسمهم */
   .logo .lg-ar, .side-drawer-logo .lg-ar, .footer-lockup .lg-ar,
@@ -729,10 +752,8 @@
   }
   @media(max-width:520px){
     .logo{ gap:8px; }
-    .logo .lg-en{ font-size:16px; }
-    .logo .lg-ar{ font-size:14.5px; }
-    .logo .logo-badge{ width:34px; height:34px; }
-    .logo .logo-badge .logo-mark{ width:19px; height:19px; }
+    .logo .lg-en{ font-size:15px; }
+    .logo .lg-ar{ font-size:13.5px; }
     /* زرار الحساب أيقونة بس: الاسم الثلاثي محتاج العرض ده. الأيقونة موجودة
        أصلًا جوه الزرار، فبنخفي الكلمة بس. */
     #accountOpenBtn{ width:44px; height:44px; padding:0; justify-content:center; gap:0; }
@@ -747,10 +768,8 @@
     body.view-mode-mobile #accountOpenBtn{ width:44px; height:44px; padding:0; justify-content:center; gap:0; }
     body.view-mode-mobile #accountOpenBtn > span:not(.icon-badge){ display:none; }
     body.view-mode-mobile .logo{ gap:8px; }
-    body.view-mode-mobile .logo .lg-en{ font-size:16px; }
-    body.view-mode-mobile .logo .lg-ar{ font-size:14.5px; }
-    body.view-mode-mobile .logo .logo-badge{ width:34px; height:34px; }
-    body.view-mode-mobile .logo .logo-badge .logo-mark{ width:19px; height:19px; }
+    body.view-mode-mobile .logo .lg-en{ font-size:15px; }
+    body.view-mode-mobile .logo .lg-ar{ font-size:13.5px; }
   }
   .logo-accent{color:var(--brass);}
   nav.cats{display:flex; gap:6px; flex-wrap:wrap;}
