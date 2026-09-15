@@ -172,8 +172,23 @@
      attribute needed; the other 5 are selected from the admin panel by
      setting data-accent on <html>, read from /site-config's colorTheme
      field via the bootstrap script in index.html's <head>. */
+  /* 15 سبتمبر 2026: كل الـ6 تصميمات كانت لون واحد مصمت (flat) — طلب ماجدي
+     تحويلها لتصميمات "لامعة وشيك" فعلية. كل --header-bg دلوقتي عبارة عن
+     طبقتين: توهج ناعم فى ركن واحد (بلون مميز لعائلة التصميم، شفافية واطية
+     14-18% عشان يفضل غامق) + تدرّج مائل بتلات درجات من نفس العائلة اللونية،
+     بدل اللون المصمت. القيمة دي بتتحط كطبقة كاملة جوه header{background:...}
+     (اللي فيها طبقة لمعة بيضاء خفيفة فوق كل ده أصلاً) — فمفيش داعي نلمس
+     header{} نفسها. عمدًا من غير أي حركة/أنيميشن (تدرّج وتوهج ثابتين
+     تمامًا) — الهيدر ظاهر فى كل صفحة وكل تمرير، ومشروع الموقع ده شال قبل
+     كده أكتر من حركة زخرفية مشابهة (لمعة اللوجو، بانر العرض) لأنها كانت
+     بتستهلك بطارية/تهنيج على أندرويد من غير فايدة وظيفية حقيقية — نفس
+     المبدأ اتطبق هنا. --panel-bg و--media-bg فضلوا زي ما هم بالظبط (لون
+     مصمت بسيط) لأنهم مساحات "مات محايدة" خلف المحتوى، مش المفروض ياخدوا
+     اهتمام بصري زي الهيدر. */
   :root{
-    --header-bg: rgba(12,12,16,0.94);
+    --header-bg:
+      radial-gradient(circle at 88% -15%, rgba(255,201,77,0.16), transparent 55%),
+      linear-gradient(135deg, rgba(28,28,34,0.95) 0%, rgba(12,12,16,0.95) 55%, rgba(6,6,8,0.96) 100%);
     /* نسخة معتمة تمامًا من نفس اللون. الهيدر بيستخدم الشفاف عشان العلامة
        المائية تبان من وراه؛ الدرج الجانبي لأ — الدرج بيقفل على الصفحة،
        وأي شفافية بتخلي الشريط الإعلاني يطلع من خلاله ويشتبك مع الكلام. */
@@ -181,27 +196,37 @@
     --media-bg: #150c26;
   }
   html[data-accent="brown"]{
-    --header-bg:#2b1d14;
+    --header-bg:
+      radial-gradient(circle at 88% -15%, rgba(255,196,120,0.18), transparent 55%),
+      linear-gradient(135deg, #3d2a1a 0%, #2b1d14 55%, #1a1109 100%);
     --panel-bg:#2b1d14;
     --media-bg:#241a12;
   }
   html[data-accent="emerald"]{
-    --header-bg:#10241d;
+    --header-bg:
+      radial-gradient(circle at 88% -15%, rgba(70,224,166,0.16), transparent 55%),
+      linear-gradient(135deg, #163527 0%, #10241d 55%, #081712 100%);
     --panel-bg:#10241d;
     --media-bg:#122e22;
   }
   html[data-accent="wine"]{
-    --header-bg:#2a1018;
+    --header-bg:
+      radial-gradient(circle at 88% -15%, rgba(255,112,152,0.14), transparent 55%),
+      linear-gradient(135deg, #3a1522 0%, #2a1018 55%, #180a0f 100%);
     --panel-bg:#2a1018;
     --media-bg:#2f121a;
   }
   html[data-accent="navy"]{
-    --header-bg:#10182b;
+    --header-bg:
+      radial-gradient(circle at 88% -15%, rgba(122,171,255,0.16), transparent 55%),
+      linear-gradient(135deg, #16213d 0%, #10182b 55%, #080c18 100%);
     --panel-bg:#10182b;
     --media-bg:#121c33;
   }
   html[data-accent="red"]{
-    --header-bg:#33121a;
+    --header-bg:
+      radial-gradient(circle at 88% -15%, rgba(255,122,132,0.15), transparent 55%),
+      linear-gradient(135deg, #431823 0%, #33121a 55%, #1f0b10 100%);
     --panel-bg:#33121a;
     --media-bg:#3a151f;
   }
@@ -562,7 +587,11 @@
   .drawer-avatar-edit-badge{
     position:absolute; inset-inline-end:-2px; bottom:-2px; width:22px; height:22px; border-radius:50%;
     background:var(--brass); color:var(--ink); display:flex; align-items:center; justify-content:center;
-    border:2px solid var(--header-bg);
+    /* 15 سبتمبر 2026: كانت --header-bg (لون واحد مصمت وقتها) — دلوقتي
+       --header-bg بقى تدرّج (طبقتين)، ومش صالح كـborder-color. الدرج
+       نفسه خلفيته --panel-bg (فضل لون مصمت زي ما هو)، وده أصلاً الأصح
+       سياقيًا هنا (الشارة دي فوق افتار جوه الدرج، مش جوه الهيدر). */
+    border:2px solid var(--panel-bg);
   }
   .drawer-input{
     width:100%; box-sizing:border-box; background:var(--ink); border:1px solid var(--line);
@@ -1942,6 +1971,12 @@
   .plan.featured.plan-most-popular::before{
     content:"⭐ الأكثر طلبًا"; position:absolute; top:-13px; right:24px; background:var(--brass);
     color:var(--ink); font-size:var(--text-sm); font-weight:700; padding:4px 12px; border-radius:100px;
+  }
+  /* The ribbon text above is hardcoded Arabic in a ::before (can't use
+     data-i18n on generated CSS content), so it was leaking onto the English
+     page too -- override it for lang="en" documents specifically. */
+  html[lang="en"] .plan.featured.plan-most-popular::before{
+    content:"⭐ Most Popular";
   }
   .plan h3{font-size:20px; color:var(--paper);}
   .plan .price{font-size:34px; color:var(--brass); font-weight:700;}
