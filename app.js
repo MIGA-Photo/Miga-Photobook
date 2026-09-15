@@ -285,6 +285,14 @@ const translations = {
     statusCodeNote:'كود طلبك (احتفظ بيه احتياطيًا):',
     statusSafeCloseNote:'تقدر تقفل الصفحة دلوقتي براحتك — هنراجع طلبك ونبعتلك تحديث بمجرد ما يتأكد.',
     statusApprovedText:'تم تأكيد الدفع ✅ تقدر ترفع صورتك دلوقتي.',
+    statusUnderpaidTemplate:'⚠️ لم يكتمل الدفع بعد. تم استلام {paid} جنيه من إجمالي {total} جنيه. المبلغ المتبقي: {remaining} جنيه. تم حفظ طلبك والمبلغ الذي دفعته.',
+    statusCompletedTemplate:'✅ تم استكمال الدفع بنجاح. إجمالي المدفوع: {total} جنيه. طلبك الآن جاهز للتنفيذ.',
+    payRemainingBtnTemplate:'دفع المبلغ المتبقي — {amount} جنيه',
+    remainingRefLabel:'رقم عملية تحويل المبلغ المتبقي',
+    toastRemainingRefInvalid:'من فضلك اكتب رقم عملية التحويل الصحيح',
+    toastRemainingSubmitted:'تم استلام رقم العملية — هنراجعه ونحدّثك بمجرد التأكيد.',
+    toastRemainingFailed:'تعذّر إرسال رقم العملية حاليًا — تأكد من اتصالك بالإنترنت وحاول تاني.',
+    toastOrderUnderpaidRemainingTemplate:'المبلغ المُدخل لا يكفي — المتبقي على العميل: {remaining} جنيه (تم حفظ هذه الدفعة في السجل)',
     buyModalNote:'هنراجع تحويلك بنفسنا فور ما يوصلنا — الصفحة هتفضل فاتحة قدامك وهتقولك أول ما يتأكد، من غير ما تدوّر على كود في مكان تاني.',
     buyConfirmBtn:'تم الدفع', cancelBtn:'إلغاء',
     detailValue1:'✓ نحوّل صورتك تلقائيًا فور تأكيد الدفع', detailValue2:'✓ جودة استوديو احترافية مضمونة',
@@ -431,7 +439,7 @@ const translations = {
     sendPromptWhatsAppBtn:'إرسال عبر واتساب',
     whatsappPromptMessageTemplate:'مرحبًا 👋 تحويلك تم تأكيده — ده البرومبت الاحترافي الخاص بـ "{title}":\n\n{prompt}\n\nشكرًا لثقتك في Miga-Photobook 🙏',
     orderApproveBtn:'موافقة وتفعيل التحويل',
-    orderVerifyApproveBtn:'تحقق ووافق', orderLabelRequiredAmount:'المبلغ المطلوب', orderLabelVerifiedAmount:'المبلغ الذي تم التحقق من استلامه',
+    orderVerifyApproveBtn:'تحقق ووافق', orderLabelRequiredAmount:'المبلغ المطلوب', orderLabelVerifiedAmount:'المبلغ الذي تم التحقق من استلامه', orderLabelRemainingAmount:'المبلغ المتبقي',
     orderVerifiedAmountPlaceholder:'اكتب المبلغ اللي اتأكدت إنه وصل فعلًا',
     orderPaymentStatusVerified:'تم التحقق', orderPaymentStatusUnderpaid:'مبلغ ناقص', orderPaymentStatusRejected:'مرفوض',
     orderPaymentStatusPending:'في انتظار التحقق',
@@ -646,6 +654,14 @@ const translations = {
     statusCodeNote:'Your order code (keep it just in case):',
     statusSafeCloseNote:"You can close this page now — we'll review your order and update you as soon as it's confirmed.",
     statusApprovedText:'Payment confirmed ✅ You can upload your photo now.',
+    statusUnderpaidTemplate:'⚠️ Payment not complete yet. We received {paid} EGP out of {total} EGP. Remaining amount: {remaining} EGP. Your order and the amount you paid have been saved.',
+    statusCompletedTemplate:'✅ Payment completed successfully. Total paid: {total} EGP. Your order is now ready.',
+    payRemainingBtnTemplate:'Pay Remaining Amount — {amount} EGP',
+    remainingRefLabel:'Transfer reference number for the remaining amount',
+    toastRemainingRefInvalid:'Please enter a valid transfer reference number',
+    toastRemainingSubmitted:"Reference received — we'll review it and update you once confirmed.",
+    toastRemainingFailed:"Couldn't send the reference right now — check your connection and try again.",
+    toastOrderUnderpaidRemainingTemplate:'Amount entered is not enough — customer still owes: {remaining} EGP (this payment was saved to the ledger)',
     buyModalNote:"We'll review your transfer ourselves as soon as it arrives — this page stays open and updates itself once confirmed, no separate code to look for.",
     buyConfirmBtn:"I've Paid", cancelBtn:'Cancel',
     detailValue1:'✓ Your photo is transformed automatically right after payment', detailValue2:'✓ Guaranteed professional studio quality',
@@ -792,7 +808,7 @@ const translations = {
     sendPromptWhatsAppBtn:'Send via WhatsApp',
     whatsappPromptMessageTemplate:'Hi 👋 your payment is confirmed — here\\u2019s the professional prompt for "{title}":\\n\\n{prompt}\\n\\nThanks for choosing Miga-Photobook 🙏',
     orderApproveBtn:'Approve & Enable Transform',
-    orderVerifyApproveBtn:'Verify & Approve', orderLabelRequiredAmount:'Required Amount', orderLabelVerifiedAmount:'Verified Received Amount',
+    orderVerifyApproveBtn:'Verify & Approve', orderLabelRequiredAmount:'Required Amount', orderLabelVerifiedAmount:'Verified Received Amount', orderLabelRemainingAmount:'Remaining Amount',
     orderVerifiedAmountPlaceholder:'Enter the amount you actually confirmed was received',
     orderPaymentStatusVerified:'Verified', orderPaymentStatusUnderpaid:'Underpaid', orderPaymentStatusRejected:'Rejected',
     orderPaymentStatusPending:'Awaiting verification',
@@ -3167,6 +3183,43 @@ function stopOrderStatusPolling(){
   if(orderStatusPollTimer){ clearInterval(orderStatusPollTimer); orderStatusPollTimer = null; }
 }
 
+/** Fills in an underpaid-state message + "pay the remaining amount" button
+ * from a trackOrder response (added 2026-09-15: Underpaid → Remaining
+ * Payment). All three numbers (paid/total/remaining) come straight from the
+ * server response — never computed or trusted client-side — and the exact
+ * copy is the one Magdy specified, never a technical "UNDERPAID" label. */
+function renderUnderpaidMessage(order){
+  return t('statusUnderpaidTemplate')
+    .replace('{paid}', order.totalVerifiedPaid)
+    .replace('{total}', order.requiredAmount)
+    .replace('{remaining}', order.remainingAmount);
+}
+
+/** Posts a customer-submitted transfer reference for the REMAINING amount
+ * against an existing order — never creates a new order/orderCode. Shared by
+ * both the live post-checkout panel (payUnderpaidBox) and the "return later"
+ * tracking modal (trackUnderpaidBox). Returns true on success so callers can
+ * clear their own input/refresh their own status. */
+async function submitRemainingPaymentRef(code, ref){
+  if(!BACKEND_BASE) { showToast(t('toastRemainingFailed')); return false; }
+  if(!ref || !/[0-9]/.test(ref) || ref.trim().length < 4){
+    showToast(t('toastRemainingRefInvalid'));
+    return false;
+  }
+  try{
+    const res = await fetch(`${BACKEND_BASE}/orders/submit-remaining-payment`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ code, ref: ref.trim() }),
+    });
+    if(!res.ok){ showToast(t('toastRemainingFailed')); return false; }
+    showToast(t('toastRemainingSubmitted'));
+    return true;
+  }catch(e){
+    showToast(t('toastRemainingFailed'));
+    return false;
+  }
+}
+
 function showOrderStatusPanel(productId, code, orderType){
   orderType = orderType === 'prompt' ? 'prompt' : orderType === 'package' ? 'package' : 'transform';
   document.getElementById('payFormFields').style.display = 'none';
@@ -3174,6 +3227,7 @@ function showOrderStatusPanel(productId, code, orderType){
   document.getElementById('payStatusCode').textContent = code;
   document.getElementById('payStatusText').textContent = t('statusPendingText');
   document.querySelector('#payStatusPanel .order-status-spinner').style.display = '';
+  document.getElementById('payUnderpaidBox').style.display = 'none';
 
   stopOrderStatusPolling();
   const check = async ()=>{
@@ -3182,8 +3236,24 @@ function showOrderStatusPanel(productId, code, orderType){
       const res = await fetch(`${BACKEND_BASE}/orders/track?code=${encodeURIComponent(code)}`);
       if(!res.ok) return;
       const order = await res.json();
+
+      if(order.paymentStatus === 'underpaid'){
+        // Recorded and saved server-side already (see /orders/submit-remaining-payment
+        // and approveOrder's ledger) — this just reflects that state, and
+        // survives a refresh/close/return-later because it's read fresh from
+        // the server on every poll, never from anything kept only in the browser.
+        document.querySelector('#payStatusPanel .order-status-spinner').style.display = 'none';
+        document.getElementById('payStatusText').textContent = renderUnderpaidMessage(order);
+        const box = document.getElementById('payUnderpaidBox');
+        box.style.display = '';
+        document.getElementById('submitRemainingBtn').textContent =
+          t('payRemainingBtnTemplate').replace('{amount}', order.remainingAmount);
+        return; // keep polling — admin/gateway verification happens next
+      }
+
       if(order.status === 'approved'){
         stopOrderStatusPolling();
+        document.getElementById('payUnderpaidBox').style.display = 'none';
         if(orderType === 'prompt'){
           if(!promptPurchases.includes(productId)) promptPurchases.push(productId);
           promptOrderCodes[productId] = order.code || code;
@@ -3204,6 +3274,10 @@ function showOrderStatusPanel(productId, code, orderType){
         document.getElementById('payStatusText').textContent =
           orderType === 'prompt' ? t('statusPromptApprovedText')
           : orderType === 'package' ? t('statusPackageApprovedText').replace('{n}', order.creditsRemaining)
+          // A plain "transform" order that went through payment verification
+          // shows the total paid (matters most for an order that was ever
+          // underpaid and got completed via a remaining payment).
+          : order.totalVerifiedPaid != null ? t('statusCompletedTemplate').replace('{total}', order.totalVerifiedPaid)
           : t('statusApprovedText');
         showToast(
           orderType === 'prompt' ? t('toastPromptReady')
@@ -3216,6 +3290,16 @@ function showOrderStatusPanel(productId, code, orderType){
   check();
   orderStatusPollTimer = setInterval(check, 6000);
 }
+
+elById('submitRemainingBtn').onclick = async ()=>{
+  const code = document.getElementById('payStatusCode').textContent.trim();
+  const input = document.getElementById('remainingRefInput');
+  const btn = document.getElementById('submitRemainingBtn');
+  btn.disabled = true;
+  const ok = await submitRemainingPaymentRef(code, input.value);
+  btn.disabled = false;
+  if(ok) input.value = '';
+};
 
 elById('payStatusCloseBtn').onclick = ()=>{
   stopOrderStatusPolling();
@@ -3816,6 +3900,8 @@ elById('transformDownloadBtn').onclick = async ()=>{
 const trackModalBg = document.getElementById('trackModalBg');
 elById('trackOpenBtn').onclick = ()=>{
   trackModalBg.classList.add('show');
+  document.getElementById('trackStatusText').style.display = 'none';
+  document.getElementById('trackUnderpaidBox').style.display = 'none';
   renderMyOrdersHistory();
 };
 
@@ -3883,6 +3969,22 @@ elById('trackCheckBtn').onclick = async ()=>{
     showToast(t('toastOrderNotFound'));
     return;
   }
+  const statusTextEl = document.getElementById('trackStatusText');
+  const underpaidBox = document.getElementById('trackUnderpaidBox');
+  if(order.paymentStatus === 'underpaid'){
+    // "Return later" fallback path for the SAME underpaid-order UX — the
+    // server-side state (see /orders/track) is what's shown, so this
+    // survives a refresh/close/return-later exactly like the live panel.
+    statusTextEl.style.display = '';
+    statusTextEl.textContent = renderUnderpaidMessage(order);
+    underpaidBox.style.display = '';
+    document.getElementById('trackSubmitRemainingBtn').textContent =
+      t('payRemainingBtnTemplate').replace('{amount}', order.remainingAmount);
+    underpaidBox.dataset.code = order.code || code;
+    return;
+  }
+  statusTextEl.style.display = 'none';
+  underpaidBox.style.display = 'none';
   if(order.status === 'approved'){
     if(!purchases.includes(order.productId)){
       purchases.push(order.productId);
@@ -3896,6 +3998,16 @@ elById('trackCheckBtn').onclick = async ()=>{
   }else{
     showToast(t('toastOrderPending'));
   }
+};
+elById('trackSubmitRemainingBtn').onclick = async ()=>{
+  const box = document.getElementById('trackUnderpaidBox');
+  const code = box.dataset.code || document.getElementById('trackCode').value.trim().toUpperCase();
+  const input = document.getElementById('trackRemainingRefInput');
+  const btn = document.getElementById('trackSubmitRemainingBtn');
+  btn.disabled = true;
+  const ok = await submitRemainingPaymentRef(code, input.value);
+  btn.disabled = false;
+  if(ok) input.value = '';
 };
 function getCategoryOf(productId){
   const p = products.find(x=>x.id===productId);
@@ -6814,11 +6926,15 @@ function renderOrdersList(){
         <span class="order-status ${orderPaymentStatusClass(o.paymentStatus)}">${orderPaymentStatusLabel(o.paymentStatus)}</span>
       </div>` : ''}
       ${o.paymentStatus==='underpaid' ? `
-      <div class="oline order-underpaid-note">${t('orderLabelVerifiedAmount')}: ${o.verifiedPaidAmount} ${CURRENCY} — ${t('toastOrderUnderpaid')}</div>` : ''}
+      <div class="oline order-underpaid-note">${t('orderLabelVerifiedAmount')}: ${o.totalVerifiedPaid != null ? o.totalVerifiedPaid : o.verifiedPaidAmount} ${CURRENCY} — ${t('toastOrderUnderpaid')}${o.remainingAmount != null ? ` — ${t('orderLabelRemainingAmount')}: ${o.remainingAmount} ${CURRENCY}` : ''}</div>` : ''}
+      ${Array.isArray(o.pendingReferences) && o.pendingReferences.length ? `
+      <div class="oline order-underpaid-note">🆕 ${o.pendingReferences.length} — ${o.pendingReferences.map(r=>escapeHtml(r.ref)).join(', ')}</div>` : ''}
+      ${Array.isArray(o.payments) && o.payments.length > 1 ? `
+      <div class="oline order-underpaid-note">${o.payments.map(p=>`${p.amount} ${CURRENCY}`).join(' + ')}</div>` : ''}
       <div class="order-actions">
         ${o.status==='pending' ? `
           <div class="order-verify-row">
-            <input type="number" min="0" step="0.01" class="order-verify-input" id="verifyAmount-${o.code}" placeholder="${t('orderVerifiedAmountPlaceholder')}" value="${o.paymentStatus==='underpaid' && o.verifiedPaidAmount!=null ? o.verifiedPaidAmount : ''}">
+            <input type="number" min="0" step="0.01" class="order-verify-input" id="verifyAmount-${o.code}" placeholder="${t('orderVerifiedAmountPlaceholder')}" value="${o.paymentStatus==='underpaid' && o.remainingAmount!=null ? o.remainingAmount : ''}">
             <button class="buy-btn" onclick="approveOrder('${o.code}')">${t('orderVerifyApproveBtn')}</button>
           </div>
           <button class="btn-ghost reject-btn" onclick="rejectOrderPrompt('${o.code}')">${t('orderRejectBtn')}</button>` : ''}
@@ -6951,6 +7067,21 @@ async function deleteOrderPrompt(code){
  * setting the order to approved; this client-side read of the input field
  * is only for a good admin UX (clear error before the round-trip), not the
  * actual security boundary. */
+/** A stable idempotency nonce for ONE verify-amount submission (added
+ * 2026-09-15: Underpaid → Remaining Payment). Tied to the input element via
+ * a data-attribute so a genuine retry of the SAME unsent click (e.g. this
+ * function called twice before the input is touched again) reuses the same
+ * id — the server (recordPaymentVerification) then recognizes it and never
+ * double-counts the transfer. Changing the typed amount, or a full
+ * list re-render (a new poll/refresh recreates this input), starts a fresh
+ * id, which is correct: that's a new/different submission, not a retry. */
+function getOrCreatePaymentNonce(input){
+  if(!input.dataset.paymentId){
+    input.dataset.paymentId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
+  return input.dataset.paymentId;
+}
+
 async function approveOrder(code){
   if(!BACKEND_BASE) return;
   const input = document.getElementById(`verifyAmount-${code}`);
@@ -6960,15 +7091,21 @@ async function approveOrder(code){
     if(input) input.focus();
     return;
   }
+  const paymentId = getOrCreatePaymentNonce(input);
   try{
     const res = await fetch(`${BACKEND_BASE}/orders/approve`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ token: adminSessionToken, code, verifiedAmount })
+      body: JSON.stringify({ token: adminSessionToken, code, verifiedAmount, paymentId })
     });
     if(res.status === 409){
+      const body = await res.json().catch(()=>({}));
       await loadOrders();
       renderOrdersList();
-      showToast(t('toastOrderUnderpaid'));
+      showToast(
+        Number.isFinite(body.remainingAmount)
+          ? t('toastOrderUnderpaidRemainingTemplate').replace('{remaining}', body.remainingAmount)
+          : t('toastOrderUnderpaid')
+      );
       return;
     }
     if(!res.ok){ showToast(t('toastWrongPassword')); return; }

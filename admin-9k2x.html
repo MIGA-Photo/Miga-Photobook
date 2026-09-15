@@ -1260,6 +1260,15 @@
         <p class="sub" style="font-size:12.5px; opacity:0.7;" data-i18n="statusCodeNote">كود طلبك (احتفظ بيه احتياطيًا):</p>
         <div class="ip-number" id="payStatusCode" style="font-size:18px; margin:4px 0 16px;"></div>
         <p class="sub" style="font-size:12.5px; opacity:0.8;" data-i18n="statusSafeCloseNote">تقدر تقفل الصفحة دلوقتي براحتك — هنراجع طلبك ونبعتلك تحديث بمجرد ما يتأكد.</p>
+        <div id="payUnderpaidBox" style="display:none; margin:14px 0; padding-top:14px; border-top:1px solid rgba(0,0,0,0.08); text-align:start;">
+          <div class="field">
+            <label data-i18n="remainingRefLabel">رقم عملية تحويل المبلغ المتبقي</label>
+            <input type="text" id="remainingRefInput" inputmode="latin" data-i18n-ph="payerRefPh" placeholder="مثال: 4821960573">
+          </div>
+          <div class="modal-actions">
+            <button class="btn-primary" id="submitRemainingBtn">دفع المبلغ المتبقي</button>
+          </div>
+        </div>
         <div class="modal-actions">
           <button class="btn-ghost" id="payStatusCloseBtn" data-i18n="closeBtn">إغلاق</button>
         </div>
@@ -1413,6 +1422,16 @@
     <div class="field">
       <label data-i18n="trackCodeLabel">كود المتابعة</label>
       <input type="text" id="trackCode" data-i18n-ph="trackCodePh" placeholder="مثال: A1B2C3" style="text-transform:uppercase;">
+    </div>
+    <p class="sub" id="trackStatusText" style="display:none;"></p>
+    <div id="trackUnderpaidBox" style="display:none; margin:10px 0 4px; padding-top:12px; border-top:1px solid rgba(0,0,0,0.08); text-align:start;">
+      <div class="field">
+        <label data-i18n="remainingRefLabel">رقم عملية تحويل المبلغ المتبقي</label>
+        <input type="text" id="trackRemainingRefInput" inputmode="latin" data-i18n-ph="payerRefPh" placeholder="مثال: 4821960573">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-primary" id="trackSubmitRemainingBtn">دفع المبلغ المتبقي</button>
+      </div>
     </div>
     <div class="modal-actions">
       <button class="btn-primary" id="trackCheckBtn" data-i18n="trackCheckBtn">تحقّق من الحالة</button>
@@ -2155,7 +2174,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=20260915e"></script>
+<script src="app.js?v=20260915f"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
