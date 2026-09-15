@@ -398,7 +398,7 @@
     </div>
   </div>
 
-  <div>
+  <div class="hero-text-frame">
     <div class="eyebrow" data-i18n="heroEyebrow">Miga-Photobook</div>
     <div class="tagline" data-i18n="heroSlogan">لقطتك... تتحول لتحفة فنية</div>
     <h1 id="heroTitle" data-i18n-html="heroTitle">حوّل صورتك إلى بورتريه احترافي<br>بجودة استوديو باستخدام <span class="brand-mark">Miga-Photobook ميجا فوتوبوك</span><br>خلال دقائق.</h1>
@@ -556,7 +556,13 @@
   .hero-with-slider{
     grid-template-columns:1fr 1fr !important;
     gap:14px !important;
-    align-items:start;
+    align-items:stretch;
+  }
+  .hero-text-frame{
+    display:flex; flex-direction:column; justify-content:center;
+    height:100%; padding:20px 22px; border:2px solid var(--brass);
+    border-radius:18px; box-shadow:0 0 0 3px rgba(255,201,77,0.08);
+    background:linear-gradient(180deg, rgba(255,201,77,0.05), transparent 55%);
   }
   /* The slider's own column is centered independently — the hero copy is
      naturally taller than the slider frame at most screen widths, and a
@@ -574,7 +580,7 @@
   /* 15 سبتمبر 2026 (تحديث تاني): شيل خط Rakkas خالص من H1 (كل المقاسات) —
      مش بس الموبايل — لأن الخط الزخرفي نفسه بيبان "مقطوع" حتى فى الديسكتوب
      فوق خلفية الصور المتحركة. راجع index.html للتفاصيل الكاملة. */
-  .hero-with-slider h1{ font-size:clamp(22px, 2.6vw, 34px) !important; margin-bottom:14px !important; line-height:1.35 !important; font-family:'Readex Pro', sans-serif !important; font-weight:700 !important; }
+  .hero-with-slider h1{ font-size:clamp(28px, 3.2vw, 42px) !important; margin-bottom:16px !important; line-height:1.3 !important; font-family:'Readex Pro', sans-serif !important; font-weight:700 !important; text-align:center !important; }
   .hero-with-slider .eyebrow{ font-size:14px !important; margin-bottom:12px !important; }
   .hero-with-slider .tagline{ font-size:17px !important; }
   .hero-with-slider p{ font-size:clamp(14px,1.1vw,16.5px) !important; margin-bottom:20px !important; }
@@ -582,17 +588,19 @@
   .hero-with-slider .hero-ctas{ gap:14px !important; flex-wrap:wrap; }
   .hero-with-slider .hero-ctas a{ font-size:14.5px !important; padding:12px 20px !important; }
   @media(max-width:860px){
-    .hero-with-slider h1{ font-size:clamp(13px,4vw,22px) !important; margin-bottom:6px !important; line-height:1.3 !important; font-family:'Readex Pro', sans-serif !important; font-weight:700 !important; }
+    .hero-with-slider h1{ font-size:clamp(17px,5vw,28px) !important; margin-bottom:8px !important; line-height:1.28 !important; font-family:'Readex Pro', sans-serif !important; font-weight:700 !important; }
     .hero-with-slider .eyebrow{ font-size:12.5px !important; margin-bottom:6px !important; }
     .hero-with-slider .tagline{ font-size:12.5px !important; }
     .hero-with-slider p{ font-size:clamp(11px,2.6vw,14.5px) !important; margin-bottom:0 !important; }
     .hero-with-slider .trust-checks{ font-size:12.5px !important; gap:6px !important; margin-bottom:14px !important; }
     .hero-with-slider .hero-ctas{ gap:8px !important; }
     .hero-with-slider .hero-ctas a{ font-size:12.5px !important; padding:10px 14px !important; }
+    .hero-text-frame{ padding:12px 10px; border-radius:14px; }
   }
   @media(max-width:480px){
-    .hero-with-slider h1{ font-size:clamp(11px,3.6vw,16px) !important; }
+    .hero-with-slider h1{ font-size:clamp(14px,4.4vw,20px) !important; }
     .hero-with-slider .trust-checks{ display:none; } /* first to go when truly tight on space */
+    .hero-text-frame{ padding:9px 8px; border-radius:12px; }
   }
   .fixed-slider-frame{
     padding:6px; border:2px solid var(--brass); border-radius:18px;
@@ -609,7 +617,7 @@
   .hero-with-slider .slider-controls-row{ margin-top:6px; gap:8px; }
   .hero-with-slider .slider-dots{ gap:5px; }
   .hero-with-slider .slider-dot{ width:6px; height:6px; }
-  @media(min-width:860px){ .fixed-slider-frame{ max-width:340px; } }
+  @media(min-width:860px){ .fixed-slider-frame{ max-width:420px; } }
   @media(max-width:480px){
     .fixed-slider-frame{ max-width:210px; padding:4px; border-radius:14px; }
     .hero-with-slider{ gap:8px !important; }
