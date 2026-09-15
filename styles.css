@@ -3188,7 +3188,14 @@
      مفيش صف فاضي. */
   footer{ text-align:start; padding:44px 24px 24px; }
   .footer-inner{
-    display:grid; grid-template-columns:1fr 1.1fr 1fr; gap:32px;
+    /* 15 سبتمبر 2026: كانت 1fr 1.1fr 1fr — يعني عمود "روابط سريعة" وعمود
+       "ليه تثق فينا/تواصل معنا" بياخدوا نفس حصة العمود النص، مع إن محتواهم
+       (روابط قصيرة، سطرين نص) أضيق من كده بكتير. النتيجة فراغ واضح بين
+       نص كل عمود ومحتواه الفعلي، وبقى أوضح لما عرض الحاوية بقى أعرض
+       (container-w-narrow المرن). الحل: العمودين الجانبيين بياخدوا بس
+       عرض محتواهم (auto)، والعمود النص (الشعار) بياخد الباقي كله —
+       أصلاً محتواه متمركز فمفيش فرق يبان لو المساحة اتوسّعت له. */
+    display:grid; grid-template-columns:auto 1fr auto; gap:32px;
     max-width:var(--container-w-narrow); margin:0 auto 28px; padding-bottom:28px;
     border-bottom:1px solid var(--line);
   }

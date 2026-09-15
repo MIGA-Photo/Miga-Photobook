@@ -252,7 +252,7 @@
      old URL. Bumping this string (e.g. 20260906a -> 20260906b) any time
      app.js or styles.css changes forces every visitor to fetch the new file
      immediately, no manual cache-clearing needed on their end. -->
-<link rel="stylesheet" href="styles.css?v=20260915a">
+<link rel="stylesheet" href="styles.css?v=20260915b">
 
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
@@ -647,17 +647,33 @@
      the viewport edge once the columns got this narrow. This is the fix. */
   .hero-with-slider > *{ min-width:0; }
   .hero-with-slider h1, .hero-with-slider p{ overflow-wrap:break-word; }
-  /* Decisive, unambiguous sizing for the hero text now that it shares its
-     row with the slider instead of having the full width to itself —
-     overrides win with !important since several older, narrower-purpose
-     rules already target .hero h1 at various breakpoints/view-modes. */
-  .hero-with-slider h1{ font-size:clamp(13px,4vw,22px) !important; margin-bottom:6px !important; line-height:1.22 !important; }
-  .hero-with-slider .eyebrow{ font-size:12.5px !important; margin-bottom:6px !important; }
-  .hero-with-slider .tagline{ font-size:12.5px !important; }
-  .hero-with-slider p{ font-size:clamp(11px,2.6vw,14.5px) !important; margin-bottom:0 !important; }
-  .hero-with-slider .trust-checks{ font-size:12.5px !important; gap:6px !important; margin-bottom:14px !important; }
-  .hero-with-slider .hero-ctas{ gap:8px !important; flex-wrap:wrap; }
-  .hero-with-slider .hero-ctas a{ font-size:12.5px !important; padding:10px 14px !important; }
+  /* 15 سبتمبر 2026 — الحجم الصغير ده (clamp لغاية 22px) كان بلا أي media
+     query تحته أصلاً، يعني كان شغال بنفس القيمة على شاشة لابتوب 1433px
+     زي ما هو شغال على موبايل 375px. عمود النص عند 1433px عرضه ~614px —
+     مساحة واسعة جدًا لخط بـ22px بس، فكانت النتيجة فراغ ظاهر حوالين نص
+     صغير، وأحيانًا كسر أسطر غريب لما جملة العنوان الطويلة ("بجودة استوديو
+     باستخدام Miga-Photobook ميجا فوتوبوك") تقابل overflow-wrap:break-word
+     في عمود أعرض من اللازم بس بخط أصغر من اللازم. الحل: نفس القيم دي
+     دلوقتي محصورة جوه @media(max-width:860px) تحت (فمفيش أي تغيير على
+     الموبايل الحقيقي)، وفوقها هنا مقاسات لائقة بشاشات اللاب توب/الديسكتوب. */
+  .hero-with-slider h1{ font-size:clamp(22px, 2.6vw, 34px) !important; margin-bottom:14px !important; line-height:1.3 !important; }
+  .hero-with-slider .eyebrow{ font-size:14px !important; margin-bottom:12px !important; }
+  .hero-with-slider .tagline{ font-size:17px !important; }
+  .hero-with-slider p{ font-size:clamp(14px,1.1vw,16.5px) !important; margin-bottom:20px !important; }
+  .hero-with-slider .trust-checks{ font-size:14px !important; gap:14px !important; margin-bottom:24px !important; }
+  .hero-with-slider .hero-ctas{ gap:14px !important; flex-wrap:wrap; }
+  .hero-with-slider .hero-ctas a{ font-size:14.5px !important; padding:12px 20px !important; }
+  @media(max-width:860px){
+    /* دي القيم المضغوطة الأصلية — فضلت زي ما هي بالظبط، محصورة دلوقتي
+       تحت 860px بس (نفس نقطة التحول المستخدمة في باقي الهيرو). */
+    .hero-with-slider h1{ font-size:clamp(13px,4vw,22px) !important; margin-bottom:6px !important; line-height:1.22 !important; }
+    .hero-with-slider .eyebrow{ font-size:12.5px !important; margin-bottom:6px !important; }
+    .hero-with-slider .tagline{ font-size:12.5px !important; }
+    .hero-with-slider p{ font-size:clamp(11px,2.6vw,14.5px) !important; margin-bottom:0 !important; }
+    .hero-with-slider .trust-checks{ font-size:12.5px !important; gap:6px !important; margin-bottom:14px !important; }
+    .hero-with-slider .hero-ctas{ gap:8px !important; }
+    .hero-with-slider .hero-ctas a{ font-size:12.5px !important; padding:10px 14px !important; }
+  }
   @media(max-width:480px){
     .hero-with-slider h1{ font-size:clamp(11px,3.6vw,16px) !important; }
     .hero-with-slider .trust-checks{ display:none; } /* first to go when truly tight on space */
