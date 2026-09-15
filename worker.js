@@ -23,7 +23,7 @@
  *   POST     /orders/mark-thanked  (admin only)
  *   POST     /reviews/submit       GET /reviews/list      GET /reviews/pending
  *   POST     /reviews/approve
- *   POST     /visits/log (public)  GET  /visits/stats (admin only)
+ *   POST     /visits/log (public)  GET  /visits/stats (admin only)  GET /visits/public-count (public)
  *   POST     /auth/register        POST /auth/login       GET /auth/me
  *   POST     /auth/social/google   POST /auth/social/apple   POST /auth/social/facebook
  *   POST     /auth/webauthn/register-options   POST /auth/webauthn/register-verify
@@ -33,7 +33,8 @@
  *   GET      /showcase              POST /admin/showcase (admin only)
  *   POST     /payment/paymob/create   POST /payment/paymob/webhook   (real, already working)
  *   POST     /payment/fawry/create    POST /payment/fawry/webhook    (real, already working)
- *   POST     /transform                                              (real, via fal.ai)
+ *   POST     /payment/fawaterk/create POST /payment/fawaterk/webhook (real, needs one live test)
+ *   POST     /transform                                              (real, via fal.ai — model admin-selectable, see MODEL_REGISTRY)
  *
  * Design choices made specifically to fix problems found in review:
  *   1. Product photos are NEVER stored as base64. Admin uploads go to R2 and
@@ -250,6 +251,70 @@ async function getVisitStats(env, request) {
   }
 }
 
+/** Public, no-auth: the storefront's own visible visitor-count badge calls
+ * this directly (see loadVisitorCount() in app.js). This route never
+ * existed on this Worker before — the frontend has been calling
+ * /visits/public-count since it was written, but nothing here ever
+ * answered it, so every call 404'd and the badge silently stayed hidden
+ * (its own fetch is wrapped in try/catch, so this never broke the page —
+ * it just meant the badge could never appear, no matter what the
+ * frontend's init-ordering logic did). Deliberately returns ONLY the
+ * total count — no path, country, name, or email — since this is public
+ * and reachable by anyone, unlike /visits/stats above which is
+ * admin-password-gated and returns the full detail rows.
+ */
+const TRANSFORM_COUNT_KEY = "stats:transformCount";
+
+/** عدد الصور المحوّلة. أول مرة تتنادى بعد نشر الكود ده، العدّاد مش
+ *  هيكون موجود — فبنحسبه مرة واحدة من سجل الطلبات القديم ونخزّنه،
+ *  عشان الأرقام اللي اتعملت قبل إضافة العدّاد ما تضيعش. بعد كده
+ *  بيزيد بواحد مع كل تحويل ناجح، فالقراءة بتفضل قراءة واحدة. */
+async function getTransformCount(env) {
+  const raw = await env.MEGA_KV.get(TRANSFORM_COUNT_KEY);
+  if (raw !== null && raw !== undefined) {
+    const n = parseInt(raw, 10);
+    return Number.isFinite(n) ? n : 0;
+  }
+  let count = 0;
+  try {
+    const idxRaw = await env.MEGA_KV.get("orders:index");
+    const codes = idxRaw ? JSON.parse(idxRaw) : [];
+    for (const code of (Array.isArray(codes) ? codes : [])) {
+      const oRaw = await env.MEGA_KV.get(`order:${code}`);
+      if (!oRaw) continue;
+      const o = JSON.parse(oRaw);
+      if (o.transformUsed) count++;
+      if (Array.isArray(o.usedItems)) count += o.usedItems.length;
+    }
+  } catch (e) { /* لو الحساب فشل، نخزّن صفر بدل ما نعيد المحاولة كل مرة */ }
+  await env.MEGA_KV.put(TRANSFORM_COUNT_KEY, String(count));
+  return count;
+}
+
+/** إحصاءات عامة للبادج على الصفحة الرئيسية — بدون مصادقة.
+ *  كل جزء في try/catch بمفرده: فشل أي مصدر بيرجّع صفر بدل ما يوقّع
+ *  الباقي، والواجهة بتخفي البادج اللي رقمه صفر. */
+async function getPublicVisitCount(env) {
+  let total = 0, transforms = 0, reviewCount = 0, reviewAvg = 0;
+  try {
+    const totalRow = await env.MEGA_DB.prepare(`SELECT COUNT(*) as c FROM visits`).first();
+    total = totalRow?.c || 0;
+  } catch (e) { /* جدول الزيارات مش جاهز — البادج يفضل مخفي */ }
+  try {
+    transforms = await getTransformCount(env);
+  } catch (e) { /* تجاهل */ }
+  try {
+    const raw = await env.MEGA_KV.get("reviews:approved");
+    const reviews = raw ? JSON.parse(raw) : [];
+    const rated = reviews.filter((r) => typeof r.rating === "number" && r.rating > 0);
+    reviewCount = rated.length;
+    if (reviewCount) {
+      reviewAvg = Math.round((rated.reduce((a, r) => a + r.rating, 0) / reviewCount) * 10) / 10;
+    }
+  } catch (e) { /* تجاهل */ }
+  return json({ total, transforms, reviewCount, reviewAvg });
+}
+
 function randomCode(len) {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O/1/I ambiguity
   const bytes = crypto.getRandomValues(new Uint8Array(len || 8));
@@ -266,20 +331,126 @@ async function sha256Hex(str) {
   return Array.from(new Uint8Array(buf), (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-async function approveOrderByCode(env, code) {
+/** True HMAC-SHA256 (not the same thing as sha256Hex(data+secret) used by
+ * Paymob/Fawry above) — Fawaterk's own docs specify the real HMAC
+ * construction for webhook signature verification, so this can't reuse
+ * sha256Hex without silently producing the wrong signature. */
+async function hmacSha256Hex(secret, message) {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const sig = await crypto.subtle.sign("HMAC", key, enc.encode(message));
+  return Array.from(new Uint8Array(sig), (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+// ============================================================================
+// Payment integrity (added 2026-09-15)
+// =========================================================================
+// One rule, everywhere an order gets approved: CLIENT NEVER DECIDES THE
+// PRICE OR WHETHER PAYMENT IS VERIFIED. `order.requiredAmount` (same value
+// as `order.price`, which was already server-computed at createOrder() —
+// see finalPrice there) is the only number this file ever compares a
+// payment against. A manual InstaPay/Vodafone Cash "payment" is only ever
+// verified by an authenticated admin typing in the amount they personally
+// confirmed arrived (see approveOrder()); a gateway payment (Paymob/Fawry/
+// Fawaterk) is only ever verified from the amount inside a signature-checked
+// webhook payload (see paymobWebhook/fawryWebhook/fawaterkWebhook below) —
+// never from anything the browser sends. Both paths funnel through this one
+// function so there is exactly one place that decides "was this paid".
+const PAYMENT_AMOUNT_EPSILON = 0.01; // float-rounding tolerance, in EGP
+
+function isPaymentSufficient(requiredAmount, verifiedAmount) {
+  return (
+    Number.isFinite(requiredAmount) &&
+    Number.isFinite(verifiedAmount) &&
+    verifiedAmount >= requiredAmount - PAYMENT_AMOUNT_EPSILON
+  );
+}
+
+/** Mutates `order` in place to reflect a verification attempt and returns
+ * {ok, reason}. Never called with client-supplied trust — every caller must
+ * derive `verifiedAmount` itself (admin manual entry, or a provider webhook
+ * amount, already signature-verified by the time it gets here).
+ *
+ * Idempotent: an order already paymentStatus:"verified" + status:"approved"
+ * is left untouched and reported ok — a double-click on Approve, or a
+ * retried webhook delivery, can never re-process, downgrade, or duplicate
+ * anything (see TEST 14/22/23 in the Sept-15 payment-integrity request). */
+function recordPaymentVerification(order, { verifiedAmount, method, provider, providerTransactionId, reference, verifiedBy }) {
+  const requiredAmount = Number(order.requiredAmount ?? order.price) || 0;
+
+  if (order.paymentStatus === "verified" && order.status === "approved") {
+    return { ok: true, alreadyVerified: true };
+  }
+
+  // Free / soft-launch orders (requiredAmount === 0) have nothing to verify —
+  // see claimFreeOrder(), the only place a real order can ever have price 0.
+  if (requiredAmount === 0) {
+    order.paymentStatus = "verified";
+    order.verifiedPaidAmount = 0;
+    order.paymentVerifiedAt = order.paymentVerifiedAt || Date.now();
+    order.status = "approved";
+    return { ok: true };
+  }
+
+  const amount = Number(verifiedAmount);
+  if (!Number.isFinite(amount) || amount <= 0) {
+    order.paymentStatus = "rejected";
+    return { ok: false, reason: "invalid-amount", requiredAmount };
+  }
+
+  if (method) order.paymentMethod = method;
+  if (provider) order.paymentProvider = provider;
+  if (reference) order.paymentReference = reference;
+
+  if (!isPaymentSufficient(requiredAmount, amount)) {
+    order.paymentStatus = "underpaid";
+    order.verifiedPaidAmount = amount;
+    return { ok: false, reason: "underpaid", requiredAmount, verifiedAmount: amount };
+  }
+
+  order.paymentStatus = "verified";
+  order.verifiedPaidAmount = amount;
+  if (providerTransactionId) order.providerTransactionId = providerTransactionId;
+  order.paymentVerifiedAt = Date.now();
+  order.paymentVerifiedBy = verifiedBy || order.paymentVerifiedBy || null;
+  order.status = "approved";
+  return { ok: true };
+}
+
+/** Provider-webhook approval path (Paymob/Fawry/Fawaterk). `verification` MUST
+ * carry the amount as reported inside that provider's own signature-verified
+ * webhook payload — never anything from the browser. Also enforces that one
+ * provider transaction can only ever verify one order (see section 12/TEST 15
+ * of the Sept-15 payment-integrity request): a transaction id already spent
+ * on a different order is refused rather than silently re-approving. */
+async function approveOrderByCode(env, code, verification) {
   const raw = await env.MEGA_KV.get(`order:${code}`);
   if (!raw) return false;
   const order = JSON.parse(raw);
-  order.status = "approved";
-  if (order.orderType === "prompt" && !order.promptText) {
+
+  if (verification?.providerTransactionId && verification?.provider) {
+    const txnKey = `providertxn:${verification.provider}:${verification.providerTransactionId}`;
+    const existingOwner = await env.MEGA_KV.get(txnKey);
+    if (existingOwner && existingOwner !== code) {
+      // This exact provider transaction already paid for a DIFFERENT order —
+      // never let it verify a second one.
+      return false;
+    }
+    if (!existingOwner) await env.MEGA_KV.put(txnKey, code);
+  }
+
+  const result = recordPaymentVerification(order, verification || {});
+
+  if (result.ok && order.orderType === "prompt" && !order.promptText) {
     const productRaw = await env.MEGA_KV.get(`product:${order.productId}`);
     if (productRaw) {
       const product = JSON.parse(productRaw);
       order.promptText = product.prompt || null;
     }
   }
+
   await env.MEGA_KV.put(`order:${code}`, JSON.stringify(order));
-  return true;
+  return result.ok;
 }
 
 // PBKDF2 password hashing (Web Crypto is available in Workers; no external deps needed).
@@ -508,6 +679,125 @@ async function getAdminProducts(env, request) {
   return json({ value: JSON.stringify(list) });
 }
 
+// ============================================================================
+// Per-product share links  (GET /share?product=<id>)
+// ----------------------------------------------------------------------------
+// Product links use a "#product=<id>" hash so the SPA can open the right
+// modal client-side — but a hash is never sent to the server, so Facebook/
+// WhatsApp/Instagram crawlers (which don't run JS) always see the site's
+// generic og-image.png instead of the actual product photo.
+//
+// This route gives crawlers something real to read: it looks the product up,
+// returns a tiny standalone HTML page with OG/Twitter tags for THAT product's
+// title + photo, and immediately forwards real visitors (via meta-refresh and
+// a JS redirect, so it works with or without JS) to the normal
+// "https://miga-photobook.com/#product=<id>" SPA link. It only ever answers
+// GET /share — every other path on the domain is untouched, so this cannot
+// affect the live storefront even if something here is wrong.
+// ============================================================================
+
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+// WhatsApp's link-preview fetcher is far stricter than Facebook's about image
+// size — in practice it silently drops the preview image (falling back to a
+// plain text-only card, exactly like the generic "og-image.png" case this
+// endpoint was built to avoid) once the image is much past ~300KB. Product
+// photos here come straight from the admin's original upload (up to 5MB,
+// no compression — see uploadImage above), which is fine for Facebook but
+// routinely too big for WhatsApp. This routes the OG/Twitter image through
+// wsrv.nl (formerly images.weserv.nl — a free, widely-used public image
+// resizing proxy) to guarantee a small, correctly-sized JPEG regardless of
+// the source file's size, while leaving the original stored image untouched for every other
+// use (product cards, the transform flow, etc.). Explicit width/height are
+// declared to match exactly, since WhatsApp is also known to rely on those
+// tags rather than reliably measuring the image itself.
+const SHARE_IMAGE_WIDTH = 1200;
+const SHARE_IMAGE_HEIGHT = 630;
+function buildShareImageUrl(sourceUrl) {
+  const params = new URLSearchParams({
+    url: sourceUrl,
+    w: String(SHARE_IMAGE_WIDTH),
+    h: String(SHARE_IMAGE_HEIGHT),
+    fit: "cover",
+    a: "attention",
+    output: "jpg",
+    q: "80",
+  });
+  return `https://wsrv.nl/?${params.toString()}`;
+}
+
+async function renderShareCard(env, request) {
+  const url = new URL(request.url);
+  const id = url.searchParams.get("product");
+  const siteUrl = "https://miga-photobook.com/";
+  if (!id) return Response.redirect(siteUrl, 302);
+
+  const target = `${siteUrl}#product=${encodeURIComponent(id)}`;
+  // The canonical URL declared to crawlers (og:url) — deliberately this /share
+  // link itself, NOT the "#product=" target. Facebook keys its scrape cache off
+  // og:url: if it pointed at the hash link, any earlier scrape of that same
+  // plain link (from before this endpoint existed, back when it only showed the
+  // generic site image) would keep being served forever, since Facebook would
+  // treat "og:url" as the identity of this share and reuse the old cached
+  // preview instead of the fresh one below. Every product gets its own
+  // never-before-seen /share URL, so there is nothing stale to collide with.
+  const canonical = `${siteUrl}share?product=${encodeURIComponent(id)}`;
+  const raw = await env.MEGA_KV.get(`product:${id}`);
+  if (!raw) return Response.redirect(target, 302);
+
+  let p;
+  try {
+    p = JSON.parse(raw);
+  } catch {
+    return Response.redirect(target, 302);
+  }
+
+  const title = escapeHtml(p.title || "Miga-Photobook");
+  const description = "حوّل صورتك العادية لتحفة فنية بالذكاء الاصطناعي — miga-photobook.com";
+  const originalImage = p.image || `${siteUrl}og-image.png`;
+  const image = escapeHtml(buildShareImageUrl(originalImage));
+  const safeTarget = escapeHtml(target);
+  const safeCanonical = escapeHtml(canonical);
+
+  const html = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${title} | Miga-Photobook</title>
+<meta property="og:site_name" content="Miga-Photobook">
+<meta property="og:type" content="website">
+<meta property="og:url" content="${safeCanonical}">
+<meta property="og:title" content="${title}">
+<meta property="og:description" content="${escapeHtml(description)}">
+<meta property="og:image" content="${image}">
+<meta property="og:image:secure_url" content="${image}">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="${SHARE_IMAGE_WIDTH}">
+<meta property="og:image:height" content="${SHARE_IMAGE_HEIGHT}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${title}">
+<meta name="twitter:description" content="${escapeHtml(description)}">
+<meta name="twitter:image" content="${image}">
+<!-- No <meta http-equiv="refresh">: Facebook/WhatsApp/Instagram's crawler follows
+     that kind of redirect immediately and reads whatever is at the OTHER end
+     instead of the tags above — which is exactly why every earlier version of
+     this page kept showing the generic site preview no matter what was set here.
+     The JS redirect below only runs in a real browser (crawlers don't execute
+     JS), so people still land on the product instantly, while crawlers stop
+     here and read this page's own tags. -->
+<script>location.replace(${JSON.stringify(target)});</script>
+</head>
+<body>
+<p>جارٍ التحويل لصفحة المنتج… <a href="${safeTarget}">اضغط هنا لو الصفحة معملتش تحويل تلقائي</a></p>
+</body>
+</html>`;
+
+  return new Response(html, { headers: { "Content-Type": "text/html; charset=UTF-8" } });
+}
+
 async function upsertProduct(env, request) {
   let body;
   try {
@@ -666,7 +956,340 @@ async function getSiteConfig(env) {
     activeDesign,
     availableDesigns: Object.values(DESIGN_REGISTRY),
     heroModes: await getHeroModes(env),
+    outputResolution: await getOutputResolution(env),
+    aiModel: await getAiModel(env),
+    availableModels: Object.values(MODEL_REGISTRY),
+    colorTheme: await getColorTheme(env),
+    headerMode: await getHeaderMode(env),
+    promptLibraryMode: await getPromptLibraryMode(env),
   });
+}
+
+// ============================================================================
+// AI output resolution  (included in GET /site-config, set via
+// POST /admin/set-resolution)
+// The admin panel's resolution dropdown and its "حفظ الدقة" button already
+// existed in app.js, but the matching backend was never actually built here —
+// every generation silently stayed hardcoded to "4K" no matter what the admin
+// picked, quietly costing ~13 EGP/image instead of ~4 EGP/image at "2K".
+// This wires the setting all the way through: saved here, read by
+// getSiteConfig for the admin dropdown, and read again at the actual fal.ai
+// call site below so a saved choice really changes what gets billed.
+// ============================================================================
+
+const OUTPUT_RESOLUTIONS = ["2K", "4K"];
+
+async function getOutputResolution(env) {
+  const raw = await env.MEGA_KV.get("config:outputResolution");
+  return OUTPUT_RESOLUTIONS.includes(raw) ? raw : "2K"; // cheaper option is the safe default
+}
+
+async function setOutputResolution(env, request) {
+  const url = new URL(request.url);
+  const token = url.searchParams.get("token") || request.headers.get("X-Admin-Token");
+  if (!(await verifyAdminSession(env, token))) return err("Wrong password", 401);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return err("Invalid JSON body");
+  }
+  if (!OUTPUT_RESOLUTIONS.includes(body.resolution)) {
+    return err(`Unknown resolution. Available: ${OUTPUT_RESOLUTIONS.join(", ")}`, 400);
+  }
+
+  await env.MEGA_KV.put("config:outputResolution", body.resolution);
+  return json({ ok: true, outputResolution: body.resolution });
+}
+
+// ============================================================================
+// AI model selection  (included in GET /site-config, set via
+// POST /admin/set-ai-model)
+// Magdy asked whether he could pick which fal.ai model does the actual
+// generation instead of it being permanently hardcoded to nano-banana-2.
+// Every model below was checked against fal.ai's own published API schema
+// before being added — the INPUT shape differs a lot between providers
+// (resolution vs image_size, "2K" vs "auto_2K" vs "1k", negative_prompt
+// supported or not), and getting one wrong silently 502s every generation a
+// paying customer tries to make. buildFalRequest() below shapes the request
+// per model's paramStyle. Adding a future model is: one entry here (plus a
+// new paramStyle branch in buildFalRequest only if its shape is genuinely
+// new) — no other code changes, same pattern as OUTPUT_RESOLUTIONS above.
+// ============================================================================
+
+const MODEL_REGISTRY = {
+  "nano-banana-2": {
+    id: "nano-banana-2",
+    slug: "fal-ai/nano-banana-2/edit",
+    nameAr: "Nano Banana 2 (الحالي)",
+    nameEn: "Nano Banana 2 (current)",
+    paramStyle: "nanoBanana",
+  },
+  "nano-banana-pro": {
+    id: "nano-banana-pro",
+    slug: "fal-ai/nano-banana-pro/edit",
+    nameAr: "Nano Banana Pro (أعلى جودة)",
+    nameEn: "Nano Banana Pro (higher quality)",
+    paramStyle: "nanoBananaPro", // same family as nano-banana-2 but pricier ($0.15/$0.30) — Google's own higher tier
+  },
+  "flux-2-pro": {
+    id: "flux-2-pro",
+    slug: "fal-ai/flux-2-pro/edit",
+    nameAr: "Flux 2 Pro",
+    nameEn: "Flux 2 Pro",
+    paramStyle: "fluxAuto", // no 2K/4K tiers on this endpoint — the admin's resolution choice is ignored for this model specifically
+  },
+  "seedream-4.5": {
+    id: "seedream-4.5",
+    slug: "fal-ai/bytedance/seedream/v4.5/edit",
+    nameAr: "Seedream 4.5",
+    nameEn: "Seedream 4.5",
+    paramStyle: "seedreamAuto",
+  },
+  "seedream-5-lite": {
+    id: "seedream-5-lite",
+    slug: "fal-ai/bytedance/seedream/v5/lite/edit",
+    nameAr: "Seedream 5 Lite",
+    nameEn: "Seedream 5 Lite",
+    paramStyle: "seedreamAuto",
+  },
+  "grok-imagine": {
+    id: "grok-imagine",
+    slug: "xai/grok-imagine-image/edit",
+    nameAr: "Grok Imagine",
+    nameEn: "Grok Imagine",
+    paramStyle: "grok", // tops out at "2k" — there is no 4K tier for this model
+  },
+  "gpt-image-2": {
+    id: "gpt-image-2",
+    slug: "openai/gpt-image-2/edit",
+    nameAr: "GPT Image 2 (OpenAI)",
+    nameEn: "GPT Image 2 (OpenAI)",
+    paramStyle: "gptImage2", // no 2K/4K tiers — the admin's resolution choice maps to a quality level instead
+  },
+};
+
+async function getAiModel(env) {
+  const raw = await env.MEGA_KV.get("config:aiModel");
+  return MODEL_REGISTRY[raw] ? raw : "nano-banana-2"; // unknown/removed id falls back to the known-good default
+}
+
+async function setAiModel(env, request) {
+  const url = new URL(request.url);
+  const token = url.searchParams.get("token") || request.headers.get("X-Admin-Token");
+  if (!(await verifyAdminSession(env, token))) return err("Wrong password", 401);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return err("Invalid JSON body");
+  }
+  if (!MODEL_REGISTRY[body.model]) {
+    return err(`Unknown model. Available: ${Object.keys(MODEL_REGISTRY).join(", ")}`, 400);
+  }
+
+  await env.MEGA_KV.put("config:aiModel", body.model);
+  return json({ ok: true, aiModel: body.model });
+}
+
+/** Shapes the fal.ai request body for one model's paramStyle. Every model
+ * here returns its output the same way (images[0].url — checked for each
+ * one), but the INPUT fields differ enough between providers that a single
+ * shared body would silently break most of them. See MODEL_REGISTRY comment
+ * above for why each style exists. */
+function buildFalRequest(modelCfg, { prompt, negativePrompt, imageDataUri, resolution }) {
+  const falBody = { prompt, image_urls: [imageDataUri] };
+  switch (modelCfg.paramStyle) {
+    case "fluxAuto":
+      falBody.image_size = "auto"; // preserves the input photo's own aspect ratio/size
+      falBody.output_format = "png";
+      break;
+    case "seedreamAuto":
+      falBody.image_size = resolution === "4K" ? "auto_4K" : "auto_2K";
+      break;
+    case "grok":
+      falBody.resolution = resolution === "4K" ? "2k" : "1k";
+      falBody.output_format = "png";
+      break;
+    case "nanoBananaPro":
+      falBody.resolution = resolution; // "2K"/"4K" pass straight through — this endpoint's own enum matches ours exactly
+      falBody.output_format = "png";
+      break;
+    case "gptImage2":
+      falBody.image_size = "auto"; // preserves the input photo's own aspect ratio/size
+      falBody.quality = resolution === "4K" ? "high" : "medium"; // no K-tiers on this endpoint — maps to its quality enum instead
+      falBody.output_format = "png";
+      break;
+    case "nanoBanana":
+    default:
+      falBody.resolution = resolution;
+      falBody.output_format = "png";
+      if (negativePrompt) falBody.negative_prompt = negativePrompt;
+      break;
+  }
+  return falBody;
+}
+
+// ============================================================================
+// Header color theme + header layout  (included in GET /site-config, set via
+// POST /admin/set-color-theme and POST /admin/set-header-mode)
+// Same story as outputResolution above: the admin panel's controls and save
+// buttons already existed in app.js, but nothing on this end ever stored the
+// choice — every save silently 404'd. This wires storage + retrieval only.
+// NOTE: saving now succeeds and the value round-trips through /site-config,
+// but nothing on the customer-facing frontend (index.html/styles.css/app.js)
+// reads colorTheme/headerMode yet to actually change what customers see —
+// that's a separate, larger frontend task, not covered by this fix.
+// ============================================================================
+
+const COLOR_THEMES = ["black", "brown", "emerald", "wine", "navy", "red"];
+const HEADER_MODES = ["classic", "compact"];
+
+async function getColorTheme(env) {
+  const raw = await env.MEGA_KV.get("config:colorTheme");
+  return COLOR_THEMES.includes(raw) ? raw : "black";
+}
+
+async function getHeaderMode(env) {
+  const raw = await env.MEGA_KV.get("config:headerMode");
+  return HEADER_MODES.includes(raw) ? raw : "classic";
+}
+
+async function setColorTheme(env, request) {
+  const url = new URL(request.url);
+  const token = url.searchParams.get("token") || request.headers.get("X-Admin-Token");
+  if (!(await verifyAdminSession(env, token))) return err("Wrong password", 401);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return err("Invalid JSON body");
+  }
+  if (!COLOR_THEMES.includes(body.theme)) {
+    return err(`Unknown color theme. Available: ${COLOR_THEMES.join(", ")}`, 400);
+  }
+
+  await env.MEGA_KV.put("config:colorTheme", body.theme);
+  return json({ ok: true, colorTheme: body.theme });
+}
+
+async function setHeaderMode(env, request) {
+  const url = new URL(request.url);
+  const token = url.searchParams.get("token") || request.headers.get("X-Admin-Token");
+  if (!(await verifyAdminSession(env, token))) return err("Wrong password", 401);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return err("Invalid JSON body");
+  }
+  if (!HEADER_MODES.includes(body.mode)) {
+    return err(`Unknown header mode. Available: ${HEADER_MODES.join(", ")}`, 400);
+  }
+
+  await env.MEGA_KV.put("config:headerMode", body.mode);
+  return json({ ok: true, headerMode: body.mode });
+}
+
+// ============================================================================
+// Prompt Library for Professionals mode  (included in GET /site-config, set
+// via POST /admin/set-prompt-library-mode)
+// Off by default (current behaviour: 'luxury' is an ordinary, currently-empty
+// category). When turned on, the frontend repurposes that same 'luxury' slot
+// into a derived view aggregating every OTHER category's real products as
+// prompt-only cards, grouped by their real category — nothing here
+// duplicates, moves, or deletes any product data; this flag only tells the
+// frontend which way to render what's already there. Fully reversible from
+// the admin panel with zero data loss either direction.
+// ============================================================================
+
+async function getPromptLibraryMode(env) {
+  const raw = await env.MEGA_KV.get("config:promptLibraryMode");
+  return raw === "true";
+}
+
+/* ---------- ترجمة آلية لاسم المنتج (عربي → إنجليزي) ----------
+ * ليه في الووركر مش في المتصفح؟ عشان Workers AI بيتنادى بـ binding
+ * (env.AI) من غير أي مفتاح API — فمفيش سر بيتحط في كود الصفحة، ومفيش
+ * خدمة خارجية ولا CORS.
+ *
+ * بتتنادى **مرة واحدة وقت إضافة المنتج** من لوحة الإدارة، والنتيجة
+ * بتتحفظ في titleEn في قاعدة البيانات. الزوار عمرهم ما بيشغّلوا الموديل
+ * — فمفيش تكلفة ولا بطء على الصفحة العامة.
+ *
+ * محمية بتوكن الأدمن عن قصد: من غير كده الـendpoint ده بيبقى خدمة ترجمة
+ * مجانية مفتوحة للعالم على حساب الـneurons بتاعك.
+ *
+ * لو الـAI binding مش مضاف من لوحة Cloudflare، بترجّع 503 برسالة واضحة
+ * بدل ما ترمي 500 غامض — والواجهة بتفضل شغالة بالقاموس المحلي عادي. */
+const BRAND_FIXUPS = [
+  [/\bMega\b/g, 'Miga'],
+  [/\bMiga\s*Photo\s*Book\b/gi, 'Miga-Photobook'],
+];
+
+async function translateTitle(env, request) {
+  const url = new URL(request.url);
+  let body = {};
+  try { body = await request.json(); } catch { /* الجسم اختياري */ }
+
+  const token =
+    body.token ||
+    url.searchParams.get("token") ||
+    request.headers.get("X-Admin-Token");
+  if (!(await verifyAdminSession(env, token))) return err("Wrong password", 401);
+
+  const text = String(body.text || "").trim();
+  if (!text) return err("text is required", 400);
+  if (text.length > 200) return err("text too long", 400);
+
+  if (!env.AI || typeof env.AI.run !== "function") {
+    return json(
+      { ok: false, reason: "ai_binding_missing",
+        message: "Workers AI binding (AI) is not configured for this Worker." },
+      503
+    );
+  }
+
+  try {
+    const res = await env.AI.run("@cf/meta/m2m100-1.2b", {
+      text,
+      source_lang: "arabic",
+      target_lang: "english",
+    });
+    let out = String((res && (res.translated_text || res.result || res.response)) || "").trim();
+    if (!out) return json({ ok: false, reason: "empty_result" }, 502);
+
+    // الموديل بيترجم "ميجا" لـ"Mega" — واسم البراند مش بيتترجم.
+    for (const [re, to] of BRAND_FIXUPS) out = out.replace(re, to);
+    out = out.replace(/\s+/g, " ").trim();
+
+    return json({ ok: true, text: out, model: "@cf/meta/m2m100-1.2b" });
+  } catch (e) {
+    return json({ ok: false, reason: "ai_error", message: String(e && e.message || e) }, 502);
+  }
+}
+
+async function setPromptLibraryMode(env, request) {
+  const url = new URL(request.url);
+  const token = url.searchParams.get("token") || request.headers.get("X-Admin-Token");
+  if (!(await verifyAdminSession(env, token))) return err("Wrong password", 401);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return err("Invalid JSON body");
+  }
+  if (typeof body.enabled !== "boolean") {
+    return err("enabled must be true or false", 400);
+  }
+
+  await env.MEGA_KV.put("config:promptLibraryMode", body.enabled ? "true" : "false");
+  return json({ ok: true, promptLibraryMode: body.enabled });
 }
 
 async function setSiteDesign(env, request) {
@@ -812,6 +1435,13 @@ const PACKAGE_PRICES = {
   20: 299,  // Monthly subscription — 20 photos/month
 };
 
+// Fixed price for buying a product's text prompt (not the transformed photo
+// itself) — the same amount regardless of which product it belongs to. Must
+// be kept in sync by hand with PROMPT_PRICE in app.js: the frontend has no
+// way to read this backend value, and this backend has no way to read that
+// frontend one, so a future price change needs both edited together.
+const PROMPT_PRICE = 10;
+
 async function createOrder(env, request) {
   if (!(await rateLimit(env, request, "orders-create", 6, 3600))) {
     return err("Too many requests, please try again later", 429);
@@ -835,12 +1465,37 @@ async function createOrder(env, request) {
   }
 
   const isPackageOrder = orderType === "package";
+  const isPromptOrder = !isPackageOrder && orderType === "prompt";
   let normalizedPackageSize = null;
+  // Overwritten below for EVERY order type — the client-submitted price is
+  // never trusted as-is, only used as this initial placeholder.
   let finalPrice = Number(price) || 0;
   if (isPackageOrder) {
     normalizedPackageSize = Number(packageSize);
     if (!PACKAGE_PRICES[normalizedPackageSize]) return err("Invalid package size", 400);
     finalPrice = PACKAGE_PRICES[normalizedPackageSize]; // ignore whatever price the client sent
+  } else if (isPromptOrder) {
+    // Prompt purchases are a single fixed price regardless of product.
+    finalPrice = PROMPT_PRICE; // ignore whatever price the client sent
+  } else {
+    // Individual "transform" orders (fixed 2026-09-14, final completion
+    // pass): this used to just trust Number(price) straight from the
+    // request body with ZERO server-side check against a real catalog
+    // price — a client could submit any productId together with any price
+    // and the stored order would say that's what it cost. In practice this
+    // was never exploitable for a free result, because every payment here
+    // is a manual bank transfer that Magdy personally reviews against the
+    // real transferred amount before releasing anything — but the order
+    // record itself could still lie about the true price. Fixed the same
+    // way PACKAGE_PRICES already works: look the product up server-side and
+    // ignore whatever price the client claims.
+    const productRaw = await env.MEGA_KV.get(`product:${productId}`);
+    if (!productRaw) return err("Product not found", 404);
+    const catalogPrice = Number(JSON.parse(productRaw).price);
+    if (!Number.isFinite(catalogPrice) || catalogPrice <= 0) {
+      return err("This product is not currently available for purchase", 409);
+    }
+    finalPrice = catalogPrice; // ignore whatever price the client sent
   }
 
   // A visitor who never transferred has no receipt number to give, so this is
@@ -863,6 +1518,25 @@ async function createOrder(env, request) {
     return err("Ordering from this number has been suspended after repeated unpaid orders. Please contact support.", 403);
   }
 
+  // Cross-device account sync (added 2026-09-14): if the buyer is logged in,
+  // link this order to their real account so it shows up on every device —
+  // WITHOUT changing anything about guest checkout. Identity comes ONLY from
+  // the server-verified session token, exactly like authMe() — never from
+  // any field the client could put in the request body. A guest (no token,
+  // or an expired/invalid one) still checks out exactly as before: authedUserId
+  // just stays null and the order is stored the same way it always was.
+  let authedUserId = null;
+  try {
+    const authHeader = request.headers.get("Authorization") || "";
+    const sessionToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+    if (sessionToken) {
+      const sessionUser = await getUserBySession(env, sessionToken);
+      if (sessionUser) authedUserId = sessionUser.id;
+    }
+  } catch (e) {
+    authedUserId = null; // never let account-linking break checkout
+  }
+
   const code = randomCode(8);
   const order = {
     code,
@@ -878,6 +1552,7 @@ async function createOrder(env, request) {
     ref: ref ? String(ref).slice(0, 120) : "",
     buyerName: buyerName ? String(buyerName).slice(0, 120) : "",
     buyerEmail: buyerEmail ? String(buyerEmail).slice(0, 160) : "",
+    userId: authedUserId, // null for guest checkout — unchanged behavior
     status: "pending",
     createdAt: Date.now(),
     transformUsed: false,
@@ -887,6 +1562,25 @@ async function createOrder(env, request) {
     packageSize: isPackageOrder ? normalizedPackageSize : undefined,
     creditsRemaining: isPackageOrder ? normalizedPackageSize : undefined,
     usedItems: isPackageOrder ? [] : undefined,
+
+    // --- Payment integrity fields (added 2026-09-15) -------------------------
+    // `price` above is already the server-computed, non-negotiable amount —
+    // it always has been (see finalPrice above, which never trusts the
+    // client). `requiredAmount` is just a same-value, explicitly-named alias
+    // going forward, so new code never has to wonder whether `price` is
+    // trusted (it is) — see recordPaymentVerification() for how this is used.
+    requiredAmount: finalPrice,
+    // Nothing has been verified yet for a real (non-free) order — see
+    // claimFreeOrder() for the free/soft-launch path, which sets these
+    // straight to their "verified" values since there is nothing to check.
+    paymentStatus: "pending", // pending | underpaid | verified | rejected | failed
+    verifiedPaidAmount: null,
+    paymentMethod: null,
+    paymentProvider: null, // 'manual' (InstaPay/Vodafone Cash) | 'paymob' | 'fawry' | 'fawaterk'
+    paymentReference: null,
+    providerTransactionId: null,
+    paymentVerifiedAt: null,
+    paymentVerifiedBy: null,
   };
   await env.MEGA_KV.put(`order:${code}`, JSON.stringify(order));
   await env.MEGA_KV.put(refKey, code);
@@ -896,18 +1590,55 @@ async function createOrder(env, request) {
   index.push(code);
   await env.MEGA_KV.put("orders:index", JSON.stringify(index));
 
+  // Best-effort index write for "list my orders" (D1 can query by user_id;
+  // the KV blob above can't). If this fails for any reason, the order itself
+  // is already safely saved above — it just won't show in cross-device sync
+  // until the customer's next order, same as any other best-effort sync step
+  // already in this codebase (see addFavoriteOnServer client-side).
+  if (authedUserId) {
+    try {
+      await env.MEGA_DB.prepare(
+        "INSERT OR IGNORE INTO user_orders (user_id, order_code, created_at) VALUES (?, ?, ?)"
+      )
+        .bind(authedUserId, code, order.createdAt)
+        .run();
+    } catch (e) {
+      /* order already placed successfully; index write is best-effort */
+    }
+  }
+
   await notifyOwnerOfOrder(env, order);
 
   return json({ code });
 }
 
 async function trackOrder(env, request) {
+  // Added 2026-09-14: every other endpoint in this file rate-limits itself;
+  // this one didn't. Order codes are 8 chars from a 32-char alphabet (see
+  // randomCode()) — a 32^8 (~1.1 trillion) keyspace, so this isn't a
+  // realistic brute-force target — but a successful guess does return
+  // another customer's package credit balance, usage history, and (for
+  // approved prompt orders) the paid prompt text, and an unlimited GET here
+  // is free abuse/scraping surface either way. 900/hour per IP comfortably
+  // covers the real worst case (a customer leaving the pending-order panel
+  // open polls every 6s = up to ~600/hour from one IP) plus normal
+  // "My Orders" history bursts, while still bounding automated abuse.
+  if (!(await rateLimit(env, request, "orders-track", 900, 3600))) {
+    return err("Too many requests, please try again later", 429);
+  }
   const url = new URL(request.url);
   const code = (url.searchParams.get("code") || "").toUpperCase().trim();
   if (!code) return err("Missing code");
   const raw = await env.MEGA_KV.get(`order:${code}`);
   if (!raw) return err("Order not found", 404);
   const order = JSON.parse(raw);
+  return json(orderToPublicResponse(order));
+}
+
+// Shared by trackOrder (one code) and listAccountOrders (all of a logged-in
+// user's codes) so the two response shapes can't drift apart — same fields,
+// same "only reveal promptText once approved" rule, in one place.
+function orderToPublicResponse(order) {
   const response = { code: order.code, productId: order.productId, status: order.status, createdAt: order.createdAt, orderType: order.orderType || "transform" };
   if (order.orderType === "prompt" && order.status === "approved") {
     response.promptText = order.promptText || null;
@@ -917,7 +1648,204 @@ async function trackOrder(env, request) {
     response.creditsRemaining = order.creditsRemaining;
     response.usedItems = order.usedItems || [];
   }
-  return json(response);
+  return response;
+}
+
+// ============================================================================
+// Account sync (added 2026-09-14) — GET /account/orders, GET /account/favorites,
+// POST /account/favorites/add, POST /account/favorites/remove,
+// POST /account/update-profile
+//
+// Security rule that applies to EVERY function below, no exceptions: the
+// account acted on is whoever the session TOKEN resolves to via
+// getUserBySession() — never a field from the request body or query string.
+// This is the same identity rule authMe() already uses; these just extend it
+// to read/write instead of read-only. A request with no valid token gets a
+// plain "Not logged in" 401 — never a different error for "user doesn't
+// exist" vs "bad token" vs "expired", so a guest/attacker can't use the
+// response to learn anything about which accounts exist.
+// ============================================================================
+
+async function getAuthedUserOrNull(env, request) {
+  const authHeader = request.headers.get("Authorization") || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+  if (!token) return null;
+  return await getUserBySession(env, token); // null if invalid/expired — same helper authMe() uses
+}
+
+async function listAccountOrders(env, request) {
+  if (!(await rateLimit(env, request, "account-orders", 120, 3600))) {
+    return err("Too many requests, please try again later", 429);
+  }
+  const user = await getAuthedUserOrNull(env, request);
+  if (!user) return err("Not logged in", 401);
+
+  const { results } = await env.MEGA_DB.prepare(
+    "SELECT order_code FROM user_orders WHERE user_id = ? ORDER BY created_at DESC"
+  )
+    .bind(user.id)
+    .all();
+
+  const orders = [];
+  for (const row of results || []) {
+    const raw = await env.MEGA_KV.get(`order:${row.order_code}`);
+    if (!raw) continue; // shouldn't happen, but a stale index row must never 500 the whole list
+    orders.push(orderToPublicResponse(JSON.parse(raw)));
+  }
+  return json({ orders });
+}
+
+async function listAccountFavorites(env, request) {
+  if (!(await rateLimit(env, request, "account-favorites", 120, 3600))) {
+    return err("Too many requests, please try again later", 429);
+  }
+  const user = await getAuthedUserOrNull(env, request);
+  if (!user) return err("Not logged in", 401);
+
+  const { results } = await env.MEGA_DB.prepare(
+    "SELECT product_id FROM favorites WHERE user_id = ?"
+  )
+    .bind(user.id)
+    .all();
+  return json({ productIds: (results || []).map((r) => r.product_id) });
+}
+
+async function addAccountFavorite(env, request) {
+  if (!(await rateLimit(env, request, "account-favorites-write", 60, 3600))) {
+    return err("Too many requests, please try again later", 429);
+  }
+  const user = await getAuthedUserOrNull(env, request);
+  if (!user) return err("Not logged in", 401);
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return err("Invalid JSON body");
+  }
+  const productId = body && body.productId ? String(body.productId).slice(0, 200) : "";
+  if (!productId) return err("Missing productId");
+
+  await env.MEGA_DB.prepare(
+    "INSERT OR IGNORE INTO favorites (user_id, product_id, created_at) VALUES (?, ?, ?)"
+  )
+    .bind(user.id, productId, Date.now())
+    .run();
+  return json({ ok: true });
+}
+
+async function removeAccountFavorite(env, request) {
+  if (!(await rateLimit(env, request, "account-favorites-write", 60, 3600))) {
+    return err("Too many requests, please try again later", 429);
+  }
+  const user = await getAuthedUserOrNull(env, request);
+  if (!user) return err("Not logged in", 401);
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return err("Invalid JSON body");
+  }
+  const productId = body && body.productId ? String(body.productId).slice(0, 200) : "";
+  if (!productId) return err("Missing productId");
+
+  await env.MEGA_DB.prepare("DELETE FROM favorites WHERE user_id = ? AND product_id = ?")
+    .bind(user.id, productId)
+    .run();
+  return json({ ok: true });
+}
+
+async function updateAccountProfile(env, request) {
+  if (!(await rateLimit(env, request, "account-update-profile", 20, 3600))) {
+    return err("Too many requests, please try again later", 429);
+  }
+  const user = await getAuthedUserOrNull(env, request);
+  if (!user) return err("Not logged in", 401);
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return err("Invalid JSON body");
+  }
+  const { name, phone } = body || {};
+  if (!name || !String(name).trim()) return err("Missing name");
+  const cleanedName = String(name).trim().slice(0, 120);
+
+  let cleanedPhone = null;
+  if (phone) {
+    // Same Egyptian-mobile rule createOrder() already enforces, reused as-is
+    // rather than a second, possibly-drifting copy of the pattern.
+    cleanedPhone = String(phone).trim();
+    if (!/^01[0125][0-9]{8}$/.test(cleanedPhone)) {
+      return err("Please enter a valid Egyptian mobile number (e.g. 01xxxxxxxxx)", 400);
+    }
+  }
+
+  await env.MEGA_DB.prepare("UPDATE users SET name = ?, phone = ? WHERE id = ?")
+    .bind(cleanedName, cleanedPhone, user.id)
+    .run();
+  return json({ ok: true, name: cleanedName, phone: cleanedPhone });
+}
+
+// ============================================================================
+// Profile-photo upload (added 2026-09-14) — POST /account/upload-avatar
+// ----------------------------------------------------------------------------
+// Same identity rule as every other /account/* endpoint above: the account
+// acted on is whoever the session token resolves to via getUserBySession(),
+// never a field the client sends. Reuses the existing MEGA_IMAGES R2 bucket
+// and the same ALLOWED_IMAGE_TYPES allowlist the admin product-photo
+// uploader already uses (see uploadImage() above) — a second, separate
+// image pipeline isn't needed for this. The frontend already downscales the
+// chosen photo client-side to a 512×512 JPEG before it's ever sent, so the
+// size cap below is generous headroom, not a real limit anyone should hit
+// in practice; it exists purely so a directly-crafted request can't abuse
+// this endpoint to stuff arbitrarily large files into R2.
+// ============================================================================
+const MAX_AVATAR_BYTES = 3 * 1024 * 1024;
+
+async function uploadAccountAvatar(env, request) {
+  if (!(await rateLimit(env, request, "account-avatar-upload", 20, 3600))) {
+    return err("Too many requests, please try again later", 429);
+  }
+  const user = await getAuthedUserOrNull(env, request);
+  if (!user) return err("Not logged in", 401);
+
+  const contentType = request.headers.get("Content-Type") || "";
+  if (!contentType.includes("multipart/form-data")) {
+    return err("Expected multipart/form-data with an 'avatar' field", 400);
+  }
+  const form = await request.formData();
+  const file = form.get("avatar");
+  if (!file || typeof file === "string") return err("Missing 'avatar' file field", 400);
+  if (!ALLOWED_IMAGE_TYPES.has(file.type)) return err("Unsupported image type", 415);
+  if (file.size > MAX_AVATAR_BYTES) return err("Image too large", 413);
+
+  const ext = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif" }[file.type];
+  // Keyed by this account's own (session-verified) id — never anything the
+  // client could choose — so one user can never overwrite another's photo.
+  const key = `avatar_${user.id}_${Date.now()}_${randomHex(6)}.${ext}`;
+  await env.MEGA_IMAGES.put(key, await file.arrayBuffer(), {
+    httpMetadata: { contentType: file.type, cacheControl: "public, max-age=31536000, immutable" },
+  });
+  const avatarUrl = `${new URL(request.url).origin}/images/${key}`;
+
+  // Best-effort cleanup of the previous avatar (if any) so R2 storage doesn't
+  // grow unbounded across repeated re-uploads. Never lets a delete failure —
+  // or a pre-existing avatar_url that isn't actually one of ours — block
+  // saving the new photo; only ever deletes a key matching our own naming
+  // scheme, never an arbitrary stored URL.
+  try {
+    const prevRow = await env.MEGA_DB.prepare("SELECT avatar_url FROM users WHERE id = ?").bind(user.id).first();
+    const prevUrl = prevRow && prevRow.avatar_url;
+    if (prevUrl) {
+      const prevKey = String(prevUrl).split("/images/")[1];
+      if (prevKey && prevKey.startsWith("avatar_")) await env.MEGA_IMAGES.delete(prevKey);
+    }
+  } catch (e) {
+    // Cleanup is a nicety, never a condition of saving the new avatar.
+  }
+
+  await env.MEGA_DB.prepare("UPDATE users SET avatar_url = ? WHERE id = ?").bind(avatarUrl, user.id).run();
+  return json({ ok: true, avatarUrl });
 }
 
 async function claimFreeOrder(env, request) {
@@ -950,6 +1878,19 @@ async function claimFreeOrder(env, request) {
     createdAt: Date.now(),
     transformUsed: false,
     resultUrl: null,
+    // A genuinely free order (env.SOFT_LAUNCH_MODE, a server-side toggle a
+    // client can never set) has nothing to verify — marked verified/0 up
+    // front so it reads unambiguously in the admin ledger and can never be
+    // confused with a real paid order missing its verification step.
+    requiredAmount: 0,
+    paymentStatus: "verified",
+    verifiedPaidAmount: 0,
+    paymentMethod: null,
+    paymentProvider: "free",
+    paymentReference: null,
+    providerTransactionId: null,
+    paymentVerifiedAt: Date.now(),
+    paymentVerifiedBy: "soft-launch",
   };
   await env.MEGA_KV.put(`order:${code}`, JSON.stringify(order));
   const indexRaw = await env.MEGA_KV.get("orders:index");
@@ -1008,6 +1949,17 @@ async function getProductPopularity(env) {
   return json({ counts });
 }
 
+/** Manual InstaPay/Vodafone Cash approval (added 2026-09-15: payment
+ * integrity). The website has no way to know what actually landed in
+ * Magdy's bank account/wallet — a customer typing a transfer reference is
+ * not proof of amount. So this endpoint now REQUIRES the admin to type the
+ * amount they personally confirmed arrived (verifiedAmount) — never
+ * defaulted from anything the customer submitted at checkout — and that
+ * amount is compared against order.requiredAmount (the same server-computed
+ * price createOrder() already trusted, never the client's). Underpaying
+ * returns a clear underpaid response instead of ever setting status to
+ * "approved"; /transform independently re-checks paymentStatus too (see
+ * transformImage()), so even a bug here can't unlock a result on its own. */
 async function approveOrder(env, request) {
   let body;
   try {
@@ -1020,8 +1972,22 @@ async function approveOrder(env, request) {
   const raw = await env.MEGA_KV.get(`order:${code}`);
   if (!raw) return err("Order not found", 404);
   const order = JSON.parse(raw);
-  order.status = "approved";
-  if (order.orderType === "prompt" && !order.promptText) {
+
+  const requiredAmount = Number(order.requiredAmount ?? order.price) || 0;
+  const verifiedAmount = Number(body.verifiedAmount);
+  if (requiredAmount > 0 && !Number.isFinite(verifiedAmount)) {
+    return err("Enter the amount you actually confirmed was received before approving", 400);
+  }
+
+  const result = recordPaymentVerification(order, {
+    verifiedAmount,
+    method: order.appUsed || undefined,
+    provider: "manual",
+    reference: order.ref || undefined,
+    verifiedBy: "admin",
+  });
+
+  if (order.orderType === "prompt" && !order.promptText && result.ok) {
     const productRaw = await env.MEGA_KV.get(`product:${order.productId}`);
     if (productRaw) {
       const product = JSON.parse(productRaw);
@@ -1029,7 +1995,17 @@ async function approveOrder(env, request) {
     }
   }
   await env.MEGA_KV.put(`order:${code}`, JSON.stringify(order));
-  return json({ ok: true });
+
+  if (!result.ok) {
+    if (result.reason === "underpaid") {
+      return json(
+        { error: "UNDERPAID", underpaid: true, requiredAmount: result.requiredAmount, verifiedAmount: result.verifiedAmount },
+        409
+      );
+    }
+    return err("Enter a valid received amount before approving", 400);
+  }
+  return json({ ok: true, alreadyVerified: !!result.alreadyVerified });
 }
 
 async function rejectOrder(env, request) {
@@ -1047,6 +2023,7 @@ async function rejectOrder(env, request) {
   if (order.status === "approved") return err("This order was already approved and can't be rejected", 409);
   const alreadyRejected = order.status === "rejected";
   order.status = "rejected";
+  order.paymentStatus = "rejected";
   await env.MEGA_KV.put(`order:${code}`, JSON.stringify(order));
 
   if (!alreadyRejected) {
@@ -1102,10 +2079,33 @@ async function submitReview(env, request) {
   const commentText = String(comment || "").slice(0, 600).trim();
   if (!commentText) return err("Comment required");
 
+  // Security fix (2026-09-14): resultImageUrl used to be stored completely
+  // unvalidated, then rendered straight into an <img src="..."> in the ADMIN
+  // panel's pending-reviews list with no escaping — any registered customer
+  // (registration is free/instant, no email verification) could submit a
+  // crafted string here that broke out of the src attribute and injected an
+  // onerror handler, running arbitrary JS in the ADMIN's own browser session
+  // the next time they opened that tab — including reading the admin session
+  // token out of localStorage and exfiltrating it. This is now validated
+  // server-side (must be null, or a genuine http(s) URL under 500 chars) —
+  // anything else is silently dropped rather than failing the whole review,
+  // since this field only decorates a review and a customer shouldn't lose
+  // their review over a malformed value. The admin-panel rendering was ALSO
+  // hardened to properly escape this field (defense in depth — see app.js).
+  let safeResultImageUrl = null;
+  if (typeof resultImageUrl === "string" && resultImageUrl.length > 0 && resultImageUrl.length <= 500) {
+    try {
+      const parsed = new URL(resultImageUrl);
+      if (parsed.protocol === "http:" || parsed.protocol === "https:") safeResultImageUrl = parsed.href;
+    } catch {
+      safeResultImageUrl = null; // not a well-formed URL at all — drop it
+    }
+  }
+
       const pendingRaw = await env.MEGA_KV.get("reviews:pending");
     const pending = pendingRaw ? JSON.parse(pendingRaw) : [];
     const nextId = (parseInt((await env.MEGA_KV.get("reviews:nextId")) || "1", 10));
-    pending.push({ id: nextId, rating: ratingNum, comment: commentText, resultImageUrl: resultImageUrl || null, user_name: user.name, createdAt: Date.now() });
+    pending.push({ id: nextId, rating: ratingNum, comment: commentText, resultImageUrl: safeResultImageUrl, user_name: user.name, createdAt: Date.now() });
     await env.MEGA_KV.put("reviews:pending", JSON.stringify(pending));
     await env.MEGA_KV.put("reviews:nextId", String(nextId + 1));
 
@@ -1115,7 +2115,9 @@ async function submitReview(env, request) {
 async function listApprovedReviews(env) {
   const raw = await env.MEGA_KV.get("reviews:approved");
   const reviews = raw ? JSON.parse(raw) : [];
-  return json({ reviews: reviews.slice(-30).reverse() });
+  // كان .slice(-30) بيقص آخر 30 تقييم بس ويسيب الباقي مش ظاهر خالص — مش
+  // عداد حقيقي. اتشالت (14 سبتمبر 2026) عشان كل التقييمات المعتمدة تظهر.
+  return json({ reviews: [...reviews].reverse() });
 }
 
 async function listPendingReviews(env, request) {
@@ -1219,7 +2221,10 @@ async function registerUser(env, request) {
   const userId = result.meta.last_row_id;
 
   const token = await createSession(env, userId);
-  return json({ token, name, email });
+  // phone/avatarUrl are always empty right after registration — included so
+  // the response shape matches loginUser()/authMe() exactly, since the
+  // frontend stores whichever one it last received as the full profile.
+  return json({ token, name, email, phone: "", avatarUrl: "" });
 }
 
 async function loginUser(env, request) {
@@ -1236,7 +2241,7 @@ async function loginUser(env, request) {
   const password = String(body.password || "");
 
   const user = await env.MEGA_DB.prepare(
-    "SELECT id, name, email, password_hash, salt, auth_provider FROM users WHERE email = ?"
+    "SELECT id, name, email, password_hash, salt, auth_provider, phone, avatar_url FROM users WHERE email = ?"
   )
     .bind(email)
     .first();
@@ -1249,7 +2254,11 @@ async function loginUser(env, request) {
   if (!(await safeEqual(hash, user.password_hash))) return err("Invalid email or password", 401);
 
   const token = await createSession(env, user.id);
-  return json({ token, name: user.name, email: user.email });
+  // phone/avatarUrl added 2026-09-14 — previously missing here entirely,
+  // which meant a returning user's saved phone/profile-photo never actually
+  // came back on login (silently dropped, not just on this device: on ANY
+  // device, since this is the one place login data comes from).
+  return json({ token, name: user.name, email: user.email, phone: user.phone || "", avatarUrl: user.avatar_url || "" });
 }
 
 async function createSession(env, userId) {
@@ -1263,7 +2272,7 @@ async function createSession(env, userId) {
 async function getUserBySession(env, token) {
   if (!token) return null;
   const row = await env.MEGA_DB.prepare(
-    `SELECT users.id, users.name, users.email, sessions.expires_at
+    `SELECT users.id, users.name, users.email, users.phone, users.avatar_url, sessions.expires_at
      FROM sessions JOIN users ON users.id = sessions.user_id
      WHERE sessions.token = ?`
   )
@@ -1271,7 +2280,7 @@ async function getUserBySession(env, token) {
     .first();
   if (!row) return null;
   if (row.expires_at < Date.now()) return null;
-  return { id: row.id, name: row.name, email: row.email };
+  return { id: row.id, name: row.name, email: row.email, phone: row.phone || null, avatarUrl: row.avatar_url || null };
 }
 
 async function authMe(env, request) {
@@ -1279,7 +2288,12 @@ async function authMe(env, request) {
   const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
   const user = await getUserBySession(env, token);
   if (!user) return err("Not logged in", 401);
-  return json({ name: user.name, email: user.email });
+  // phone/avatarUrl added 2026-09-14 — this endpoint is what every returning
+  // visit calls (checkLoggedInUser() on page load) to rebuild currentUser,
+  // so leaving these out meant the phone number and profile photo silently
+  // reset to blank on every single page load, on every device, even though
+  // both were saved correctly in D1 the whole time.
+  return json({ name: user.name, email: user.email, phone: user.phone || "", avatarUrl: user.avatarUrl || "" });
 }
 
 // ============================================================================
@@ -1346,7 +2360,7 @@ async function findOrCreateSocialUser(env, { email, name, provider }) {
   if (!email) throw new Error("Provider did not return an email address");
   name = String(name || email.split("@")[0]).slice(0, 80);
 
-  let user = await env.MEGA_DB.prepare("SELECT id, name, email FROM users WHERE email = ?").bind(email).first();
+  let user = await env.MEGA_DB.prepare("SELECT id, name, email, phone, avatar_url FROM users WHERE email = ?").bind(email).first();
   if (!user) {
     const { hash, salt } = await hashPassword(randomHex(32));
     const result = await env.MEGA_DB.prepare(
@@ -1354,10 +2368,13 @@ async function findOrCreateSocialUser(env, { email, name, provider }) {
     )
       .bind(name, email, hash, salt, provider, Date.now())
       .run();
-    user = { id: result.meta.last_row_id, name, email };
+    user = { id: result.meta.last_row_id, name, email, phone: null, avatar_url: null };
   }
   const token = await createSession(env, user.id);
-  return { token, name: user.name, email: user.email };
+  // phone/avatarUrl added 2026-09-14 — same fix as loginUser()/authMe(): a
+  // returning social-login user's saved phone/photo were silently dropped
+  // here before, on every device.
+  return { token, name: user.name, email: user.email, phone: user.phone || "", avatarUrl: user.avatar_url || "" };
 }
 
 async function socialLoginGoogle(env, request) {
@@ -1918,11 +2935,22 @@ async function paymobWebhook(env, request) {
     ].map((v) => (v === undefined || v === null ? "" : String(v))).join("");
     const computedHmac = await sha256Hex(orderedFields + env.PAYMOB_HMAC_SECRET);
 
-    if (!hmacFromPaymob || computedHmac !== hmacFromPaymob) {
+    // Constant-time compare (2026-09-14 hardening) — a plain !== leaks how
+    // many leading characters matched via response timing, in theory letting
+    // an attacker brute-force the correct signature byte-by-byte over many
+    // requests instead of needing the real PAYMOB_HMAC_SECRET outright.
+    if (!hmacFromPaymob || !(await safeEqual(computedHmac, hmacFromPaymob))) {
       return err("HMAC verification failed", 401);
     }
     if (obj?.success && obj?.order?.merchant_order_id) {
-      await approveOrderByCode(env, obj.order.merchant_order_id);
+      // Paymob reports amount_cents (EGP × 100) — never trust anything the
+      // browser said the price was; this is the provider's own signed figure.
+      const amountEgp = Number(obj?.amount_cents) / 100;
+      await approveOrderByCode(env, obj.order.merchant_order_id, {
+        verifiedAmount: amountEgp,
+        provider: "paymob",
+        providerTransactionId: obj?.id != null ? String(obj.id) : null,
+      });
     }
     return json({ ok: true });
   } catch (e) {
@@ -1988,9 +3016,119 @@ async function fawryWebhook(env, request) {
     if (!messageSignature) return err("Missing signature", 401);
     const raw = `${fawryRefNumber ?? ""}${merchantRefNumber ?? ""}${paymentAmount ?? ""}${orderAmount ?? ""}${orderStatus ?? ""}${paymentMethod ?? ""}${env.FAWRY_SECURITY_KEY}`;
     const computed = await sha256Hex(raw);
-    if (computed !== messageSignature) return err("Signature verification failed", 401);
+    // Constant-time compare (2026-09-14 hardening) — see paymobWebhook() for rationale.
+    if (!(await safeEqual(computed, messageSignature))) return err("Signature verification failed", 401);
     if (orderStatus === "PAID" && merchantRefNumber) {
-      await approveOrderByCode(env, merchantRefNumber);
+      // Fawry reports the amount it actually collected in paymentAmount —
+      // orderAmount is what was requested, paymentAmount is what was paid;
+      // verifying against the latter is what actually protects against a
+      // partial/short payment being reported as PAID.
+      await approveOrderByCode(env, merchantRefNumber, {
+        verifiedAmount: Number(paymentAmount),
+        provider: "fawry",
+        providerTransactionId: fawryRefNumber != null ? String(fawryRefNumber) : null,
+      });
+    }
+    return json({ ok: true });
+  } catch (e) {
+    return json({ error: "Webhook processing error", detail: String(e) }, 500);
+  }
+}
+
+async function fawaterkCreate(env, request) {
+  if (!env.FAWATERK_API_KEY) {
+    return err("Card payment via Fawaterk is not configured yet (missing FAWATERK_API_KEY)", 501);
+  }
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return err("Invalid JSON body");
+  }
+  const { orderCode, amount, name, phone, email } = body;
+  if (!orderCode || !amount) return err("Missing orderCode or amount");
+
+  const fullName = (name || "Customer").trim();
+  const spaceIdx = fullName.indexOf(" ");
+  const firstName = spaceIdx === -1 ? fullName : fullName.slice(0, spaceIdx);
+  const lastName = spaceIdx === -1 ? "N/A" : fullName.slice(spaceIdx + 1);
+
+  try {
+    const origin = new URL(request.url).origin;
+    const invoiceRes = await fetch("https://app.fawaterk.com/api/v2/createInvoiceLink", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.FAWATERK_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        cartTotal: Number(amount).toFixed(2),
+        currency: "EGP",
+        customer: {
+          first_name: firstName,
+          last_name: lastName,
+          email: email || "customer@example.com",
+          phone: phone || "01000000000",
+        },
+        cartItems: [{ name: `Miga-Photobook order ${orderCode}`, price: Number(amount).toFixed(2), quantity: 1 }],
+        payLoad: { orderCode },
+        redirectionUrls: {
+          successUrl: "https://miga-photobook.com/payment-success",
+          failUrl: "https://miga-photobook.com/payment-failed",
+          pendingUrl: "https://miga-photobook.com/payment-pending",
+          webhookUrl: `${origin}/payment/fawaterk/webhook`,
+        },
+      }),
+    });
+
+    if (!invoiceRes.ok) {
+      const detail = await invoiceRes.text();
+      return json({ error: "Fawaterk invoice creation failed", detail }, 502);
+    }
+    const data = await invoiceRes.json();
+    const checkoutUrl = data?.data?.url;
+    if (!checkoutUrl) return json({ error: "No checkout url returned from Fawaterk", detail: data }, 502);
+    return json({ checkoutUrl });
+  } catch (e) {
+    return json({ error: "Unexpected error creating Fawaterk payment", detail: String(e) }, 500);
+  }
+}
+
+async function fawaterkWebhook(env, request) {
+  if (!env.FAWATERK_VENDOR_KEY) return err("Server misconfigured: FAWATERK_VENDOR_KEY not set", 500);
+  try {
+    const body = await request.json().catch(() => null);
+    if (!body) return err("Invalid payload", 400);
+    const { hashKey, invoice_id, invoice_key, payment_method, invoice_status, pay_load } = body;
+    if (!hashKey) return err("Missing signature", 401);
+    const message = `InvoiceId=${invoice_id ?? ""}&InvoiceKey=${invoice_key ?? ""}&PaymentMethod=${payment_method ?? ""}`;
+    const computed = await hmacSha256Hex(env.FAWATERK_VENDOR_KEY, message);
+    // Constant-time compare (2026-09-14 hardening) — see paymobWebhook() for rationale.
+    if (!(await safeEqual(computed, hashKey))) return err("Signature verification failed", 401);
+
+    let orderCode = null;
+    try {
+      const parsedPayload = typeof pay_load === "string" ? JSON.parse(pay_load) : pay_load;
+      orderCode = parsedPayload?.orderCode || null;
+    } catch {
+      orderCode = null;
+    }
+    if (invoice_status === "paid" && orderCode) {
+      // Fawaterk's webhook payload isn't fully confirmed against live docs in
+      // this pass (this integration is still disabled client-side) — check
+      // for the paid amount under every plausible field name their dashboard
+      // docs use. If NONE of them are present, verifiedAmount comes out
+      // NaN/non-finite and recordPaymentVerification() fails the order
+      // closed (paymentStatus: "rejected", never approved) instead of
+      // trusting invoice_status alone. Before actually turning Fawaterk on,
+      // confirm the real field name in their webhook payload and adjust the
+      // list below if needed.
+      const rawAmount = body.invoice_amount ?? body.amount ?? body.cartTotal ?? body.paid_amount ?? body.total;
+      await approveOrderByCode(env, orderCode, {
+        verifiedAmount: Number(rawAmount),
+        provider: "fawaterk",
+        providerTransactionId: invoice_id != null ? String(invoice_id) : null,
+      });
     }
     return json({ ok: true });
   } catch (e) {
@@ -2001,6 +3139,114 @@ async function fawryWebhook(env, request) {
 // ============================================================================
 // AI photo transform  (POST /transform)
 // ============================================================================
+
+// Defensive cleanup: some products still have an OLD, manually-typed
+// watermark/logo instruction saved in their prompt (e.g. the "royal king
+// crown" text pasted before this became automatic, or later a text-based
+// gold-icon instruction). None of that should ever reach the AI anymore —
+// see applyLogoWatermark() below for why — so this strips out any sentence
+// that mentions "watermark" or "logo" from a product's OWN prompt before it
+// is sent to fal.ai. Safe to leave old text sitting in a product's prompt
+// field; it will just be ignored. New products should just skip mentioning
+// the logo entirely, to keep the field clean.
+function stripLegacyWatermarkText(promptText) {
+  if (!promptText) return "";
+  return promptText
+    .split(/(?<=[.!?])\s+/)
+    .filter((sentence) => !/watermark|logo/i.test(sentence))
+    .join(" ")
+    .trim();
+}
+
+// ============================================================================
+// Real logo watermarking (Cloudflare Images binding) — added 2026-09-07,
+// replacing the old approach of asking the AI model to *draw* a logo from a
+// text description. That never worked reliably: the model misspelled
+// "Miga-Photobook", drew the wrong colors, and ignored every size
+// instruction we gave it (tried 8%, 5%, 3%, "extremely tiny" — all still
+// rendered far too large). This instead overlays the REAL logo file — exact
+// shape, exact color, exact size, every time, no AI interpretation involved.
+//
+// How it works: after fal.ai generates the (logo-free) transformed photo,
+// this fetches that image plus the real logo PNG, composites them with the
+// Images binding at a fixed size/position, stores the composited result in
+// the existing MEGA_IMAGES R2 bucket, and serves it through the existing
+// /images/:key route (see uploadImage/serveImage above) — so `resultUrl`
+// downstream is still just a normal https URL, exactly like before. Nothing
+// else in the codebase (admin panel, WhatsApp share links, order records)
+// needs to change.
+//
+// Setup this needs (one-time, done from the Cloudflare dashboard — outside
+// what this code change alone can do):
+//   1. Workers & Pages -> miga-photobook-api -> Settings -> Bindings ->
+//      Add -> Images -> bind it as "IMAGES" (i.e. env.IMAGES).
+//   2. Upload logo-watermark.png (transparent background, real logo) to the
+//      GitHub repo root, next to index.html, so LOGO_WATERMARK_URL below
+//      resolves to a real, permanently-hosted file.
+// If the Images binding isn't set up yet, this fails safe: the customer
+// still gets their (unwatermarked) photo rather than an error.
+// ============================================================================
+const LOGO_WATERMARK_URL = "https://miga-photobook.com/logo-watermark.png";
+// Sized as a PERCENTAGE of the delivered photo's own width, not a fixed pixel
+// count. A fixed pixel width (previously 110px) looks fine on one output
+// resolution/aspect ratio but too small or too large on another — every
+// product can use a different resolution setting from the admin panel, and
+// this needs to look the same *relative* size on all of them. 0.10 = 10% of
+// the photo's width.
+const LOGO_WATERMARK_WIDTH_RATIO = 0.1;
+// Floor so the logo never becomes illegibly tiny if a product's output
+// resolution is unusually small.
+const LOGO_WATERMARK_MIN_WIDTH_PX = 90;
+// Gap from the bottom/right edges, as a fraction of the logo's OWN (already
+// percentage-sized) width — so the margin scales together with the logo
+// instead of looking cramped on a large logo or oversized on a small one.
+const LOGO_WATERMARK_MARGIN_RATIO = 0.16;
+
+async function applyLogoWatermark(env, sourceImageUrl, request) {
+  if (!env.IMAGES) {
+    // Images binding not added yet in the dashboard — don't break a real,
+    // already-paid-for customer transform over a missing watermark.
+    return sourceImageUrl;
+  }
+  const [sourceRes, logoRes] = await Promise.all([fetch(sourceImageUrl), fetch(LOGO_WATERMARK_URL)]);
+  if (!sourceRes.ok) throw new Error(`Could not fetch generated image (HTTP ${sourceRes.status})`);
+  if (!logoRes.ok) throw new Error(`Could not fetch logo-watermark.png (HTTP ${logoRes.status}) — is it uploaded to the site root?`);
+
+  // .tee() the source photo's stream into two independent copies: one to read
+  // its real width via .info() (free — no billing impact, per Cloudflare's
+  // docs), and one to actually composite. A stream can only be consumed once,
+  // so both need their own copy — this is the same .tee() pattern Cloudflare's
+  // own "rounded corners" example uses to feed one source into multiple draws.
+  const [infoStream, drawStream] = sourceRes.body.tee();
+  const info = await env.IMAGES.info(infoStream);
+  const overlayWidthPx = Math.max(LOGO_WATERMARK_MIN_WIDTH_PX, Math.round(info.width * LOGO_WATERMARK_WIDTH_RATIO));
+  const marginPx = Math.round(overlayWidthPx * LOGO_WATERMARK_MARGIN_RATIO);
+
+  // IMPORTANT: .output() returns a Promise — you must await it BEFORE calling
+  // .response() on the resolved result (see Cloudflare's own docs example:
+  // `(await env.IMAGES.input(...).output(...)).response()`). Calling
+  // `.output(...).response()` without awaiting first calls `.response` on the
+  // Promise object itself, which doesn't exist, and throws
+  // "composited.response is not a function" on every single request — this
+  // was the exact bug causing every real transform to fail after fal.ai
+  // successfully generated the photo.
+  const composited = (
+    await env.IMAGES.input(drawStream)
+      .draw(env.IMAGES.input(logoRes.body).transform({ width: overlayWidthPx }), {
+        bottom: marginPx,
+        right: marginPx,
+      })
+      .output({ format: "image/jpeg", quality: 92 })
+  ).response();
+
+  const compositedBytes = await composited.arrayBuffer();
+  const key = `gen_${Date.now()}_${randomHex(6)}.jpg`;
+  await env.MEGA_IMAGES.put(key, compositedBytes, {
+    httpMetadata: { contentType: "image/jpeg", cacheControl: "public, max-age=31536000, immutable" },
+  });
+  const origin = new URL(request.url).origin;
+  return `${origin}/images/${key}`;
+}
 
 async function transformImage(env, request) {
   if (!(await rateLimit(env, request, "transform", 15, 3600))) {
@@ -2021,6 +3267,26 @@ async function transformImage(env, request) {
   if (!orderRaw) return err("Order not found — please re-enter your order code", 404);
   const order = JSON.parse(orderRaw);
   if (order.status !== "approved") return err("This order has not been approved yet", 403);
+  // Defense-in-depth (added 2026-09-15): status alone becoming "approved" is
+  // now only ever set by recordPaymentVerification() after a sufficient
+  // verified payment (or a genuinely free order) — see approveOrder()/
+  // approveOrderByCode(). This re-checks that directly, so that even a future
+  // bug that flips `status` without going through that function still can't
+  // unlock a transform. Only enforced when paymentStatus is actually present
+  // — an order created before this field existed keeps working exactly as it
+  // did before, per the backward-compatibility rule for legacy orders (never
+  // let a MISSING field become a bypass for a NEW order, but never punish an
+  // OLD one for a field it was never given either).
+  if (order.paymentStatus && order.paymentStatus !== "verified") {
+    return err("This order's payment has not been verified yet", 403);
+  }
+  if (
+    order.paymentStatus === "verified" &&
+    Number(order.requiredAmount ?? order.price) > 0 &&
+    !isPaymentSufficient(Number(order.requiredAmount ?? order.price), Number(order.verifiedPaidAmount))
+  ) {
+    return err("This order's payment could not be confirmed", 403);
+  }
   if (order.orderType === "prompt") return err("This order is for the prompt text, not an image transform", 403);
 
   const isPackage = order.orderType === "package";
@@ -2066,15 +3332,17 @@ async function transformImage(env, request) {
   }
 
   try {
-    const falBody = {
-      prompt: product.prompt,
-      image_urls: [image],
-      resolution: "4K",
-      output_format: "png",
-    };
-    if (product.negativePrompt) falBody.negative_prompt = product.negativePrompt;
+    const modelId = await getAiModel(env); // admin-configurable — see getSiteConfig/setAiModel/MODEL_REGISTRY above
+    const modelCfg = MODEL_REGISTRY[modelId] || MODEL_REGISTRY["nano-banana-2"];
+    const resolution = await getOutputResolution(env); // admin-configurable — see getSiteConfig/setOutputResolution above
+    const falBody = buildFalRequest(modelCfg, {
+      prompt: stripLegacyWatermarkText(product.prompt),
+      negativePrompt: product.negativePrompt,
+      imageDataUri: image,
+      resolution,
+    });
 
-    const falRes = await fetch("https://fal.run/fal-ai/nano-banana-2/edit", {
+    const falRes = await fetch(`https://fal.run/${modelCfg.slug}`, {
       method: "POST",
       headers: { Authorization: `Key ${env.FAL_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify(falBody),
@@ -2086,10 +3354,18 @@ async function transformImage(env, request) {
       return json({ error: "Image generation request failed", detail }, 502);
     }
     const data = await falRes.json();
-    const outputUrl = data?.images?.[0]?.url;
-    if (!outputUrl) {
+    const rawOutputUrl = data?.images?.[0]?.url;
+    if (!rawOutputUrl) {
       await env.MEGA_KV.delete(lockKey);
       return json({ error: "No image returned from the generation service", detail: data }, 502);
+    }
+
+    let outputUrl;
+    try {
+      outputUrl = await applyLogoWatermark(env, rawOutputUrl, request);
+    } catch (e) {
+      await env.MEGA_KV.delete(lockKey);
+      return json({ error: "Logo watermarking failed", detail: String(e) }, 502);
     }
 
     let responseExtra = {};
@@ -2104,6 +3380,16 @@ async function transformImage(env, request) {
       responseExtra = { creditsRemaining: order.creditsRemaining };
     }
     await env.MEGA_KV.put(`order:${code}`, JSON.stringify(order));
+    // عدّاد الصور المحوّلة — يزيد هنا فقط، بعد نجاح التحويل والحفظ.
+    // مخزّن كعدد مستقل بدل ما يتحسب من كل الطلبات في كل طلب عرض:
+    // القراءة بتبقى قراءة واحدة سريعة مهما كبر عدد الطلبات، والبادج
+    // بيتحدّث كل دقيقة عند كل زائر — فالحساب المتكرر كان هيبقى غالي.
+    // await مقصود: لو فشل، مش هيوقّع التحويل نفسه (جوه try/catch).
+    try {
+      const cRaw = await env.MEGA_KV.get(TRANSFORM_COUNT_KEY);
+      const cur = parseInt(cRaw || "0", 10);
+      await env.MEGA_KV.put(TRANSFORM_COUNT_KEY, String((Number.isFinite(cur) ? cur : 0) + 1));
+    } catch (e) { /* العدّاد مش حرج — التحويل نجح وده الأهم */ }
     await env.MEGA_KV.delete(lockKey);
 
     return json({ imageUrl: outputUrl, ...responseExtra });
@@ -2154,9 +3440,16 @@ export default {
       else if (pathname === "/reviews/delete" && request.method === "POST") response = await deleteReview(env, request);
       else if (pathname === "/visits/log" && request.method === "POST") response = await logVisit(env, request);
       else if (pathname === "/visits/stats" && request.method === "GET") response = await getVisitStats(env, request);
+      else if (pathname === "/visits/public-count" && request.method === "GET") response = await getPublicVisitCount(env);
       else if (pathname === "/auth/register" && request.method === "POST") response = await registerUser(env, request);
       else if (pathname === "/auth/login" && request.method === "POST") response = await loginUser(env, request);
       else if (pathname === "/auth/me" && request.method === "GET") response = await authMe(env, request);
+      else if (pathname === "/account/orders" && request.method === "GET") response = await listAccountOrders(env, request);
+      else if (pathname === "/account/favorites" && request.method === "GET") response = await listAccountFavorites(env, request);
+      else if (pathname === "/account/favorites/add" && request.method === "POST") response = await addAccountFavorite(env, request);
+      else if (pathname === "/account/favorites/remove" && request.method === "POST") response = await removeAccountFavorite(env, request);
+      else if (pathname === "/account/update-profile" && request.method === "POST") response = await updateAccountProfile(env, request);
+      else if (pathname === "/account/upload-avatar" && request.method === "POST") response = await uploadAccountAvatar(env, request);
       else if (pathname === "/auth/social/google" && request.method === "POST") response = await socialLoginGoogle(env, request);
       else if (pathname === "/auth/social/apple" && request.method === "POST") response = await socialLoginApple(env, request);
       else if (pathname === "/auth/social/facebook" && request.method === "POST") response = await socialLoginFacebook(env, request);
@@ -2171,14 +3464,23 @@ export default {
       else if (pathname === "/payment/paymob/webhook" && request.method === "POST") response = await paymobWebhook(env, request);
       else if (pathname === "/payment/fawry/create" && request.method === "POST") response = await fawryCreate(env, request);
       else if (pathname === "/payment/fawry/webhook" && request.method === "POST") response = await fawryWebhook(env, request);
+      else if (pathname === "/payment/fawaterk/create" && request.method === "POST") response = await fawaterkCreate(env, request);
+      else if (pathname === "/payment/fawaterk/webhook" && request.method === "POST") response = await fawaterkWebhook(env, request);
       else if (pathname === "/transform" && request.method === "POST") response = await transformImage(env, request);
       else if (pathname === "/showcase" && request.method === "GET") response = await getShowcase(env);
       else if (pathname === "/admin/showcase" && request.method === "POST") response = await saveShowcase(env, request);
       else if (pathname === "/site-config" && request.method === "GET") response = await getSiteConfig(env);
       else if (pathname === "/admin/set-design" && request.method === "POST") response = await setSiteDesign(env, request);
       else if (pathname === "/admin/set-hero-mode" && request.method === "POST") response = await setHeroMode(env, request);
+      else if (pathname === "/admin/set-resolution" && request.method === "POST") response = await setOutputResolution(env, request);
+      else if (pathname === "/admin/set-ai-model" && request.method === "POST") response = await setAiModel(env, request);
+      else if (pathname === "/admin/set-color-theme" && request.method === "POST") response = await setColorTheme(env, request);
+      else if (pathname === "/admin/set-header-mode" && request.method === "POST") response = await setHeaderMode(env, request);
+      else if (pathname === "/admin/set-prompt-library-mode" && request.method === "POST") response = await setPromptLibraryMode(env, request);
+      else if (pathname === "/admin/translate-title" && request.method === "POST") response = await translateTitle(env, request);
       else if (pathname === "/promo-images" && request.method === "GET") response = await getPromoImages(env);
       else if (pathname === "/admin/promo-images" && request.method === "POST") response = await savePromoImages(env, request);
+      else if (pathname === "/share" && request.method === "GET") response = await renderShareCard(env, request);
       else response = err("Not found", 404);
 
       const merged = new Headers(response.headers);
@@ -2189,3 +3491,4 @@ export default {
     }
   },
 };
+
