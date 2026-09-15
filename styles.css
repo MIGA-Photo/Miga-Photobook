@@ -55,6 +55,20 @@
     --space-9: 56px;
     --space-10: 72px;
 
+    /* --- عرض المحتوى: كان رقم ثابت (1180px/1080px) متكرر في تسع قواعد
+       مختلفة (الهيدر، الهيرو، شريط الأقسام، أقسام الكروت، الأسعار،
+       الفوتر) — على أي لابتوب أعرض من ~1310px (يعني كل لابتوب تقريبًا:
+       1366، 1440، 1536 بعد تكبير العرض 125%، 1920...) كان بيسيب فراغ
+       متماثل كبير يمين وشمال، وكل حاجة تحت هيدفعنا نكبّر نفس الرقم في
+       تسع أماكن. دلوقتي رقم واحد مرن (clamp): بيفضل 1180px بالظبط لغاية
+       ~1310px عرض شاشة زي ما هو (مفيش أي تغيير على تابلت/لابتوب صغير)،
+       وبعدها بيكبر تدريجيًا مع عرض الشاشة لغاية سقف 1520px (فوتر أضيق
+       شوية بسقف 1320px عشان أعمدة الروابط القصيرة متتمططش أكتر من
+       اللازم) — بدل ما يفضل فراغ ميت، المحتوى نفسه (كروت، خط، تباعد)
+       بياخد المساحة الإضافية. */
+    --container-w: clamp(1180px, 90vw, 1520px);
+    --container-w-narrow: clamp(1080px, 82vw, 1320px);
+
     /* --- زوايا الاستدارة: أربع درجات بس بدل ثمنية مبعثرة --- */
     --radius-sm: 8px;    /* أزرار، شارات */
     --radius-md: 12px;
@@ -381,7 +395,7 @@
      an always-visible horizontal-scroll strip instead of a hidden panel.
      The trigger button stays in the DOM (hidden) so nothing in the existing
      dropdown-open/close JS needs to change. */
-  .cat-dropdown.cat-pills-mode{max-width:1180px; margin:0 auto; padding:0 24px 10px;}
+  .cat-dropdown.cat-pills-mode{max-width:var(--container-w); margin:0 auto; padding:0 24px 10px;}
   .cat-dropdown.cat-pills-mode .cat-dropdown-menu{
     position:static; display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch;
     background:transparent; border:none; padding:2px 0 6px; box-shadow:none; min-width:auto;
@@ -447,7 +461,7 @@
      every extra pixel of height here is permanently-visible screen real
      estate on mobile, not just a one-time cost at the top of the page. */
   .header-utility{
-    max-width:1180px; margin:0 auto; padding:4px 24px;
+    max-width:var(--container-w); margin:0 auto; padding:4px 24px;
     display:flex; align-items:center; justify-content:flex-end; gap:8px;
     border-bottom:1px solid var(--line);
   }
@@ -461,7 +475,7 @@
      كان صف واحد بيلفّ، وده اللي خلّى التوسيط الرأسي للاسم يحسب الصفين
      مع بعض ويركب على البحث. */
   .nav-wrap{
-    max-width:1180px; margin:0 auto; padding:10px 24px;
+    max-width:var(--container-w); margin:0 auto; padding:10px 24px;
     display:flex; flex-direction:column; align-items:stretch; gap:8px;
   }
   /* ===== Compact header mode — an admin-panel toggle (see #headerModeSelect)
@@ -695,6 +709,28 @@
     display:flex; align-items:center; gap:8px;
   }
   .nav-top > .logo{ flex:1 1 auto; min-width:0; justify-content:center; margin:0; }
+  /* 15 سبتمبر 2026: الميكانيزم فوق (الاسم ياخد "باقي السطر" ويتمركز فيه)
+     كان مظبوط لما الصف كله ضيق (موبايل) — "باقي السطر" و"الصف كله" كانا
+     تقريبًا نفس الحاجة. على شاشة لابتوب عادية (١٣٦٦ فما فوق)، container-w
+     المرن فوق بيوسّع .nav-wrap لغاية ١٥٢٠px، و"باقي السطر بعد الهامبرجر"
+     (٤٠px بس) بقى مختلف جدًا عن نص الصف الحقيقي — النتيجة: الاسم بيتمركز
+     صح رياضيًا لكن بصريًا بيبان مزاح، وفجوة كبيرة غير متماثلة بينه وبين
+     الهامبرجر. الحل هنا محصور على الشاشات الأعرض من الموبايل بس (٧٠٠px+)
+     عشان الميكانيزم القديم المضبوط على الموبايل يفضل زي ما هو بالظبط:
+     ثلاث خانات شبكة (هامبرجر ٤٠px | الاسم يملأ الباقي ومتمركز فيه | خانة
+     فاضية ٤٠px مطابقة) — الاسم بقى في نص الصف الحقيقي كله، مش نص "الباقي". */
+  @media(min-width:701px){
+    /* minmax(40px, max-content) على الخانة الأولى (مش 40px ثابت): زرار
+       الأدمن (#adminOpenBtn) بيتحط جوه .nav-side ده برضو وبيتشال إخفاؤه
+       في وضع الأدمن — لو ثبّتنا الخانة على 40px بالظبط، ظهوره كان هيتقصّ
+       أو يركب على الاسم. minmax بتخلّي الخانة تكبر تلقائيًا لو ظهر، وبرضو
+       تفضل 40px بالظبط في الحالة العادية (زرار الهامبرجر بس) — يعني نفس
+       عرض الخانة الفاضية التالتة، فالاسم بيتمركز صح فعليًا. */
+    .nav-top{ display:grid; grid-template-columns:minmax(40px, max-content) 1fr 40px; }
+    .nav-top > .nav-side{ grid-column:1; }
+    .nav-top > .logo{ grid-column:2; }
+    .nav-top::after{ content:""; grid-column:3; }
+  }
   /* شارة الهيدر: 40px قطر، العلامة جواها 22px (نفس مقاس الزرار الدائري
      الجديد بجنبها بالظبط — إحساس متسق بين الطرفين). */
   .logo .logo-badge{ width:40px; height:40px; }
@@ -1014,7 +1050,7 @@
 
   /* ===== Hero ===== */
   .hero{
-    max-width:1180px; margin:0 auto; padding:64px 24px 40px;
+    max-width:var(--container-w); margin:0 auto; padding:64px 24px 40px;
     display:grid; grid-template-columns:1.1fr 0.9fr; gap:48px; align-items:center;
     position:relative;
   }
@@ -1058,6 +1094,18 @@
     font-size:1.32em; line-height:1;
   }
   .hero p{color:var(--paper-dim); font-size:16.5px; max-width:480px; margin-bottom:28px;}
+  /* 15 سبتمبر 2026: عرض المحتوى (--container-w) بقى مرن ويكبر على شاشات
+     اللابتوب العادية (١٣٦٦px فما فوق) — لكن مقاسات الخط هنا كانت أرقام
+     ثابتة، فكل ما العمود يكبر كل حاجة فيه (الكلمة التمهيدية، العنوان،
+     الوصف) كانت بتبان أصغر نسبيًا من المساحة حواليها، بدل ما تكبر معاها.
+     محصور على ١٢٨٠px+ عشان الموبايل والتابلت يفضلوا زي ما هما بالظبط —
+     ده بس بيكبّر شوية على الشاشات اللي أصلاً بقت أعرض. */
+  @media(min-width:1280px){
+    .eyebrow{font-size:14px;}
+    .tagline{font-size:22px;}
+    .hero h1{font-size:clamp(52px, 3.6vw, 62px);}
+    .hero p{font-size:18px; max-width:560px;}
+  }
   .hero-ctas{display:flex; flex-wrap:wrap; gap:12px;}
   .trust-checks{
     display:flex; flex-wrap:wrap; gap:14px; margin:18px 0 24px; font-size:13px; color:var(--paper-dim);
@@ -1316,7 +1364,7 @@
   }
 
   /* ===== Section shells ===== */
-  section.cat-section{max-width:1180px; margin:0 auto; padding:52px 24px 16px;}
+  section.cat-section{max-width:var(--container-w); margin:0 auto; padding:52px 24px 16px;}
   .section-head{
     display:flex; align-items:center; justify-content:flex-start; gap:12px;
     margin-bottom:18px; padding-bottom:12px;
@@ -1861,7 +1909,7 @@
   }
 
   /* ===== Pricing ===== */
-  .pricing{max-width:1180px; margin:0 auto; padding:52px 24px 16px;}
+  .pricing{max-width:var(--container-w); margin:0 auto; padding:52px 24px 16px;}
   .pricing-trust-strip{
     display:flex; flex-wrap:wrap; align-items:center; gap:10px;
     margin-top:14px; font-size:13.5px; color:var(--paper-dim);
@@ -2455,6 +2503,14 @@
     .hero::before{width:340px; height:340px; top:-90px; left:-70px; filter:blur(55px);}
     .pricing-grid{grid-template-columns:1fr;}
     .hero h1{font-size:36px;}
+    /* 15 سبتمبر 2026: .hero{padding:64px 24px 40px} (القاعدة الأساسية فوق)
+       كانت بتتطبّق زي ما هي على الموبايل الحقيقي — ماكانش فيه أي تصغير
+       ليها هنا أصلاً (بعكس grid-template-columns وh1 اللي فوق). ده كان
+       بيسيب فراغ فاضي حوالي 64px فوق العنوان و40px تحت آخر عنصر (قبل
+       شارة "زائر/تقييم")، ده اللي ماجدي لاحظه في صور الموبايل الحقيقية.
+       القيمة هنا نفس القيمة المستخدمة أصلاً في وضع "معاينة الموبايل" الإداري
+       (body.view-mode-mobile .hero) — رقم متسق ومجرّب قبل كده، مش رقم جديد. */
+    .hero{padding:28px 18px 24px;}
   }
 
   /* ===== Header controls (lang / view toggles) — same height, weight of
@@ -3133,7 +3189,7 @@
   footer{ text-align:start; padding:44px 24px 24px; }
   .footer-inner{
     display:grid; grid-template-columns:1fr 1.1fr 1fr; gap:32px;
-    max-width:1080px; margin:0 auto 28px; padding-bottom:28px;
+    max-width:var(--container-w-narrow); margin:0 auto 28px; padding-bottom:28px;
     border-bottom:1px solid var(--line);
   }
   @media(max-width:560px){ .footer-inner{ grid-template-columns:1fr; text-align:center; gap:36px; } }
