@@ -2060,6 +2060,10 @@
   .status-pending{background:rgba(255,201,77,0.15); color:var(--brass);}
   .status-approved{background:rgba(79,240,192,0.22); color:var(--sage);}
   .status-rejected{background:rgba(224,122,122,0.15); color:#e07a7a;}
+  .status-underpaid{background:rgba(224,122,122,0.15); color:#e07a7a;}
+  .order-verify-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:6px;}
+  .order-verify-input{width:140px; max-width:100%;}
+  .order-underpaid-note{color:#e07a7a; font-weight:600; font-size:var(--text-sm);}
   .order-actions{display:flex; gap:8px; margin-top:8px;}
   .order-actions button{flex:1; padding:7px; border-radius:6px; font-size:var(--text-sm);}
 

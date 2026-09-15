@@ -180,7 +180,7 @@ const translations = {
     themeDayLabel:'الوضع النهاري', themeNightLabel:'الوضع الليلي',
     themeToggleTitle:'التبديل بين الوضع النهاري والوضع الليلي',
     heroEyebrow:'Miga-Photobook',
-    promoMarqueePre:'🎉 باقاتنا تبدأ من ', promoMarqueePrice:'59 جنيه لـ3 صور', promoMarqueeMid:' — بتقنيات ', promoMarqueeBrand:'ميجا', promoMarqueePost:'، وخلال دقائق. يلا، مستني إيه؟',
+    promoMarqueePre:'🎉 صورتك دلوقتي بـ', promoMarqueePrice:'25 جنيه بدل 50', promoMarqueeMid:' — بتقنيات ', promoMarqueeBrand:'ميجا', promoMarqueePost:'، وخلال دقائق. يلا، مستني إيه؟',
     heroSlogan:'لقطتك... تتحول لتحفة فنية',
     promoVideoTitle:'شوف Miga-Photobook وهو شغال', promoVideoSub:'دقائق معدودة، وصورتك العادية بتتحول لتحفة فنية احترافية.',
     trustCheck1:'✅ نتيجة خلال دقائق', trustCheck2:'✅ دفع آمن', trustCheck3:'✅ دعم فني مباشر', trustCheck4:'✅ تحديثات مستمرة',
@@ -251,7 +251,7 @@ const translations = {
     bafTitle:'صورة واحدة منك... نحولها لأجمل صورة من اختيارك من عندنا',
     bafSub:'دي نفس الصورة، بعد ما Miga-Photobook حوّلها لأكتر من ستايل. اختار اللي يعجبك وجرّبه على صورتك.',
     bafCenterLabel:'صورتك الأصلية',
-    bafCta:'اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي',
+    bafCta:'اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي بـ25 جنيه بدل 50',
     secChildrenTitle:'قسم الأطفال', secMaleTitle:'القسم الرجالي', secFemaleTitle:'القسم النسائي',
     secBusinessTitle:'قسم الأعمال', secCinematicTitle:'القسم السينمائي', secLuxuryTitle:'القسم الفاخر',
     secArtisticTitle:'القسم الفني', secMagazineTitle:'قسم المجلات والملصقات',
@@ -307,7 +307,7 @@ const translations = {
     shareResultBtn:'شارك النتيجة', shareResultText:'شوف صورتي من Miga-Photobook 🔥',
     toastShareCopied:'تم نسخ الرابط — الصقه في أي مكان ✅',
     nudgeTitle:'لسه مستني إيه؟',
-    nudgeBody:'باقاتنا تبدأ من 59 جنيه لـ3 صور. لو محتار في الاختيار، ابعتلنا واتساب ونساعدك تختار الأنسب لك.',
+    nudgeBody:'صورتك الأولى بـ25 جنيه بس بدل 50، أو باقاتنا تبدأ من 59 جنيه لـ3 صور. لو محتار في الاختيار، ابعتلنا واتساب ونساعدك تختار الأنسب لك.',
     nudgeBrowseBtn:'تصفّح الصور', nudgeAskBtn:'اسألنا واتساب',
     thanksTitle:'شكراً إنك جربتنا 🙏',
     thanksBody:'لو الصورة عجبتك، مشاركتها مع صحابك أو تقييم سريع بيساعدنا كتير.',
@@ -431,6 +431,12 @@ const translations = {
     sendPromptWhatsAppBtn:'إرسال عبر واتساب',
     whatsappPromptMessageTemplate:'مرحبًا 👋 تحويلك تم تأكيده — ده البرومبت الاحترافي الخاص بـ "{title}":\n\n{prompt}\n\nشكرًا لثقتك في Miga-Photobook 🙏',
     orderApproveBtn:'موافقة وتفعيل التحويل',
+    orderVerifyApproveBtn:'تحقق ووافق', orderLabelRequiredAmount:'المبلغ المطلوب', orderLabelVerifiedAmount:'المبلغ الذي تم التحقق من استلامه',
+    orderVerifiedAmountPlaceholder:'اكتب المبلغ اللي اتأكدت إنه وصل فعلًا',
+    orderPaymentStatusVerified:'تم التحقق', orderPaymentStatusUnderpaid:'مبلغ ناقص', orderPaymentStatusRejected:'مرفوض',
+    orderPaymentStatusPending:'في انتظار التحقق',
+    toastEnterVerifiedAmount:'من فضلك اكتب المبلغ اللي اتأكدت إنه وصل فعلًا قبل الموافقة',
+    toastOrderUnderpaid:'المبلغ المُدخل أقل من المطلوب — لم تتم الموافقة على الطلب',
     softLaunchBanner:'🎉 إطلاق تجريبي — كل التحويلات متاحة مجانًا الآن لفترة محدودة',
     freeLabel:'مجانًا', claimFreeBtn:'احصل عليه مجانًا',
     toastFreeUnlocked:'تم الفتح مجانًا — جاهز تحوّل صورتك! (فترة الإطلاق التجريبي)',
@@ -459,7 +465,7 @@ const translations = {
     a11ySliderHandle:'اسحب أو استخدم أسهم اليمين واليسار للمقارنة بين قبل وبعد',
     a11yContact:'تواصل معنا', a11yBackToTop:'العودة لأعلى الصفحة',
     brandNameAr:'ميجا فوتوبوك', backHomeLabel:'الرئيسية', contactFabWord:'تواصل مع', contactFabBrand:'ميجا',
-    launchPromoBannerShort:'🎉 باقات تبدأ من 59 جنيه',
+    launchPromoBannerShort:'🎉 صورتك بـ25 جنيه بدل 50',
     a11yScrollUp:'لأعلى', a11yScrollDown:'لأسفل',
     a11yOriginalPhoto:'الصورة الأصلية', a11yChangeAvatar:'تغيير صورة البروفايل',
     sliderHint:'اسحب يمين وشمال، ودوس ‹ › تتنقل بين أمثلة مختلفة',
@@ -535,7 +541,7 @@ const translations = {
     themeDayLabel:'Day Mode', themeNightLabel:'Night Mode',
     themeToggleTitle:'Switch between day mode and night mode',
     heroEyebrow:'Miga-Photobook',
-    promoMarqueePre:"🎉 Our bundles start from ", promoMarqueePrice:"59 EGP for 3 photos", promoMarqueeMid:" — powered by ", promoMarqueeBrand:"Miga", promoMarqueePost:", in minutes. What are you waiting for?",
+    promoMarqueePre:"🎉 Get your photo now for ", promoMarqueePrice:"25 EGP instead of 50", promoMarqueeMid:" — powered by ", promoMarqueeBrand:"Miga", promoMarqueePost:", in minutes. What are you waiting for?",
     heroSlogan:'Your shot... becomes a masterpiece',
     promoVideoTitle:'See Miga-Photobook in action', promoVideoSub:'A few minutes, and your ordinary photo becomes a professional work of art.',
     trustCheck1:'✅ Result within minutes', trustCheck2:'✅ Secure payment', trustCheck3:'✅ Direct support', trustCheck4:'✅ Ongoing updates',
@@ -606,7 +612,7 @@ const translations = {
     bafTitle:'One Photo From You... Turned Into Your Favorite Style',
     bafSub:'This is the same photo, after Miga-Photobook transformed it into different styles. Pick one you like and try it on your own photo.',
     bafCenterLabel:'Your Original Photo',
-    bafCta:'Make Your <b class="brand-mega">Mega</b> Photo Now',
+    bafCta:'Make Your <b class="brand-mega">Mega</b> Photo Now — 25 EGP instead of 50',
     secChildrenTitle:"Children's Section", secMaleTitle:"Men's Section", secFemaleTitle:"Women's Section",
     secBusinessTitle:'Business Section', secCinematicTitle:'Cinematic Section', secLuxuryTitle:'Luxury Section',
     secArtisticTitle:'Artistic Section', secMagazineTitle:'Magazine / Poster Section',
@@ -662,7 +668,7 @@ const translations = {
     shareResultBtn:'Share result', shareResultText:'Check out my photo from Miga-Photobook 🔥',
     toastShareCopied:'Link copied — paste it anywhere ✅',
     nudgeTitle:'Still deciding?',
-    nudgeBody:'Our bundles start from 59 EGP for 3 photos. Not sure which style suits you? Message us on WhatsApp and we will help you pick.',
+    nudgeBody:'Your first photo is just 25 EGP instead of 50, or bundles starting from 59 EGP for 3 photos. Not sure which style suits you? Message us on WhatsApp and we will help you pick.',
     nudgeBrowseBtn:'Browse photos', nudgeAskBtn:'Ask us on WhatsApp',
     thanksTitle:'Thank you for trying us 🙏',
     thanksBody:'If you like your photo, sharing it with friends or leaving a quick review helps us a lot.',
@@ -786,6 +792,12 @@ const translations = {
     sendPromptWhatsAppBtn:'Send via WhatsApp',
     whatsappPromptMessageTemplate:'Hi 👋 your payment is confirmed — here\\u2019s the professional prompt for "{title}":\\n\\n{prompt}\\n\\nThanks for choosing Miga-Photobook 🙏',
     orderApproveBtn:'Approve & Enable Transform',
+    orderVerifyApproveBtn:'Verify & Approve', orderLabelRequiredAmount:'Required Amount', orderLabelVerifiedAmount:'Verified Received Amount',
+    orderVerifiedAmountPlaceholder:'Enter the amount you actually confirmed was received',
+    orderPaymentStatusVerified:'Verified', orderPaymentStatusUnderpaid:'Underpaid', orderPaymentStatusRejected:'Rejected',
+    orderPaymentStatusPending:'Awaiting verification',
+    toastEnterVerifiedAmount:'Please enter the amount you actually confirmed was received before approving',
+    toastOrderUnderpaid:'The entered amount is less than required — the order was not approved',
     softLaunchBanner:'🎉 Soft Launch — all transformations are free right now for a limited time',
     freeLabel:'Free', claimFreeBtn:'Get It Free',
     toastFreeUnlocked:'Unlocked for free — ready to transform your photo! (soft launch period)',
@@ -812,7 +824,7 @@ const translations = {
     a11ySliderHandle:'Drag, or use the left/right arrow keys, to compare before and after',
     a11yContact:'Contact us', a11yBackToTop:'Back to top',
     brandNameAr:'ميجا فوتوبوك', backHomeLabel:'Home', contactFabWord:'Contact', contactFabBrand:'Miga',
-    launchPromoBannerShort:'🎉 Bundles from 59 EGP',
+    launchPromoBannerShort:'🎉 25 EGP instead of 50',
     a11yScrollUp:'Scroll up', a11yScrollDown:'Scroll down',
     a11yOriginalPhoto:'Original photo', a11yChangeAvatar:'Change profile photo',
     sliderHint:'Drag left and right, and tap \u2039 \u203a to move between examples',
@@ -6748,6 +6760,23 @@ function orderStatusLabel(status){
   if(status==='rejected') return t('orderStatusRejected');
   return t('orderStatusPending');
 }
+/** Payment-specific status (added 2026-09-15, payment integrity) — separate
+ * from the order-workflow `status` above on purpose: `status` only ever
+ * becomes 'approved' once paymentStatus is 'verified' (see the Worker's
+ * recordPaymentVerification()), but this lets the admin SEE why a pending
+ * order is still pending — awaiting a first verification attempt, or
+ * already underpaid on the last attempt. */
+function orderPaymentStatusLabel(paymentStatus){
+  if(paymentStatus==='verified') return t('orderPaymentStatusVerified');
+  if(paymentStatus==='underpaid') return t('orderPaymentStatusUnderpaid');
+  if(paymentStatus==='rejected') return t('orderPaymentStatusRejected');
+  return t('orderPaymentStatusPending');
+}
+function orderPaymentStatusClass(paymentStatus){
+  if(paymentStatus==='verified') return 'status-approved';
+  if(paymentStatus==='underpaid' || paymentStatus==='rejected') return 'status-underpaid';
+  return 'status-pending';
+}
 
 function renderOrdersList(){
   const el = document.getElementById('ordersList');
@@ -6778,9 +6807,20 @@ function renderOrdersList(){
       <div class="oline"><span>${t('orderLabelStatus')}</span>
         <span class="order-status ${orderStatusClass(o.status)}">${orderStatusLabel(o.status)}</span>
       </div>
+      ${o.requiredAmount != null || o.status==='pending' ? `
+      <div class="oline"><span>${t('orderLabelRequiredAmount')}</span><b>${o.requiredAmount != null ? o.requiredAmount : o.price} ${CURRENCY}</b></div>` : ''}
+      ${o.paymentStatus ? `
+      <div class="oline"><span>${t('orderLabelStatus')} (${t('orderLabelPayApp')})</span>
+        <span class="order-status ${orderPaymentStatusClass(o.paymentStatus)}">${orderPaymentStatusLabel(o.paymentStatus)}</span>
+      </div>` : ''}
+      ${o.paymentStatus==='underpaid' ? `
+      <div class="oline order-underpaid-note">${t('orderLabelVerifiedAmount')}: ${o.verifiedPaidAmount} ${CURRENCY} — ${t('toastOrderUnderpaid')}</div>` : ''}
       <div class="order-actions">
         ${o.status==='pending' ? `
-          <button class="buy-btn" onclick="approveOrder('${o.code}')">${t('orderApproveBtn')}</button>
+          <div class="order-verify-row">
+            <input type="number" min="0" step="0.01" class="order-verify-input" id="verifyAmount-${o.code}" placeholder="${t('orderVerifiedAmountPlaceholder')}" value="${o.paymentStatus==='underpaid' && o.verifiedPaidAmount!=null ? o.verifiedPaidAmount : ''}">
+            <button class="buy-btn" onclick="approveOrder('${o.code}')">${t('orderVerifyApproveBtn')}</button>
+          </div>
           <button class="btn-ghost reject-btn" onclick="rejectOrderPrompt('${o.code}')">${t('orderRejectBtn')}</button>` : ''}
         ${o.status==='rejected' ? `<button class="btn-ghost reject-btn" onclick="deleteOrderPrompt('${o.code}')">${t('orderDeleteBtn')}</button>` : ''}
         ${o.orderType==='prompt' && o.status==='approved' && o.promptText ? `<button class="btn-ghost" onclick="sendPromptViaWhatsApp('${o.code}')">${t('sendPromptWhatsAppBtn')}</button>` : ''}
@@ -6903,13 +6943,34 @@ async function deleteOrderPrompt(code){
   }catch(e){ showToast(t('toastOrderFailed')); }
 }
 
+/** Payment integrity (2026-09-15): approving an order now ALWAYS requires
+ * the admin to type the amount they personally confirmed actually arrived
+ * (InstaPay/Vodafone Cash app, bank SMS, etc.) — never auto-filled from
+ * anything the customer submitted at checkout. The Worker independently
+ * re-checks this against the server-computed required price before ever
+ * setting the order to approved; this client-side read of the input field
+ * is only for a good admin UX (clear error before the round-trip), not the
+ * actual security boundary. */
 async function approveOrder(code){
   if(!BACKEND_BASE) return;
+  const input = document.getElementById(`verifyAmount-${code}`);
+  const verifiedAmount = input ? Number(input.value) : NaN;
+  if(!input || input.value === '' || !Number.isFinite(verifiedAmount) || verifiedAmount < 0){
+    showToast(t('toastEnterVerifiedAmount'));
+    if(input) input.focus();
+    return;
+  }
   try{
     const res = await fetch(`${BACKEND_BASE}/orders/approve`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ token: adminSessionToken, code })
+      body: JSON.stringify({ token: adminSessionToken, code, verifiedAmount })
     });
+    if(res.status === 409){
+      await loadOrders();
+      renderOrdersList();
+      showToast(t('toastOrderUnderpaid'));
+      return;
+    }
     if(!res.ok){ showToast(t('toastWrongPassword')); return; }
     await loadOrders();
     renderOrdersList();
