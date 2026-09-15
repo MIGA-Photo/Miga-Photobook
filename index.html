@@ -693,7 +693,13 @@
   .hero-with-slider .trust-checks{ font-size:14px !important; gap:14px !important; margin-bottom:24px !important; }
   .hero-with-slider .hero-ctas{ gap:14px !important; flex-wrap:wrap; }
   .hero-with-slider .hero-ctas a{ font-size:14.5px !important; padding:12px 20px !important; }
-  @media(max-width:860px){
+  /* 15 سبتمبر 2026 — ماجدي طلب إن الوضع الأفقي (landscape) للموبايل يتظبط
+     برضه. عرض شاشة الموبايل بالعرض بيوصل لـ800-930px أحيانًا (أوسع من
+     الـ860px)، فمكانش داخل فى نطاق "الموبايل" هنا أصلاً. إضافة الشرط التاني
+     (max-height:500px) and (orientation:landscape) بتلقط أي موبايل مقلوب
+     أفقيًا (شاشته قصيرة عرضيًا) حتى لو عرضه أكبر من 860px، فيدخل يستخدم
+     نفس مقاسات الموبايل المضغوطة وتوسيط الإطارين بنفس الارتفاع. */
+  @media(max-width:860px), (max-height:500px) and (orientation:landscape){
     /* دي القيم المضغوطة الأصلية — فضلت زي ما هي بالظبط، محصورة دلوقتي
        تحت 860px بس (نفس نقطة التحول المستخدمة في باقي الهيرو). */
     /* 15 سبتمبر 2026 — السبب الحقيقي لشكوى "الخط مقطوع فى بداية السطر":
@@ -714,6 +720,22 @@
     .hero-with-slider .hero-ctas{ gap:8px !important; }
     .hero-with-slider .hero-ctas a{ font-size:12.5px !important; padding:10px 14px !important; }
     .hero-text-frame{ padding:12px 10px; border-radius:14px; }
+    /* 15 سبتمبر 2026 — طلب صريح: فى الموبايل يبقى ارتفاع إطار السلايدر
+       وإطار النص متساويين بالظبط من غير أي فراغ. كان السلايدر بيتوسّط
+       (align-self:center) جوه صف بارتفاع النص الأطول، فيفضل هو نفسه على
+       ارتفاعه الطبيعي (aspect-ratio:4/5) وحواليه فراغ فوق وتحت. الحل:
+       بدل التوسيط، السلايدر بقى stretch (ياخد ارتفاع الصف بالظبط زي
+       النص)، وشيلنا aspect-ratio عشان الكارت يمط لنفس الارتفاع ده تمامًا
+       (flex:1)، والصور جواه أصلاً object-fit:cover (سطر 601) فبتملا أي
+       ارتفاع من غير أي تمدد/تشويه — بس بتقص من فوق/تحت الصورة شوية. */
+    .hero-with-slider .fixed-slider-frame{
+      align-self:stretch; height:100%; display:flex; flex-direction:column;
+    }
+    .fixed-slider-frame .slider-wrap-instance{
+      flex:1 1 auto; display:flex; flex-direction:column; min-height:0;
+    }
+    .slider-card-compact{ aspect-ratio:auto; flex:1 1 auto; min-height:0; width:100% !important; margin:0 !important; } /* margin:0 auto من القاعدة الأصلية كان بيلغي stretch ويخلي الكارت ياخد عرض غلط تلقائي */
+    .hero-with-slider .slider-controls-row{ flex-shrink:0; }
   }
   @media(max-width:480px){
     .hero-with-slider h1{ font-size:clamp(14px,4.4vw,20px) !important; }
