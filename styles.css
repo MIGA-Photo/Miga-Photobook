@@ -1164,6 +1164,10 @@
     box-shadow:0 4px 12px rgba(0,0,0,0.35);
   }
   html[dir="rtl"] .why-edge::before{ right:24px; left:auto; }
+  /* Same class of bug as the pricing "Most Popular" ribbon: hardcoded Arabic
+     ::before content in the single shared stylesheet, leaking onto the
+     English page. */
+  html[lang="en"] .why-edge::before{ content:"💡 The Secret"; }
   .why-edge h3{margin:0 0 10px; font-size:16.5px; color:var(--brass);}
   .why-edge p{margin:0 0 10px; color:var(--paper); font-size:14.5px; line-height:1.85;}
   .why-edge p:last-child{margin-bottom:0;}
