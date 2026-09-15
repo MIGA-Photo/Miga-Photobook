@@ -253,7 +253,7 @@
      old URL. Bumping this string (e.g. 20260906a -> 20260906b) any time
      app.js or styles.css changes forces every visitor to fetch the new file
      immediately, no manual cache-clearing needed on their end. -->
-<link href="/styles.css?v=20260915c" rel="stylesheet"/>
+<link href="/styles.css?v=20260915d" rel="stylesheet"/>
 <!-- Google Analytics 4 -->
 <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
 <script>
@@ -622,6 +622,14 @@
   .hero-with-slider{
     grid-template-columns:1fr 1fr !important;
     gap:14px !important;
+    /* 15 سبتمبر 2026 — كان start (يعني عمود النص بياخد ارتفاعه الطبيعي
+       بس، والسلايدر بيتوسّط جواه بمساحة فاضية فوقه وتحته). ماجدي طلب
+       إطار حوالين النص بنفس ارتفاع إطار السلايدر بالظبط، مع استغلال
+       المساحة الفاضية بينهم. stretch بيخلي الصف كله (النص + السلايدر)
+       بنفس الارتفاع (أطول عنصر)، و.hero-text-frame تحت بتاخد height:100%
+       وتوسّط محتواها رأسيًا (justify-content:center) — فبدل ما يكون
+       محتوى النص ملزوق فوق وفاضي تحته، بقى متوسّط فى نفس المساحة اللي
+       السلايدر متوسّط فيها، بنفس المنطق بالظبط. */
     align-items:stretch;
   }
   .hero-text-frame{
@@ -641,12 +649,31 @@
      the viewport edge once the columns got this narrow. This is the fix. */
   .hero-with-slider > *{ min-width:0; }
   .hero-with-slider h1, .hero-with-slider p{ overflow-wrap:break-word; }
-  /* 15 سبتمبر 2026: نفس إصلاح index.html بالظبط — الصفحة الإنجليزية ليها
-     نسخة منفصلة من الكتلة دي (مش شغالة من styles.css)، وكانت لسه فيها
-     نفس مشكلة الحجم الصغير بلا media query. */
-  /* 15 سبتمبر 2026 (تحديث تاني): شيل خط Rakkas خالص من H1 (كل المقاسات) —
-     مش بس الموبايل — لأن الخط الزخرفي نفسه بيبان "مقطوع" حتى فى الديسكتوب
-     فوق خلفية الصور المتحركة. راجع index.html للتفاصيل الكاملة. */
+  /* 15 سبتمبر 2026 — الحجم الصغير ده (clamp لغاية 22px) كان بلا أي media
+     query تحته أصلاً، يعني كان شغال بنفس القيمة على شاشة لابتوب 1433px
+     زي ما هو شغال على موبايل 375px. عمود النص عند 1433px عرضه ~614px —
+     مساحة واسعة جدًا لخط بـ22px بس، فكانت النتيجة فراغ ظاهر حوالين نص
+     صغير، وأحيانًا كسر أسطر غريب لما جملة العنوان الطويلة ("بجودة استوديو
+     باستخدام Miga-Photobook ميجا فوتوبوك") تقابل overflow-wrap:break-word
+     في عمود أعرض من اللازم بس بخط أصغر من اللازم. الحل: نفس القيم دي
+     دلوقتي محصورة جوه @media(max-width:860px) تحت (فمفيش أي تغيير على
+     الموبايل الحقيقي)، وفوقها هنا مقاسات لائقة بشاشات اللاب توب/الديسكتوب. */
+  /* 15 سبتمبر 2026 (تحديث تاني) — ماجدي بعت صورة من عرض واسع (ديسكتوب،
+     مش موبايل) وبرضه شايف نفس شكوى "الحروف مقطوعة فى بداية الكلام". كبّرت
+     الصورة بتاعته وفحصتها حرف بحرف: مفيش نص ناقص فعليًا، لكن خط Rakkas
+     نفسه — بتصميمه الكتابي المتشابك المزخرف جدًا (حروف متلاصقة، خطاطين
+     زخرفية فوق حرف البداية زي الخاء) — بيخلي حدود الحروف صعبة التمييز
+     خصوصًا فوق خلفية الصور المتحركة اللي فيها بريق/نقط، فبيبان وكأنه
+     "مقطوع" حتى في مقاس كبير زي 32-34px. القرار: بدل ما نضيّق الحل على
+     الموبايل بس (زي أول مرة)، نشيل Rakkas خالص من عنوان الهيرو (H1) في كل
+     المقاسات ونستخدم Readex Pro الواضح بدل منه — نفس الخط المستخدم في كل
+     زرار ونص تاني في الموقع أصلاً، فمفيش تعارض مع الهوية البصرية. */
+  /* 15 سبتمبر 2026 (تحديث تالت) — بعد شيل خط Rakkas، ماجدي قال إن العنوان
+     بقى "صغير جدا". السبب: Readex Pro خط عادي (Grotesque) خطوطه أرفع
+     بصريًا من خط Rakkas التقيل، فنفس رقم البكسل اللي كان شكله "كبير" مع
+     Rakkas بقى شكله "صغير" مع Readex Pro — لازم رقم أكبر عشان يوصل لنفس
+     الحضور البصري المطلوب لعنوان رئيسي. رفعت كل مقاسات الـclamp بحوالي
+     25-30% فى الثلاث مستويات (ديسكتوب/تابلت/موبايل). */
   .hero-with-slider h1{ font-size:clamp(28px, 3.2vw, 42px) !important; margin-bottom:16px !important; line-height:1.3 !important; font-family:'Readex Pro', sans-serif !important; font-weight:700 !important; text-align:center !important; }
   .hero-with-slider .eyebrow{ font-size:14px !important; margin-bottom:12px !important; }
   .hero-with-slider .tagline{ font-size:17px !important; }
@@ -654,7 +681,25 @@
   .hero-with-slider .trust-checks{ font-size:14px !important; gap:14px !important; margin-bottom:24px !important; }
   .hero-with-slider .hero-ctas{ gap:14px !important; flex-wrap:wrap; }
   .hero-with-slider .hero-ctas a{ font-size:14.5px !important; padding:12px 20px !important; }
+  /* 15 سبتمبر 2026 — ماجدي طلب إن الوضع الأفقي (landscape) للموبايل يتظبط
+     برضه. عرض شاشة الموبايل بالعرض بيوصل لـ800-930px أحيانًا (أوسع من
+     الـ860px)، فمكانش داخل فى نطاق "الموبايل" هنا أصلاً. إضافة الشرط التاني
+     (max-height:500px) and (orientation:landscape) بتلقط أي موبايل مقلوب
+     أفقيًا (شاشته قصيرة عرضيًا) حتى لو عرضه أكبر من 860px، فيدخل يستخدم
+     نفس مقاسات الموبايل المضغوطة وتوسيط الإطارين بنفس الارتفاع. */
   @media(max-width:860px), (max-height:500px) and (orientation:landscape){
+    /* دي القيم المضغوطة الأصلية — فضلت زي ما هي بالظبط، محصورة دلوقتي
+       تحت 860px بس (نفس نقطة التحول المستخدمة في باقي الهيرو). */
+    /* 15 سبتمبر 2026 — السبب الحقيقي لشكوى "الخط مقطوع فى بداية السطر":
+       H1 بيستخدم خط Rakkas (خط عرض/زخرفي تقيل الزخرفة، مصمم لعناوين كبيرة
+       40px+). عند تصغيره لـ11-22px على الموبايل، الوصلات والزخارف الدقيقة
+       في بداية الحروف بتختفي/تتكسر بصريًا فتبان "مقطوعة" — مش قص فعلي
+       للنص (النص نفسه سليم 100%، اتأكد منه). تجربتي المحلية السابقة ماكنتش
+       بتوريها لأن Google Fonts محجوب في بيئة الاختبار عندي، فكان بيرجع
+       لخط احتياطي (serif) بيبان سليم حتى في نفس المقاس — ده اللي مخلي كل
+       تعديلات المقاس السابقة متحلش المشكلة الحقيقية. الحل: نستخدم Readex
+       Pro (الخط الأساسي الواضح في الموقع) بدل Rakkas في المقاسات الصغيرة
+       دي بس، ونسيب Rakkas في الديسكتوب فوق حيث المقاس يكفي لزخرفته. */
     .hero-with-slider h1{ font-size:clamp(17px,5vw,28px) !important; margin-bottom:8px !important; line-height:1.28 !important; font-family:'Readex Pro', sans-serif !important; font-weight:700 !important; }
     .hero-with-slider .eyebrow{ font-size:12.5px !important; margin-bottom:6px !important; }
     .hero-with-slider .tagline{ font-size:12.5px !important; }
@@ -663,13 +708,21 @@
     .hero-with-slider .hero-ctas{ gap:8px !important; }
     .hero-with-slider .hero-ctas a{ font-size:12.5px !important; padding:10px 14px !important; }
     .hero-text-frame{ padding:12px 10px; border-radius:14px; }
+    /* 15 سبتمبر 2026 — طلب صريح: فى الموبايل يبقى ارتفاع إطار السلايدر
+       وإطار النص متساويين بالظبط من غير أي فراغ. كان السلايدر بيتوسّط
+       (align-self:center) جوه صف بارتفاع النص الأطول، فيفضل هو نفسه على
+       ارتفاعه الطبيعي (aspect-ratio:4/5) وحواليه فراغ فوق وتحت. الحل:
+       بدل التوسيط، السلايدر بقى stretch (ياخد ارتفاع الصف بالظبط زي
+       النص)، وشيلنا aspect-ratio عشان الكارت يمط لنفس الارتفاع ده تمامًا
+       (flex:1)، والصور جواه أصلاً object-fit:cover (سطر 601) فبتملا أي
+       ارتفاع من غير أي تمدد/تشويه — بس بتقص من فوق/تحت الصورة شوية. */
     .hero-with-slider .fixed-slider-frame{
       align-self:stretch; height:100%; display:flex; flex-direction:column;
     }
     .fixed-slider-frame .slider-wrap-instance{
       flex:1 1 auto; display:flex; flex-direction:column; min-height:0;
     }
-    .slider-card-compact{ aspect-ratio:auto; flex:1 1 auto; min-height:0; width:100% !important; margin:0 !important; }
+    .slider-card-compact{ aspect-ratio:auto; flex:1 1 auto; min-height:0; width:100% !important; margin:0 !important; } /* margin:0 auto من القاعدة الأصلية كان بيلغي stretch ويخلي الكارت ياخد عرض غلط تلقائي */
     .hero-with-slider .slider-controls-row{ flex-shrink:0; }
   }
   @media(max-width:480px){
@@ -692,7 +745,7 @@
   .hero-with-slider .slider-controls-row{ margin-top:6px; gap:8px; }
   .hero-with-slider .slider-dots{ gap:5px; }
   .hero-with-slider .slider-dot{ width:6px; height:6px; }
-  @media(min-width:860px){ .fixed-slider-frame{ max-width:420px; } }
+  @media(min-width:860px){ .fixed-slider-frame{ max-width:420px; } } /* 15 سبتمبر — كبّرت شوية عشان تقرّب من ارتفاع إطار النص الجديد */
   @media(max-width:480px){
     .fixed-slider-frame{ max-width:210px; padding:4px; border-radius:14px; }
     .hero-with-slider{ gap:8px !important; }
@@ -2147,7 +2200,7 @@
 </div>
 </div>
 <div class="toast" id="toast"></div>
-<script src="/app.js?v=20260915a"></script>
+<script src="/app.js?v=20260915b"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
