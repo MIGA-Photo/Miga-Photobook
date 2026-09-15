@@ -1356,6 +1356,15 @@
 <p class="sub" data-i18n="statusCodeNote" style="font-size:12.5px; opacity:0.7;">Your order code (keep it just in case):</p>
 <div class="ip-number" id="payStatusCode" style="font-size:18px; margin:4px 0 16px;"></div>
 <p class="sub" data-i18n="statusSafeCloseNote" style="font-size:12.5px; opacity:0.8;">You can close this page now — we'll review your order and update you as soon as it's confirmed.</p>
+<div id="payUnderpaidBox" style="display:none; margin:14px 0; padding-top:14px; border-top:1px solid rgba(0,0,0,0.08); text-align:start;">
+<div class="field">
+<label data-i18n="remainingRefLabel">Transfer reference number for the remaining amount</label>
+<input data-i18n-ph="payerRefPh" id="remainingRefInput" inputmode="latin" placeholder="e.g. 4821960573" type="text"/>
+</div>
+<div class="modal-actions">
+<button class="btn-primary" id="submitRemainingBtn">دفع المبلغ المتبقي</button>
+</div>
+</div>
 <div class="modal-actions">
 <button class="btn-ghost" data-i18n="closeBtn" id="payStatusCloseBtn">Close</button>
 </div>
@@ -1494,6 +1503,16 @@
 <div class="field">
 <label data-i18n="trackCodeLabel">Tracking Code</label>
 <input data-i18n-ph="trackCodePh" id="trackCode" placeholder="e.g. A1B2C3" style="text-transform:uppercase;" type="text"/>
+</div>
+<p class="sub" id="trackStatusText" style="display:none;"></p>
+<div id="trackUnderpaidBox" style="display:none; margin:10px 0 4px; padding-top:12px; border-top:1px solid rgba(0,0,0,0.08); text-align:start;">
+<div class="field">
+<label data-i18n="remainingRefLabel">Transfer reference number for the remaining amount</label>
+<input data-i18n-ph="payerRefPh" id="trackRemainingRefInput" inputmode="latin" placeholder="e.g. 4821960573" type="text"/>
+</div>
+<div class="modal-actions">
+<button class="btn-primary" id="trackSubmitRemainingBtn">دفع المبلغ المتبقي</button>
+</div>
 </div>
 <div class="modal-actions">
 <button class="btn-primary" data-i18n="trackCheckBtn" id="trackCheckBtn">Check Status</button>
@@ -2200,7 +2219,7 @@
 </div>
 </div>
 <div class="toast" id="toast"></div>
-<script src="/app.js?v=20260915e"></script>
+<script src="/app.js?v=20260915f"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
