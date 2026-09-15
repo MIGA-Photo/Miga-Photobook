@@ -366,55 +366,163 @@ function isPaymentSufficient(requiredAmount, verifiedAmount) {
   );
 }
 
-/** Mutates `order` in place to reflect a verification attempt and returns
- * {ok, reason}. Never called with client-supplied trust — every caller must
- * derive `verifiedAmount` itself (admin manual entry, or a provider webhook
- * amount, already signature-verified by the time it gets here).
- *
- * Idempotent: an order already paymentStatus:"verified" + status:"approved"
- * is left untouched and reported ok — a double-click on Approve, or a
- * retried webhook delivery, can never re-process, downgrade, or duplicate
- * anything (see TEST 14/22/23 in the Sept-15 payment-integrity request). */
-function recordPaymentVerification(order, { verifiedAmount, method, provider, providerTransactionId, reference, verifiedBy }) {
-  const requiredAmount = Number(order.requiredAmount ?? order.price) || 0;
+function round2(n) {
+  return Math.round((Number(n) || 0) * 100) / 100;
+}
 
-  if (order.paymentStatus === "verified" && order.status === "approved") {
-    return { ok: true, alreadyVerified: true };
+/** Cumulative-payment ledger (added 2026-09-15: Underpaid → Remaining
+ * Payment → Full Verification). `order.payments` is an append-only array of
+ * {id, provider, providerTransactionId, amount, method, reference,
+ * verifiedAt, verifiedBy} entries — every successfully-verified payment
+ * against this order, never overwritten or removed. `id` is the idempotency
+ * key (`${provider}:${providerTransactionId}` for a gateway webhook, or
+ * `manual:${paymentId}` for an admin-verified manual transfer) that makes a
+ * re-delivered webhook or a double-submitted admin approval a safe no-op
+ * instead of double-counting — see recordPaymentVerification() below.
+ *
+ * Works for orders created before this ledger existed too: if `order.payments`
+ * doesn't exist yet, this synthesizes ONE entry from the order's old
+ * single-shot verification fields (verifiedPaidAmount/paymentProvider/
+ * providerTransactionId/...) the first time the order is touched again, so a
+ * legacy order's already-verified total is never silently lost. An old order
+ * that is NEVER touched again keeps working exactly as it did before this
+ * change, because /transform's payment gate (see transformImage()) reads
+ * order.paymentStatus/order.verifiedPaidAmount directly and this migration
+ * only ever runs inside recordPaymentVerification(), not on every read. */
+function ensurePaymentLedger(order) {
+  if (Array.isArray(order.payments)) return;
+  order.payments = [];
+  const legacyAmount = Number(order.verifiedPaidAmount);
+  if (Number.isFinite(legacyAmount) && legacyAmount > 0) {
+    order.payments.push({
+      id:
+        order.providerTransactionId && order.paymentProvider
+          ? `${order.paymentProvider}:${order.providerTransactionId}`
+          : `legacy:${order.code || "unknown"}`,
+      provider: order.paymentProvider || "legacy",
+      providerTransactionId: order.providerTransactionId || null,
+      amount: legacyAmount,
+      method: order.paymentMethod || null,
+      reference: order.paymentReference || null,
+      verifiedAt: order.paymentVerifiedAt || Date.now(),
+      verifiedBy: order.paymentVerifiedBy || null,
+    });
   }
+}
+
+/** Server-computed totals only — never trusts anything from the browser.
+ * Works whether or not `order.payments` has been migrated yet (falls back to
+ * the legacy single-shot `verifiedPaidAmount` for a read-only summary, e.g.
+ * orderToPublicResponse(), without mutating/persisting anything). */
+function computePaymentTotals(order) {
+  const requiredAmount = Number(order.requiredAmount ?? order.price) || 0;
+  const totalVerifiedPaid = round2(
+    Array.isArray(order.payments)
+      ? order.payments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
+      : Number(order.verifiedPaidAmount) || 0
+  );
+  const remainingAmount = Math.max(0, round2(requiredAmount - totalVerifiedPaid));
+  const overpaidAmount = Math.max(0, round2(totalVerifiedPaid - requiredAmount));
+  return { requiredAmount, totalVerifiedPaid, remainingAmount, overpaidAmount };
+}
+
+/** Mutates `order` in place to record ONE verified payment (a single
+ * webhook delivery, or one admin-confirmed manual transfer) and returns
+ * {ok, reason, ...totals}. Never called with client-supplied trust — every
+ * caller must derive `verifiedAmount` itself (admin manual entry, or a
+ * provider webhook amount, already signature-verified by the time it gets
+ * here) and must supply an idempotency key: `provider`+`providerTransactionId`
+ * for a gateway webhook, or `paymentId` for a manual admin approval.
+ *
+ * Supports MULTIPLE payments per order (added 2026-09-15: Underpaid →
+ * Remaining Payment): each call appends to order.payments if its id hasn't
+ * been seen before, then recomputes totalVerifiedPaid/remainingAmount fresh
+ * from the whole ledger. `order.status` only ever becomes "approved" once
+ * the cumulative total reaches requiredAmount — a partial second payment
+ * (e.g. 200 + 50 against 259) stays paymentStatus:"underpaid".
+ *
+ * Idempotent per-transaction: the SAME (provider, providerTransactionId) or
+ * the SAME paymentId delivered twice is recognized and reported ok WITHOUT
+ * being counted a second time (see TEST 14/22/23 in the Sept-15
+ * payment-integrity request, extended for the ledger in this round). This
+ * intentionally no longer short-circuits on "already fully verified" the
+ * way the single-shot version did — that old shortcut would have silently
+ * dropped a genuine NEW payment (e.g. an overpayment) arriving after an
+ * order was already approved; every distinct transaction is now recorded. */
+function recordPaymentVerification(order, { verifiedAmount, method, provider, providerTransactionId, reference, verifiedBy, paymentId }) {
+  ensurePaymentLedger(order);
+  const requiredAmount = Number(order.requiredAmount ?? order.price) || 0;
 
   // Free / soft-launch orders (requiredAmount === 0) have nothing to verify —
   // see claimFreeOrder(), the only place a real order can ever have price 0.
   if (requiredAmount === 0) {
     order.paymentStatus = "verified";
     order.verifiedPaidAmount = 0;
+    order.totalVerifiedPaid = 0;
+    order.remainingAmount = 0;
+    order.overpaidAmount = 0;
     order.paymentVerifiedAt = order.paymentVerifiedAt || Date.now();
     order.status = "approved";
-    return { ok: true };
+    return { ok: true, requiredAmount, totalVerifiedPaid: 0, remainingAmount: 0, overpaidAmount: 0 };
   }
 
   const amount = Number(verifiedAmount);
   if (!Number.isFinite(amount) || amount <= 0) {
-    order.paymentStatus = "rejected";
-    return { ok: false, reason: "invalid-amount", requiredAmount };
+    return { ok: false, reason: "invalid-amount", ...computePaymentTotals(order) };
   }
+
+  const idempotencyId =
+    providerTransactionId && provider ? `${provider}:${providerTransactionId}` : paymentId ? `manual:${paymentId}` : null;
+  if (!idempotencyId) {
+    // Every payment MUST be uniquely identified, or a retried request could
+    // double-count it — refuse rather than guess one.
+    return { ok: false, reason: "missing-idempotency-key", ...computePaymentTotals(order) };
+  }
+
+  const alreadyRecorded = order.payments.find((p) => p.id === idempotencyId);
+  if (alreadyRecorded) {
+    // Exact same transaction delivered again (duplicate webhook, or the same
+    // admin approval retried) — report ok without double-counting anything.
+    return { ok: true, duplicate: true, ...computePaymentTotals(order) };
+  }
+
+  order.payments.push({
+    id: idempotencyId,
+    provider: provider || "manual",
+    providerTransactionId: providerTransactionId || null,
+    amount,
+    method: method || null,
+    reference: reference || null,
+    verifiedAt: Date.now(),
+    verifiedBy: verifiedBy || null,
+  });
 
   if (method) order.paymentMethod = method;
   if (provider) order.paymentProvider = provider;
   if (reference) order.paymentReference = reference;
+  if (providerTransactionId) order.providerTransactionId = providerTransactionId;
 
-  if (!isPaymentSufficient(requiredAmount, amount)) {
+  const totals = computePaymentTotals(order);
+  order.totalVerifiedPaid = totals.totalVerifiedPaid;
+  order.remainingAmount = totals.remainingAmount;
+  order.overpaidAmount = totals.overpaidAmount;
+  // verifiedPaidAmount stays a live alias of totalVerifiedPaid so the
+  // UNCHANGED /transform payment gate (transformImage(), which reads
+  // verifiedPaidAmount directly and is not touched by this change) keeps
+  // working correctly under the new cumulative model.
+  order.verifiedPaidAmount = totals.totalVerifiedPaid;
+
+  if (totals.remainingAmount <= PAYMENT_AMOUNT_EPSILON) {
+    order.paymentStatus = "verified";
+    order.paymentVerifiedAt = Date.now();
+    order.paymentVerifiedBy = verifiedBy || order.paymentVerifiedBy || null;
+    order.status = "approved";
+  } else {
     order.paymentStatus = "underpaid";
-    order.verifiedPaidAmount = amount;
-    return { ok: false, reason: "underpaid", requiredAmount, verifiedAmount: amount };
+    // status is intentionally left NOT "approved" here.
   }
 
-  order.paymentStatus = "verified";
-  order.verifiedPaidAmount = amount;
-  if (providerTransactionId) order.providerTransactionId = providerTransactionId;
-  order.paymentVerifiedAt = Date.now();
-  order.paymentVerifiedBy = verifiedBy || order.paymentVerifiedBy || null;
-  order.status = "approved";
-  return { ok: true };
+  return { ok: true, ...totals };
 }
 
 /** Provider-webhook approval path (Paymob/Fawry/Fawaterk). `verification` MUST
@@ -1581,6 +1689,23 @@ async function createOrder(env, request) {
     providerTransactionId: null,
     paymentVerifiedAt: null,
     paymentVerifiedBy: null,
+    // --- Cumulative payment ledger (added 2026-09-15: Underpaid → Remaining
+    // Payment → Full Verification) — see recordPaymentVerification(). A
+    // brand-new order always starts with an explicit empty ledger, so it
+    // never needs the legacy migration in ensurePaymentLedger() at all —
+    // that path exists only for orders created before this change.
+    payments: [],
+    totalVerifiedPaid: 0,
+    remainingAmount: finalPrice,
+    overpaidAmount: 0,
+    // Pending manual-transfer references submitted against THIS order that
+    // an admin hasn't verified yet — the original checkout `ref` above is
+    // the first one; POST /orders/submit-remaining-payment appends more here
+    // when the customer pays the rest without creating a new order. Purely
+    // informational (what the customer CLAIMS they paid) — never a source of
+    // truth on its own; only an admin's verifiedAmount (approveOrder) or a
+    // signature-verified gateway webhook ever moves money into `payments`.
+    pendingReferences: [],
   };
   await env.MEGA_KV.put(`order:${code}`, JSON.stringify(order));
   await env.MEGA_KV.put(refKey, code);
@@ -1648,7 +1773,106 @@ function orderToPublicResponse(order) {
     response.creditsRemaining = order.creditsRemaining;
     response.usedItems = order.usedItems || [];
   }
+  // Underpaid → Remaining Payment (added 2026-09-15): computed fresh from
+  // the ledger every time, in-memory only (this function never writes to
+  // KV) — so the customer's own status panel (polling this every 6s) always
+  // reflects the true server-side total, and survives a refresh/close/
+  // return-later exactly because it's read straight from the stored order,
+  // never from anything kept only in the browser.
+  if (order.paymentStatus) {
+    const totals = computePaymentTotals(order);
+    response.paymentStatus = order.paymentStatus;
+    response.requiredAmount = totals.requiredAmount;
+    response.totalVerifiedPaid = totals.totalVerifiedPaid;
+    response.remainingAmount = totals.remainingAmount;
+  }
   return response;
+}
+
+async function notifyOwnerOfRemainingPayment(env, order, ref) {
+  const token = env.TELEGRAM_BOT_TOKEN;
+  const chatId = env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return;
+  const mono = (v) => "`" + String(v || "—") + "`";
+  const totals = computePaymentTotals(order);
+  const lines = [
+    "💰 *دفعة متبقية جديدة*",
+    "",
+    "*كود الطلب:* " + mono(order.code),
+    "*المنتج:* " + order.productTitle,
+    "*رقم العملية الجديد:* " + mono(ref),
+    "*إجمالي المطلوب:* " + totals.requiredAmount + " EGP",
+    "*تم تأكيده سابقًا:* " + totals.totalVerifiedPaid + " EGP",
+    "*يحتاج مراجعة الآن:* " + totals.remainingAmount + " EGP",
+  ];
+  try {
+    await fetch("https://api.telegram.org/bot" + token + "/sendMessage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text: lines.join("\n"), parse_mode: "Markdown", disable_web_page_preview: true }),
+    });
+  } catch (e) {
+    // Alerting is a convenience, never a condition of accepting the reference.
+  }
+}
+
+/** Customer-facing endpoint (added 2026-09-15: Underpaid → Remaining
+ * Payment) — lets a customer whose order is still `paymentStatus:"underpaid"`
+ * submit a NEW manual-transfer reference for the remaining amount against
+ * their EXISTING order, without ever creating a second order. No admin
+ * token required (this mirrors the trust level of the original checkout
+ * submission: a transfer reference alone is a claim, never proof — see
+ * isPlausibleRef()), and no amount is accepted from the client at all: the
+ * only numbers ever compared against money are computed server-side by
+ * computePaymentTotals()/recordPaymentVerification(). This only records that
+ * "the customer says they made another transfer, ref X" — an admin still has
+ * to verify the real amount via approveOrder() (or a gateway webhook) before
+ * anything moves the order toward approved, exactly like the original `ref`
+ * captured at checkout. */
+async function submitRemainingPayment(env, request) {
+  if (!(await rateLimit(env, request, "orders-remaining-payment", 10, 3600))) {
+    return err("Too many requests, please try again later", 429);
+  }
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return err("Invalid JSON body");
+  }
+  const code = String(body.code || "").toUpperCase().trim();
+  if (!code) return err("Missing order code", 400);
+  const raw = await env.MEGA_KV.get(`order:${code}`);
+  if (!raw) return err("Order not found — please re-enter your order code", 404);
+  const order = JSON.parse(raw);
+
+  if (!isPlausibleRef(body.ref)) {
+    return err("Please enter the transfer reference number from your payment receipt", 400);
+  }
+
+  // Same order can't be approved without genuinely reaching requiredAmount —
+  // computed fresh here, never from anything the client believes it owes.
+  const totals = computePaymentTotals(order);
+  if (totals.remainingAmount <= PAYMENT_AMOUNT_EPSILON) {
+    return err("This order has already been fully paid", 409);
+  }
+
+  // The same global reference-reuse guard as the original checkout: one
+  // transfer receipt can only ever be claimed once, on one order.
+  const refKey = `orderref:${normaliseRef(body.ref)}`;
+  if (await env.MEGA_KV.get(refKey)) {
+    return err("This transfer reference has already been used for another order", 409);
+  }
+  await env.MEGA_KV.put(refKey, code);
+
+  const ref = String(body.ref).trim().slice(0, 120);
+  const appUsed = body.appUsed ? String(body.appUsed).slice(0, 60) : order.appUsed || "";
+  if (!Array.isArray(order.pendingReferences)) order.pendingReferences = [];
+  order.pendingReferences.push({ ref, appUsed, submittedAt: Date.now() });
+  await env.MEGA_KV.put(`order:${code}`, JSON.stringify(order));
+
+  await notifyOwnerOfRemainingPayment(env, order, ref);
+
+  return json({ ok: true, ...computePaymentTotals(order), paymentStatus: order.paymentStatus });
 }
 
 // ============================================================================
@@ -1950,16 +2174,29 @@ async function getProductPopularity(env) {
 }
 
 /** Manual InstaPay/Vodafone Cash approval (added 2026-09-15: payment
- * integrity). The website has no way to know what actually landed in
- * Magdy's bank account/wallet — a customer typing a transfer reference is
- * not proof of amount. So this endpoint now REQUIRES the admin to type the
- * amount they personally confirmed arrived (verifiedAmount) — never
- * defaulted from anything the customer submitted at checkout — and that
- * amount is compared against order.requiredAmount (the same server-computed
- * price createOrder() already trusted, never the client's). Underpaying
- * returns a clear underpaid response instead of ever setting status to
- * "approved"; /transform independently re-checks paymentStatus too (see
- * transformImage()), so even a bug here can't unlock a result on its own. */
+ * integrity; extended 2026-09-15 for cumulative/remaining-payment support).
+ * The website has no way to know what actually landed in Magdy's bank
+ * account/wallet — a customer typing a transfer reference is not proof of
+ * amount. So this endpoint REQUIRES the admin to type the amount they
+ * personally confirmed arrived for THIS ONE transfer (verifiedAmount) —
+ * never defaulted from anything the customer submitted at checkout — and
+ * that amount is added to the order's payment ledger (recordPaymentVerification),
+ * which compares the running TOTAL against order.requiredAmount (the same
+ * server-computed price createOrder() already trusted, never the client's).
+ * A still-insufficient total keeps the order paymentStatus:"underpaid" and
+ * status not "approved"; /transform independently re-checks paymentStatus
+ * too (see transformImage()), so even a bug here can't unlock a result on
+ * its own.
+ *
+ * `body.paymentId` is a REQUIRED idempotency nonce (the admin UI generates
+ * one per approval click/retry) so that a double-click or a retried request
+ * can never add the same transfer to the ledger twice — see
+ * recordPaymentVerification(). `body.reference` is optional and lets the
+ * admin point at a SPECIFIC pending transfer reference (see
+ * order.pendingReferences, populated by /orders/submit-remaining-payment)
+ * when approving a second/later payment; it falls back to the order's
+ * original `ref` for backward compatibility with the original one-payment
+ * flow. */
 async function approveOrder(env, request) {
   let body;
   try {
@@ -1978,16 +2215,24 @@ async function approveOrder(env, request) {
   if (requiredAmount > 0 && !Number.isFinite(verifiedAmount)) {
     return err("Enter the amount you actually confirmed was received before approving", 400);
   }
+  const paymentId = body.paymentId ? String(body.paymentId).slice(0, 120) : "";
+  if (requiredAmount > 0 && !paymentId) {
+    // Every manual verification needs its own idempotency key — refuse
+    // rather than silently generating one server-side, which would defeat
+    // the point (a retried request would just get counted twice again).
+    return err("Missing paymentId — please refresh the admin page and try again", 400);
+  }
 
   const result = recordPaymentVerification(order, {
     verifiedAmount,
     method: order.appUsed || undefined,
     provider: "manual",
-    reference: order.ref || undefined,
+    reference: body.reference ? String(body.reference).slice(0, 120) : order.ref || undefined,
     verifiedBy: "admin",
+    paymentId: paymentId || undefined,
   });
 
-  if (order.orderType === "prompt" && !order.promptText && result.ok) {
+  if (order.orderType === "prompt" && !order.promptText && result.ok && order.status === "approved") {
     const productRaw = await env.MEGA_KV.get(`product:${order.productId}`);
     if (productRaw) {
       const product = JSON.parse(productRaw);
@@ -1997,15 +2242,43 @@ async function approveOrder(env, request) {
   await env.MEGA_KV.put(`order:${code}`, JSON.stringify(order));
 
   if (!result.ok) {
-    if (result.reason === "underpaid") {
-      return json(
-        { error: "UNDERPAID", underpaid: true, requiredAmount: result.requiredAmount, verifiedAmount: result.verifiedAmount },
-        409
-      );
-    }
-    return err("Enter a valid received amount before approving", 400);
+    return err(
+      result.reason === "missing-idempotency-key"
+        ? "Missing paymentId — please refresh the admin page and try again"
+        : "Enter a valid received amount before approving",
+      400
+    );
   }
-  return json({ ok: true, alreadyVerified: !!result.alreadyVerified });
+
+  // This ONE transfer was successfully recorded into the ledger either way —
+  // the HTTP status below is purely about whether the order's CUMULATIVE
+  // total now clears requiredAmount, matching the original single-payment
+  // contract (409 + underpaid:true) so the admin UI's existing underpaid
+  // handling keeps working unchanged, now carrying the running totals too.
+  if (order.paymentStatus === "underpaid") {
+    return json(
+      {
+        error: "UNDERPAID",
+        underpaid: true,
+        duplicate: !!result.duplicate,
+        requiredAmount: result.requiredAmount,
+        verifiedAmount: result.totalVerifiedPaid, // cumulative, not just this transfer
+        totalVerifiedPaid: result.totalVerifiedPaid,
+        remainingAmount: result.remainingAmount,
+      },
+      409
+    );
+  }
+  return json({
+    ok: true,
+    alreadyVerified: !!result.duplicate && order.status === "approved",
+    duplicate: !!result.duplicate,
+    paymentStatus: order.paymentStatus,
+    requiredAmount: result.requiredAmount,
+    totalVerifiedPaid: result.totalVerifiedPaid,
+    remainingAmount: result.remainingAmount,
+    overpaidAmount: result.overpaidAmount,
+  });
 }
 
 async function rejectOrder(env, request) {
@@ -2868,6 +3141,30 @@ async function changeAdminPassword(env, request) {
 // Payments — Paymob (card) / Fawry
 // ============================================================================
 
+/** Shared by paymobCreate/fawryCreate/fawaterkCreate (fixed 2026-09-15:
+ * Underpaid → Remaining Payment). Every payment-CREATION endpoint used to
+ * trust `amount` straight from the request body — a customer's browser
+ * could ask a gateway to create a payment intent for ANY amount, unrelated
+ * to what the order actually needs. Now the server looks the order up
+ * itself and returns its own computed remainingAmount; whatever `amount`
+ * the client sent is never read by any of the three *Create functions
+ * below. This also naturally supports the remaining-payment flow: a
+ * customer paying off an underpaid order through a gateway (rather than a
+ * manual transfer) is charged exactly serverCalculatedRemainingAmount, never
+ * the original full price again. */
+async function resolveServerChargeAmount(env, orderCode) {
+  const code = String(orderCode || "").toUpperCase().trim();
+  if (!code) return { error: err("Missing orderCode", 400) };
+  const raw = await env.MEGA_KV.get(`order:${code}`);
+  if (!raw) return { error: err("Order not found", 404) };
+  const order = JSON.parse(raw);
+  const totals = computePaymentTotals(order);
+  if (totals.remainingAmount <= PAYMENT_AMOUNT_EPSILON) {
+    return { error: err("This order has already been fully paid", 409) };
+  }
+  return { order, amount: totals.remainingAmount };
+}
+
 async function paymobCreate(env, request) {
   if (!env.PAYMOB_SECRET_KEY || !env.PAYMOB_PUBLIC_KEY || !env.PAYMOB_INTEGRATION_ID) {
     return err("Card payment is not configured yet (missing Paymob secrets)", 501);
@@ -2878,8 +3175,11 @@ async function paymobCreate(env, request) {
   } catch {
     return err("Invalid JSON body");
   }
-  const { orderCode, amount, name, phone, email } = body;
-  if (!orderCode || !amount) return err("Missing orderCode or amount");
+  const { orderCode, name, phone, email } = body;
+  if (!orderCode) return err("Missing orderCode");
+  const resolved = await resolveServerChargeAmount(env, orderCode);
+  if (resolved.error) return resolved.error;
+  const amount = resolved.amount; // server-computed remainingAmount — never the client's `amount`
 
   try {
     const intentionRes = await fetch("https://accept.paymob.com/v1/intention/", {
@@ -2968,8 +3268,11 @@ async function fawryCreate(env, request) {
   } catch {
     return err("Invalid JSON body");
   }
-  const { orderCode, amount, name, phone, email } = body;
-  if (!orderCode || !amount || !phone) return err("Missing orderCode, amount, or phone");
+  const { orderCode, name, phone, email } = body;
+  if (!orderCode || !phone) return err("Missing orderCode or phone");
+  const resolved = await resolveServerChargeAmount(env, orderCode);
+  if (resolved.error) return resolved.error;
+  const amount = resolved.amount; // server-computed remainingAmount — never the client's `amount`
 
   try {
     const amountFormatted = Number(amount).toFixed(2);
@@ -3045,8 +3348,11 @@ async function fawaterkCreate(env, request) {
   } catch {
     return err("Invalid JSON body");
   }
-  const { orderCode, amount, name, phone, email } = body;
-  if (!orderCode || !amount) return err("Missing orderCode or amount");
+  const { orderCode, name, phone, email } = body;
+  if (!orderCode) return err("Missing orderCode");
+  const resolved = await resolveServerChargeAmount(env, orderCode);
+  if (resolved.error) return resolved.error;
+  const amount = resolved.amount; // server-computed remainingAmount — never the client's `amount`
 
   const fullName = (name || "Customer").trim();
   const spaceIdx = fullName.indexOf(" ");
@@ -3094,8 +3400,34 @@ async function fawaterkCreate(env, request) {
   }
 }
 
+/** Fetches the invoice's server-side-authoritative amount/status from
+ * Fawaterk's own API (added 2026-09-15, replacing a guessed webhook field —
+ * see fawaterkWebhook() below for why). Per Fawaterk's official API
+ * reference (fawaterak-api.readme.io/reference/get-transaction-data),
+ * GET /api/v2/getInvoiceData/{invoice_id} returns
+ * { data: { total, paid, invoice_id, invoice_key, payment_method, ... } }
+ * where `total` is the invoice amount and `paid` is 1/0. Returns null on any
+ * failure so the caller can fail closed. */
+async function fawaterkFetchInvoiceData(env, invoiceId) {
+  try {
+    const res = await fetch(`https://app.fawaterk.com/api/v2/getInvoiceData/${encodeURIComponent(invoiceId)}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${env.FAWATERK_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) return null;
+    const parsed = await res.json().catch(() => null);
+    return parsed?.data || null;
+  } catch {
+    return null;
+  }
+}
+
 async function fawaterkWebhook(env, request) {
   if (!env.FAWATERK_VENDOR_KEY) return err("Server misconfigured: FAWATERK_VENDOR_KEY not set", 500);
+  if (!env.FAWATERK_API_KEY) return err("Server misconfigured: FAWATERK_API_KEY not set", 500);
   try {
     const body = await request.json().catch(() => null);
     if (!body) return err("Invalid payload", 400);
@@ -3114,18 +3446,56 @@ async function fawaterkWebhook(env, request) {
       orderCode = null;
     }
     if (invoice_status === "paid" && orderCode) {
-      // Fawaterk's webhook payload isn't fully confirmed against live docs in
-      // this pass (this integration is still disabled client-side) — check
-      // for the paid amount under every plausible field name their dashboard
-      // docs use. If NONE of them are present, verifiedAmount comes out
-      // NaN/non-finite and recordPaymentVerification() fails the order
-      // closed (paymentStatus: "rejected", never approved) instead of
-      // trusting invoice_status alone. Before actually turning Fawaterk on,
-      // confirm the real field name in their webhook payload and adjust the
-      // list below if needed.
-      const rawAmount = body.invoice_amount ?? body.amount ?? body.cartTotal ?? body.paid_amount ?? body.total;
+      // FIXED 2026-09-15: Fawaterk's official webhook reference
+      // (fawaterak-api.readme.io/reference/web-hook) documents this payload
+      // as ONLY { hashKey, invoice_key, invoice_id, payment_method,
+      // invoice_status, pay_load, referenceNumber } — there is genuinely NO
+      // amount field in it at all. The previous code guessed at field names
+      // (invoice_amount/amount/cartTotal/...) that are not part of the
+      // documented payload, which is exactly what Magdy asked not to do
+      // ("لا تخمّن"). Instead, after the signature above is verified, this
+      // now calls Fawaterk's own "Get Transaction Data" API
+      // (GET /api/v2/getInvoiceData/{invoice_id}, also officially
+      // documented) to fetch the real, provider-confirmed invoice total and
+      // paid flag — the actual amount from the payment provider, not a
+      // guess and not anything from the browser.
+      const invoiceData = await fawaterkFetchInvoiceData(env, invoice_id);
+      if (!invoiceData || Number(invoiceData.paid) !== 1) {
+        return err("Could not confirm this invoice as paid via Fawaterk's own API", 502);
+      }
+      // Defense-in-depth hardening (2026-09-15 security review): per
+      // Fawaterk's own official webhook docs, the hashKey signature covers
+      // ONLY InvoiceId+InvoiceKey+PaymentMethod — pay_load (which carries our
+      // orderCode) is NOT part of the signed message. Forging a webhook that
+      // reaches this point at all already requires FAWATERK_VENDOR_KEY (no
+      // valid hashKey can be produced without it, regardless of pay_load), so
+      // this is not independently exploitable today — but it means orderCode
+      // binding otherwise rests entirely on an unsigned field. getInvoiceData
+      // is documented to echo back the SAME pay_load Fawaterk itself recorded
+      // when the invoice was created, fetched here directly from Fawaterk's
+      // server with our own API key (never from the untrusted inbound
+      // webhook body), so cross-checking it costs nothing and removes that
+      // reliance entirely. Fails OPEN only when Fawaterk's API omits pay_load
+      // (documented to happen — their own example response shows it as
+      // null), and fails CLOSED on an actual mismatch.
+      if (invoiceData.pay_load) {
+        let confirmedOrderCode = null;
+        try {
+          const parsedConfirmed = typeof invoiceData.pay_load === "string" ? JSON.parse(invoiceData.pay_load) : invoiceData.pay_load;
+          confirmedOrderCode = parsedConfirmed?.orderCode || null;
+        } catch {
+          confirmedOrderCode = null;
+        }
+        if (confirmedOrderCode && confirmedOrderCode !== orderCode) {
+          return err("Invoice pay_load does not match the order this webhook claims to be for", 401);
+        }
+      }
+      const verifiedAmount = Number(invoiceData.total);
+      if (!Number.isFinite(verifiedAmount) || verifiedAmount <= 0) {
+        return err("Fawaterk returned an invalid invoice amount", 502);
+      }
       await approveOrderByCode(env, orderCode, {
-        verifiedAmount: Number(rawAmount),
+        verifiedAmount,
         provider: "fawaterk",
         providerTransactionId: invoice_id != null ? String(invoice_id) : null,
       });
@@ -3426,6 +3796,7 @@ export default {
         response = await serveImage(env, pathname.slice("/images/".length));
       else if (pathname === "/orders/create" && request.method === "POST") response = await createOrder(env, request);
       else if (pathname === "/orders/track" && request.method === "GET") response = await trackOrder(env, request);
+      else if (pathname === "/orders/submit-remaining-payment" && request.method === "POST") response = await submitRemainingPayment(env, request);
       else if (pathname === "/orders/claim-free" && request.method === "POST") response = await claimFreeOrder(env, request);
       else if (pathname === "/orders/list" && request.method === "GET") response = await listOrders(env, request);
       else if (pathname === "/products/popularity" && request.method === "GET") response = await getProductPopularity(env);
@@ -3491,4 +3862,3 @@ export default {
     }
   },
 };
-
