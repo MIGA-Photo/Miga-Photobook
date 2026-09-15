@@ -202,7 +202,7 @@
 }
 </script>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Organization","name":"Miga-Photobook","alternateName":"ميجا فوتوبوك","description":"نحوّل صورتك الشخصية تلقائيًا لتحفة فنية احترافية بتقنيات ميجا المتطوّرة القائمة على الذكاء الاصطناعي — ارفع صورتك واختر المكان والأسلوب.","url":"https://miga-photobook.com/","logo":"https://miga-photobook.com/logo-watermark.png","image":"https://miga-photobook.com/og-image.png","email":"migaphotobook@gmail.com","telephone":"+201202530308","founder":{"@type":"Person","name":"Magdy Farouk Soliman","alternateName":"مجدي فاروق سليمان"},"areaServed":{"@type":"Country","name":"Egypt"},"address":{"@type":"PostalAddress","addressRegion":"Cairo","addressCountry":"EG"},"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"migaphotobook@gmail.com","telephone":"+201202530308","availableLanguage":["ar","en"],"areaServed":"EG"}],"sameAs":["https://www.facebook.com/share/1HyaB2xwuZ/?mibextid=wwXIfr","https://www.instagram.com/migaphotobook/"]}
+{"@context":"https://schema.org","@type":"Organization","name":"Miga-Photobook","alternateName":"ميجا فوتوبوك","description":"نحوّل صورتك الشخصية تلقائيًا لتحفة فنية احترافية بتقنيات ميجا المتطوّرة القائمة على الذكاء الاصطناعي — ارفع صورتك واختر المكان والأسلوب.","url":"https://miga-photobook.com/","logo":"https://miga-photobook.com/logo-badge-header.png","image":"https://miga-photobook.com/og-image.png","email":"migaphotobook@gmail.com","telephone":"+201202530308","founder":{"@type":"Person","name":"Magdy Farouk Soliman","alternateName":"مجدي فاروق سليمان"},"areaServed":{"@type":"Country","name":"Egypt"},"address":{"@type":"PostalAddress","addressRegion":"Cairo","addressCountry":"EG"},"contactPoint":[{"@type":"ContactPoint","contactType":"customer support","email":"migaphotobook@gmail.com","telephone":"+201202530308","availableLanguage":["ar","en"],"areaServed":"EG"}],"sameAs":["https://www.facebook.com/share/1HyaB2xwuZ/?mibextid=wwXIfr","https://www.instagram.com/migaphotobook/"]}
 </script>
 <!-- ⚠ الأرقام اللي تحت **مش** هي المصدر — دي قيمة احتياطية بس.
      `syncProductRatingLd()` في app.js بتكتب فوقها من نفس الاستجابة اللي
@@ -378,19 +378,16 @@
            فوق منتصف الإنجليزي بالظبط) والعلامة بجوارهم في شارة دائرية
            بارتفاع السطرين الاتنين — بدل الترتيب الأفقي القديم (عربي/علامة/
            إنجليزي في سطر واحد). الترتيب لسه مقصود لـRTL: الشارة أول عنصر
-           فبتظهر أقصى اليمين، والسطرين شمالها. -->
+           فبتظهر أقصى اليمين، والسطرين شمالها.
+
+           15 سبتمبر 2026: العلامة بقت صورة (مش SVG خطي) هنا كمان — نفس
+           معالجة الفوتر بالظبط: نسخة مقصوصة من التصميم الذهبي المجسّم اللي
+           بعته ماجدي، على الأيقونة (كتاب+كاميرا) بس من غير الحلقة الدائرية
+           ولا الاسم المطبوع جواها. الحلقة الذهبية حوالين الأيقونة اتعملت
+           بـCSS (.logo-badge) بدل ما تبقى جزء من الصورة. درج القائمة
+           الجانبية لسه بالعلامة القديمة (SVG) — ماجدي ماطلبش تغييره. -->
 <span aria-hidden="true" class="logo-badge">
-<svg class="logo-mark" height="22" viewbox="0 0 48 48" width="22" xmlns="http://www.w3.org/2000/svg">
-<!-- open book -->
-<path d="M24 14 C19 10 10 9 5 11 V37 C10 35 19 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-linejoin="round" stroke-width="2"></path>
-<path d="M24 14 C29 10 38 9 43 11 V37 C38 35 29 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-linejoin="round" stroke-width="2"></path>
-<path d="M24 14 V40" opacity="0.5" stroke="var(--brass)" stroke-width="1.5"></path>
-<!-- camera resting on the book -->
-<rect fill="var(--ink)" height="14" rx="3" stroke="var(--brass)" stroke-width="2" width="20" x="14" y="18"></rect>
-<rect fill="var(--ink)" height="5" rx="1.5" stroke="var(--brass)" stroke-width="2" width="8" x="20" y="14"></rect>
-<circle cx="24" cy="25" fill="none" r="4.5" stroke="var(--brass)" stroke-width="2"></circle>
-<circle cx="24" cy="25" fill="var(--brass)" r="1.6"></circle>
-</svg>
+<img alt="" class="logo-mark-img" decoding="async" height="120" loading="eager" src="/logo-badge-header.png" width="120"/>
 </span>
 <span class="logo-text-stack">
 <span class="lg-ar" data-i18n="brandNameAr">ميجا فوتوبوك</span>
@@ -1130,16 +1127,16 @@
          أعمدة حقيقية بس فمفيش صف تاني فاضي. -->
 <div class="footer-col footer-brand-center">
 <div class="footer-logo footer-lockup">
+<!-- 15 سبتمبر 2026: العلامة هنا بقت صورة (مش SVG خطي) — نسخة مقصوصة
+             من التصميم الذهبي المجسّم اللي بعته ماجدي، على الأيقونة
+             (كتاب+كاميرا) بس، من غير الحلقة الدائرية ولا الاسم المطبوعين
+             في الصورة الأصلية (هيبانوا مش واضحين في مقاس 34px، ومكررين مع
+             اسم الموقع الحي جنبهم). الحلقة الذهبية الواضحة اتعملت بـCSS
+             (.footer-lockup .logo-badge) بدل ما تبقى جزء من الصورة. الهيدر
+             ودرج القائمة لسه بالعلامة الأصلية (SVG) — التغيير هنا للفوتر
+             بس، بعد ما ماجدي صحّح إنه ده اللي قصده مش الهيدر. -->
 <span aria-hidden="true" class="logo-badge">
-<svg class="logo-mark" height="20" viewbox="0 0 48 48" width="20" xmlns="http://www.w3.org/2000/svg">
-<path d="M24 14 C19 10 10 9 5 11 V37 C10 35 19 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-linejoin="round" stroke-width="2"></path>
-<path d="M24 14 C29 10 38 9 43 11 V37 C38 35 29 36 24 40 V14 Z" fill="none" stroke="var(--brass)" stroke-linejoin="round" stroke-width="2"></path>
-<path d="M24 14 V40" opacity="0.5" stroke="var(--brass)" stroke-width="1.5"></path>
-<rect fill="var(--ink)" height="14" rx="3" stroke="var(--brass)" stroke-width="2" width="20" x="14" y="18"></rect>
-<rect fill="var(--ink)" height="5" rx="1.5" stroke="var(--brass)" stroke-width="2" width="8" x="20" y="14"></rect>
-<circle cx="24" cy="25" fill="none" r="4.5" stroke="var(--brass)" stroke-width="2"></circle>
-<circle cx="24" cy="25" fill="var(--brass)" r="1.6"></circle>
-</svg>
+<img alt="" class="logo-mark-img" decoding="async" height="120" loading="lazy" src="/logo-badge-footer.png" width="120"/>
 </span>
 <span class="logo-text-stack">
 <span class="lg-ar" data-i18n="brandNameAr">ميجا فوتوبوك</span>
