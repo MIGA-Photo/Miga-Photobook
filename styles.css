@@ -893,16 +893,20 @@
      each of the sections below (why-us / how it works / testimonials /
      about / faq), so a visitor finds all of it at a glance instead of
      scrolling past five separate stacked headers. */
+  /* 15 سبتمبر 2026: كانت عمود واحد (كل زرار ياخد صف كامل لوحده) — 5
+     أزرار = 5 صفوف طويلة فاضية جوها كتير. بقت شبكة عمودين، فبقت 3 صفوف
+     بس (آخر زرار "أسئلة شائعة" لوحده فى صفه، بنفس المقاس بالظبط زي
+     الباقي — مفيش تكبير أو تمديد ليه، حسب الطلب "بمقاسات متساوية"). */
   .section-tabs{
-    display:grid; grid-template-columns:1fr; gap:12px; margin:0 0 28px;
+    display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:0 0 28px;
   }
   .section-tab-btn{
-    display:flex; align-items:center; justify-content:center; gap:12px;
-    width:100%; height:66px; box-sizing:border-box; text-align:center;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    width:100%; min-height:66px; box-sizing:border-box; text-align:center;
     background:var(--ink-2); border:1.5px solid var(--brass); color:var(--paper);
-    padding:0 20px; border-radius:14px;
+    padding:10px 16px; border-radius:14px;
     font-size:18px; font-weight:700; letter-spacing:0.2px; font-family:inherit;
-    transition:.2s;
+    line-height:1.3; transition:.2s;
   }
   .section-tab-btn:hover{background:rgba(255,201,77,0.08);}
   .section-tab-btn.active{
@@ -910,7 +914,12 @@
   }
   .section-tab-btn.active .icon-badge{border-color:var(--ink); color:var(--ink);}
   @media(max-width:700px){
-    .section-tab-btn{font-size:16px; height:60px; padding:0 16px;}
+    .section-tab-btn{font-size:14.5px; min-height:60px; padding:8px 10px; gap:8px;}
+  }
+  @media(max-width:480px){
+    .section-tab-btn{font-size:13px; gap:6px;}
+    .section-tab-btn .icon-badge{width:26px; height:26px; flex:none;}
+    .section-tab-btn .icon-badge svg{width:14px; height:14px;}
   }
   /* All tab buttons stay visible side by side at all times now — only the
      active one's background highlights which panel is currently showing

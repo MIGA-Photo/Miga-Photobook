@@ -7960,6 +7960,14 @@ function initSliderInstance(rootId){
   };
   if(!els.card || !els.imgBefore || !els.imgAfter || !els.wrap || !els.line || !els.handle) return null;
   const state = { pairs: [], current: 0, demo: true, dragging: false };
+  // 15 سبتمبر 2026: "angle" بتتحرك بشكل مستمر طول ما autoDemo شغال، حتى
+  // وإحنا بعيدين عن 50%. لما renderPair() كانت بترجع المقبض لـ50% فجأة
+  // (setPct(50)) من غير ما تصفّر angle، الفريم الجاي من autoDemo كان
+  // بيحسب sin(angle) بقيمة مختلفة تمامًا وبيلخبط المقبض لمكان تاني فورًا
+  // — ده اللي كان بيبان كـ"زحلقة"/قفزة عند الضغط على أسهم السابق/التالي.
+  // تصفير angle هنا بيخلي autoDemo يكمل من نفس نقطة الـ50% اللي رجع لها
+  // المقبض، من غير أي قفزة.
+  let angle = 0;
 
   function renderDots(){
     if(!els.dots) return;
@@ -7974,6 +7982,7 @@ function initSliderInstance(rootId){
     els.imgBefore.src = pair.before;
     els.imgAfter.src = pair.after;
     setPct(50);
+    angle = 0;
     state.demo = true;
     if(els.dots) [...els.dots.children].forEach((d,i)=> d.classList.toggle('active', i===state.current));
   }
@@ -8023,7 +8032,6 @@ function initSliderInstance(rootId){
     setPct(current + dir * STEP);
   });
 
-  let angle = 0;
   (function autoDemo(){
     if(state.demo && !state.dragging && state.pairs.length){
       angle += 0.014;
