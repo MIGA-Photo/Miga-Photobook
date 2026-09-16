@@ -2418,24 +2418,31 @@ function renderProductCard(p, opts){
   // one and only action.
   if(promptOnly){
     const hasPrompt = promptPurchases.includes(p.id);
+    const promptMainBtn = hasPrompt
+      ? (purchasedPromptTexts[p.id]
+          ? `<button class="buy-btn" onclick="copyPurchasedPrompt('${p.id}')">${t('copyPromptBtn')}</button>`
+          : `<button class="buy-btn" onclick="openTrackForPrompt('${p.id}')">${t('promptPendingBtn')}</button>`)
+      : `<button class="buy-btn" onclick="openBuyModal('${p.id}', 'prompt')">
+           ${t('buyPromptBtnPrefix')} — <span class="price-old">${PROMPT_ORIGINAL_PRICE} ${CURRENCY}</span> <span class="price-new">${PROMPT_PRICE} ${CURRENCY}</span>
+         </button>`;
+    // نفس صف الشراء الموحّد اللي بقى في الكارت العادي (16 سبتمبر 2026) — هنا
+    // بس المفضلة (مفيش سلة أصلاً، منتجات البرومبت-لوحده مش قابلة للإضافة
+    // للسلة) عشان الشكل يفضل متسق بين كل كروت الموقع بدل ما القلب يفضل
+    // عايم فوق الصورة زي الشكل القديم وحده.
     return `
     <div class="card">
       <div class="card-media">
         <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" loading="lazy" decoding="async" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
         <span class="card-badge">${escapeHtml(productTitle(p))}</span>
         ${requestCount > 0 ? `<span class="request-count-overlay" title="${t('popularityCountTitle')}">🔥 ${requestCount}</span>` : ''}
-        ${favBtnHtml(p.id)}
       </div>
       <div class="card-body">
         <div class="card-title" onclick="openProductDetail('${p.id}')" style="cursor:pointer;">${escapeHtml(productTitle(p))}</div>
         <div class="card-actions">
-          ${hasPrompt
-            ? (purchasedPromptTexts[p.id]
-                ? `<button class="buy-btn" onclick="copyPurchasedPrompt('${p.id}')">${t('copyPromptBtn')}</button>`
-                : `<button class="buy-btn" onclick="openTrackForPrompt('${p.id}')">${t('promptPendingBtn')}</button>`)
-            : `<button class="buy-btn" onclick="openBuyModal('${p.id}', 'prompt')">
-                 ${t('buyPromptBtnPrefix')} — <span class="price-old">${PROMPT_ORIGINAL_PRICE} ${CURRENCY}</span> <span class="price-new">${PROMPT_PRICE} ${CURRENCY}</span>
-               </button>`}
+          <div class="buy-row">
+            ${favBtnHtml(p.id)}
+            ${promptMainBtn}
+          </div>
         </div>
       </div>
     </div>`;
