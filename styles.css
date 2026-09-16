@@ -1947,7 +1947,17 @@
   .buy-row{ display:flex; align-items:stretch; gap:6px; width:100%; }
   .buy-row .buy-btn{ flex:1; }
   .buy-row .fav-btn, .buy-row .cart-btn{
-    position:static; opacity:1; width:40px; height:auto; flex:0 0 auto;
+    /* لازم position:relative مش static: ده اللي بيخلي الزرار نفسه هو
+       الـcontaining block بتاع طبقة اللمس بتاعته (::after بعدين في الملف،
+       .fav-btn::after/.cat-fav-btn::after) بدل ما تهرب لأقرب جد فيه
+       position:relative (.grid-nav-wrap) وتتمدد لعرض/ارتفاع الكارت كله —
+       ده كان بيخلي القلب الشفاف بتاع المفضلة بياخد كل دوسة حقيقية في
+       الكارت (الزرار الذهبي، العنوان، أي حتة) ويحوّلها toggleFavorite()
+       بصمت، مع إن onclick()/.click() البرمجي كانا شغالين عادي لأنهم
+       بيتجاوزوا الـhit-testing خالص. position:relative هنا لسه عادي في
+       الـflex row (مش زي position:absolute القديم اللي كان شايل العنصر
+       بره الـflow). */
+    position:relative; opacity:1; width:40px; height:auto; flex:0 0 auto;
     border-radius:8px; background:rgba(255,255,255,0.06); border:1px solid var(--line);
   }
   .buy-row .fav-btn:hover, .buy-row .cart-btn:hover{ background:rgba(255,201,77,0.16); }
