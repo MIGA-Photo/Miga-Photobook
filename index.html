@@ -367,8 +367,17 @@
            أيقونة الخطوط التلاتة (populateDrawerProfileFields بتتحكم في الاتنين
            سوا) — الزرار برضو بيفتح نفس الدرج بالظبط، الـ aria-label فاضل
            "القائمة" عمدًا عشان ده لسه زرار فتح القائمة مش تغيير الصورة. -->
-      <img id="hamburgerAvatarImg" src="" alt="" style="display:none;">
-      <svg id="hamburgerMenuIcon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg>
+      <span class="hamburger-icon-clip">
+        <img id="hamburgerAvatarImg" src="" alt="" style="display:none;">
+        <svg id="hamburgerMenuIcon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></svg>
+      </span>
+      <!-- عداد السلة: بيبان فوق نفس الزرار ده سواء كان شكله لسه أيقونة
+           القائمة (زائر/بدون تسجيل دخول) أو بقى صورة البروفايل (بعد تسجيل
+           الدخول) — ده بالظبط اللي طلبه ماجدي: العدد يبان على الأفاتار لو
+           مسجل دخول، أو على أيقونة الدرج الخارجية لو لسه مسجلش. لازم يكون
+           خارج span.hamburger-icon-clip (اللي عليه overflow:hidden) عشان
+           ما يتقصش لما يبان في ركن الدائرة. -->
+      <span id="hamburgerCartBadge" class="cart-badge" style="display:none;" aria-hidden="true"></span>
     </button>
     <!-- مخفي دايمًا؛ موجود عشان كود الأدمن بينده عليه. مكانه هنا عشان
          مايضيفش خانة تالتة تزحزح توسيط الاسم. -->
@@ -447,33 +456,13 @@
      chosen for the hero's own toggle-able showcase further down. Framed in
      the site's brass gold to read as a distinct, deliberate feature. -->
 <section class="hero hero-with-slider">
-  <!-- Visual result comes FIRST in markup on purpose: in this RTL layout the
-       first DOM child lands in the right-most grid column (the natural start
-       of Arabic reading order), and on mobile (single column) it stacks on
-       top -- so the actual transformation result is the first thing seen,
-       ahead of the headline, on both desktop and mobile. Still the same
-       always-on interactive slider, populated from real data by
-       loadSliderData() (site-config showcase, falling back to real product
-       images) -- never a hardcoded/fake image. -->
-  <div class="fixed-slider-frame">
-    <div class="slider-wrap-instance" id="bafSliderFixed">
-      <div class="slider-card slider-card-compact" data-slider-card>
-        <img data-slider-before alt="قبل" data-i18n-alt="beforeLabel">
-        <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد" data-i18n-alt="afterLabel"></div>
-        <div class="slider-line" data-slider-line></div>
-        <button type="button" class="slider-handle" data-slider-handle role="slider" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-label="اسحب أو استخدم أسهم اليمين واليسار للمقارنة بين قبل وبعد" data-i18n-aria="a11ySliderHandle">↔</button>
-        <span class="tag tag-before" data-i18n="beforeLabel">قبل</span>
-        <span class="tag tag-after" data-i18n="afterLabel">بعد</span>
-      </div>
-      <div class="slider-controls-row">
-        <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق" data-i18n-aria="a11yPrev">‹</button>
-        <div class="slider-dots" data-slider-dots></div>
-        <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي" data-i18n-aria="a11yNext">›</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="hero-text-frame">
+  <!-- 15 سبتمبر 2026 (طلب صريح من ماجدي): تبديل ترتيب النص والسلايدر —
+       النص بقى أول عنصر في الـDOM (فبيظهر يمين في RTL) والسلايدر بقى
+       العنصر التاني (فبيظهر شمال)، عكس الترتيب القديم. المقاس والارتفاع
+       والمحاذاة العلوية/السفلية زي ما هي (grid-template-columns:1fr 1fr +
+       align-items:stretch فوق) — التبديل بصري بس. نفس السلايدر التفاعلي
+       الدائم، بيتغذى من بيانات حقيقية عبر loadSliderData(). -->
+<div class="hero-text-frame">
     <div class="eyebrow" data-i18n="heroEyebrow">Miga-Photobook</div>
     <div class="tagline" data-i18n="heroSlogan">لقطتك... تتحول لتحفة فنية</div>
     <h1 id="heroTitle" data-i18n-html="heroTitle">حوّل صورتك إلى بورتريه احترافي<br>بجودة استوديو باستخدام <span class="brand-mark">Miga-Photobook ميجا فوتوبوك</span><br>خلال دقائق.</h1>
@@ -494,6 +483,24 @@
       <span data-i18n="trustCheck2">✅ دفع آمن</span>
       <span data-i18n="trustCheck3">✅ دعم فني مباشر</span>
       <span data-i18n="trustCheck4">✅ تحديثات مستمرة</span>
+    </div>
+  </div>
+
+<div class="fixed-slider-frame">
+    <div class="slider-wrap-instance" id="bafSliderFixed">
+      <div class="slider-card slider-card-compact" data-slider-card>
+        <img data-slider-before alt="قبل" data-i18n-alt="beforeLabel">
+        <div class="slider-after-wrap" data-slider-afterwrap><img data-slider-after alt="بعد" data-i18n-alt="afterLabel"></div>
+        <div class="slider-line" data-slider-line></div>
+        <button type="button" class="slider-handle" data-slider-handle role="slider" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-label="اسحب أو استخدم أسهم اليمين واليسار للمقارنة بين قبل وبعد" data-i18n-aria="a11ySliderHandle">↔</button>
+        <span class="tag tag-before" data-i18n="beforeLabel">قبل</span>
+        <span class="tag tag-after" data-i18n="afterLabel">بعد</span>
+      </div>
+      <div class="slider-controls-row">
+        <button type="button" class="slider-nav slider-nav-prev" data-slider-prev aria-label="السابق" data-i18n-aria="a11yPrev">‹</button>
+        <div class="slider-dots" data-slider-dots></div>
+        <button type="button" class="slider-nav slider-nav-next" data-slider-next aria-label="التالي" data-i18n-aria="a11yNext">›</button>
+      </div>
     </div>
   </div>
 </section>
@@ -595,7 +602,7 @@
   .slider-card{
     position:relative; border-radius:16px; overflow:hidden;
     border:1px solid var(--line); box-shadow:0 20px 60px rgba(0,0,0,0.45);
-    aspect-ratio:4/5; max-width:420px; margin:0 auto; touch-action:none; user-select:none;
+    aspect-ratio:4/5; max-width:420px; margin:0 auto; touch-action:pan-y; user-select:none;
     background:var(--ink-2, #151317); cursor:ew-resize;
   }
   .slider-card img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
@@ -686,7 +693,7 @@
      Rakkas بقى شكله "صغير" مع Readex Pro — لازم رقم أكبر عشان يوصل لنفس
      الحضور البصري المطلوب لعنوان رئيسي. رفعت كل مقاسات الـclamp بحوالي
      25-30% فى الثلاث مستويات (ديسكتوب/تابلت/موبايل). */
-  .hero-with-slider h1{ font-size:clamp(28px, 3.2vw, 42px) !important; margin-bottom:16px !important; line-height:1.3 !important; font-family:'Readex Pro', sans-serif !important; font-weight:700 !important; text-align:center !important; }
+  .hero-with-slider h1{ font-size:clamp(32px, 3.6vw, 46px) !important; margin-bottom:16px !important; line-height:1.3 !important; font-family:'Readex Pro', sans-serif !important; font-weight:700 !important; text-align:center !important; }
   .hero-with-slider .eyebrow{ font-size:14px !important; margin-bottom:12px !important; }
   .hero-with-slider .tagline{ font-size:17px !important; }
   .hero-with-slider p{ font-size:clamp(14px,1.1vw,16.5px) !important; margin-bottom:20px !important; }
@@ -712,7 +719,7 @@
        تعديلات المقاس السابقة متحلش المشكلة الحقيقية. الحل: نستخدم Readex
        Pro (الخط الأساسي الواضح في الموقع) بدل Rakkas في المقاسات الصغيرة
        دي بس، ونسيب Rakkas في الديسكتوب فوق حيث المقاس يكفي لزخرفته. */
-    .hero-with-slider h1{ font-size:clamp(17px,5vw,28px) !important; margin-bottom:8px !important; line-height:1.28 !important; font-family:'Readex Pro', sans-serif !important; font-weight:700 !important; }
+    .hero-with-slider h1{ font-size:clamp(20px,5.6vw,32px) !important; margin-bottom:8px !important; line-height:1.28 !important; font-family:'Readex Pro', sans-serif !important; font-weight:700 !important; }
     .hero-with-slider .eyebrow{ font-size:12.5px !important; margin-bottom:6px !important; }
     .hero-with-slider .tagline{ font-size:12.5px !important; }
     .hero-with-slider p{ font-size:clamp(11px,2.6vw,14.5px) !important; margin-bottom:0 !important; }
@@ -738,7 +745,7 @@
     .hero-with-slider .slider-controls-row{ flex-shrink:0; }
   }
   @media(max-width:480px){
-    .hero-with-slider h1{ font-size:clamp(14px,4.4vw,20px) !important; }
+    .hero-with-slider h1{ font-size:clamp(17px,5vw,24px) !important; }
     .hero-with-slider .trust-checks{ display:none; } /* first to go when truly tight on space */
     .hero-text-frame{ padding:9px 8px; border-radius:12px; }
   }
@@ -872,6 +879,22 @@
     <div class="grid" id="favoritesGrid"></div>
   </div>
   <div class="grid-page-dots" id="gridDots-favorites"></div>
+</section>
+
+<!-- سلة المنتجات (15 سبتمبر 2026): نفس معمارية "المفضلة" بالظبط —
+     نفس نمط الحفظ محليًا + المزامنة مع الحساب عند تسجيل الدخول، ونفس
+     أسلوب القسم/الكارت. الفرق الوحيد: عداد ظاهر فوق زرار الهمبرجر/الأفاتار
+     نفسه (نفس الزرار سواء كان بيعرض صورة البروفايل أو أيقونة الخطوط —
+     راجع header-avatar-replaces-hamburger-icon)، وبيختفي تلقائيًا لما
+     المنتج يتم شراؤه فعليًا (مش مجرد إزالته يدويًا من السلة). -->
+<section class="cat-section" id="cartSection" style="display:none;">
+  <div class="section-head">
+    <h2 data-i18n="cartSectionTitle">سلتي</h2>
+  </div>
+  <div class="grid-nav-wrap">
+    <div class="grid" id="cartGrid"></div>
+  </div>
+  <div class="grid-page-dots" id="gridDots-cart"></div>
 </section>
 
 <section class="cat-section" id="categoryTiles">
@@ -1243,6 +1266,7 @@
         <a href="/categories/business/">أعمال</a>
       </div>
       <div class="footer-links footer-legal-links">
+        <a href="about.html" data-i18n="footerAbout">قصتنا</a>
         <a href="terms.html" data-i18n="footerTerms">شروط الاستخدام</a>
         <a href="privacy.html" data-i18n="footerPrivacy">سياسة الخصوصية</a>
         <a href="refund.html" data-i18n="footerRefund">سياسة الاسترجاع</a>
@@ -1654,6 +1678,10 @@
     </div>
     <button type="button" class="drawer-link-row" id="drawerFavBtn" style="display:none;">
       <span><span data-i18n="favSectionTitle">قائمتي المفضلة</span> <span id="drawerFavCount" class="drawer-fav-count"></span></span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
+    </button>
+    <button type="button" class="drawer-link-row" id="drawerCartBtn" style="display:none;">
+      <span><span data-i18n="cartSectionTitle">سلتي</span> <span id="drawerCartCount" class="drawer-fav-count"></span></span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg>
     </button>
     <button type="button" class="drawer-link-row" id="drawerTrackBtn">

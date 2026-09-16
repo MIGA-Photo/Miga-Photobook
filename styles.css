@@ -518,16 +518,35 @@
   .hamburger-btn{
     display:flex; background:transparent; border:1px solid var(--line); color:var(--paper);
     width:40px; height:40px; border-radius:50%; align-items:center; justify-content:center;
-    flex-shrink:0; overflow:hidden;
+    flex-shrink:0; position:relative;
   }
   /* لما العميل يكون مسجّل دخول وعنده صورة بروفايل، #hamburgerAvatarImg
      بيحل محل #hamburgerMenuIcon جوه نفس الزرار (شايف JS في
      populateDrawerProfileFields) — الزرار نفسه مابيتغيرش حجمه أو مكانه،
      فمفيش أي خطورة على توسيط اسم الموقع بجنبه. الصورة بقت بتملأ الدائرة
      بالكامل (40×40) بدل ما تكون صورة صغيرة (26×26) عايمة جوه إطار أكبر —
-     أوضح وأعلى جودة ظاهرة، بنفس الإحساس اللي جوه الدرج بالظبط. */
+     أوضح وأعلى جودة ظاهرة، بنفس الإحساس اللي جوه الدرج بالظبط.
+     15 سبتمبر 2026: overflow:hidden اتنقل من هنا لـ.hamburger-icon-clip
+     (span جديد لافّ الصورة/الأيقونة بس) عشان عداد السلة الجديد (كمان جوه
+     الزرار ده) يقدر يبان شويه بره حدود الدائرة (ركن الزرار) من غير ما
+     يتقص — الزرار نفسه (بحدوده المربعة 40×40) فضل زي ما هو تمامًا. */
+  .hamburger-icon-clip{
+    width:100%; height:100%; border-radius:50%; overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+  }
   .hamburger-btn img{
     width:40px; height:40px; border-radius:50%; object-fit:cover; flex-shrink:0;
+  }
+  /* عداد السلة الظاهر على زرار الهمبرجر/الأفاتار — نفس الزرار سواء أظهر
+     أيقونة القائمة (زائر) أو صورة البروفايل (بعد تسجيل الدخول)، فبيغطي
+     الحالتين اللي طلبهم ماجدي بزرار واحد بس من غير أي عنصر هيدر جديد
+     (يحافظ على توسيط اللوجو - راجع header-overlap-root-cause-absolute-centering). */
+  .cart-badge{
+    position:absolute; top:-3px; inset-inline-end:-3px; z-index:2;
+    min-width:18px; height:18px; padding:0 4px; border-radius:999px;
+    background:#e05252; color:#fff; font-size:11px; font-weight:700; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    border:2px solid var(--ink);
   }
   /* ⚠ كان بيظهر في الوضع المطوي بس. بقى الباب **الوحيد** للحساب بعد شيل
      زرار التسجيل — وشريط وضع «الشكل الحالي» مافيهوش أي مدخل للحساب خالص،
@@ -650,17 +669,18 @@
     background:radial-gradient(circle at 35% 30%, rgba(232,182,74,0.22), rgba(232,182,74,0.05) 70%);
     border:1px solid rgba(232,182,74,0.35);
   }
-  /* تحديث 15 سبتمبر 2026: شارة الهيدر والفوتر (الاتنين) بقوا يحملوا صورة
-     (.logo-mark-img) بدل SVG خطي — نسخة مقصوصة من التصميم الذهبي المجسّم
-     اللي بعته ماجدي، على الأيقونة بس (من غير الحلقة ولا الاسم المطبوعين في
-     الصورة الأصلية، عشان كانوا هيبانوا غير واضحين في مقاس صغير ومكررين مع
-     اسم الموقع الحي جنبهم). الحلقة الذهبية "الواضحة" اللي طلبها ماجدي
-     اتعملت بحدّ CSS هنا (2px بدل 1px، ولون أصلب) حوالين الشارة نفسها بدل ما
-     تتولد من بكسلات الصورة — كده بتفضل حادة وواضحة في أي مقاس شاشة.
+  /* تحديث 15 سبتمبر 2026 (مراجعة ثانية): ماجدي أوضح إنه عايز الحلقة الذهبية
+     "بنفس الشكل تمام" زي الصورة اللي بعتها بالظبط — مش حلقة CSS بديلة.
+     الصورة اتعدّلت (الحلقة + الأيقونة موجودين بالكامل زي الأصل، والنص
+     المطبوع تحت الأيقونة بس اتشال/اتغطى بخلفية متطابقة، لأنه هيبقى غير
+     مقروء في مقاس 34-40px وهو مكرر أصلاً مع اسم الموقع الحي جنبه) — فبقت
+     الحلقة نفسها جزء من بكسلات الصورة. الحدّ/التوهج اللي كان بيتولد بـCSS
+     اتشال هنا عشان ما تتكررش حلقتين فوق بعض؛ خلفية الشارة الأساسية
+     (radial-gradient + border 1px من قاعدة .logo-badge) كمان بتتشال هنا
+     عشان الصورة نفسها بقت تغطي الدائرة بالكامل (حلقة + خلفية غامقة).
      درج القائمة الجانبية لسه بالعلامة القديمة (SVG) — ماجدي ماطلبش تغييره. */
   .logo .logo-badge, .footer-lockup .logo-badge{
-    border-width:2px; border-color:rgba(232,182,74,0.75);
-    box-shadow:0 0 0 1px rgba(232,182,74,0.15), 0 2px 10px -2px rgba(232,182,74,0.5);
+    border:none; background:transparent; box-shadow:none;
   }
   .logo .logo-badge .logo-mark-img, .footer-lockup .logo-badge .logo-mark-img{
     width:100%; height:100%; object-fit:cover; display:block; border-radius:50%;
@@ -1857,6 +1877,26 @@
   .cat-tile-cover .fav-btn{inset-inline-end:auto; inset-inline-start:8px; width:30px; height:30px;}
   .cat-tile-cover .fav-btn svg{width:16px; height:16px;}
 
+  /* زرار "أضِفه للسلة" — نفس معمارية زرار القلب بالظبط بس في الركن
+     المقابل (بداية الكارت بدل نهايته) عشان الاتنين يتعايشوا من غير تداخل،
+     ولونه ذهبي (نفس لون العلامة) بدل الوردي/البراص المستخدم في القلب لما
+     يتفعّل، عشان يتفرق بصريًا عن المفضلة رغم تشابه الشكل. */
+  .cart-btn{
+    opacity:0.78;
+    position:absolute; inset-inline-start:8px; bottom:8px; z-index:3;
+    width:34px; height:34px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(12,12,16,0.72); border:1px solid rgba(255,255,255,0.16);
+    color:var(--paper); cursor:pointer; padding:0;
+    transition:background .15s ease, color .15s ease, transform .15s ease;
+  }
+  .cart-btn svg{width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linejoin:round;}
+  .card:hover .cart-btn{ opacity:1; }
+  .cart-btn:hover{background:rgba(255,201,77,0.16); color:var(--brass); opacity:1;}
+  .cart-btn:active{transform:scale(0.92);}
+  .cart-btn:focus-visible{outline:2px solid var(--brass); outline-offset:2px;}
+  .cart-btn.in-cart{color:var(--brass); border-color:rgba(255,201,77,0.55); background:rgba(255,201,77,0.14);}
+
   .card-body{padding:18px 18px 20px; display:flex; flex-direction:column; gap:11px; flex:1;}
   .card-title{font-size:16px; font-weight:600; color:var(--paper); line-height:1.4;}
   .card-price{
@@ -2061,11 +2101,22 @@
   .status-approved{background:rgba(79,240,192,0.22); color:var(--sage);}
   .status-rejected{background:rgba(224,122,122,0.15); color:#e07a7a;}
   .status-underpaid{background:rgba(224,122,122,0.15); color:#e07a7a;}
-  .order-verify-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:6px;}
-  .order-verify-input{width:140px; max-width:100%;}
+  /* توحيد شكل أزرار قسم الطلبات (رفض/تحقق ووافق/حقل المبلغ) — كانوا بأشكال
+     وارتفاعات مختلفة (الحقل بستايل المتصفح الافتراضي الأبيض، وزرار الرفض
+     بعرض متغيّر حسب المساحة المتبقية). الحل: صف عمودي ثابت، كل عنصر ياخد
+     العرض الكامل، ونفس الحشو/الاستدارة/حجم الخط في كل مكان (طلب ماجدي). */
+  .order-verify-row{display:flex; gap:8px; align-items:stretch; width:100%; margin-top:6px;}
+  .order-verify-input{
+    flex:1; min-width:0; box-sizing:border-box;
+    background:var(--ink); border:1px solid var(--line); border-radius:6px;
+    padding:9px 10px; color:var(--paper); font-size:var(--text-sm); font-family:inherit;
+  }
+  .order-verify-input:focus{ outline:none; border-color:var(--brass); box-shadow:0 0 0 3px rgba(255,201,77,0.18); }
+  .order-verify-input::placeholder{ color:var(--paper-dim); }
+  .order-verify-row .buy-btn{flex:0 0 auto; white-space:nowrap; padding:9px 16px; border-radius:6px; font-size:var(--text-sm);}
   .order-underpaid-note{color:#e07a7a; font-weight:600; font-size:var(--text-sm);}
-  .order-actions{display:flex; gap:8px; margin-top:8px;}
-  .order-actions button{flex:1; padding:7px; border-radius:6px; font-size:var(--text-sm);}
+  .order-actions{display:flex; flex-direction:column; gap:8px; margin-top:8px;}
+  .order-actions > button{width:100%; box-sizing:border-box; padding:9px; border-radius:6px; font-size:var(--text-sm);}
 
   /* التوست ماكانش بيتخفي فعليًا — كان بس بيتزحلق لتحت بـ translateY(120%)
      وبيعتمد إن الإزاحة دي تخرجه بره حافة الشاشة. على bottom:24px الإزاحة

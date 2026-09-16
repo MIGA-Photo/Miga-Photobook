@@ -375,6 +375,7 @@ const translations = {
     footerQuickLinksTitle:'روابط سريعة', footerTrustTitle:'ليه تثق فينا', footerContactTitle:'تواصل معنا',
     footerContactWa:'واتساب', footerContactIg:'إنستجرام',
     footerAddress:'الجيزة - مصر',
+    footerAbout:'قصتنا',
     trustDesc1:'كل صورة بتتراجع بعنايه قبل ما توصلك', trustDesc2:'أساليب وتقنيات جديدة بتتضاف باستمرار',
     trustDesc3:'بترد عليك بنفسنا لو احتجت أي مساعدة', trustDesc4:'صورك تُعالَج بأمان، ولا تُباع ولا تُستخدم في التسويق',
     lockOverlayText:'يتم تحويل صورتك بعد الشراء', ownedPill:'✓ تم الشراء',
@@ -413,6 +414,8 @@ const translations = {
     favSectionTitle:'قائمتي المفضلة', favAddTitle:'ضيفها لقائمتي المفضلة', favRemoveTitle:'شيلها من المفضلة',
     favCatAddTitle:'ثبّت القسم ده في الأول', favCatRemoveTitle:'شيل تثبيت القسم',
     toastFavAdded:'اتضافت لقائمتك المفضلة ❤', toastFavRemoved:'اتشالت من المفضلة',
+    cartSectionTitle:'سلتي', cartAddTitle:'ضيفه للسلة', cartRemoveTitle:'شيله من السلة',
+    toastCartAdded:'اتضاف للسلة 🛒', toastCartRemoved:'اتشال من السلة',
     toastFavCatAdded:'تم تثبيت القسم في أول القائمة', toastFavCatRemoved:'تم إلغاء تثبيت القسم',
     promptLibraryHeading:'مكتبة البرومبتات للمحترفين — اشترِ البرومبت الاحترافي بمفرده، من غير تحويل صورة',
     promptLibraryModeTitle:'وضع مكتبة البرومبتات للمحترفين', promptLibraryModeIntro:'"الوضع الحالي" يسيب قسم "فاخر" فاضي زي ما هو. "الوضع الجديد" يحوّل نفس القسم لمكتبة برومبتات تجمع تلقائيًا كل منتجات الموقع من كل الأقسام لبيع البرومبت بمفرده، وبيشيل سطر "شراء البرومبت لوحده" من باقي كروت الأقسام العادية (بيفضل ظاهر بس هنا). تقدر ترجع للوضع الحالي في أي وقت من غير أي فقدان بيانات.',
@@ -744,6 +747,7 @@ const translations = {
     footerQuickLinksTitle:'Quick Links', footerTrustTitle:'Why trust us', footerContactTitle:'Contact us',
     footerContactWa:'WhatsApp', footerContactIg:'Instagram',
     footerAddress:'Giza - Egypt',
+    footerAbout:'Our Story',
     trustDesc1:'Every photo is carefully reviewed before it reaches you', trustDesc2:'New styles and techniques added all the time',
     trustDesc3:'We reply ourselves whenever you need help', trustDesc4:'Your photos are processed securely, never sold or used for marketing',
     lockOverlayText:'Your photo gets transformed after purchase', ownedPill:'✓ Purchased',
@@ -782,6 +786,8 @@ const translations = {
     favSectionTitle:'My Favorites', favAddTitle:'Add to my favorites', favRemoveTitle:'Remove from favorites',
     favCatAddTitle:'Pin this category first', favCatRemoveTitle:'Unpin this category',
     toastFavAdded:'Added to your favorites ❤', toastFavRemoved:'Removed from favorites',
+    cartSectionTitle:'My Cart', cartAddTitle:'Add to cart', cartRemoveTitle:'Remove from cart',
+    toastCartAdded:'Added to your cart 🛒', toastCartRemoved:'Removed from cart',
     toastFavCatAdded:'Category pinned to the front', toastFavCatRemoved:'Category unpinned',
     promptLibraryHeading:'Prompt Library for Professionals — buy the professional prompt on its own, no photo transformation needed',
     promptLibraryModeTitle:'Prompt Library for Professionals mode', promptLibraryModeIntro:'"Current mode" leaves the empty "Luxury" category as-is. "New mode" turns that same slot into a prompt library that automatically gathers every product from every category to sell its prompt alone, and removes the "buy the prompt alone" line from other category cards (it stays visible here only). You can switch back at any time with no data loss.',
@@ -1574,6 +1580,12 @@ let packageCredits = {}; // { [orderCode]: { size, remaining, usedProductIds: []
 //                   first without hiding anything from anyone else.
 let favorites = [];
 let favCategories = [];
+// سلة المنتجات (15 سبتمبر 2026): نفس نمط favorites بالظبط (مصفوفة IDs
+// محفوظة محليًا + مزامنة مع الحساب لو مسجل دخول) — راجع toggleCart/renderCart
+// تحت وendpoints /account/cart/* في الووركر. القرار المتعمد: من غير كمية لكل
+// منتج، لأن كل "منتج" هنا أسلوب تحويل صورة واحد بيتشرى مرة واحدة، مش سلعة
+// بكمية — بالظبط زي المفضلة تمامًا في الشكل.
+let cart = [];
 async function loadPurchases(){
   try{
     const raw = localStorage.getItem('megaPromptPurchases');
@@ -1611,6 +1623,10 @@ async function loadPurchases(){
     const parsed = JSON.parse(localStorage.getItem('megaPromptFavCategories'));
     favCategories = Array.isArray(parsed) ? parsed : [];
   }catch(e){ favCategories = []; }
+  try{
+    const parsed = JSON.parse(localStorage.getItem('megaPromptCart'));
+    cart = Array.isArray(parsed) ? parsed : [];
+  }catch(e){ cart = []; }
 }
 
 function saveFavorites(){
@@ -1618,6 +1634,11 @@ function saveFavorites(){
   catch(e){ /* private mode / quota — the list just doesn't survive this visit */ }
   try{ localStorage.setItem('megaPromptFavCategories', JSON.stringify(favCategories)); }
   catch(e){}
+}
+
+function saveCart(){
+  try{ localStorage.setItem('megaPromptCart', JSON.stringify(cart)); }
+  catch(e){ /* private mode / quota — the cart just doesn't survive this visit */ }
 }
 
 /** The heart shown on a product photo. Rendered as part of the card's HTML
@@ -1659,6 +1680,68 @@ function toggleFavorite(id){
 
   renderFavorites();
   showToast(t(nowFav ? 'toastFavAdded' : 'toastFavRemoved'));
+}
+
+/** Cart toggle icon shown on a product card (opposite corner from the
+ * favourites heart) — same data-attribute-driven "flip every copy in place"
+ * pattern as favBtnHtml/toggleFavorite above. */
+function cartBtnHtml(id){
+  const on = cart.includes(id);
+  const label = t(on ? 'cartRemoveTitle' : 'cartAddTitle');
+  return `<button type="button" class="cart-btn${on ? ' in-cart' : ''}" data-cart="${escapeHtml(id)}"
+    onclick="event.stopPropagation(); toggleCart('${id}')"
+    title="${label}" aria-label="${label}" aria-pressed="${on ? 'true' : 'false'}">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.4" fill="currentColor" stroke="none"/><circle cx="18" cy="20" r="1.4" fill="currentColor" stroke="none"/><path d="M2.5 3h2l2.2 11.4a2 2 0 0 0 2 1.6h8.1a2 2 0 0 0 2-1.6L21 7H5.3"/></svg>
+  </button>`;
+}
+
+/** Adds/removes a product from the cart. Mirrors toggleFavorite exactly
+ * (local save → server push if logged in → flip every button copy in place →
+ * re-render the cart section + every badge that shows its count). Never
+ * blocks or delays on the network — the local state (and the button/badge
+ * feedback) is authoritative for this browser instantly, same as favorites. */
+function toggleCart(id){
+  const i = cart.indexOf(id);
+  const nowIn = i === -1;
+  if(nowIn) cart.unshift(id); else cart.splice(i, 1);
+  saveCart();
+  if(currentUser){ nowIn ? addCartOnServer(id) : removeCartOnServer(id); }
+
+  document.querySelectorAll('.cart-btn').forEach(btn=>{
+    if(btn.getAttribute('data-cart') !== id) return;
+    const label = t(nowIn ? 'cartRemoveTitle' : 'cartAddTitle');
+    btn.classList.toggle('in-cart', nowIn);
+    btn.setAttribute('aria-pressed', nowIn ? 'true' : 'false');
+    btn.setAttribute('aria-label', label);
+    btn.title = label;
+  });
+
+  renderCart();
+  showToast(t(nowIn ? 'toastCartAdded' : 'toastCartRemoved'));
+}
+
+/** Silently drops a product from the cart once it's actually been bought —
+ * called from every "purchase completed" moment (paid order approved, free
+ * launch-promo claim, package-credit redemption), never from a manual
+ * removal. Best-effort and a no-op if the product wasn't in the cart, so it's
+ * always safe to call from any purchase path without checking first. This is
+ * what makes the badge on the header button disappear once a cart item is
+ * actually purchased, per Magdy's explicit requirement — not just removed by
+ * hand. */
+function removeFromCartAfterPurchase(id){
+  const i = cart.indexOf(id);
+  if(i === -1) return;
+  cart.splice(i, 1);
+  saveCart();
+  if(currentUser) removeCartOnServer(id);
+  document.querySelectorAll('.cart-btn').forEach(btn=>{
+    if(btn.getAttribute('data-cart') !== id) return;
+    btn.classList.remove('in-cart');
+    btn.setAttribute('aria-pressed', 'false');
+    btn.setAttribute('aria-label', t('cartAddTitle'));
+    btn.title = t('cartAddTitle');
+  });
+  renderCart();
 }
 
 function toggleFavCategory(cat){
@@ -1727,6 +1810,58 @@ function updateFavDrawerRow(count){
   if(!row) return;
   row.style.display = count > 0 ? '' : 'none';
   if(badge) badge.textContent = count > 0 ? String(count) : '';
+}
+
+/** The cart's own section — same shortlist pattern as renderFavorites(),
+ * including the exact same card (so its own "buy now" button is the real,
+ * already-audited single-item checkout — checkout out of the cart is just
+ * clicking that button on each item here, one at a time, never a combined
+ * multi-item payment). A product bought elsewhere on the site (or that lost
+ * its photo) is filtered out defensively even if removeFromCartAfterPurchase
+ * was somehow missed, so a stale card can never linger here. */
+function renderCart(){
+  const section = document.getElementById('cartSection');
+  const grid = document.getElementById('cartGrid');
+  const dots = document.getElementById('gridDots-cart');
+  if(!section || !grid) return;
+
+  const items = cart
+    .map(id => products.find(p => p.id === id))
+    .filter(p => p && p.image && p.image !== PLACEHOLDER_IMG && !purchases.includes(p.id));
+
+  updateCartDrawerRow(items.length);
+
+  if(!items.length){
+    section.style.display = 'none';
+    grid.innerHTML = '';
+    if(dots) dots.innerHTML = '';
+    return;
+  }
+  section.style.display = '';
+  grid.innerHTML = items.map(p => renderProductCard(p)).join('');
+  buildRowArrows('cart', dots, grid);
+}
+
+/** Updates every place the cart count shows: the drawer's own row (same
+ * pattern as updateFavDrawerRow), AND the badge on the header hamburger/
+ * avatar button itself — the one Magdy asked for specifically, visible
+ * without opening anything, whether that button currently shows the plain
+ * menu icon (guest / not logged in yet) or the customer's own profile photo
+ * (logged in) — same button either way, see header-avatar-replaces-
+ * hamburger-icon. Disappears the moment the count reaches zero, whether that
+ * happened from a manual removal or an actual completed purchase. */
+function updateCartDrawerRow(count){
+  const row = document.getElementById('drawerCartBtn');
+  const rowBadge = document.getElementById('drawerCartCount');
+  if(row){
+    row.style.display = count > 0 ? '' : 'none';
+    if(rowBadge) rowBadge.textContent = count > 0 ? String(count) : '';
+  }
+  const headerBadge = document.getElementById('hamburgerCartBadge');
+  if(headerBadge){
+    headerBadge.style.display = count > 0 ? 'flex' : 'none';
+    headerBadge.textContent = count > 9 ? '9+' : String(count);
+  }
 }
 async function savePurchases(){
   try{ localStorage.setItem('megaPromptPurchases', JSON.stringify(purchases)); }
@@ -2031,6 +2166,7 @@ function renderGrids(){
   });
   renderCatTiles();
   renderFavorites();
+  renderCart();
 }
 
 /** Fills in a category row that renderGrids() deliberately left empty because
@@ -2227,14 +2363,12 @@ function scrollRow(key, direction){
   const cardRect = targetCard.getBoundingClientRect();
   const targetScrollLeft = rowEl.scrollLeft + (cardRect.left + cardRect.width/2) - (rowRect.left + rowRect.width/2);
 
-  const headerH = stickyTopGroup ? stickyTopGroup.getBoundingClientRect().height : 0;
-  const GAP = 10;
-  const targetScrollTop = window.scrollY + cardRect.top - headerH - GAP;
-
+  // ملحوظة (طلب ماجدي صراحةً): الأسهم بتتحكم في السلايدر الأفقي بس — الصفحة
+  // نفسها ماتتحركش رأسيًا خالص عند الضغط عليها. النسخة القديمة كانت بتزحزح
+  // window.scrollY كمان عشان "تحطّ" الكارت تحت الهيدر اللاصق، وده كان بيبان
+  // كأن كل الكروت بتنزل لتحت مع كل ضغطة سهم — على الموبايل واللابتوب الاتنين.
   const startLeft = rowEl.scrollLeft;
-  const startTop = window.scrollY;
   const deltaLeft = targetScrollLeft - startLeft;
-  const deltaTop = targetScrollTop - startTop;
   const duration = 320;
   const startTime = performance.now();
 
@@ -2242,7 +2376,6 @@ function scrollRow(key, direction){
     const t = Math.min(1, (now - startTime) / duration);
     const ease = t*t*(3-2*t); // smoothstep — matches the feel scrollIntoView('smooth') gave, without delegating to it
     rowEl.scrollTo({ left: startLeft + deltaLeft*ease, behavior:'instant' });
-    window.scrollTo({ top: startTop + deltaTop*ease, behavior:'instant' });
     if(t < 1) requestAnimationFrame(step);
   }
   requestAnimationFrame(step);
@@ -2317,6 +2450,7 @@ function renderProductCard(p, opts){
       <span class="card-badge">${escapeHtml(productTitle(p))}</span>
       ${requestCount > 0 ? `<span class="request-count-overlay" title="${t('popularityCountTitle')}">🔥 ${requestCount}</span>` : ''}
       ${favBtnHtml(p.id)}
+      ${!owned ? cartBtnHtml(p.id) : ''}
     </div>
     <div class="card-body">
       <div class="card-title" onclick="openProductDetail('${p.id}')" style="cursor:pointer;">${escapeHtml(productTitle(p))}</div>
@@ -2714,6 +2848,7 @@ async function claimFree(id){
     if(!purchases.includes(id)) purchases.push(id);
     if(data.code) orderCodes[id] = data.code;
     await savePurchases();
+    removeFromCartAfterPurchase(id);
     renderGrids();
     showToast(t('toastFreeUnlocked'));
   }catch(e){
@@ -3169,6 +3304,7 @@ function usePackageCredit(productId){
   orderCodes[productId] = pkg.code;
   if(!purchases.includes(productId)) purchases.push(productId);
   savePurchases();
+  removeFromCartAfterPurchase(productId);
   renderGrids();
   openTransformModal(productId);
 }
@@ -3267,6 +3403,12 @@ function showOrderStatusPanel(productId, code, orderType){
         }else{
           if(!purchases.includes(productId)) purchases.push(productId);
           orderCodes[productId] = order.code || code;
+          // The one moment this actually matters per Magdy's spec: a paid,
+          // fully-approved single-item order (never on 'underpaid' — the
+          // item stays in the cart until the payment issue is actually
+          // resolved) removes that item from the cart and makes its badge
+          // count drop, right when the purchase truly completes.
+          removeFromCartAfterPurchase(productId);
         }
         await savePurchases();
         renderGrids();
@@ -5061,8 +5203,9 @@ async function syncAccountDataFromServer(){
   const token = localStorage.getItem('megaPromptAuthToken');
   if(!token || !BACKEND_BASE) return;
   try{
-    const [favRes, ordersRes] = await Promise.all([
+    const [favRes, cartRes, ordersRes] = await Promise.all([
       fetch(`${BACKEND_BASE}/account/favorites`, { headers: authHeader() }),
+      fetch(`${BACKEND_BASE}/account/cart`, { headers: authHeader() }),
       fetch(`${BACKEND_BASE}/account/orders`, { headers: authHeader() }),
     ]);
 
@@ -5077,6 +5220,21 @@ async function syncAccountDataFromServer(){
       // Anything favourited on this device before logging in (or offline)
       // wasn't on the server yet — push it up now so it's on every device.
       localOnlyIds.forEach(id => addFavoriteOnServer(id));
+    }
+
+    // Same merge logic as favorites just above, for the cart: this is exactly
+    // what makes a guest's cart (picked before ever logging in, on this or
+    // any other device) survive a login/logout/device switch — the server's
+    // list wins as the base, anything only sitting locally gets pushed up so
+    // it's there next time too, and nothing already chosen is ever dropped.
+    if(cartRes.ok){
+      const { productIds } = await cartRes.json();
+      const serverIds = productIds || [];
+      const localOnlyIds = cart.filter(id => !serverIds.includes(id));
+      cart = Array.from(new Set([...serverIds, ...cart]));
+      saveCart();
+      renderCart();
+      localOnlyIds.forEach(id => addCartOnServer(id));
     }
 
     if(ordersRes.ok){
@@ -5122,6 +5280,26 @@ async function removeFavoriteOnServer(productId){
       body: JSON.stringify({ productId }),
     });
   }catch(e){ /* best-effort — the heart already saved locally either way */ }
+}
+
+async function addCartOnServer(productId){
+  if(!BACKEND_BASE) return;
+  try{
+    await fetch(`${BACKEND_BASE}/account/cart/add`, {
+      method:'POST', headers:{ 'Content-Type':'application/json', ...authHeader() },
+      body: JSON.stringify({ productId }),
+    });
+  }catch(e){ /* best-effort — already saved locally either way */ }
+}
+
+async function removeCartOnServer(productId){
+  if(!BACKEND_BASE) return;
+  try{
+    await fetch(`${BACKEND_BASE}/account/cart/remove`, {
+      method:'POST', headers:{ 'Content-Type':'application/json', ...authHeader() },
+      body: JSON.stringify({ productId }),
+    });
+  }catch(e){ /* best-effort — already saved locally either way */ }
 }
 
 function updateAccountButton(){
@@ -5248,6 +5426,13 @@ function initSideDrawer(){
       // Same scroll helper every other jump on the page uses, so the section
       // lands below the sticky header instead of behind it.
       scrollToSectionBelowHeader(document.getElementById('favorites'));
+    };
+  }
+  const drawerCartBtn = document.getElementById('drawerCartBtn');
+  if(drawerCartBtn){
+    drawerCartBtn.onclick = ()=>{
+      closeDrawer();
+      scrollToSectionBelowHeader(document.getElementById('cartSection'));
     };
   }
 
