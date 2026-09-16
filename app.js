@@ -1709,6 +1709,27 @@ function toggleCart(id){
   saveCart();
   if(currentUser){ nowIn ? addCartOnServer(id) : removeCartOnServer(id); }
 
+  // Cart funnel tracking (added 2026-09-16 — was previously the one real
+  // gap in funnel coverage: begin_checkout/add_payment_info/purchase were
+  // already tracked, but adding/removing a cart item fired nothing).
+  // GA4's own standard e-commerce spec names 'add_to_cart' as a standard
+  // event; Meta has 'AddToCart' as standard but no equivalent for removal,
+  // so removal goes through trackCustom like the other soft-signal events.
+  {
+    const cp = products.find(x => x.id === id) || {};
+    if(nowIn){
+      trackFunnelEvent(
+        'add_to_cart', { currency:'EGP', value: cp.price || 0, items:[{ item_id:id, item_name: cp.title || '', price: cp.price || 0 }] },
+        'AddToCart', { currency:'EGP', value: cp.price || 0, content_ids:[id], content_name: cp.title || '' }
+      );
+    } else {
+      trackFunnelEvent(
+        'remove_from_cart', { currency:'EGP', value: cp.price || 0, items:[{ item_id:id, item_name: cp.title || '' }] },
+        'RemoveFromCart', { content_ids:[id] }, true
+      );
+    }
+  }
+
   document.querySelectorAll('.cart-btn').forEach(btn=>{
     if(btn.getAttribute('data-cart') !== id) return;
     const label = t(nowIn ? 'cartRemoveTitle' : 'cartAddTitle');
