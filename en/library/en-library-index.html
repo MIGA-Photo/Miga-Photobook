@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Photo & Style Library | Miga-Photobook</title>
+<meta name="description" content="Browse all available Miga-Photobook styles, preview any image, save favorites, or add styles to your cart before checkout.">
+<link rel="stylesheet" href="/styles.css">
+</head>
+
+<body class="catalog-page">
+<main class="catalog-page-inner" style="max-width:1180px;margin:0 auto;padding:28px 18px 70px">
+<header class="catalog-head">
+<a href="/" class="brand" style="display:inline-block;margin-bottom:18px">Miga-Photobook</a>
+
+<h1>Photo & Style Library</h1>
+<p>Browse the available styles, preview any result, save your favorites, or use the small cart icon to save your choice before checkout.</p>
+
+</header>
+
+<nav class="catalog-tools" id="filters" aria-label="Filter by category"></nav>
+<section id="catalogGrid" class="catalog-grid" aria-live="polite">
+<div class="catalog-status">Loading styles…</div>
+</section>
+
+<a href="/" class="catalog-back">← Back to homepage</a>
+</main>
+
+<div id="catalogToast" class="catalog-toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+
+var API='https://miga-photobook-api.magdyfarouk380.workers.dev';
+var grid=document.getElementById('catalogGrid');
+var filters=document.getElementById('filters');
+var toast=document.getElementById('catalogToast');
+var products=[];
+var selected='all';
+
+var cats={
+  all:'All',
+  children:'Children',
+  male:'Men',
+  female:'Women',
+  business:'Business',
+  cinematic:'Cinematic',
+  luxury:'Luxury',
+  artistic:'Artistic',
+  magazine:'Magazine'
+};
+
+function esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+function cart(){
+  try{
+    var x=JSON.parse(localStorage.getItem('megaPromptCart'));
+    return Array.isArray(x)?x:[];
+  }catch(e){return[]}
+}
+
+function saveCart(x){
+  try{localStorage.setItem('megaPromptCart',JSON.stringify(x))}catch(e){}
+}
+
+function favorites(){
+  try{
+    var x=JSON.parse(localStorage.getItem('megaPromptFavorites'));
+    return Array.isArray(x)?x:[];
+  }catch(e){return[]}
+}
+
+function saveFavorites(x){
+  try{localStorage.setItem('megaPromptFavorites',JSON.stringify(x))}catch(e){}
+}
+
+function authHeader(){
+  var t=localStorage.getItem('megaPromptAuthToken');
+  return t?{'Authorization':'Bearer '+t}:{};
+}
+
+function syncServer(id,add){
+  var token=localStorage.getItem('megaPromptAuthToken');
+  if(!token)return;
+  fetch(API+(add?'/account/cart/add':'/account/cart/remove'),{
+    method:'POST',
+    headers:Object.assign({'Content-Type':'application/json'},authHeader()),
+    body:JSON.stringify({productId:id})
+  }).catch(function(){});
+}
+
+function loadServerCart(){
+  var token=localStorage.getItem('megaPromptAuthToken');
+  if(!token)return Promise.resolve();
+
+  return fetch(API+'/account/cart',{
+    headers:authHeader(),
+    cache:'no-store'
+  }).then(function(r){
+    if(!r.ok)throw new Error('cart '+r.status);
+    return r.json();
+  }).then(function(d){
+    if(d&&Array.isArray(d.productIds))saveCart(d.productIds);
+  }).catch(function(){});
+}
+
+var toastTimer;
+function showToast(msg){
+  if(!toast)return;
+  toast.textContent=msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){toast.classList.remove('show')},1800);
+}
+
+function toggleCart(id){
+  var c=cart(),i=c.indexOf(id),add=i===-1;
+  if(add)c.unshift(id);else c.splice(i,1);
+  saveCart(c);
+  syncServer(id,add);
+  render();
+  showToast(add?'Added to cart':'Removed from cart');
+}
+
+function toggleFavorite(id){
+  var f=favorites(),i=f.indexOf(id),on=i===-1;
+  if(on)f.unshift(id);else f.splice(i,1);
+  saveFavorites(f);
+  render();
+  showToast(on?'Added to favorites':'Removed from favorites');
+}
+
+window.toggleCatalogCart=toggleCart;
+window.toggleCatalogFavorite=toggleFavorite;
+
+function renderFilters(){
+  var used={all:true};
+  products.forEach(function(p){if(p.category)used[p.category]=true});
+
+  filters.innerHTML=Object.keys(cats)
+    .filter(function(k){return used[k]})
+    .map(function(k){
+      return '<button type="button" class="catalog-filter'+
+        (selected===k?' active':'')+'" data-cat="'+k+'">'+cats[k]+'</button>';
+    }).join('');
+
+  filters.querySelectorAll('button').forEach(function(b){
+    b.onclick=function(){
+      selected=b.dataset.cat;
+      renderFilters();
+      render();
+    };
+  });
+}
+
+function render(){
+  var c=cart(),f=favorites();
+  var items=selected==='all'?products:products.filter(function(p){
+    return p.category===selected;
+  });
+
+  if(!items.length){
+    grid.innerHTML='<div class="catalog-status">No styles are currently available in this section.</div>';
+    return;
+  }
+
+  grid.innerHTML=items.map(function(p){
+    var inCart=c.indexOf(p.id)!==-1;
+    var inFav=f.indexOf(p.id)!==-1;
+    var title=p.titleEn||p.title||'';
+    var subtitle=p.subtitleEn||p.descriptionEn||p.subtitle||p.description||'Miga-Photobook style';
+    var safeId=esc(p.id).replace(/'/g,"\\'");
+    var favLabel=inFav?'Remove from favorites':'Add to favorites';
+    var cartLabel=inCart?'Remove from cart':'Add to cart';
+
+    return '<article class="catalog-card">'
+      +'<a class="catalog-media-link" href="/#product='+encodeURIComponent(p.id)+'" aria-label="Preview '+esc(title)+'">'
+      +'<div class="catalog-media"><img src="'+esc(p.image||'')+'" alt="'+esc(title)+'" loading="lazy" decoding="async"></div></a>'
+
+      +'<div class="catalog-body"><div class="catalog-title">'+esc(title)+'</div>'
+      +'<div class="catalog-subtitle">'+esc(subtitle)+'</div>'
+      +(Number(p.price)>0?'<div class="catalog-price">'+esc(p.price)+' EGP</div>':'')
+
+      +'<div class="catalog-card-actions">'
+      +'<button type="button" class="catalog-icon-btn catalog-fav'+(inFav?' is-fav':'')+'"'
+      +' onclick="toggleCatalogFavorite(\''+safeId+'\')"'
+      +' title="'+favLabel+'" aria-label="'+favLabel+'" aria-pressed="'+(inFav?'true':'false')+'">'
+      +'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3l-1.4-1.3C5.4 14.3 2 11.2 2 7.5 2 4.4 4.4 2 7.5 2c1.7 0 3.3.8 4.5 2.1C13.2 2.8 14.8 2 16.5 2 19.6 2 22 4.4 22 7.5c0 3.7-3.4 6.8-8.6 11.5L12 20.3z"/></svg></button>'
+
+      +'<button type="button" class="catalog-icon-btn catalog-cart'+(inCart?' in-cart':'')+'"'
+      +' onclick="toggleCatalogCart(\''+safeId+'\')"'
+      +' title="'+cartLabel+'" aria-label="'+cartLabel+'" aria-pressed="'+(inCart?'true':'false')+'">'
+      +'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.4" fill="currentColor" stroke="none"/><circle cx="18" cy="20" r="1.4" fill="currentColor" stroke="none"/><path d="M2.5 3h2l2.2 11.4a2 2 0 0 0 2 1.6h8.1a2 2 0 0 0 2-1.6L21 7H5.3"/></svg></button>'
+
+      +'</div>'
+      +'<button type="button" class="catalog-package-link" onclick="location.href=\'/#packages\'" aria-label="View packages">'
+      +'Save more with packages <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>'
+
+      +'</div></article>';
+  }).join('');
+}
+
+fetch(API+'/products',{cache:'no-store'})
+.then(function(r){
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return r.json();
+})
+.then(function(d){
+  try{products=JSON.parse(d.value||'[]')}catch(e){products=[]}
+  products=Array.isArray(products)?products.filter(function(p){return p&&p.id&&p.image}):[];
+  products.sort(function(a,b){return (a.order||0)-(b.order||0)});
+  renderFilters();
+  return loadServerCart();
+})
+.then(function(){render()})
+.catch(function(){
+  grid.innerHTML='<div class="catalog-status">Could not load the library right now. Please refresh in a moment.</div>';
+});
+
+})();
+</script>
+</body>
+</html>
