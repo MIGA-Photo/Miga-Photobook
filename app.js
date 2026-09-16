@@ -382,7 +382,7 @@ const translations = {
     trustDesc3:'بترد عليك بنفسنا لو احتجت أي مساعدة', trustDesc4:'صورك تُعالَج بأمان، ولا تُباع ولا تُستخدم في التسويق',
     lockOverlayText:'يتم تحويل صورتك بعد الشراء', ownedPill:'✓ تم الشراء',
     buyBtnPrefix:'✨ اعمل صورتي بهذا الستايل', emptyNoteCategory:'لا توجد منتجات في هذا القسم بعد — أضِف منتجات من لوحة الإدارة.',
-    cardPackageHint:'أو وفّر أكتر بالباقات ›',
+    cardPackageHint:'وفّر أكتر مع ميجا ›',
     buyModalTextTemplate:'شراء "{title}" مقابل {price} جنيه.',
     buyPromptModalTextTemplate:'شراء البرومبت الاحترافي لـ "{title}" مقابل {price} جنيه.',
     buyPackageModalTextTemplate:'شراء "{title}" مقابل {price} جنيه — تقدر تستخدمها على أي منتجات تختارها بعد التأكيد.',
@@ -754,7 +754,7 @@ const translations = {
     trustDesc3:'We reply ourselves whenever you need help', trustDesc4:'Your photos are processed securely, never sold or used for marketing',
     lockOverlayText:'Your photo gets transformed after purchase', ownedPill:'✓ Purchased',
     buyBtnPrefix:'✨ Create My Photo in This Style', emptyNoteCategory:'No products in this section yet — add products from the admin panel.',
-    cardPackageHint:'Or save more with bundles ›',
+    cardPackageHint:'Save more with Miga ›',
     buyModalTextTemplate:'Buy "{title}" for {price} EGP.',
     buyPromptModalTextTemplate:'Buy the professional prompt for "{title}" for {price} EGP.',
     buyPackageModalTextTemplate:'Buy "{title}" for {price} EGP — use it on any products you choose after confirmation.',
@@ -2445,27 +2445,35 @@ function renderProductCard(p, opts){
   const alreadyTransformed = !!transformedResults[p.id];
   const activePkg = !owned ? activePackageWithCredits() : null;
   const pkgAvailableHere = activePkg && !activePkg.usedProductIds.includes(p.id);
+  // زرار الشراء الأساسي — نفس الاختيارات القديمة بالظبط (مشترى/متحول/شراء
+  // مجاني/شراء عادي)، بس بقى دايمًا العنصر النصّي جوه .buy-row (مش الأول من
+  // كذا زرار متساوين في card-actions) عشان يبقى في نص الصف بين أيقونتي
+  // المفضلة والسلة (طلب ماجدي 16 سبتمبر: شيل زرار «أضف للسلة» النصّي، وحط
+  // أيقونة سلة صغيرة + المفضلة ملتصقين بطرفي زرار الشراء بدل ما يكونوا فوق
+  // صورة المنتج).
+  const mainBtnHtml = owned
+    ? (alreadyTransformed
+        ? `<button class="buy-btn" onclick="openTransformModal('${p.id}')">${t('viewResultBtn')}</button>`
+        : `<button class="buy-btn" onclick="openTransformModal('${p.id}')">${t('transformBtn')}</button>`)
+    : SOFT_LAUNCH
+      ? `<button class="buy-btn" onclick="claimFree('${p.id}')">${t('claimFreeBtn')}</button>`
+      : `<button class="buy-btn" onclick="openBuyModal('${p.id}', 'transform')">${t('buyBtnPrefix')} — ${p.price} ${CURRENCY}</button>`;
   return `
   <div class="card">
     <div class="card-media">
       <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" loading="lazy" decoding="async" onclick="openLightbox(this.src)" style="cursor:zoom-in;">
       <span class="card-badge">${escapeHtml(productTitle(p))}</span>
       ${requestCount > 0 ? `<span class="request-count-overlay" title="${t('popularityCountTitle')}">🔥 ${requestCount}</span>` : ''}
-      ${favBtnHtml(p.id)}
-      ${!owned ? cartBtnHtml(p.id) : ''}
     </div>
     <div class="card-body">
       <div class="card-title" onclick="openProductDetail('${p.id}')" style="cursor:pointer;">${escapeHtml(productTitle(p))}</div>
       ${owned ? `<span class="owned-pill">${t('ownedPill')}</span>` : ''}
       <div class="card-actions">
-        ${!owned ? `<button type="button" class="buy-btn cart-action-btn${cart.includes(p.id) ? ' in-cart' : ''}" onclick="toggleCart('${p.id}')" aria-pressed="${cart.includes(p.id) ? 'true' : 'false'}">${t(cart.includes(p.id) ? 'cartRemoveAction' : 'cartAddAction')}</button>` : ''}
-        ${owned
-          ? (alreadyTransformed
-              ? `<button class="buy-btn" onclick="openTransformModal('${p.id}')">${t('viewResultBtn')}</button>`
-              : `<button class="buy-btn" onclick="openTransformModal('${p.id}')">${t('transformBtn')}</button>`)
-          : SOFT_LAUNCH
-            ? `<button class="buy-btn" onclick="claimFree('${p.id}')">${t('claimFreeBtn')}</button>`
-            : `<button class="buy-btn" onclick="openBuyModal('${p.id}', 'transform')">${t('buyBtnPrefix')} — ${p.price} ${CURRENCY}</button>`}
+        <div class="buy-row">
+          ${favBtnHtml(p.id)}
+          ${mainBtnHtml}
+          ${!owned ? cartBtnHtml(p.id) : ''}
+        </div>
         ${pkgAvailableHere
           ? `<button class="buy-btn package-credit-btn" onclick="usePackageCredit('${p.id}')">${t('usePackageCreditBtnPrefix')} (${activePkg.remaining})</button>`
           : ''}
@@ -4246,6 +4254,13 @@ const stickyTopGroup = document.querySelector('.sticky-top-group');
  * header happens to be expanded or already collapsed from scrolling. */
 function scrollToSectionBelowHeader(el){
   if(!el) return;
+  // حراسة إضافية (16 سبتمبر 2026): لو العنصر مخفي فعلاً (display:none —
+  // مثلاً قسم لسه فاضي من المنتجات، أو اتشال من الصفحة قبل ما نوصله) بيرجّع
+  // getBoundingClientRect() صفر في كل حاجة. من غير الحراسة دي كان الحساب
+  // تحت بيطلع رقم مالوش معنى وبيودّي الزائر مكان بعيد تمامًا (لحد آخر
+  // الصفحة أحيانًا) بدل ما يفضل واقف مكانه من غير ما يتحرك أصلاً.
+  const r0 = el.getBoundingClientRect();
+  if(r0.width === 0 && r0.height === 0) return;
   // Force the collapsed header state BEFORE reading its height. Scrolling
   // to any product section always lands well past HEADER_COLLAPSE_THRESHOLD
   // (72px), so the header WILL end up collapsed by the time this animation
@@ -4775,9 +4790,25 @@ document.addEventListener('keydown', (e)=>{
   if(e.key === 'Escape') closeCatDropdown();
 });
 
-elById('catNav').addEventListener('click', (e)=>{
+// شريط الأقسام (#catNav) شريط قابل للسحب أفقيًا (overflow-x:auto) — على
+// الموبايل، لو الزائر بادئ يسحب الشريط (يمرّر على الأقسام) وصباعه لسه واقف
+// على زرار مختلف عن اللي بدأ منه لحظة ما السحب يخلص، المتصفح ساعات بيسجّل
+// ده كـ«click» عادي على الزرار اللي تحت الإصبع في اللحظة دي — يعني ممكن
+// يفتح قسم غير اللي الزائر قاصده أصلاً. بنسجّل مكان بداية اللمسة/الماوس هنا،
+// ولو الشريط نفسه اتحرك (scrollLeft) أكتر من ٦ بكسل قبل الـclick، نعتبرها
+// سحب مش اختيار قسم ونتجاهلها بدل ما نفتح قسم عشوائي.
+const catNavEl = elById('catNav');
+let catNavScrollAtPress = null;
+catNavEl.addEventListener('pointerdown', ()=>{ catNavScrollAtPress = catNavEl.scrollLeft; }, { passive:true });
+
+catNavEl.addEventListener('click', (e)=>{
   const btn = e.target.closest('button');
   if(!btn) return;
+  if(catNavScrollAtPress !== null && Math.abs(catNavEl.scrollLeft - catNavScrollAtPress) > 6){
+    catNavScrollAtPress = null;
+    return; // كان سحب للشريط، مش اختيار قسم فعلي — تجاهل الـclick ده.
+  }
+  catNavScrollAtPress = null;
   [...document.querySelectorAll('#catNav button')].forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   // Selecting "All" restores the generic "Categories" label; picking a specific

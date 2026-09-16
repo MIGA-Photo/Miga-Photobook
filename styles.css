@@ -1936,15 +1936,36 @@
   }
   .card-actions{display:flex; flex-wrap:wrap; gap:8px; margin-top:auto;}
   .card-actions .buy-btn, .card-actions .copy-btn{flex:1 1 auto;}
-  /* رابط هادي تحت زرار الشراء الذهبي — فصل بصري واضح بين "شراء صورة واحدة"
-     (الزرار الذهبي البارز) و"وفّر بالباقات" (رابط ثانوي هادي)، بدل ما
-     يتلخبطوا في نفس مستوى الأهمية (طلب صريح من ماجدي 11 سبتمبر 2026). */
-  .card-package-hint{
-    display:block; width:100%; margin-top:6px; padding:4px 2px;
-    background:none; border:none; text-align:center;
-    font-size:12px; color:var(--paper-dim); cursor:pointer; font-family:inherit;
+  /* ===== صف الشراء الموحّد (16 سبتمبر 2026) =====
+     طلب ماجدي: شيل زرار «أضف للسلة» النصّي المنفصل، وشيل أيقونتي المفضلة/
+     السلة اللي كانتا عائمتين فوق صورة المنتج — وحطّهم التلاتة (مفضلة + شراء
+     + سلة) في صف واحد ملتصق تحت الصورة مباشرة، الأيقونتين كأنهم مربّعين
+     صغيرين ملزوقين بطرفي الزرار الذهبي (تصميم رقم ٣ من الموكابات اللي
+     اختارها). .fav-btn/.cart-btn هنا هما نفس الكلاسين المستخدمين في مكان
+     تاني (قلب المفضلة على غلاف قسم كامل) — القواعد اللي فوق بتحطهم عائمين
+     بالمطلق فوق صورة؛ جوه .buy-row بنلغي كل ده ونخليهم عنصر عادي في الصف. */
+  .buy-row{ display:flex; align-items:stretch; gap:6px; width:100%; }
+  .buy-row .buy-btn{ flex:1; }
+  .buy-row .fav-btn, .buy-row .cart-btn{
+    position:static; opacity:1; width:40px; height:auto; flex:0 0 auto;
+    border-radius:8px; background:rgba(255,255,255,0.06); border:1px solid var(--line);
   }
-  .card-package-hint:hover, .card-package-hint:focus-visible{ color:var(--brass); text-decoration:underline; }
+  .buy-row .fav-btn:hover, .buy-row .cart-btn:hover{ background:rgba(255,201,77,0.16); }
+  .buy-row .fav-btn.is-fav, .buy-row .cart-btn.in-cart{
+    background:rgba(255,201,77,0.14); border-color:rgba(255,201,77,0.55);
+  }
+  /* رابط تحت زرار الشراء الذهبي — فصل بصري بين "شراء صورة واحدة" (الزرار
+     الذهبي البارز) و"وفّر أكتر مع ميجا" (رابط الباقات). كان شكله باهت رمادي
+     يتلخبط مع باقي النصوص الثانوية؛ بقى دلوقتي بلون البراند وخط أتقل عشان
+     يبان كدعوة فعلية للانتباه، مش تفصيلة صغيرة (طلب ماجدي 16 سبتمبر 2026:
+     "بخط اوضح مميز"). */
+  .card-package-hint{
+    display:block; width:100%; margin-top:6px; padding:5px 2px;
+    background:none; border:none; text-align:center;
+    font-size:13px; font-weight:700; letter-spacing:0.15px;
+    color:var(--brass); cursor:pointer; font-family:inherit;
+  }
+  .card-package-hint:hover, .card-package-hint:focus-visible{ color:var(--brass-dim); text-decoration:underline; }
   .buy-btn{
     flex:1; color:var(--ink); font-weight:700; font-size:13.5px;
     padding:11px; border-radius:8px; transition:.2s;
