@@ -70,6 +70,8 @@ const FACEBOOK_APP_ID = "";
 const APPLE_CLIENT_ID = "";
 const APPLE_REDIRECT_URI = window.location.origin + window.location.pathname;
 let adminSessionToken = ''; // a short-lived session token issued by the server after login — the admin's actual password is never stored or resent after the initial /admin/verify call
+// Public storefronts never mount or open the Admin UI. The dedicated admin page is the only frontend surface that may activate it.
+const IS_DEDICATED_ADMIN_PAGE = /\/admin-9k2x\.html$/.test(window.location.pathname);
 const PLACEHOLDER_IMG = "data:image/svg+xml;utf8," + encodeURIComponent(
   `<svg xmlns='http://www.w3.org/2000/svg' width='400' height='500'><rect width='100%' height='100%' fill='#17161d'/><text x='50%' y='50%' fill='#e3a429' font-size='16' font-family='sans-serif' text-anchor='middle'>Miga-Photobook</text></svg>`
 );
@@ -4801,7 +4803,8 @@ let adminBellPollTimer = null;
 function updateAdminFabVisibility(){
   const fab = document.getElementById('adminFab');
   if(!fab) return;
-  const modalOpen = document.getElementById('adminModalBg').classList.contains('show');
+  const modal = document.getElementById('adminModalBg');
+  const modalOpen = !!modal && modal.classList.contains('show');
   fab.classList.toggle('show', !!adminLoggedIn && !modalOpen);
 }
 
@@ -4900,12 +4903,17 @@ async function refreshAdminBellBadge(){
  * modal is hidden and the floating launcher takes its place, so re-opening
  * lands back on exactly the same tab with the same half-filled form. */
 function collapseAdminPanel(){
-  document.getElementById('adminModalBg').classList.remove('show');
+  const modal = document.getElementById('adminModalBg');
+  if(!modal) return;
+  modal.classList.remove('show');
   updateAdminFabVisibility();
 }
 
 function expandAdminPanel(){
-  document.getElementById('adminModalBg').classList.add('show');
+  if(!IS_DEDICATED_ADMIN_PAGE || !adminLoggedIn) return;
+  const modal = document.getElementById('adminModalBg');
+  if(!modal) return;
+  modal.classList.add('show');
   updateAdminFabVisibility();
 }
 
@@ -6345,11 +6353,13 @@ async function deleteReviewPrompt(id){
 }
 
 // ---------- Admin ----------
-const adminOpenBtn = document.getElementById('adminOpenBtn');
+const adminOpenBtn = elById('adminOpenBtn');
 const adminModalBg = document.getElementById('adminModalBg');
 let adminLoggedIn = false;
 
 adminOpenBtn.onclick = async ()=>{
+  if(!IS_DEDICATED_ADMIN_PAGE) return;
+  if(!adminModalBg) return;
   adminModalBg.classList.add('show');
   document.getElementById('adminLoginView').style.display = adminLoggedIn ? 'none' : 'block';
   document.getElementById('adminFormView').style.display = adminLoggedIn ? 'block' : 'none';
@@ -7366,6 +7376,7 @@ function sendPromptViaWhatsApp(code){
   window.open(`https://wa.me/${intlPhone}?text=${encodeURIComponent(message)}`, '_blank');
 }
 elById('adminModalClose').onclick = ()=>{
+  if(!adminModalBg) return;
   adminModalBg.classList.remove('show');
   // كان بيخفي الأيقونة العائمة كمان. ده كان مقبول وقت ما كان فيه زرار في
   // الهيدر يرجّعك؛ دلوقتي الأيقونة هي المدخل الوحيد، فلازم تفضل ظاهرة
@@ -7454,6 +7465,7 @@ async function adminRestoreSession(token){
 }
 /** Shared activation step for both a fresh login and a restored session. */
 async function activateAdminSession(token, persist){
+  if(!IS_DEDICATED_ADMIN_PAGE) return false;
   adminSessionToken = token;
   adminLoggedIn = true;
   document.getElementById('adminLoginView').style.display = 'none';
@@ -7479,7 +7491,7 @@ elById('adminLogoutBtn').onclick = async ()=>{
   const tokenToRevoke = adminSessionToken;
   adminLoggedIn = false;
   adminSessionToken = '';
-  adminModalBg.classList.remove('show');
+  if(adminModalBg) adminModalBg.classList.remove('show');
   editingProductId = null;
   resetEditUI();
   updateAdminFabVisibility();
@@ -8550,15 +8562,9 @@ async function applyHeroModeForThisDesign(){
   await applyHeroModeForThisDesign();
   initSideDrawer();
 
-  // Secret admin entry point: visit index.html#mega-admin-9k2x, the
-  // install-safe ?admin=9k2x query form, or the dedicated standalone
-  // admin-9k2x.html page (added so "Add to Home Screen" on iOS has a real,
-  // static, never-redirected URL+manifest to capture — see the head
-  // comment in admin-9k2x.html for the full history). The button itself
-  // stays hidden from customers (see adminOpenBtn above).
-  if(window.location.hash === '#mega-admin-9k2x' ||
-     /(^|&)admin=9k2x(&|$)/.test(window.location.search.replace(/^\?/, '')) ||
-     /\/admin-9k2x\.html$/.test(window.location.pathname)){
+  // Admin UI is deliberately isolated to the dedicated admin page.
+  // The public storefront never auto-opens or mounts the Admin panel.
+  if(IS_DEDICATED_ADMIN_PAGE && adminModalBg){
     adminModalBg.classList.add('show');
   }
   openProductFromHash();
