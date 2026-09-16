@@ -366,8 +366,11 @@
            أيقونة الخطوط التلاتة (populateDrawerProfileFields بتتحكم في الاتنين
            سوا) — الزرار برضو بيفتح نفس الدرج بالظبط، الـ aria-label فاضل
            "القائمة" عمدًا عشان ده لسه زرار فتح القائمة مش تغيير الصورة. -->
+<span class="hamburger-icon-clip">
 <img alt="" id="hamburgerAvatarImg" src="" style="display:none;"/>
 <svg fill="none" height="22" id="hamburgerMenuIcon" stroke="currentColor" stroke-linecap="round" stroke-width="1.8" viewbox="0 0 24 24" width="22"><path d="M4 6.5h16M4 12h16M4 17.5h16"></path></svg>
+</span>
+<span aria-hidden="true" class="cart-badge" id="hamburgerCartBadge" style="display:none;"></span>
 </button>
 <!-- مخفي دايمًا؛ موجود عشان كود الأدمن بينده عليه. مكانه هنا عشان
          مايضيفش خانة تالتة تزحزح توسيط الاسم. -->
@@ -442,31 +445,13 @@
      chosen for the hero's own toggle-able showcase further down. Framed in
      the site's brass gold to read as a distinct, deliberate feature. -->
 <section class="hero hero-with-slider">
-<!-- Visual result comes FIRST in markup on purpose: in this RTL layout the
-       first DOM child lands in the right-most grid column (the natural start
-       of Arabic reading order), and on mobile (single column) it stacks on
-       top -- so the actual transformation result is the first thing seen,
-       ahead of the headline, on both desktop and mobile. Still the same
-       always-on interactive slider, populated from real data by
-       loadSliderData() (site-config showcase, falling back to real product
-       images) -- never a hardcoded/fake image. -->
-<div class="fixed-slider-frame">
-<div class="slider-wrap-instance" id="bafSliderFixed">
-<div class="slider-card slider-card-compact" data-slider-card="">
-<img alt="Before" data-i18n-alt="beforeLabel" data-slider-before=""/>
-<div class="slider-after-wrap" data-slider-afterwrap=""><img alt="After" data-i18n-alt="afterLabel" data-slider-after=""/></div>
-<div class="slider-line" data-slider-line=""></div>
-<button aria-label="Drag, or use the left/right arrow keys, to compare before and after" aria-orientation="horizontal" aria-valuemax="100" aria-valuemin="0" aria-valuenow="50" class="slider-handle" data-i18n-aria="a11ySliderHandle" data-slider-handle="" role="slider" type="button">↔</button>
-<span class="tag tag-before" data-i18n="beforeLabel">Before</span>
-<span class="tag tag-after" data-i18n="afterLabel">After</span>
-</div>
-<div class="slider-controls-row">
-<button aria-label="Previous" class="slider-nav slider-nav-prev" data-i18n-aria="a11yPrev" data-slider-prev="" type="button">‹</button>
-<div class="slider-dots" data-slider-dots=""></div>
-<button aria-label="Next" class="slider-nav slider-nav-next" data-i18n-aria="a11yNext" data-slider-next="" type="button">›</button>
-</div>
-</div>
-</div>
+<!-- 15 September 2026 (explicit request): swapped the order of the hero
+     text and the before/after slider so the text leads in this page's
+     reading direction and the slider trails, mirroring the Arabic site's
+     layout. Size, height and top/bottom alignment are unchanged
+     (grid-template-columns:1fr 1fr + align-items:stretch above) -- this is
+     a visual re-order only. Same permanent interactive slider, fed from
+     real data via loadSliderData(). -->
 <div class="hero-text-frame">
 <div class="eyebrow" data-i18n="heroEyebrow">Miga-Photobook</div>
 <div class="tagline" data-i18n="heroSlogan">Your shot... becomes a masterpiece</div>
@@ -488,6 +473,24 @@
 <span data-i18n="trustCheck2">✅ Secure payment</span>
 <span data-i18n="trustCheck3">✅ Direct support</span>
 <span data-i18n="trustCheck4">✅ Ongoing updates</span>
+</div>
+</div>
+
+<div class="fixed-slider-frame">
+<div class="slider-wrap-instance" id="bafSliderFixed">
+<div class="slider-card slider-card-compact" data-slider-card="">
+<img alt="Before" data-i18n-alt="beforeLabel" data-slider-before=""/>
+<div class="slider-after-wrap" data-slider-afterwrap=""><img alt="After" data-i18n-alt="afterLabel" data-slider-after=""/></div>
+<div class="slider-line" data-slider-line=""></div>
+<button aria-label="Drag, or use the left/right arrow keys, to compare before and after" aria-orientation="horizontal" aria-valuemax="100" aria-valuemin="0" aria-valuenow="50" class="slider-handle" data-i18n-aria="a11ySliderHandle" data-slider-handle="" role="slider" type="button">↔</button>
+<span class="tag tag-before" data-i18n="beforeLabel">Before</span>
+<span class="tag tag-after" data-i18n="afterLabel">After</span>
+</div>
+<div class="slider-controls-row">
+<button aria-label="Previous" class="slider-nav slider-nav-prev" data-i18n-aria="a11yPrev" data-slider-prev="" type="button">‹</button>
+<div class="slider-dots" data-slider-dots=""></div>
+<button aria-label="Next" class="slider-nav slider-nav-next" data-i18n-aria="a11yNext" data-slider-next="" type="button">›</button>
+</div>
 </div>
 </div>
 </section>
@@ -583,7 +586,7 @@
   .slider-card{
     position:relative; border-radius:16px; overflow:hidden;
     border:1px solid var(--line); box-shadow:0 20px 60px rgba(0,0,0,0.45);
-    aspect-ratio:4/5; max-width:420px; margin:0 auto; touch-action:none; user-select:none;
+    aspect-ratio:4/5; max-width:420px; margin:0 auto; touch-action:pan-y; user-select:none;
     background:var(--ink-2, #151317); cursor:ew-resize;
   }
   .slider-card img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
@@ -674,7 +677,7 @@
      Rakkas بقى شكله "صغير" مع Readex Pro — لازم رقم أكبر عشان يوصل لنفس
      الحضور البصري المطلوب لعنوان رئيسي. رفعت كل مقاسات الـclamp بحوالي
      25-30% فى الثلاث مستويات (ديسكتوب/تابلت/موبايل). */
-  .hero-with-slider h1{ font-size:clamp(28px, 3.2vw, 42px) !important; margin-bottom:16px !important; line-height:1.3 !important; font-family:'Readex Pro', sans-serif !important; font-weight:700 !important; text-align:center !important; }
+  .hero-with-slider h1{ font-size:clamp(32px, 3.6vw, 46px) !important; margin-bottom:16px !important; line-height:1.3 !important; font-family:'Readex Pro', sans-serif !important; font-weight:700 !important; text-align:center !important; }
   .hero-with-slider .eyebrow{ font-size:14px !important; margin-bottom:12px !important; }
   .hero-with-slider .tagline{ font-size:17px !important; }
   .hero-with-slider p{ font-size:clamp(14px,1.1vw,16.5px) !important; margin-bottom:20px !important; }
@@ -700,7 +703,7 @@
        تعديلات المقاس السابقة متحلش المشكلة الحقيقية. الحل: نستخدم Readex
        Pro (الخط الأساسي الواضح في الموقع) بدل Rakkas في المقاسات الصغيرة
        دي بس، ونسيب Rakkas في الديسكتوب فوق حيث المقاس يكفي لزخرفته. */
-    .hero-with-slider h1{ font-size:clamp(17px,5vw,28px) !important; margin-bottom:8px !important; line-height:1.28 !important; font-family:'Readex Pro', sans-serif !important; font-weight:700 !important; }
+    .hero-with-slider h1{ font-size:clamp(20px,5.6vw,32px) !important; margin-bottom:8px !important; line-height:1.28 !important; font-family:'Readex Pro', sans-serif !important; font-weight:700 !important; }
     .hero-with-slider .eyebrow{ font-size:12.5px !important; margin-bottom:6px !important; }
     .hero-with-slider .tagline{ font-size:12.5px !important; }
     .hero-with-slider p{ font-size:clamp(11px,2.6vw,14.5px) !important; margin-bottom:0 !important; }
@@ -726,7 +729,7 @@
     .hero-with-slider .slider-controls-row{ flex-shrink:0; }
   }
   @media(max-width:480px){
-    .hero-with-slider h1{ font-size:clamp(14px,4.4vw,20px) !important; }
+    .hero-with-slider h1{ font-size:clamp(17px,5vw,24px) !important; }
     .hero-with-slider .trust-checks{ display:none; } /* first to go when truly tight on space */
     .hero-text-frame{ padding:9px 8px; border-radius:12px; }
   }
@@ -852,6 +855,15 @@
 <div class="grid" id="favoritesGrid"></div>
 </div>
 <div class="grid-page-dots" id="gridDots-favorites"></div>
+</section>
+<section class="cat-section" id="cartSection" style="display:none;">
+<div class="section-head">
+<h2 data-i18n="cartSectionTitle">My Cart</h2>
+</div>
+<div class="grid-nav-wrap">
+<div class="grid" id="cartGrid"></div>
+</div>
+<div class="grid-page-dots" id="gridDots-cart"></div>
 </section>
 <section class="cat-section" id="categoryTiles">
 <div class="section-head">
@@ -1195,6 +1207,7 @@
 <a href="/categories/business/">أعمال</a>
 </div>
 <div class="footer-links footer-legal-links">
+<a data-i18n="footerAbout" href="/about.html">Our Story</a>
 <a data-i18n="footerTerms" href="/terms.html">Terms of Use</a>
 <a data-i18n="footerPrivacy" href="/privacy.html">Privacy Policy</a>
 <a data-i18n="footerRefund" href="/refund.html">Refund Policy</a>
@@ -1578,6 +1591,10 @@
 </div>
 <button class="drawer-link-row" id="drawerFavBtn" style="display:none;" type="button">
 <span><span data-i18n="favSectionTitle">My Favorites</span> <span class="drawer-fav-count" id="drawerFavCount"></span></span>
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M15 6l-6 6 6 6"></path></svg>
+</button>
+<button class="drawer-link-row" id="drawerCartBtn" style="display:none;" type="button">
+<span><span data-i18n="cartSectionTitle">My Cart</span> <span class="drawer-fav-count" id="drawerCartCount"></span></span>
 <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M15 6l-6 6 6 6"></path></svg>
 </button>
 <button class="drawer-link-row" id="drawerTrackBtn" type="button">
