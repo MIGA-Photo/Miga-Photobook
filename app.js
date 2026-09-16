@@ -416,7 +416,7 @@ const translations = {
     favSectionTitle:'قائمتي المفضلة', favAddTitle:'ضيفها لقائمتي المفضلة', favRemoveTitle:'شيلها من المفضلة',
     favCatAddTitle:'ثبّت القسم ده في الأول', favCatRemoveTitle:'شيل تثبيت القسم',
     toastFavAdded:'اتضافت لقائمتك المفضلة ❤', toastFavRemoved:'اتشالت من المفضلة',
-    cartSectionTitle:'سلتي', cartAddTitle:'ضيفه للسلة', cartRemoveTitle:'شيله من السلة',
+    cartSectionTitle:'سلتي', cartAddTitle:'ضيفه للسلة', cartRemoveTitle:'شيله من السلة', cartAddAction:'أضف للسلة', cartRemoveAction:'إزالة من السلة',
     toastCartAdded:'اتضاف للسلة 🛒', toastCartRemoved:'اتشال من السلة',
     toastFavCatAdded:'تم تثبيت القسم في أول القائمة', toastFavCatRemoved:'تم إلغاء تثبيت القسم',
     promptLibraryHeading:'مكتبة البرومبتات للمحترفين — اشترِ البرومبت الاحترافي بمفرده، من غير تحويل صورة',
@@ -788,7 +788,7 @@ const translations = {
     favSectionTitle:'My Favorites', favAddTitle:'Add to my favorites', favRemoveTitle:'Remove from favorites',
     favCatAddTitle:'Pin this category first', favCatRemoveTitle:'Unpin this category',
     toastFavAdded:'Added to your favorites ❤', toastFavRemoved:'Removed from favorites',
-    cartSectionTitle:'My Cart', cartAddTitle:'Add to cart', cartRemoveTitle:'Remove from cart',
+    cartSectionTitle:'My Cart', cartAddTitle:'Add to cart', cartRemoveTitle:'Remove from cart', cartAddAction:'Add to cart', cartRemoveAction:'Remove from cart',
     toastCartAdded:'Added to your cart 🛒', toastCartRemoved:'Removed from cart',
     toastFavCatAdded:'Category pinned to the front', toastFavCatRemoved:'Category unpinned',
     promptLibraryHeading:'Prompt Library for Professionals — buy the professional prompt on its own, no photo transformation needed',
@@ -2458,6 +2458,7 @@ function renderProductCard(p, opts){
       <div class="card-title" onclick="openProductDetail('${p.id}')" style="cursor:pointer;">${escapeHtml(productTitle(p))}</div>
       ${owned ? `<span class="owned-pill">${t('ownedPill')}</span>` : ''}
       <div class="card-actions">
+        ${!owned ? `<button type="button" class="buy-btn cart-action-btn${cart.includes(p.id) ? ' in-cart' : ''}" onclick="toggleCart('${p.id}')" aria-pressed="${cart.includes(p.id) ? 'true' : 'false'}">${t(cart.includes(p.id) ? 'cartRemoveAction' : 'cartAddAction')}</button>` : ''}
         ${owned
           ? (alreadyTransformed
               ? `<button class="buy-btn" onclick="openTransformModal('${p.id}')">${t('viewResultBtn')}</button>`
