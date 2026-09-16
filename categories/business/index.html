@@ -29,7 +29,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Rakkas&family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <!-- الملف المشترك نفسه مش نسخة مقصوصة منه: لو التصميم اتغيّر، الصفحة دي
      بتتغيّر معاه. أي نسخة مقصوصة كانت هتبعد لوحدها من غير ما حد يلاحظ. -->
-<link rel="stylesheet" href="/styles.css?v=20260914a">
+<link rel="stylesheet" href="/styles.css?v=c9ebf3e8">
 <style>
   .cat-wrap{ max-width:1080px; margin:0 auto; padding:0 18px 60px; }
   .cat-bar{ display:flex; align-items:center; justify-content:space-between;
@@ -69,6 +69,29 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"الرئيسية","item":"https://miga-photobook.com/"},{"@type":"ListItem","position":2,"name":"أعمال","item":"https://miga-photobook.com/categories/business/"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"صور احترافية لأصحاب الأعمال وفرق العمل","description":"صور بورتريه موحّدة الشكل لفريقك بدل جلسة تصوير للشركة — من صور موبايل عادية وخلال دقائق.","url":"https://miga-photobook.com/categories/business/","inLanguage":"ar","isPartOf":{"@type":"WebSite","name":"Miga-Photobook","url":"https://miga-photobook.com/"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"الصور هتبقى بنفس الشكل فعلاً؟","acceptedAnswer":{"@type":"Answer","text":"أيوه لو كلهم اختاروا نفس الأسلوب — وده اللي بيخلي الصف متجانس."}},{"@type":"Question","name":"لو حد جديد اشتغل معانا بعدين؟","acceptedAnswer":{"@type":"Answer","text":"بترفع صورته بنفس الأسلوب وتتضاف للصف عادي."}},{"@type":"Question","name":"أقدر أستخدمها على موقع الشركة؟","acceptedAnswer":{"@type":"Answer","text":"ده استخدام تجاري — كلّمنا الأول ونظبّط الترخيص المناسب."}}]}</script>
+
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-98HS77F9E9');
+</script>
+
+<!-- Meta Pixel — live Pixel ID (dataset "Magdy Farouk's Pixel" in Meta
+     Events Manager). Added 2026-09-16 — these SEO landing pages had zero
+     analytics before this, so any traffic Google sent them was invisible
+     in GA4/Ads reporting. -->
+<script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+  document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '317880457219719');
+  fbq('track', 'PageView');
+</script>
 </head>
 <body>
 <div class="cat-wrap">
@@ -169,7 +192,7 @@
     items.sort(function(a,b){ return (a.order||0) - (b.order||0); });
     grid.innerHTML = items.map(function(p, i){
       var t = esc(p.title || '');
-      return '<a class="cat-card-link" href="/#product=' + encodeURIComponent(p.id) + '">'
+      return '<a class="cat-card-link" href="/#product=' + encodeURIComponent(p.id) + '" onclick="try{ if(typeof gtag===\'function\') gtag(\'event\',\'category_page_product_click\',{category:\'business\', item_id:\'' + esc(p.id) + '\'}); if(typeof fbq===\'function\') fbq(\'trackCustom\',\'CategoryPageProductClick\',{category:\'business\', content_ids:[\'' + esc(p.id) + '\']}); }catch(e){}">'
         + '<div class="card"><div class="card-media">'
         + '<img src="' + esc(p.image) + '" alt="' + t + '"'
         +   (i < 4 ? '' : ' loading="lazy"') + ' decoding="async">'
