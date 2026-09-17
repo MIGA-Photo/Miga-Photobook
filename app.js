@@ -176,6 +176,16 @@ const translations = {
     visitorsEmptyNote:'لا توجد زيارات مسجلة بعد.',
     toastAuthFailed:'حصل خطأ، تأكد من البيانات وحاول تاني',
     toastLoggedIn:'تم تسجيل الدخول بنجاح', toastRegistered:'تم إنشاء الحساب بنجاح',
+    forgotPasswordLink:'نسيت كلمة المرور؟', forgotPasswordTitle:'إعادة تعيين كلمة المرور',
+    forgotPasswordDesc:'اكتب بريدك الإلكتروني وهنبعتلك رابط لإعادة تعيين كلمة المرور.',
+    sendResetLinkBtn:'إرسال رابط إعادة التعيين', backToLoginBtn:'الرجوع لتسجيل الدخول',
+    toastResetLinkSent:'لو البريد الإلكتروني ده مسجّل عندنا، هيوصلك رابط إعادة التعيين خلال دقائق.',
+    resetPasswordTitle:'كلمة مرور جديدة', resetPasswordDesc:'اكتب كلمة مرور جديدة لحسابك.',
+    newPasswordLabel:'كلمة المرور الجديدة', confirmNewPasswordLabel:'تأكيد كلمة المرور',
+    resetPasswordBtn:'تحديث كلمة المرور',
+    toastPasswordResetSuccess:'تم تحديث كلمة المرور بنجاح، سجّل دخولك بكلمة المرور الجديدة.',
+    toastPasswordsDontMatch:'كلمتا المرور غير متطابقتين',
+    toastInvalidResetLink:'رابط إعادة التعيين غير صالح أو منتهي الصلاحية',
     toastLoginRequired:'سجّل دخولك الأول عشان تقدر تكتب تقييم',
     toastReviewSubmitted:'تم إرسال تقييمك، هيظهر بعد المراجعة. شكرًا ليك!',
     viewDesktopLabel:'كمبيوتر', viewMobileLabel:'موبايل',
@@ -548,6 +558,16 @@ const translations = {
     visitorsEmptyNote:'No visits logged yet.',
     toastAuthFailed:'Something went wrong, please check your details and try again',
     toastLoggedIn:'Logged in successfully', toastRegistered:'Account created successfully',
+    forgotPasswordLink:'Forgot password?', forgotPasswordTitle:'Reset your password',
+    forgotPasswordDesc:"Enter your email and we'll send you a link to reset your password.",
+    sendResetLinkBtn:'Send reset link', backToLoginBtn:'Back to login',
+    toastResetLinkSent:"If that email is registered with us, you'll receive a reset link shortly.",
+    resetPasswordTitle:'New password', resetPasswordDesc:'Enter a new password for your account.',
+    newPasswordLabel:'New password', confirmNewPasswordLabel:'Confirm new password',
+    resetPasswordBtn:'Update password',
+    toastPasswordResetSuccess:'Password updated successfully — please log in with your new password.',
+    toastPasswordsDontMatch:"Passwords don't match",
+    toastInvalidResetLink:'This reset link is invalid or has expired',
     toastLoginRequired:'Please log in first to write a review',
     toastReviewSubmitted:'Your review has been submitted and will appear after moderation. Thank you!',
     viewDesktopLabel:'Computer', viewMobileLabel:'Mobile',
@@ -5673,6 +5693,104 @@ elById('registerSubmitBtn').onclick = async ()=>{
     showToast(t('toastRegistered'));
   }catch(e){ showToast(t('toastAuthFailed')); }
 };
+
+// ---------- Forgot / reset password (added 2026-09-17) ----------
+// Three views share the logged-out half of the account modal: the normal
+// login/register tabs, a "forgot password" email-entry view, and a "reset
+// password" new-password view reached only via the emailed link's
+// ?resetToken= URL param (never through in-app navigation, since the token
+// is single-use and tied to one specific request).
+function showForgotPasswordView(){
+  document.getElementById('loginFormView').style.display = 'none';
+  document.getElementById('registerFormView').style.display = 'none';
+  document.getElementById('resetPasswordView').style.display = 'none';
+  document.getElementById('forgotPasswordView').style.display = 'block';
+  const tabs = document.querySelector('.account-tabs');
+  if(tabs) tabs.style.display = 'none';
+}
+function showLoginViewFromForgot(){
+  document.getElementById('forgotPasswordView').style.display = 'none';
+  document.getElementById('resetPasswordView').style.display = 'none';
+  document.getElementById('loginFormView').style.display = 'block';
+  const tabs = document.querySelector('.account-tabs');
+  if(tabs) tabs.style.display = 'flex';
+  elById('tabLoginBtn').classList.add('active');
+  elById('tabRegisterBtn').classList.remove('active');
+}
+elById('forgotPasswordLinkBtn').onclick = showForgotPasswordView;
+elById('backToLoginFromForgotBtn').onclick = showLoginViewFromForgot;
+
+elById('sendResetLinkBtn').onclick = async ()=>{
+  const email = document.getElementById('forgotPasswordEmail').value.trim();
+  if(!email){ showToast(t('toastFillFields')); return; }
+  const btn = elById('sendResetLinkBtn');
+  btn.disabled = true;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/auth/forgot-password`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email, lang: currentLang })
+    });
+    const data = await res.json().catch(()=>({}));
+    // Always show the same generic message regardless of what the server
+    // actually did — this is intentional (see forgotPassword() on the
+    // backend): the UI must never reveal whether an email has an account.
+    showToast((data && data.message) || t('toastResetLinkSent'));
+    showLoginViewFromForgot();
+    document.getElementById('forgotPasswordEmail').value = '';
+  }catch(e){
+    showToast(t('toastResetLinkSent')); // network hiccup — still don't leak account existence
+  }finally{
+    btn.disabled = false;
+  }
+};
+
+let pendingPasswordResetToken = null;
+function showResetPasswordView(token){
+  pendingPasswordResetToken = token;
+  document.getElementById('loginFormView').style.display = 'none';
+  document.getElementById('registerFormView').style.display = 'none';
+  document.getElementById('forgotPasswordView').style.display = 'none';
+  document.getElementById('resetPasswordView').style.display = 'block';
+  const tabs = document.querySelector('.account-tabs');
+  if(tabs) tabs.style.display = 'none';
+  document.getElementById('accountLoggedOutView').style.display = 'block';
+  document.getElementById('accountLoggedInView').style.display = 'none';
+  accountModalBg.classList.add('show');
+}
+
+elById('resetPasswordSubmitBtn').onclick = async ()=>{
+  const pw1 = document.getElementById('newPassword').value;
+  const pw2 = document.getElementById('confirmNewPassword').value;
+  if(!pw1 || !pw2){ showToast(t('toastFillFields')); return; }
+  if(pw1 !== pw2){ showToast(t('toastPasswordsDontMatch')); return; }
+  if(!pendingPasswordResetToken){ showToast(t('toastInvalidResetLink')); return; }
+  try{
+    const res = await fetch(`${BACKEND_BASE}/auth/reset-password`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ token: pendingPasswordResetToken, newPassword: pw1 })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(!res.ok){ showToast(data.error || t('toastInvalidResetLink')); return; }
+    showToast(t('toastPasswordResetSuccess'));
+    pendingPasswordResetToken = null;
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmNewPassword').value = '';
+    // Drop ?resetToken= from the URL so a page refresh / share doesn't
+    // re-open this view with an already-used token.
+    const url = new URL(location.href);
+    url.searchParams.delete('resetToken');
+    history.replaceState({}, '', url.toString());
+    showLoginViewFromForgot();
+  }catch(e){ showToast(t('toastAuthFailed')); }
+};
+
+// If the page was opened from a password-reset email, jump straight into
+// the reset-password view with the token from the link.
+(function checkForPasswordResetLink(){
+  const params = new URLSearchParams(location.search);
+  const resetToken = params.get('resetToken');
+  if(resetToken) showResetPasswordView(resetToken);
+})();
 
 elById('accountLogoutBtn').onclick = ()=>{
   localStorage.removeItem('megaPromptAuthToken');

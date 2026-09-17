@@ -1754,8 +1754,40 @@
           <label data-i18n="passwordLabel">كلمة المرور</label>
           <input type="password" id="loginPassword">
         </div>
+        <div style="text-align:end; margin-top:-8px; margin-bottom:14px;">
+          <button type="button" id="forgotPasswordLinkBtn" data-i18n="forgotPasswordLink" style="background:none; border:none; padding:0; color:var(--brass); font-size:13px; cursor:pointer; text-decoration:underline;">نسيت كلمة المرور؟</button>
+        </div>
         <div class="modal-actions">
           <button class="btn-primary" id="loginSubmitBtn" data-i18n="loginBtn">دخول</button>
+        </div>
+      </div>
+
+      <div id="forgotPasswordView" style="display:none;">
+        <h3 data-i18n="forgotPasswordTitle" style="margin-top:0;">إعادة تعيين كلمة المرور</h3>
+        <p class="sub" data-i18n="forgotPasswordDesc">اكتب بريدك الإلكتروني وهنبعتلك رابط لإعادة تعيين كلمة المرور.</p>
+        <div class="field">
+          <label data-i18n="emailLabel">البريد الإلكتروني</label>
+          <input type="email" id="forgotPasswordEmail" placeholder="you@example.com">
+        </div>
+        <div class="modal-actions" style="flex-direction:column; gap:10px;">
+          <button class="btn-primary" id="sendResetLinkBtn" data-i18n="sendResetLinkBtn" style="width:100%;">إرسال رابط إعادة التعيين</button>
+          <button type="button" class="btn-ghost" id="backToLoginFromForgotBtn" data-i18n="backToLoginBtn" style="width:100%;">الرجوع لتسجيل الدخول</button>
+        </div>
+      </div>
+
+      <div id="resetPasswordView" style="display:none;">
+        <h3 data-i18n="resetPasswordTitle" style="margin-top:0;">كلمة مرور جديدة</h3>
+        <p class="sub" data-i18n="resetPasswordDesc">اكتب كلمة مرور جديدة لحسابك.</p>
+        <div class="field">
+          <label data-i18n="newPasswordLabel">كلمة المرور الجديدة</label>
+          <input type="password" id="newPassword" placeholder="6 أحرف على الأقل">
+        </div>
+        <div class="field">
+          <label data-i18n="confirmNewPasswordLabel">تأكيد كلمة المرور</label>
+          <input type="password" id="confirmNewPassword">
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="resetPasswordSubmitBtn" data-i18n="resetPasswordBtn" style="width:100%;">تحديث كلمة المرور</button>
         </div>
       </div>
 
@@ -2368,7 +2400,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=6e21a328"></script>
+<script src="app.js?v=dfe9c57a"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
