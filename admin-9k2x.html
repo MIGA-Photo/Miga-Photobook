@@ -631,14 +631,61 @@
   }
   .hero-showcase-variant[hidden]{ display:none !important; }
 
-  /* ---------- Admin pricing table ("الأسعار والباقات" tab, added 2026-09-17) ---------- */
-  .admin-table{ width:100%; border-collapse:collapse; min-width:640px; }
-  .admin-table th{ text-align:right; font-size:12.5px; color:var(--paper-dim); font-weight:600; padding:6px 8px; border-bottom:1px solid var(--line); white-space:nowrap; }
-  .admin-table td{ padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:middle; }
-  .admin-table input, .admin-table select{ width:100%; min-width:70px; box-sizing:border-box; }
-  .admin-table input[data-pkg-field="nameAr"], .admin-table input[data-pkg-field="nameEn"]{ min-width:150px; }
-  .admin-table .pkg-remove-btn{ background:none; border:none; color:#e05a5a; cursor:pointer; font-size:16px; padding:2px 8px; }
+  /* ---------- Admin pricing table ("الأسعار والباقات" tab, added 2026-09-17,
+     restyled 2026-09-17 for clearer laptop/mobile input fields) ---------- */
+  .admin-table-wrap{
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+    border:1px solid var(--line); border-radius:12px;
+    background:rgba(255,255,255,0.02);
+  }
+  .admin-table{ width:100%; border-collapse:collapse; min-width:820px; }
+  .admin-table th{ text-align:right; font-size:12.5px; color:var(--paper-dim); font-weight:600; padding:10px 10px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  .admin-table td{ padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .admin-table tbody tr:last-child td{ border-bottom:none; }
+  .admin-table tbody tr:nth-child(even) td{ background:rgba(255,255,255,0.015); }
+  .admin-table input, .admin-table select{
+    width:100%; min-width:70px; box-sizing:border-box;
+    padding:9px 10px; font-size:14px; line-height:1.3;
+    border:1px solid #d5d5d5; border-radius:8px;
+    background:#fff; color:#181818;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .admin-table input:focus, .admin-table select:focus{
+    outline:none; border-color:var(--accent, #c9a24b);
+    box-shadow:0 0 0 3px rgba(201,162,75,0.25);
+  }
+  .admin-table input[data-pkg-field="id"]{ min-width:110px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:13px; }
+  .admin-table input[data-pkg-field="nameAr"]{ min-width:190px; }
+  .admin-table input[data-pkg-field="nameEn"]{ min-width:230px; }
+  .admin-table select[data-pkg-field="type"]{ min-width:92px; }
+  .admin-table input[data-pkg-field="photoCount"]{ min-width:76px; text-align:center; }
+  .admin-table input[data-pkg-field="price"]{ min-width:92px; text-align:center; font-variant-numeric:tabular-nums; }
+  .admin-table .pkg-remove-btn{
+    background:none; border:none; color:#e05a5a; cursor:pointer;
+    font-size:17px; padding:6px 10px; border-radius:6px; line-height:1;
+  }
+  .admin-table .pkg-remove-btn:hover{ background:rgba(224,90,90,0.12); }
   html[dir="ltr"] .admin-table th{ text-align:left; }
+  .admin-table-scroll-hint{
+    display:none; font-size:12px; color:var(--paper-dim); text-align:center;
+    margin:6px 0 0;
+  }
+  @media (max-width:780px){
+    .admin-table-scroll-hint{ display:block; }
+  }
+
+  /* ---------- Launch-promo (offer/original price) fields, added 2026-09-17 ---------- */
+  .launch-promo-fields{ display:flex; gap:14px; flex-wrap:wrap; }
+  .launch-promo-fields .field{ flex:1 1 200px; min-width:200px; }
+  .launch-promo-fields input{
+    width:100%; box-sizing:border-box; padding:10px 12px; font-size:15px;
+    border:1px solid #d5d5d5; border-radius:8px; background:#fff; color:#181818;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .launch-promo-fields input:focus{
+    outline:none; border-color:var(--accent, #c9a24b);
+    box-shadow:0 0 0 3px rgba(201,162,75,0.25);
+  }
 </style>
 
 <section class="baf-section js-nudge-avoid" id="beforeAfterShowcase">
@@ -2193,7 +2240,7 @@
         <div class="admin-card">
         <h4 style="margin:0 0 8px;" data-i18n="pricingPkgTitle">الباقات والاشتراكات</h4>
         <p class="sub" style="margin-bottom:14px;" data-i18n="pricingPkgIntro">عدّل اسم أي باقة أو سعرها أو عدد الصور اللي بتوفّرها، واحفظ — التعديل بيظهر فورًا في كل مكان بالموقع (العربي والإنجليزي) من غير أي حاجة تانية تتعمل. تغيير باقة موجودة بيأثر بس على المشتريات الجديدة — أي عميل عنده رصيد صور من شراء سابق يفضل رصيده زي ما هو بالظبط.</p>
-        <div style="overflow-x:auto;">
+        <div class="admin-table-wrap">
         <table class="admin-table" id="pricingPackagesTable">
           <thead>
             <tr>
@@ -2209,11 +2256,32 @@
           <tbody id="pricingPackagesBody"><!-- populated dynamically from /site-config --></tbody>
         </table>
         </div>
+        <p class="admin-table-scroll-hint" data-i18n="pricingScrollHint">◀ مرّر يمين/شمال لعرض كل الأعمدة ▶</p>
         <div class="modal-actions">
           <button class="btn-ghost" id="addPricingPackageBtn" data-i18n="pricingAddBtn">+ إضافة باقة جديدة</button>
           <button class="btn-primary" id="savePricingPackagesBtn" data-i18n="pricingSaveBtn">حفظ الباقات</button>
         </div>
         <p class="sub" id="pricingPackagesError" style="color:#e05a5a; display:none;"></p>
+        </div>
+
+        <div class="admin-card">
+        <h4 style="margin:0 0 8px;" data-i18n="launchPromoTitle">سعر الصورة الفردية والعرض الترويجي</h4>
+        <p class="sub" style="margin-bottom:14px;" data-i18n="launchPromoIntro">بيغيّر سعر كل المنتجات (الأساليب) الفردية في الموقع دفعة واحدة، وكمان الشريط الإعلاني أعلى الصفحة وكل نص "X جنيه بدل Y" في الموقع — كل حاجة بتتحدّث تلقائيًا لنفس الرقمين اللي تحفظهم هنا. الباقات والاشتراكات مش بتتأثر (ليها الجدول الخاص بيها فوق).</p>
+        <div class="launch-promo-fields">
+          <div class="field">
+            <label data-i18n="launchOfferPriceLabel">السعر الحالي (العرض)</label>
+            <input type="number" id="launchOfferPriceInput" min="1" step="1">
+          </div>
+          <div class="field">
+            <label data-i18n="launchOriginalPriceLabel">السعر قبل العرض (يظهر كخصم)</label>
+            <input type="number" id="launchOriginalPriceInput" min="1" step="1">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="saveLaunchPromoBtn" data-i18n="launchPromoSaveBtn">حفظ السعر في كل الموقع</button>
+        </div>
+        <p class="sub" id="launchPromoError" style="color:#e05a5a; display:none;"></p>
+        <p class="sub" id="launchPromoSummary" style="color:var(--paper-dim); display:none;"></p>
         </div>
 
         <div class="admin-card">

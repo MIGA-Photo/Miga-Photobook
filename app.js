@@ -101,6 +101,8 @@ const PACKAGE_CATALOG_FALLBACK = [
 ];
 let packagesRegistry = PACKAGE_CATALOG_FALLBACK; // replaced by the live list once /site-config responds
 let livePromptPrice = PROMPT_PRICE; // replaced by the admin-set value once /site-config responds
+const LAUNCH_ORIGINAL_PRICE_FALLBACK = 50; // matches the Worker's own LAUNCH_ORIGINAL_PRICE_DEFAULT
+let liveLaunchOriginalPrice = LAUNCH_ORIGINAL_PRICE_FALLBACK; // replaced by the admin-set value once /site-config responds
 
 /** Returns whatever is currently being purchased — a real product, or (for
  * package purchases) a synthetic pseudo-product built from the live package
@@ -233,7 +235,7 @@ const translations = {
     themeDayLabel:'الوضع النهاري', themeNightLabel:'الوضع الليلي',
     themeToggleTitle:'التبديل بين الوضع النهاري والوضع الليلي',
     heroEyebrow:'Miga-Photobook',
-    promoMarqueePre:'🎉 صورتك دلوقتي بـ', promoMarqueePrice:'25 جنيه بدل 50', promoMarqueeMid:' — بتقنيات ', promoMarqueeBrand:'ميجا', promoMarqueePost:'، وخلال دقائق. يلا، مستني إيه؟',
+    promoMarqueePre:'🎉 صورتك دلوقتي بـ', promoMarqueePrice:'{offer} جنيه بدل {original}', promoMarqueeMid:' — بتقنيات ', promoMarqueeBrand:'ميجا', promoMarqueePost:'، وخلال دقائق. يلا، مستني إيه؟',
     heroSlogan:'لقطتك... تتحول لتحفة فنية',
     promoVideoTitle:'شوف Miga-Photobook وهو شغال', promoVideoSub:'دقائق معدودة، وصورتك العادية بتتحول لتحفة فنية احترافية.',
     trustCheck1:'✅ نتيجة خلال دقائق', trustCheck2:'✅ دفع آمن', trustCheck3:'✅ دعم فني مباشر', trustCheck4:'✅ تحديثات مستمرة',
@@ -304,7 +306,7 @@ const translations = {
     bafTitle:'صورة واحدة منك... نحولها لأجمل صورة من اختيارك من عندنا',
     bafSub:'دي نفس الصورة، بعد ما Miga-Photobook حوّلها لأكتر من ستايل. اختار اللي يعجبك وجرّبه على صورتك.',
     bafCenterLabel:'صورتك الأصلية',
-    bafCta:'اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي بـ25 جنيه بدل 50',
+    bafCta:'اعمل صورتك <b class="brand-mega">ميجا</b> دلوقتي بـ{offer} جنيه بدل {original}',
     secChildrenTitle:'قسم الأطفال', secMaleTitle:'القسم الرجالي', secFemaleTitle:'القسم النسائي',
     secBusinessTitle:'قسم الأعمال', secCinematicTitle:'القسم السينمائي', secLuxuryTitle:'القسم الفاخر',
     secArtisticTitle:'القسم الفني', secMagazineTitle:'قسم المجلات والملصقات',
@@ -368,7 +370,7 @@ const translations = {
     shareResultBtn:'شارك النتيجة', shareResultText:'شوف صورتي من Miga-Photobook 🔥',
     toastShareCopied:'تم نسخ الرابط — الصقه في أي مكان ✅',
     nudgeTitle:'لسه مستني إيه؟',
-    nudgeBody:'صورتك الأولى بـ25 جنيه بس بدل 50، أو باقاتنا تبدأ من 59 جنيه لـ3 صور. لو محتار في الاختيار، ابعتلنا واتساب ونساعدك تختار الأنسب لك.',
+    nudgeBody:'صورتك الأولى بـ{offer} جنيه بس بدل {original}، أو باقاتنا تبدأ من {starterPrice} جنيه لـ{starterPhotos} صور. لو محتار في الاختيار، ابعتلنا واتساب ونساعدك تختار الأنسب لك.',
     nudgeBrowseBtn:'تصفّح الصور', nudgeAskBtn:'اسألنا واتساب',
     thanksTitle:'شكراً إنك جربتنا 🙏',
     thanksBody:'لو الصورة عجبتك، مشاركتها مع صحابك أو تقييم سريع بيساعدنا كتير.',
@@ -466,6 +468,11 @@ const translations = {
     pricingPromptTitle:'سعر شراء البرومبت لوحده', pricingPromptIntro:'السعر اللي بيدفعه العميل عشان ياخد نص البرومبت بدل الصورة المحوّلة نفسها — سعر ثابت وواحد لكل المنتجات.', pricingPromptLabel:'السعر (جنيه)', pricingPromptSaveBtn:'حفظ سعر البرومبت',
     toastPricingSaved:'تم حفظ الباقات — التعديل ظاهر فورًا على الموقع', toastPricingPromptSaved:'تم حفظ سعر البرومبت',
     pricingErrEmpty:'لازم توجد باقة واحدة على الأقل', pricingErrDupId:'في معرّفين باقة متكررين — كل معرّف لازم يكون فريد', pricingErrInvalidId:'المعرف لازم يكون حروف إنجليزية وأرقام و- و_ بس (بدون مسافات)', pricingErrInvalidRow:'راجع بيانات الباقة رقم', pricingErrFields:'كل الحقول مطلوبة والسعر وعدد الصور لازم يكونوا أرقام أكبر من صفر', pricingErrPromptPrice:'سعر البرومبت لازم يكون رقم أكبر من صفر',
+    pricingScrollHint:'◀ مرّر يمين/شمال لعرض كل الأعمدة ▶',
+    launchPromoTitle:'سعر الصورة الفردية والعرض الترويجي', launchPromoIntro:'بيغيّر سعر كل المنتجات (الأساليب) الفردية في الموقع دفعة واحدة، وكمان الشريط الإعلاني أعلى الصفحة وكل نص "X جنيه بدل Y" في الموقع — كل حاجة بتتحدّث تلقائيًا لنفس الرقمين اللي تحفظهم هنا. الباقات والاشتراكات مش بتتأثر (ليها الجدول الخاص بيها فوق).', launchOfferPriceLabel:'السعر الحالي (العرض)', launchOriginalPriceLabel:'السعر قبل العرض (يظهر كخصم)', launchPromoSaveBtn:'حفظ السعر في كل الموقع',
+    launchPromoErrFields:'محتاج تدخل السعرين كأرقام أكبر من صفر', launchPromoErrOrder:'السعر الحالي لازم يكون أقل من السعر قبل العرض (عشان يبقى في خصم فعلي)',
+    toastLaunchPromoSaved:'تم الحفظ في كل الموقع', launchPromoSummaryTpl:'تم تحديث سعر {count} منتج — العرض بقى {offer} جنيه بدل {original} في كل مكان بالموقع.',
+    launchPromoConfirmTpl:'هيتغيّر سعر {count} منتج (كل الأساليب الفردية) لـ{offer} جنيه، وهيظهر في كل الموقع كـ"{offer} جنيه بدل {original}". متأكد؟',
     aiModelTitle:'موديل الذكاء الاصطناعي', aiModelIntro:'اختار موديل توليد الصور اللي هيستخدمه الموقع. كل موديل بيفرق في السعر وجودة النتيجة — جرّب صورة تجريبية بكل موديل قبل ما تعتمده بشكل نهائي. ملحوظة: اختيار "دقة الصورة" فوق مالوش تأثير على Flux 2 Pro (بياخد دايمًا أفضل دقة متاحة أوتوماتيك).', aiModelSaveBtn:'حفظ الموديل', toastAiModelSaved:'تم حفظ موديل الذكاء الاصطناعي',
     colorThemeTitle:'لون الهيدر والخلفية تحت الصور', colorThemeIntro:'اختار درجة اللون الغامق اللي تظهر في شريط الهيدر والمساحة خلف صور المنتجات. باقي ألوان الموقع (الدهبي، الخط) بتفضل زي ما هي في كل الاختيارات.', colorThemeLabel:'لون الهيدر', colorThemeBlack:'أسود (الحالي)', colorThemeBrown:'بني قهوة فخم', colorThemeEmerald:'أخضر زمردي غامق', colorThemeWine:'نبيتي غامق', colorThemeNavy:'كحلي ملكي', colorThemeRed:'أحمر / وردي غامق', colorThemeSaveBtn:'حفظ اللون', toastColorThemeSaved:'تم حفظ اللون — هيظهر للعملاء من زيارتهم الجاية',
     headerModeTitle:'شكل الهيدر', headerModeIntro:'"الشكل الحالي" يعرض كل أزرار الهيدر (اللغة، الوضع الليلي، عرض الموبايل/الكمبيوتر، تتبع الطلب) في شريط دايمًا ظاهر. "قائمة مطوية" بينقلهم جوه قائمة (☰) بتتفتح عند الضغط، وده بيقلل ارتفاع الهيدر.', headerModeLabel:'وضع الهيدر', headerModeClassicOption:'الشكل الحالي', headerModeCompactOption:'قائمة مطوية (☰)', headerModeSaveBtn:'حفظ شكل الهيدر', toastHeaderModeSaved:'تم حفظ شكل الهيدر — هيظهر للعملاء من زيارتهم الجاية',
@@ -535,7 +542,7 @@ const translations = {
     a11ySliderHandle:'اسحب أو استخدم أسهم اليمين واليسار للمقارنة بين قبل وبعد',
     a11yContact:'تواصل معنا', a11yBackToTop:'العودة لأعلى الصفحة',
     brandNameAr:'ميجا فوتوبوك', backHomeLabel:'الرئيسية', contactFabWord:'تواصل مع', contactFabBrand:'ميجا',
-    launchPromoBannerShort:'🎉 صورتك بـ25 جنيه بدل 50',
+    launchPromoBannerShort:'🎉 صورتك بـ{offer} جنيه بدل {original}',
     a11yScrollUp:'لأعلى', a11yScrollDown:'لأسفل',
     a11yOriginalPhoto:'الصورة الأصلية', a11yChangeAvatar:'تغيير صورة البروفايل',
     sliderHint:'اسحب يمين وشمال، ودوس ‹ › تتنقل بين أمثلة مختلفة',
@@ -621,7 +628,7 @@ const translations = {
     themeDayLabel:'Day Mode', themeNightLabel:'Night Mode',
     themeToggleTitle:'Switch between day mode and night mode',
     heroEyebrow:'Miga-Photobook',
-    promoMarqueePre:"🎉 Get your photo now for ", promoMarqueePrice:"25 EGP instead of 50", promoMarqueeMid:" — powered by ", promoMarqueeBrand:"Miga", promoMarqueePost:", in minutes. What are you waiting for?",
+    promoMarqueePre:"🎉 Get your photo now for ", promoMarqueePrice:"{offer} EGP instead of {original}", promoMarqueeMid:" — powered by ", promoMarqueeBrand:"Miga", promoMarqueePost:", in minutes. What are you waiting for?",
     heroSlogan:'Your shot... becomes a masterpiece',
     promoVideoTitle:'See Miga-Photobook in action', promoVideoSub:'A few minutes, and your ordinary photo becomes a professional work of art.',
     trustCheck1:'✅ Result within minutes', trustCheck2:'✅ Secure payment', trustCheck3:'✅ Direct support', trustCheck4:'✅ Ongoing updates',
@@ -692,7 +699,7 @@ const translations = {
     bafTitle:'One Photo From You... Turned Into Your Favorite Style',
     bafSub:'This is the same photo, after Miga-Photobook transformed it into different styles. Pick one you like and try it on your own photo.',
     bafCenterLabel:'Your Original Photo',
-    bafCta:'Make Your <b class="brand-mega">Mega</b> Photo Now — 25 EGP instead of 50',
+    bafCta:'Make Your <b class="brand-mega">Mega</b> Photo Now — {offer} EGP instead of {original}',
     secChildrenTitle:"Children's Section", secMaleTitle:"Men's Section", secFemaleTitle:"Women's Section",
     secBusinessTitle:'Business Section', secCinematicTitle:'Cinematic Section', secLuxuryTitle:'Luxury Section',
     secArtisticTitle:'Artistic Section', secMagazineTitle:'Magazine / Poster Section',
@@ -756,7 +763,7 @@ const translations = {
     shareResultBtn:'Share result', shareResultText:'Check out my photo from Miga-Photobook 🔥',
     toastShareCopied:'Link copied — paste it anywhere ✅',
     nudgeTitle:'Still deciding?',
-    nudgeBody:'Your first photo is just 25 EGP instead of 50, or bundles starting from 59 EGP for 3 photos. Not sure which style suits you? Message us on WhatsApp and we will help you pick.',
+    nudgeBody:'Your first photo is just {offer} EGP instead of {original}, or bundles starting from {starterPrice} EGP for {starterPhotos} photos. Not sure which style suits you? Message us on WhatsApp and we will help you pick.',
     nudgeBrowseBtn:'Browse photos', nudgeAskBtn:'Ask us on WhatsApp',
     thanksTitle:'Thank you for trying us 🙏',
     thanksBody:'If you like your photo, sharing it with friends or leaving a quick review helps us a lot.',
@@ -854,6 +861,11 @@ const translations = {
     pricingPromptTitle:'Prompt-only purchase price', pricingPromptIntro:'The price a customer pays to get the prompt text instead of the transformed photo itself — one fixed price across all products.', pricingPromptLabel:'Price (EGP)', pricingPromptSaveBtn:'Save prompt price',
     toastPricingSaved:'Packages saved — the change is live on the site immediately', toastPricingPromptSaved:'Prompt price saved',
     pricingErrEmpty:'At least one package is required', pricingErrDupId:'Duplicate package IDs found — every ID must be unique', pricingErrInvalidId:'ID must be English letters, numbers, - and _ only (no spaces)', pricingErrInvalidRow:'Check the data for package #', pricingErrFields:'All fields are required, and price/photo count must be numbers greater than zero', pricingErrPromptPrice:'Prompt price must be a number greater than zero',
+    pricingScrollHint:'◀ Swipe left/right to see every column ▶',
+    launchPromoTitle:'Individual photo price & promo offer', launchPromoIntro:'Changes every individual (non-package) product\'s price on the site at once, plus the top announcement banner and every "X instead of Y" string on the site — everything updates automatically to the two numbers you save here. Packages/subscriptions are unaffected (they have their own table above).', launchOfferPriceLabel:'Current price (offer)', launchOriginalPriceLabel:'Price before the offer (shown as a discount)', launchPromoSaveBtn:'Save site-wide',
+    launchPromoErrFields:'Enter both prices as numbers greater than zero', launchPromoErrOrder:'The current price must be lower than the price before the offer (so it\'s a real discount)',
+    toastLaunchPromoSaved:'Saved across the whole site', launchPromoSummaryTpl:'Updated the price of {count} product(s) — the offer is now {offer} EGP instead of {original} everywhere on the site.',
+    launchPromoConfirmTpl:'This will change the price of {count} product(s) (every individual style) to {offer} EGP, shown across the site as "{offer} EGP instead of {original}". Continue?',
     aiModelTitle:'AI model', aiModelIntro:'Choose which image-generation model the site uses. Each model differs in price and result quality — try a test image with each before committing to it. Note: the resolution choice above has no effect on Flux 2 Pro (it always uses the best resolution automatically).', aiModelSaveBtn:'Save model', toastAiModelSaved:'AI model saved',
     colorThemeTitle:'Header and image-background color', colorThemeIntro:'Choose the dark shade used for the header bar and the space behind product images. The rest of the site colors (gold, text) stay the same across every option.', colorThemeLabel:'Header color', colorThemeBlack:'Black (current)', colorThemeBrown:'Warm coffee brown', colorThemeEmerald:'Deep emerald green', colorThemeWine:'Deep wine', colorThemeNavy:'Royal navy', colorThemeRed:'Deep red / rose', colorThemeSaveBtn:'Save color', toastColorThemeSaved:'Color saved — customers will see it on their next visit',
     headerModeTitle:'Header layout', headerModeIntro:'"Current layout" shows every header button (language, dark mode, mobile/desktop preview, track order) in an always-visible strip. "Collapsed menu" moves them into a (☰) menu that opens on tap, which shortens the header.', headerModeLabel:'Header layout', headerModeClassicOption:'Current layout', headerModeCompactOption:'Collapsed menu (☰)', headerModeSaveBtn:'Save header layout', toastHeaderModeSaved:'Header layout saved — customers will see it on their next visit',
@@ -921,7 +933,7 @@ const translations = {
     a11ySliderHandle:'Drag, or use the left/right arrow keys, to compare before and after',
     a11yContact:'Contact us', a11yBackToTop:'Back to top',
     brandNameAr:'ميجا فوتوبوك', backHomeLabel:'Home', contactFabWord:'Contact', contactFabBrand:'Miga',
-    launchPromoBannerShort:'🎉 25 EGP instead of 50',
+    launchPromoBannerShort:'🎉 {offer} EGP instead of {original}',
     a11yScrollUp:'Scroll up', a11yScrollDown:'Scroll down',
     a11yOriginalPhoto:'Original photo', a11yChangeAvatar:'Change profile photo',
     sliderHint:'Drag left and right, and tap \u2039 \u203a to move between examples',
@@ -1399,6 +1411,7 @@ function applyLanguage(lang){
   // silently wipe the price these two just got synced with. See the long
   // comment on syncHeroPriceCta() itself for the full story.
   syncHeroPriceCta();
+  syncLaunchPromoTexts();
   if(adminLoggedIn && document.getElementById('adminTabOrders').style.display !== 'none'){
     renderOrdersList();
   }
@@ -1568,8 +1581,67 @@ function syncHeroPriceCta(){
   const el = document.getElementById('heroPricePart');
   if(el) el.textContent = t('heroPricePartTpl').replace('{price}', cheapest.toLocaleString('en-US'));
 
+  // bafCta's translation string is now a template ('...بـ{offer} جنيه بدل
+  // {original}') instead of raw text with two hardcoded numbers baked in —
+  // see the long comment above this function for why a plain regex-replace
+  // of the FIRST digit run (the old approach) quietly left the "بدل 50"
+  // half wrong forever. Both numbers are substituted explicitly now, same
+  // as heroPricePartTpl's own {price} placeholder just above.
   document.querySelectorAll('[data-i18n-html="bafCta"]').forEach(node=>{
-    node.innerHTML = t('bafCta').replace(/\d+/, String(cheapest));
+    node.innerHTML = t('bafCta')
+      .replace('{offer}', cheapest.toLocaleString('en-US'))
+      .replace('{original}', liveLaunchOriginalPrice.toLocaleString('en-US'));
+  });
+}
+
+/** Keeps every "X جنيه بدل Y" marketing string on the site — the scrolling
+ * top marquee, the short soft-launch banner next to the search box, and the
+ * "still thinking?" stay-nudge popup — in sync with the REAL live prices,
+ * exactly like syncHeroPriceCta() above does for the hero/bafCta button.
+ *
+ * Added 2026-09-17 alongside POST /admin/set-launch-promo: before this, all
+ * three strings had "25"/"50" typed directly into the translation text, so
+ * an admin changing product prices from the panel would silently leave the
+ * marquee/banner/nudge advertising the OLD number forever — the exact same
+ * staleness trap already fixed once for bafCta (see its own comment) and
+ * for the JSON-LD price (syncProductPriceLd). "{offer}" is always the real
+ * cheapest live product price (never a separately-stored marketing number,
+ * so it can never drift from what checkout actually charges); "{original}"
+ * is the admin-set cosmetic "was" price from /site-config; "{starterPrice}"
+ * (nudgeBody only) is the cheapest live package price, same source
+ * syncPackagePricingUI() already trusts.
+ *
+ * Called (a) once products/packages/launchOriginalPrice first load, and
+ * (b) at the end of every applyLanguage() call, same reasoning as
+ * syncPackagePricingUI()/syncHeroPriceCta() needing to re-run after the
+ * blanket [data-i18n] pass resets these spans to their static fallback text. */
+function syncLaunchPromoTexts(){
+  if(!Array.isArray(products) || !products.length) return;
+  const prices = products.map(p=>Number(p.price)).filter(n=>Number.isFinite(n) && n > 0);
+  if(!prices.length) return;
+  const offer = Math.min(...prices);
+  const original = Number.isFinite(liveLaunchOriginalPrice) && liveLaunchOriginalPrice > 0 ? liveLaunchOriginalPrice : LAUNCH_ORIGINAL_PRICE_FALLBACK;
+  const fmt = (n) => n.toLocaleString('en-US');
+
+  // "cheapest package" by PRICE, not by photo count — mirrors how a customer
+  // actually shops (lowest amount to pay), and matches the "باقاتنا تبدأ من"
+  // ("our bundles start from") framing in nudgeBody.
+  const cheapestPkg = Array.isArray(packagesRegistry) && packagesRegistry.length
+    ? packagesRegistry.reduce((min, p) => (Number.isFinite(Number(p.price)) && Number(p.price) > 0 && (!min || Number(p.price) < Number(min.price))) ? p : min, null)
+    : null;
+
+  document.querySelectorAll('[data-i18n="promoMarqueePrice"]').forEach(el=>{
+    el.textContent = t('promoMarqueePrice').replace('{offer}', fmt(offer)).replace('{original}', fmt(original));
+  });
+  document.querySelectorAll('[data-i18n="launchPromoBannerShort"]').forEach(el=>{
+    el.textContent = t('launchPromoBannerShort').replace('{offer}', fmt(offer)).replace('{original}', fmt(original));
+  });
+  document.querySelectorAll('[data-i18n="nudgeBody"]').forEach(el=>{
+    let text = t('nudgeBody').replace('{offer}', fmt(offer)).replace('{original}', fmt(original));
+    if(cheapestPkg){
+      text = text.replace('{starterPrice}', fmt(Number(cheapestPkg.price))).replace('{starterPhotos}', fmt(Number(cheapestPkg.photoCount)));
+    }
+    el.textContent = text;
   });
 }
 
@@ -1590,6 +1662,7 @@ async function loadProducts(){
   // products بتبقى فاضية والدالة بتعمل return والاحتياطي بيفضل.
   syncProductPriceLd();
   syncHeroPriceCta();
+  syncLaunchPromoTexts();
 }
 
 /** Whether the 'luxury' slot is running as the derived "Prompt Library for
@@ -1614,8 +1687,10 @@ async function loadPromptLibraryMode(){
     PROMPT_LIBRARY_MODE = !!(data && data.promptLibraryMode);
     if(Array.isArray(data?.packages) && data.packages.length) packagesRegistry = data.packages;
     if(Number.isFinite(Number(data?.promptPrice)) && Number(data.promptPrice) > 0) livePromptPrice = Number(data.promptPrice);
+    if(Number.isFinite(Number(data?.launchOriginalPrice)) && Number(data.launchOriginalPrice) > 0) liveLaunchOriginalPrice = Number(data.launchOriginalPrice);
     renderGrids(); // re-render product grids so the prompt-price bullets pick up livePromptPrice
     syncPackagePricingUI(); // re-render the pricing section so it picks up packagesRegistry
+    syncLaunchPromoTexts(); // re-apply the "X جنيه بدل Y" copy everywhere with the live numbers
   }catch(e){ /* network hiccup — keep fallback defaults (already set above) */ }
 }
 
@@ -6915,6 +6990,23 @@ async function loadPricingIntoAdmin(){
     renderPricingPackagesTable(packages);
     const promptInput = document.getElementById('pricingPromptPriceInput');
     if(promptInput && Number.isFinite(Number(data.promptPrice))) promptInput.value = data.promptPrice;
+
+    // Offer price shown here is the REAL current cheapest individual-product
+    // price (same source syncHeroPriceCta/syncLaunchPromoTexts trust) — never
+    // a separately-stored number — so what the admin sees here always matches
+    // what's actually live, even if products were last edited one-by-one from
+    // the "المنتجات" tab rather than through this bulk control.
+    const offerInput = document.getElementById('launchOfferPriceInput');
+    const originalInput = document.getElementById('launchOriginalPriceInput');
+    if(offerInput && Array.isArray(products) && products.length){
+      const prices = products.map(p=>Number(p.price)).filter(n=>Number.isFinite(n) && n > 0);
+      if(prices.length) offerInput.value = Math.min(...prices);
+    }
+    if(originalInput && Number.isFinite(Number(data.launchOriginalPrice))) originalInput.value = data.launchOriginalPrice;
+    const launchErrEl = document.getElementById('launchPromoError');
+    const launchSummaryEl = document.getElementById('launchPromoSummary');
+    if(launchErrEl){ launchErrEl.style.display = 'none'; launchErrEl.textContent = ''; }
+    if(launchSummaryEl){ launchSummaryEl.style.display = 'none'; launchSummaryEl.textContent = ''; }
   }catch(e){ /* leave the table as-is on a network hiccup */ }
 }
 
@@ -7011,6 +7103,75 @@ elById('savePricingPromptBtn').onclick = async ()=>{
     }
   }catch(e){
     showToast(t('toastAdminServerError'));
+  }
+};
+
+/** Saves the site-wide "offer / before-offer" prices (added 2026-09-17). This
+ * is the single control behind: (a) every individual product's real catalog
+ * price, bulk-overwritten to `offerPrice` — the exact number createOrder()
+ * will charge from now on; and (b) the cosmetic `originalPrice` used only in
+ * the "X جنيه بدل Y" marketing copy. See setLaunchPromo() in the Worker and
+ * syncLaunchPromoTexts() above for the full reasoning. Because this touches
+ * EVERY product at once (unlike the packages/prompt-price controls above,
+ * which only ever touch what's in the form), it confirms with the admin
+ * first and tells them exactly how many products will change. */
+elById('saveLaunchPromoBtn').onclick = async ()=>{
+  const errEl = document.getElementById('launchPromoError');
+  const summaryEl = document.getElementById('launchPromoSummary');
+  const showErr = (msg)=>{ if(errEl){ errEl.textContent = msg; errEl.style.display = 'block'; } };
+  if(errEl){ errEl.style.display = 'none'; errEl.textContent = ''; }
+  if(summaryEl){ summaryEl.style.display = 'none'; summaryEl.textContent = ''; }
+  if(!BACKEND_BASE || !adminSessionToken) return;
+
+  const offerPrice = Number(document.getElementById('launchOfferPriceInput')?.value);
+  const originalPrice = Number(document.getElementById('launchOriginalPriceInput')?.value);
+  if(!Number.isFinite(offerPrice) || offerPrice <= 0 || !Number.isFinite(originalPrice) || originalPrice <= 0){
+    showErr(t('launchPromoErrFields'));
+    return;
+  }
+  if(offerPrice >= originalPrice){
+    showErr(t('launchPromoErrOrder'));
+    return;
+  }
+
+  const productCount = Array.isArray(products) ? products.length : 0;
+  // .replaceAll for {offer}: the confirm copy names the new price twice
+  // ("change N products to X" ... "shown as X instead of Y") — a plain
+  // .replace() only swaps the FIRST occurrence and leaves the literal
+  // "{offer}" text sitting in the second spot.
+  const confirmMsg = t('launchPromoConfirmTpl')
+    .replaceAll('{count}', String(productCount))
+    .replaceAll('{offer}', String(offerPrice))
+    .replaceAll('{original}', String(originalPrice));
+  if(!confirm(confirmMsg)) return;
+
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/set-launch-promo?token=${encodeURIComponent(adminSessionToken)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ offerPrice, originalPrice })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(res.ok && data.ok){
+      liveLaunchOriginalPrice = Number.isFinite(Number(data.originalPrice)) ? data.originalPrice : originalPrice;
+      // Every product's price just changed server-side — refresh the local
+      // catalog so syncHeroPriceCta()/syncLaunchPromoTexts() (and the
+      // "المنتجات" tab's own list) reflect it without a manual page reload.
+      await loadProducts();
+      syncLaunchPromoTexts();
+      if(typeof renderAdminProductsList === 'function') renderAdminProductsList();
+      if(summaryEl){
+        summaryEl.textContent = t('launchPromoSummaryTpl')
+          .replace('{count}', String(data.updatedProducts ?? productCount))
+          .replace('{offer}', String(offerPrice))
+          .replace('{original}', String(originalPrice));
+        summaryEl.style.display = 'block';
+      }
+      showToast(t('toastLaunchPromoSaved'));
+    }else{
+      showErr(data.error || t('toastAdminServerError'));
+    }
+  }catch(e){
+    showErr(t('toastAdminServerError'));
   }
 };
 
