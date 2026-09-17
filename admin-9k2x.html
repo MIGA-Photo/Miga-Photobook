@@ -186,7 +186,7 @@
      old URL. Bumping this string (e.g. 20260906a -> 20260906b) any time
      app.js or styles.css changes forces every visitor to fetch the new file
      immediately, no manual cache-clearing needed on their end. -->
-<link rel="stylesheet" href="styles.css?v=c9ebf3e8">
+<link rel="stylesheet" href="styles.css?v=eb350c19">
 
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-98HS77F9E9"></script>
@@ -1780,7 +1780,8 @@
     </div>
     <div id="adminFormView" style="display:none;">
       <div class="admin-tabs">
-        <button data-tab="products" class="active" id="tabBtnProducts" data-i18n="tabProducts">إضافة منتج</button>
+        <button data-tab="dashboard" class="active" id="tabBtnDashboard" data-i18n="tabDashboard">🏠 الرئيسية</button>
+        <button data-tab="products" id="tabBtnProducts" data-i18n="tabProducts">إضافة منتج</button>
         <button data-tab="orders" id="tabBtnOrders"><span data-i18n="tabOrders">الطلبات</span> <span id="pendingCount"></span></button>
         <button data-tab="reviews" id="tabBtnReviews"><span data-i18n="tabReviews">التقييمات</span> <span id="pendingReviewCount"></span></button>
         <button data-tab="visitors" id="tabBtnVisitors" data-i18n="tabVisitors">الزوار</button>
@@ -1791,7 +1792,42 @@
         <button data-tab="pricing" id="tabBtnPricing" data-i18n="tabPricing">الأسعار والباقات</button>
       </div>
 
-      <div id="adminTabProducts">
+      <div id="adminTabDashboard">
+        <p class="sub" style="margin-bottom:14px;" data-i18n="dashboardIntro">نظرة سريعة على أهم حاجة محتاجة انتباهك دلوقتي، من غير ما تفتح كل تبويب لوحده.</p>
+        <div class="admin-card" id="dashAttentionCard">
+          <h4 style="margin:0 0 10px;" data-i18n="dashAttentionTitle">محتاج انتباهك</h4>
+          <div class="dash-attention-grid" id="dashAttentionGrid">
+            <button type="button" class="dash-attn-tile" id="dashGoOrdersBtn">
+              <span class="dash-attn-num" id="dashPendingOrders">0</span>
+              <span class="dash-attn-label" data-i18n="dashPendingOrdersLabel">طلبات محتاجة مراجعة</span>
+            </button>
+            <button type="button" class="dash-attn-tile" id="dashGoOrdersUnderpaidBtn">
+              <span class="dash-attn-num" id="dashUnderpaidOrders">0</span>
+              <span class="dash-attn-label" data-i18n="dashUnderpaidOrdersLabel">طلبات مدفوعة جزئيًا</span>
+            </button>
+            <button type="button" class="dash-attn-tile" id="dashGoReviewsBtn">
+              <span class="dash-attn-num" id="dashPendingReviews">0</span>
+              <span class="dash-attn-label" data-i18n="dashPendingReviewsLabel">تقييمات محتاجة موافقة</span>
+            </button>
+          </div>
+        </div>
+        <div class="admin-card">
+          <h4 style="margin:0 0 10px;" data-i18n="dashTodayTitle">النهارده</h4>
+          <div class="dash-stats-grid" id="dashTodayGrid">
+            <div class="dash-stat"><span class="dash-stat-num" id="dashOrdersCreated">0</span><span class="dash-stat-label" data-i18n="dashOrdersCreatedLabel">طلبات جديدة</span></div>
+            <div class="dash-stat"><span class="dash-stat-num" id="dashOrdersApproved">0</span><span class="dash-stat-label" data-i18n="dashOrdersApprovedLabel">طلبات معتمدة</span></div>
+            <div class="dash-stat"><span class="dash-stat-num" id="dashRevenue">0</span><span class="dash-stat-label" data-i18n="dashRevenueLabel">إيراد مؤكد (جنيه)</span></div>
+            <div class="dash-stat"><span class="dash-stat-num" id="dashTransforms">0</span><span class="dash-stat-label" data-i18n="dashTransformsLabel">صور تم تحويلها</span></div>
+            <div class="dash-stat"><span class="dash-stat-num" id="dashVisitsToday">0</span><span class="dash-stat-label" data-i18n="dashVisitsTodayLabel">زيارات اليوم</span></div>
+            <div class="dash-stat"><span class="dash-stat-num" id="dashVisitsTotal">0</span><span class="dash-stat-label" data-i18n="dashTotalVisitsLabel">إجمالي الزيارات</span></div>
+          </div>
+          <div class="modal-actions">
+            <button class="btn-ghost" id="dashRefreshBtn" data-i18n="dashRefreshBtn">🔄 تحديث</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="adminTabProducts" style="display:none;">
         <div class="field-grid-2">
           <div class="field">
             <label data-i18n="pCatLabel">القسم</label>
@@ -2234,6 +2270,23 @@
           <button class="btn-primary" id="savePromptLibraryModeBtn" data-i18n="promptLibraryModeSaveBtn">حفظ الوضع</button>
         </div>
         </div>
+
+        <div class="admin-card">
+        <h4 style="margin:0 0 8px;" data-i18n="analyticsTitle">التتبع والتحليلات (GA4 / Meta Pixel)</h4>
+        <p class="sub" style="margin-bottom:14px;" data-i18n="analyticsIntro">لمعرفة مصدر الزوار وأداء الإعلانات. حط المعرّف واحفظ — التتبع بيتفعّل في كل صفحات الموقع فورًا من غير ما تحتاج تعدّل أي كود.</p>
+        <div class="field">
+          <label data-i18n="ga4IdLabel">GA4 Measurement ID</label>
+          <input type="text" id="ga4IdInput" placeholder="G-XXXXXXXXXX" style="direction:ltr; text-align:left;">
+        </div>
+        <div class="field">
+          <label data-i18n="metaPixelIdLabel">Meta Pixel ID</label>
+          <input type="text" id="metaPixelIdInput" placeholder="123456789012345" style="direction:ltr; text-align:left;">
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="saveAnalyticsBtn" data-i18n="analyticsSaveBtn">حفظ إعدادات التتبع</button>
+        </div>
+        <p class="sub" id="analyticsError" style="color:#e05a5a; display:none;"></p>
+        </div>
       </div>
 
       <div id="adminTabPricing" style="display:none;">
@@ -2277,11 +2330,82 @@
             <input type="number" id="launchOriginalPriceInput" min="1" step="1">
           </div>
         </div>
+        <details style="margin-top:12px;">
+          <summary style="cursor:pointer; color:var(--brass); font-size:13.5px;" data-i18n="launchPromoScheduleLabel">جدولة انتهاء العرض (اختياري)</summary>
+          <p class="sub" style="margin:8px 0;" data-i18n="launchPromoScheduleHint">لو حددت تاريخ ووقت انتهاء وسعر رجوع، الموقع هيرجع تلقائيًا لسعر الرجوع لما الميعاد يجي — من غير ما تحتاج ترجع تعدّل بنفسك.</p>
+          <div class="launch-promo-fields">
+            <div class="field">
+              <label data-i18n="launchPromoEndsAtLabel">تاريخ ووقت الانتهاء</label>
+              <input type="datetime-local" id="launchPromoEndsAtInput">
+            </div>
+            <div class="field">
+              <label data-i18n="launchPromoRevertPriceLabel">السعر بعد الانتهاء</label>
+              <input type="number" id="launchPromoRevertPriceInput" min="1" step="1">
+            </div>
+          </div>
+          <p class="sub" id="launchPromoScheduleActiveNote" style="color:var(--paper-dim); display:none;"></p>
+        </details>
         <div class="modal-actions">
           <button class="btn-primary" id="saveLaunchPromoBtn" data-i18n="launchPromoSaveBtn">حفظ السعر في كل الموقع</button>
         </div>
         <p class="sub" id="launchPromoError" style="color:#e05a5a; display:none;"></p>
         <p class="sub" id="launchPromoSummary" style="color:var(--paper-dim); display:none;"></p>
+        </div>
+
+        <div class="admin-card">
+        <h4 style="margin:0 0 8px;" data-i18n="categoryPricingTitle">تسعير حسب القسم</h4>
+        <p class="sub" style="margin-bottom:14px;" data-i18n="categoryPricingIntro">أداة منفصلة عن أداة "سعر الصورة الفردية" فوق — دي بتخليك تحدد سعر مختلف لكل قسم (بسيط/بيزنس/فاخر...) بدل سعر واحد موحّد للكل. سيب أي خانة فاضية عشان قسمها ما يتغيّرش. تنبيه: تشغيل أداة "سعر الصورة الفردية" فوق بعد كده هيرجّع كل الأقسام لسعر واحد تاني.</p>
+        <div class="category-pricing-grid" id="categoryPricingGrid"><!-- populated dynamically, one field per category --></div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="saveCategoryPricingBtn" data-i18n="categoryPricingSaveBtn">حفظ أسعار الأقسام</button>
+        </div>
+        <p class="sub" id="categoryPricingError" style="color:#e05a5a; display:none;"></p>
+        <p class="sub" id="categoryPricingSummary" style="color:var(--paper-dim); display:none;"></p>
+        </div>
+
+        <div class="admin-card">
+        <h4 style="margin:0 0 8px;" data-i18n="couponsTitle">أكواد الخصم</h4>
+        <p class="sub" style="margin-bottom:14px;" data-i18n="couponsIntro">كود يكتبه العميل وقت الدفع فيخصم من السعر تلقائيًا — مفيد لمتابعة أداء إعلان أو مؤثر بعينه، أو عرض لمناسبة. الخصم بيتحسب واتّحقق منه من عندنا في السيرفر دايمًا، مش من المتصفح.</p>
+        <div id="couponsList"></div>
+        <p class="sub" id="couponsEmptyNote" style="display:none;" data-i18n="couponsEmptyNote">لا يوجد أكواد خصم حاليًا.</p>
+        <div class="coupon-form-grid" style="margin-top:14px;">
+          <div class="field">
+            <label data-i18n="couponCodeLabel">الكود</label>
+            <input type="text" id="couponCodeInput" placeholder="SAVE10" style="text-transform:uppercase; direction:ltr;">
+          </div>
+          <div class="field">
+            <label data-i18n="couponTypeLabel">نوع الخصم</label>
+            <select id="couponTypeInput">
+              <option value="percent" data-i18n="couponTypePercent">نسبة %</option>
+              <option value="fixed" data-i18n="couponTypeFixed">مبلغ ثابت</option>
+            </select>
+          </div>
+          <div class="field">
+            <label data-i18n="couponValueLabel">القيمة</label>
+            <input type="number" id="couponValueInput" min="1" step="1">
+          </div>
+          <div class="field">
+            <label data-i18n="couponAppliesToLabel">يسري على</label>
+            <select id="couponAppliesToInput">
+              <option value="all" data-i18n="couponAppliesAll">كل الطلبات</option>
+              <option value="transform" data-i18n="couponAppliesTransform">الصورة الفردية بس</option>
+              <option value="package" data-i18n="couponAppliesPackage">الباقات بس</option>
+              <option value="prompt" data-i18n="couponAppliesPrompt">البرومبت بس</option>
+            </select>
+          </div>
+          <div class="field">
+            <label data-i18n="couponExpiresLabel">ينتهي في (اختياري)</label>
+            <input type="date" id="couponExpiresInput">
+          </div>
+          <div class="field">
+            <label data-i18n="couponMaxUsesLabel">أقصى عدد استخدام (اختياري)</label>
+            <input type="number" id="couponMaxUsesInput" min="1" step="1">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="addCouponBtn" data-i18n="couponAddBtn">+ إضافة الكود</button>
+        </div>
+        <p class="sub" id="couponError" style="color:#e05a5a; display:none;"></p>
         </div>
 
         <div class="admin-card">
@@ -2295,6 +2419,21 @@
           <button class="btn-primary" id="savePricingPromptBtn" data-i18n="pricingPromptSaveBtn">حفظ سعر البرومبت</button>
         </div>
         </div>
+
+        <div class="admin-card">
+        <h4 style="margin:0 0 8px;" data-i18n="priceHistoryTitle">سجل تغييرات السعر</h4>
+        <p class="sub" style="margin-bottom:14px;" data-i18n="priceHistoryIntro">آخر التغييرات اللي اتعملت على الأسعار من هنا — تاريخ كل تغيير وتفاصيله، للرجوع إليه لاحقًا.</p>
+        <div id="priceHistoryList"></div>
+        <p class="sub" id="priceHistoryEmptyNote" style="display:none;" data-i18n="priceHistoryEmptyNote">لا يوجد سجل تغييرات بعد.</p>
+        </div>
+
+        <div class="admin-card">
+        <h4 style="margin:0 0 8px;" data-i18n="exportConfigTitle">نسخة احتياطية من إعدادات الموقع</h4>
+        <p class="sub" style="margin-bottom:14px;" data-i18n="exportConfigIntro">يحمّل ملف JSON فيه كل المنتجات والأسعار والباقات وأكواد الخصم وإعدادات الموقع — تأمين سريع قبل أي تعديل كبير.</p>
+        <div class="modal-actions">
+          <button class="btn-ghost" id="exportConfigBtn" data-i18n="exportConfigBtn">⬇️ تنزيل نسخة احتياطية (JSON)</button>
+        </div>
+        </div>
       </div>
 
       <div class="modal-actions" style="margin-top:14px;">
@@ -2306,7 +2445,7 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="app.js?v=6e21a328"></script>
+<script src="app.js?v=a713afcc"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){

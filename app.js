@@ -473,6 +473,29 @@ const translations = {
     launchPromoErrFields:'محتاج تدخل السعرين كأرقام أكبر من صفر', launchPromoErrOrder:'السعر الحالي لازم يكون أقل من السعر قبل العرض (عشان يبقى في خصم فعلي)',
     toastLaunchPromoSaved:'تم الحفظ في كل الموقع', launchPromoSummaryTpl:'تم تحديث سعر {count} منتج — العرض بقى {offer} جنيه بدل {original} في كل مكان بالموقع.',
     launchPromoConfirmTpl:'هيتغيّر سعر {count} منتج (كل الأساليب الفردية) لـ{offer} جنيه، وهيظهر في كل الموقع كـ"{offer} جنيه بدل {original}". متأكد؟',
+    launchPromoScheduleLabel:'جدولة انتهاء العرض (اختياري)', launchPromoScheduleHint:'لو حددت تاريخ ووقت انتهاء وسعر رجوع، الموقع هيرجع تلقائيًا لسعر الرجوع لما الميعاد يجي — من غير ما تحتاج ترجع تعدّل بنفسك.',
+    launchPromoEndsAtLabel:'تاريخ ووقت الانتهاء', launchPromoRevertPriceLabel:'السعر بعد الانتهاء',
+    launchPromoScheduleActiveNoteTpl:'⏰ العرض هينتهي تلقائيًا يوم {date} ويرجع السعر لـ{price} جنيه.',
+    launchPromoErrScheduleFields:'محتاج تدخل تاريخ الانتهاء وسعر الرجوع سوا، أو تسيبهم فاضيين الاتنين',
+    tabDashboard:'🏠 الرئيسية', dashboardIntro:'نظرة سريعة على أهم حاجة محتاجة انتباهك دلوقتي، من غير ما تفتح كل تبويب لوحده.',
+    dashAttentionTitle:'محتاج انتباهك', dashPendingOrdersLabel:'طلبات محتاجة مراجعة', dashUnderpaidOrdersLabel:'طلبات مدفوعة جزئيًا', dashPendingReviewsLabel:'تقييمات محتاجة موافقة',
+    dashTodayTitle:'النهارده', dashOrdersCreatedLabel:'طلبات جديدة', dashOrdersApprovedLabel:'طلبات معتمدة', dashRevenueLabel:'إيراد مؤكد (جنيه)', dashTransformsLabel:'صور تم تحويلها', dashVisitsTodayLabel:'زيارات اليوم', dashTotalVisitsLabel:'إجمالي الزيارات',
+    dashRefreshBtn:'🔄 تحديث', toastDashboardRefreshed:'تم التحديث', toastDashboardError:'تعذّر تحميل بيانات الرئيسية',
+    categoryPricingTitle:'تسعير حسب القسم', categoryPricingIntro:'أداة منفصلة عن أداة "سعر الصورة الفردية" فوق — دي بتخليك تحدد سعر مختلف لكل قسم (بسيط/بيزنس/فاخر...) بدل سعر واحد موحّد للكل. سيب أي خانة فاضية عشان قسمها ما يتغيّرش. تنبيه: تشغيل أداة "سعر الصورة الفردية" فوق بعد كده هيرجّع كل الأقسام لسعر واحد تاني.',
+    categoryPricingSaveBtn:'حفظ أسعار الأقسام', categoryPricingErrFields:'محتاج تدخل سعر واحد صحيح على الأقل', toastCategoryPricingSaved:'تم حفظ أسعار الأقسام',
+    categoryPricingSummaryTpl:'تم تحديث {count} منتج حسب القسم.',
+    couponsTitle:'أكواد الخصم', couponsIntro:'كود يكتبه العميل وقت الدفع فيخصم من السعر تلقائيًا — مفيد لمتابعة أداء إعلان أو مؤثر بعينه، أو عرض لمناسبة. الخصم بيتحسب ويتّحقق منه من عندنا في السيرفر دايمًا، مش من المتصفح.',
+    couponsEmptyNote:'لا يوجد أكواد خصم حاليًا.', couponCodeLabel:'الكود', couponTypeLabel:'نوع الخصم', couponTypePercent:'نسبة %', couponTypeFixed:'مبلغ ثابت',
+    couponValueLabel:'القيمة', couponAppliesToLabel:'يسري على', couponAppliesAll:'كل الطلبات', couponAppliesTransform:'الصورة الفردية بس', couponAppliesPackage:'الباقات بس', couponAppliesPrompt:'البرومبت بس',
+    couponExpiresLabel:'ينتهي في (اختياري)', couponMaxUsesLabel:'أقصى عدد استخدام (اختياري)', couponAddBtn:'+ إضافة الكود', couponDeleteBtn:'حذف', couponActivateBtn:'تفعيل', couponDeactivateBtn:'إيقاف',
+    couponErrCode:'الكود لازم يكون 3-24 حرف/رقم إنجليزي', couponErrValue:'قيمة الخصم لازم تكون رقم أكبر من صفر', toastCouponSaved:'تم حفظ الكود', toastCouponDeleted:'تم حذف الكود',
+    couponUsedOfTpl:'استُخدم {used} مرة', couponUsedOfMaxTpl:'استُخدم {used} من {max}', couponExpiresOnTpl:'ينتهي {date}',
+    priceHistoryTitle:'سجل تغييرات السعر', priceHistoryIntro:'آخر التغييرات اللي اتعملت على الأسعار من هنا — تاريخ كل تغيير وتفاصيله، للرجوع إليه لاحقًا.', priceHistoryEmptyNote:'لا يوجد سجل تغييرات بعد.',
+    exportConfigTitle:'نسخة احتياطية من إعدادات الموقع', exportConfigIntro:'يحمّل ملف JSON فيه كل المنتجات والأسعار والباقات وأكواد الخصم وإعدادات الموقع — تأمين سريع قبل أي تعديل كبير.',
+    exportConfigBtn:'⬇️ تنزيل نسخة احتياطية (JSON)', toastExportDone:'تم تنزيل النسخة الاحتياطية',
+    hideProductTitle:'إخفاء عن الموقع', showProductTitle:'إظهار في الموقع', toastProductHidden:'تم إخفاء المنتج عن الموقع', toastProductShown:'تم إظهار المنتج في الموقع', hiddenBadgeLabel:'مخفي',
+    analyticsTitle:'التتبع والتحليلات (GA4 / Meta Pixel)', analyticsIntro:'لمعرفة مصدر الزوار وأداء الإعلانات. حط المعرّف واحفظ — التتبع بيتفعّل في كل صفحات الموقع فورًا من غير ما تحتاج تعدّل أي كود.',
+    ga4IdLabel:'GA4 Measurement ID', metaPixelIdLabel:'Meta Pixel ID', analyticsSaveBtn:'حفظ إعدادات التتبع', toastAnalyticsSaved:'تم حفظ إعدادات التتبع',
     aiModelTitle:'موديل الذكاء الاصطناعي', aiModelIntro:'اختار موديل توليد الصور اللي هيستخدمه الموقع. كل موديل بيفرق في السعر وجودة النتيجة — جرّب صورة تجريبية بكل موديل قبل ما تعتمده بشكل نهائي. ملحوظة: اختيار "دقة الصورة" فوق مالوش تأثير على Flux 2 Pro (بياخد دايمًا أفضل دقة متاحة أوتوماتيك).', aiModelSaveBtn:'حفظ الموديل', toastAiModelSaved:'تم حفظ موديل الذكاء الاصطناعي',
     colorThemeTitle:'لون الهيدر والخلفية تحت الصور', colorThemeIntro:'اختار درجة اللون الغامق اللي تظهر في شريط الهيدر والمساحة خلف صور المنتجات. باقي ألوان الموقع (الدهبي، الخط) بتفضل زي ما هي في كل الاختيارات.', colorThemeLabel:'لون الهيدر', colorThemeBlack:'أسود (الحالي)', colorThemeBrown:'بني قهوة فخم', colorThemeEmerald:'أخضر زمردي غامق', colorThemeWine:'نبيتي غامق', colorThemeNavy:'كحلي ملكي', colorThemeRed:'أحمر / وردي غامق', colorThemeSaveBtn:'حفظ اللون', toastColorThemeSaved:'تم حفظ اللون — هيظهر للعملاء من زيارتهم الجاية',
     headerModeTitle:'شكل الهيدر', headerModeIntro:'"الشكل الحالي" يعرض كل أزرار الهيدر (اللغة، الوضع الليلي، عرض الموبايل/الكمبيوتر، تتبع الطلب) في شريط دايمًا ظاهر. "قائمة مطوية" بينقلهم جوه قائمة (☰) بتتفتح عند الضغط، وده بيقلل ارتفاع الهيدر.', headerModeLabel:'وضع الهيدر', headerModeClassicOption:'الشكل الحالي', headerModeCompactOption:'قائمة مطوية (☰)', headerModeSaveBtn:'حفظ شكل الهيدر', toastHeaderModeSaved:'تم حفظ شكل الهيدر — هيظهر للعملاء من زيارتهم الجاية',
@@ -866,6 +889,29 @@ const translations = {
     launchPromoErrFields:'Enter both prices as numbers greater than zero', launchPromoErrOrder:'The current price must be lower than the price before the offer (so it\'s a real discount)',
     toastLaunchPromoSaved:'Saved across the whole site', launchPromoSummaryTpl:'Updated the price of {count} product(s) — the offer is now {offer} EGP instead of {original} everywhere on the site.',
     launchPromoConfirmTpl:'This will change the price of {count} product(s) (every individual style) to {offer} EGP, shown across the site as "{offer} EGP instead of {original}". Continue?',
+    launchPromoScheduleLabel:'Schedule promo end date (optional)', launchPromoScheduleHint:'If you set an end date/time and a revert price, the site will automatically revert to that price when the time comes — no need to remember to change it back yourself.',
+    launchPromoEndsAtLabel:'End date & time', launchPromoRevertPriceLabel:'Price after it ends',
+    launchPromoScheduleActiveNoteTpl:'⏰ This offer will automatically end on {date} and revert the price to {price} EGP.',
+    launchPromoErrScheduleFields:'Enter both the end date and the revert price together, or leave both empty',
+    tabDashboard:'🏠 Home', dashboardIntro:'A quick glance at what needs your attention right now, without opening every tab.',
+    dashAttentionTitle:'Needs attention', dashPendingOrdersLabel:'Orders awaiting review', dashUnderpaidOrdersLabel:'Partially-paid orders', dashPendingReviewsLabel:'Reviews awaiting approval',
+    dashTodayTitle:'Today', dashOrdersCreatedLabel:'New orders', dashOrdersApprovedLabel:'Approved orders', dashRevenueLabel:'Confirmed revenue (EGP)', dashTransformsLabel:'Transforms done', dashVisitsTodayLabel:'Visits today', dashTotalVisitsLabel:'Total visits',
+    dashRefreshBtn:'🔄 Refresh', toastDashboardRefreshed:'Refreshed', toastDashboardError:'Could not load the dashboard',
+    categoryPricingTitle:'Pricing by category', categoryPricingIntro:'A separate tool from the "individual photo price" one above — this lets you set a different price per category (simple/business/luxury...) instead of one flat price for everyone. Leave a field empty to leave that category untouched. Note: running the flat-price tool above afterwards will overwrite every category back to one price.',
+    categoryPricingSaveBtn:'Save category prices', categoryPricingErrFields:'Enter at least one valid price', toastCategoryPricingSaved:'Category prices saved',
+    categoryPricingSummaryTpl:'Updated {count} product(s) by category.',
+    couponsTitle:'Discount coupons', couponsIntro:'A code a customer types at checkout to get an automatic discount — useful for tracking a specific ad or influencer, or a one-off occasion offer. The discount is always calculated and verified server-side, never trusted from the browser.',
+    couponsEmptyNote:'No discount coupons yet.', couponCodeLabel:'Code', couponTypeLabel:'Discount type', couponTypePercent:'Percent %', couponTypeFixed:'Fixed amount',
+    couponValueLabel:'Value', couponAppliesToLabel:'Applies to', couponAppliesAll:'All orders', couponAppliesTransform:'Individual photo only', couponAppliesPackage:'Packages only', couponAppliesPrompt:'Prompt only',
+    couponExpiresLabel:'Expires on (optional)', couponMaxUsesLabel:'Max uses (optional)', couponAddBtn:'+ Add coupon', couponDeleteBtn:'Delete', couponActivateBtn:'Activate', couponDeactivateBtn:'Deactivate',
+    couponErrCode:'Code must be 3-24 letters/numbers', couponErrValue:'Discount value must be a number greater than zero', toastCouponSaved:'Coupon saved', toastCouponDeleted:'Coupon deleted',
+    couponUsedOfTpl:'Used {used} time(s)', couponUsedOfMaxTpl:'Used {used} of {max}', couponExpiresOnTpl:'Expires {date}',
+    priceHistoryTitle:'Price change history', priceHistoryIntro:'The latest changes made to prices from here — the date and details of each, for future reference.', priceHistoryEmptyNote:'No history yet.',
+    exportConfigTitle:'Site config backup', exportConfigIntro:'Downloads a JSON file with every product, price, package, coupon, and site-design setting — a quick safety net before any big change.',
+    exportConfigBtn:'⬇️ Download backup (JSON)', toastExportDone:'Backup downloaded',
+    hideProductTitle:'Hide from site', showProductTitle:'Show on site', toastProductHidden:'Product hidden from the site', toastProductShown:'Product shown on the site', hiddenBadgeLabel:'Hidden',
+    analyticsTitle:'Analytics & Tracking (GA4 / Meta Pixel)', analyticsIntro:'To know where visitors come from and how ads perform. Add the ID and save — tracking activates on every page immediately, no code changes needed.',
+    ga4IdLabel:'GA4 Measurement ID', metaPixelIdLabel:'Meta Pixel ID', analyticsSaveBtn:'Save tracking settings', toastAnalyticsSaved:'Tracking settings saved',
     aiModelTitle:'AI model', aiModelIntro:'Choose which image-generation model the site uses. Each model differs in price and result quality — try a test image with each before committing to it. Note: the resolution choice above has no effect on Flux 2 Pro (it always uses the best resolution automatically).', aiModelSaveBtn:'Save model', toastAiModelSaved:'AI model saved',
     colorThemeTitle:'Header and image-background color', colorThemeIntro:'Choose the dark shade used for the header bar and the space behind product images. The rest of the site colors (gold, text) stay the same across every option.', colorThemeLabel:'Header color', colorThemeBlack:'Black (current)', colorThemeBrown:'Warm coffee brown', colorThemeEmerald:'Deep emerald green', colorThemeWine:'Deep wine', colorThemeNavy:'Royal navy', colorThemeRed:'Deep red / rose', colorThemeSaveBtn:'Save color', toastColorThemeSaved:'Color saved — customers will see it on their next visit',
     headerModeTitle:'Header layout', headerModeIntro:'"Current layout" shows every header button (language, dark mode, mobile/desktop preview, track order) in an always-visible strip. "Collapsed menu" moves them into a (☰) menu that opens on tap, which shortens the header.', headerModeLabel:'Header layout', headerModeClassicOption:'Current layout', headerModeCompactOption:'Collapsed menu (☰)', headerModeSaveBtn:'Save header layout', toastHeaderModeSaved:'Header layout saved — customers will see it on their next visit',
@@ -1691,7 +1737,59 @@ async function loadPromptLibraryMode(){
     renderGrids(); // re-render product grids so the prompt-price bullets pick up livePromptPrice
     syncPackagePricingUI(); // re-render the pricing section so it picks up packagesRegistry
     syncLaunchPromoTexts(); // re-apply the "X جنيه بدل Y" copy everywhere with the live numbers
+    // Never on the admin panel itself (added 2026-09-17) — GA4/Meta Pixel are
+    // for measuring CUSTOMER traffic; injecting them here would count every
+    // one of Magdy's own admin logins/price changes as a site visit and
+    // quietly skew the real numbers.
+    if(typeof loadSiteAnalytics === 'function' && !IS_DEDICATED_ADMIN_PAGE) loadSiteAnalytics(data.analytics);
   }catch(e){ /* network hiccup — keep fallback defaults (already set above) */ }
+}
+
+/** GA4 / Meta Pixel injection (added 2026-09-17). Both IDs are config-driven
+ * (KV, via /site-config) rather than hardcoded, so Magdy can add or change
+ * them from the admin panel's "Site Design" tab with no code redeploy. Only
+ * ever injects the standard first-party snippet each platform itself
+ * publishes for site owners; a missing/blank id for either platform simply
+ * skips that one, and re-running with the same id is a safe no-op (guarded
+ * by analyticsInjected below) so this can be called again after every
+ * /site-config refresh without stacking duplicate script tags. Wrapped
+ * defensively throughout — analytics must never be able to break checkout
+ * or any other part of the storefront. */
+let analyticsInjected = { ga4: null, meta: null };
+function loadSiteAnalytics(analytics){
+  if(!analytics || typeof document === 'undefined') return;
+  const ga4Id = analytics.ga4Id;
+  const metaPixelId = analytics.metaPixelId;
+
+  if(ga4Id && analyticsInjected.ga4 !== ga4Id){
+    try{
+      const s1 = document.createElement('script');
+      s1.async = true;
+      s1.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(ga4Id)}`;
+      document.head.appendChild(s1);
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = window.gtag || function(){ window.dataLayer.push(arguments); };
+      window.gtag('js', new Date());
+      window.gtag('config', ga4Id);
+      analyticsInjected.ga4 = ga4Id;
+    }catch(e){ /* analytics must never break the storefront */ }
+  }
+
+  if(metaPixelId && analyticsInjected.meta !== metaPixelId){
+    try{
+      if(!window.fbq){
+        (function(f,b,e,v,n,t,s){
+          if(f.fbq) return; n=f.fbq=function(){ n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); };
+          if(!f._fbq) f._fbq = n; n.push = n; n.loaded = true; n.version = '2.0'; n.queue = [];
+          t = b.createElement(e); t.async = true; t.src = v;
+          s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s);
+        })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+      }
+      window.fbq('init', metaPixelId);
+      window.fbq('track', 'PageView');
+      analyticsInjected.meta = metaPixelId;
+    }catch(e){ /* analytics must never break the storefront */ }
+  }
 }
 
 async function upsertProductRemote(product){
@@ -6698,6 +6796,7 @@ adminOpenBtn.onclick = async ()=>{
 };
 
 function setAdminTab(tab){
+  document.getElementById('tabBtnDashboard').classList.toggle('active', tab==='dashboard');
   document.getElementById('tabBtnProducts').classList.toggle('active', tab==='products');
   document.getElementById('tabBtnOrders').classList.toggle('active', tab==='orders');
   document.getElementById('tabBtnReviews').classList.toggle('active', tab==='reviews');
@@ -6707,6 +6806,7 @@ function setAdminTab(tab){
   document.getElementById('tabBtnChangePassword').classList.toggle('active', tab==='changepassword');
   document.getElementById('tabBtnSiteDesign').classList.toggle('active', tab==='sitedesign');
   document.getElementById('tabBtnPricing').classList.toggle('active', tab==='pricing');
+  document.getElementById('adminTabDashboard').style.display = tab==='dashboard' ? 'block' : 'none';
   document.getElementById('adminTabProducts').style.display = tab==='products' ? 'block' : 'none';
   document.getElementById('adminTabOrders').style.display = tab==='orders' ? 'block' : 'none';
   document.getElementById('adminTabReviews').style.display = tab==='reviews' ? 'block' : 'none';
@@ -6717,6 +6817,10 @@ function setAdminTab(tab){
   document.getElementById('adminTabSiteDesign').style.display = tab==='sitedesign' ? 'block' : 'none';
   document.getElementById('adminTabPricing').style.display = tab==='pricing' ? 'block' : 'none';
 }
+elById('tabBtnDashboard').onclick = async ()=>{
+  setAdminTab('dashboard');
+  await loadDashboard();
+};
 elById('tabBtnProducts').onclick = ()=> setAdminTab('products');
 elById('tabBtnOrders').onclick = async ()=>{
   setAdminTab('orders');
@@ -6747,7 +6851,45 @@ elById('tabBtnSiteDesign').onclick = async ()=>{
 elById('tabBtnPricing').onclick = async ()=>{
   setAdminTab('pricing');
   await loadPricingIntoAdmin();
+  await loadCategoryPricingIntoAdmin();
+  await loadCouponsIntoAdmin();
+  await loadPriceHistoryIntoAdmin();
 };
+
+/** Admin dashboard landing tab (added 2026-09-17): one fetch that surfaces
+ * everything worth checking on open — pending orders/reviews, today's
+ * numbers — instead of making Magdy dig through Orders/Reviews/Visitors
+ * separately just to see what needs attention. Reuses the same
+ * admin-token-gated /admin/dashboard endpoint added to the Worker. */
+async function loadDashboard(){
+  if(!BACKEND_BASE || !adminSessionToken) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/dashboard?token=${encodeURIComponent(adminSessionToken)}`, { cache:'no-store' });
+    const data = await res.json();
+    if(!res.ok){ showToast(t('toastDashboardError')); return; }
+    const setNum = (id, val)=>{ const el = document.getElementById(id); if(el) el.textContent = Number(val) || 0; };
+    setNum('dashPendingOrders', data.pendingOrdersCount);
+    setNum('dashUnderpaidOrders', data.underpaidOrdersCount);
+    setNum('dashPendingReviews', data.pendingReviewsCount);
+    const today = data.today || {};
+    setNum('dashOrdersCreated', today.ordersCreated);
+    setNum('dashOrdersApproved', today.ordersApproved);
+    setNum('dashRevenue', today.revenueConfirmed);
+    setNum('dashTransforms', today.transformsDone);
+    setNum('dashVisitsToday', today.visits);
+    setNum('dashVisitsTotal', data.totalVisits);
+    // Alert coloring: a tile with something waiting gets a warm number
+    // instead of the neutral brass, so it visually stands out at a glance.
+    ['dashPendingOrders','dashUnderpaidOrders','dashPendingReviews'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.classList.toggle('dash-attn-alert', (Number(el.textContent)||0) > 0);
+    });
+  }catch(e){ showToast(t('toastDashboardError')); }
+}
+elById('dashRefreshBtn')?.addEventListener('click', async ()=>{ await loadDashboard(); showToast(t('toastDashboardRefreshed')); });
+elById('dashGoOrdersBtn')?.addEventListener('click', async ()=>{ setAdminTab('orders'); await loadOrders(); renderOrdersList(); });
+elById('dashGoOrdersUnderpaidBtn')?.addEventListener('click', async ()=>{ setAdminTab('orders'); await loadOrders(); renderOrdersList(); });
+elById('dashGoReviewsBtn')?.addEventListener('click', async ()=>{ setAdminTab('reviews'); await loadPendingReviews(); });
 
 /** Loads the list of available designs AND which one is currently live,
  * building the dropdown from server data — a future Design MIGA 3/4 just
@@ -6799,6 +6941,10 @@ async function loadSiteDesignIntoAdmin(){
     if(promptLibraryModeSelect){
       promptLibraryModeSelect.value = data.promptLibraryMode ? 'on' : 'off';
     }
+    const ga4Input = document.getElementById('ga4IdInput');
+    const metaPixelInput = document.getElementById('metaPixelIdInput');
+    if(ga4Input) ga4Input.value = (data.analytics && data.analytics.ga4Id) || '';
+    if(metaPixelInput) metaPixelInput.value = (data.analytics && data.analytics.metaPixelId) || '';
   }catch(e){ /* leave the dropdown empty on a network hiccup */ }
 }
 elById('saveColorThemeBtn').onclick = async ()=>{
@@ -7007,7 +7153,31 @@ async function loadPricingIntoAdmin(){
     const launchSummaryEl = document.getElementById('launchPromoSummary');
     if(launchErrEl){ launchErrEl.style.display = 'none'; launchErrEl.textContent = ''; }
     if(launchSummaryEl){ launchSummaryEl.style.display = 'none'; launchSummaryEl.textContent = ''; }
+    renderLaunchPromoSchedule(data.launchPromoSchedule);
   }catch(e){ /* leave the table as-is on a network hiccup */ }
+}
+
+/** Shows/hides the "this offer ends automatically on X" note and pre-fills
+ * the schedule fields with whatever's currently saved, so re-opening the
+ * pricing tab doesn't look like the schedule was forgotten. */
+function renderLaunchPromoSchedule(schedule){
+  const endsAtInput = document.getElementById('launchPromoEndsAtInput');
+  const revertInput = document.getElementById('launchPromoRevertPriceInput');
+  const note = document.getElementById('launchPromoScheduleActiveNote');
+  const endsAt = schedule && Number.isFinite(Number(schedule.endsAt)) ? Number(schedule.endsAt) : null;
+  const revertToPrice = schedule && Number.isFinite(Number(schedule.revertToPrice)) ? Number(schedule.revertToPrice) : null;
+  if(endsAtInput) endsAtInput.value = endsAt ? new Date(endsAt - new Date().getTimezoneOffset()*60000).toISOString().slice(0,16) : '';
+  if(revertInput) revertInput.value = revertToPrice || '';
+  if(note){
+    if(endsAt && revertToPrice){
+      note.textContent = t('launchPromoScheduleActiveNoteTpl')
+        .replace('{date}', new Date(endsAt).toLocaleString(document.documentElement.lang === 'en' ? 'en-GB' : 'ar-EG'))
+        .replace('{price}', String(revertToPrice));
+      note.style.display = 'block';
+    }else{
+      note.style.display = 'none';
+    }
+  }
 }
 
 document.getElementById('addPricingPackageBtn')?.addEventListener('click', ()=>{
@@ -7134,6 +7304,25 @@ elById('saveLaunchPromoBtn').onclick = async ()=>{
     return;
   }
 
+  // Optional scheduling (added 2026-09-17): both fields or neither — same
+  // rule the Worker enforces, checked here too so the admin sees the error
+  // immediately instead of after a round-trip.
+  const endsAtRaw = document.getElementById('launchPromoEndsAtInput')?.value;
+  const revertToPriceRaw = document.getElementById('launchPromoRevertPriceInput')?.value;
+  let endsAt = null, revertToPrice = null;
+  if(endsAtRaw || revertToPriceRaw){
+    if(!endsAtRaw || !revertToPriceRaw){
+      showErr(t('launchPromoErrScheduleFields'));
+      return;
+    }
+    endsAt = new Date(endsAtRaw).getTime();
+    revertToPrice = Number(revertToPriceRaw);
+    if(!Number.isFinite(endsAt) || endsAt <= Date.now() || !Number.isFinite(revertToPrice) || revertToPrice <= 0){
+      showErr(t('launchPromoErrScheduleFields'));
+      return;
+    }
+  }
+
   const productCount = Array.isArray(products) ? products.length : 0;
   // .replaceAll for {offer}: the confirm copy names the new price twice
   // ("change N products to X" ... "shown as X instead of Y") — a plain
@@ -7148,7 +7337,7 @@ elById('saveLaunchPromoBtn').onclick = async ()=>{
   try{
     const res = await fetch(`${BACKEND_BASE}/admin/set-launch-promo?token=${encodeURIComponent(adminSessionToken)}`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ offerPrice, originalPrice })
+      body: JSON.stringify({ offerPrice, originalPrice, endsAt, revertToPrice })
     });
     const data = await res.json().catch(()=>({}));
     if(res.ok && data.ok){
@@ -7159,6 +7348,7 @@ elById('saveLaunchPromoBtn').onclick = async ()=>{
       await loadProducts();
       syncLaunchPromoTexts();
       if(typeof renderAdminProductsList === 'function') renderAdminProductsList();
+      renderLaunchPromoSchedule({ endsAt: data.endsAt, revertToPrice: data.revertToPrice });
       if(summaryEl){
         summaryEl.textContent = t('launchPromoSummaryTpl')
           .replace('{count}', String(data.updatedProducts ?? productCount))
@@ -7174,6 +7364,281 @@ elById('saveLaunchPromoBtn').onclick = async ()=>{
     showErr(t('toastAdminServerError'));
   }
 };
+
+// ---------- Per-category bulk pricing (added 2026-09-17) ----------
+// A separate control from the launch-promo one above: that sets ONE price
+// for every individual product; this sets a price PER CATEGORY. Renders one
+// input per category the site actually uses (PRODUCT_CATEGORIES on the
+// Worker), pre-filled from /site-config's categoryPricing (only categories
+// that have ever been explicitly set here show a value — an empty field
+// means "leave this category as-is" both on load and on save).
+const PRODUCT_CATEGORIES_LIST = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
+
+async function loadCategoryPricingIntoAdmin(){
+  if(!BACKEND_BASE) return;
+  const grid = document.getElementById('categoryPricingGrid');
+  if(!grid) return;
+  const errEl = document.getElementById('categoryPricingError');
+  const summaryEl = document.getElementById('categoryPricingSummary');
+  if(errEl){ errEl.style.display = 'none'; errEl.textContent = ''; }
+  if(summaryEl){ summaryEl.style.display = 'none'; summaryEl.textContent = ''; }
+  try{
+    const res = await fetch(`${BACKEND_BASE}/site-config`, { cache:'no-store' });
+    const data = await res.json();
+    const saved = data.categoryPricing || {};
+    grid.innerHTML = PRODUCT_CATEGORIES_LIST.map(cat => `
+      <div class="field">
+        <label>${catLabel(cat)}</label>
+        <input type="number" min="1" step="1" data-cat-price="${cat}" value="${Number.isFinite(saved[cat]) ? saved[cat] : ''}" placeholder="—">
+      </div>`).join('');
+  }catch(e){ /* leave the grid as-is on a network hiccup */ }
+}
+
+elById('saveCategoryPricingBtn')?.addEventListener('click', async ()=>{
+  const errEl = document.getElementById('categoryPricingError');
+  const summaryEl = document.getElementById('categoryPricingSummary');
+  const showErr = (msg)=>{ if(errEl){ errEl.textContent = msg; errEl.style.display = 'block'; } };
+  if(errEl){ errEl.style.display = 'none'; errEl.textContent = ''; }
+  if(summaryEl){ summaryEl.style.display = 'none'; summaryEl.textContent = ''; }
+  if(!BACKEND_BASE || !adminSessionToken) return;
+
+  const inputs = [...document.querySelectorAll('#categoryPricingGrid [data-cat-price]')];
+  const prices = {};
+  let anyValid = false;
+  for(const inp of inputs){
+    const cat = inp.getAttribute('data-cat-price');
+    const raw = inp.value;
+    if(raw === '' || raw == null) continue; // empty = leave this category untouched
+    const n = Number(raw);
+    if(!Number.isFinite(n) || n <= 0){ showErr(t('categoryPricingErrFields')); return; }
+    prices[cat] = n;
+    anyValid = true;
+  }
+  if(!anyValid){ showErr(t('categoryPricingErrFields')); return; }
+
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/set-category-pricing?token=${encodeURIComponent(adminSessionToken)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ prices })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(res.ok && data.ok){
+      await loadProducts();
+      syncLaunchPromoTexts();
+      if(typeof renderAdminProductsList === 'function') renderAdminProductsList();
+      if(summaryEl){
+        summaryEl.textContent = t('categoryPricingSummaryTpl').replace('{count}', String(data.updatedProducts ?? 0));
+        summaryEl.style.display = 'block';
+      }
+      await loadPriceHistoryIntoAdmin();
+      showToast(t('toastCategoryPricingSaved'));
+    }else{
+      showErr(data.error || t('toastAdminServerError'));
+    }
+  }catch(e){
+    showErr(t('toastAdminServerError'));
+  }
+});
+
+// ---------- Discount coupons (added 2026-09-17) ----------
+// The full list — codes, values, usage — is only ever fetched with an
+// admin-token-gated request (never exposed via the public /site-config, see
+// the Worker's getSiteConfig comment) so a customer's browser never sees
+// every active code, only whichever one they typed and the server validated.
+let couponsCache = [];
+
+function couponMetaLine(c){
+  const parts = [];
+  parts.push(c.type === 'percent' ? `${c.value}%` : `${c.value} ${CURRENCY}`);
+  const appliesLabel = { all:'couponAppliesAll', transform:'couponAppliesTransform', package:'couponAppliesPackage', prompt:'couponAppliesPrompt' }[c.appliesTo] || 'couponAppliesAll';
+  parts.push(t(appliesLabel));
+  parts.push(c.maxUses ? t('couponUsedOfMaxTpl').replace('{used}', c.usedCount||0).replace('{max}', c.maxUses) : t('couponUsedOfTpl').replace('{used}', c.usedCount||0));
+  if(c.expiresAt) parts.push(t('couponExpiresOnTpl').replace('{date}', new Date(c.expiresAt).toLocaleDateString(document.documentElement.lang === 'en' ? 'en-GB' : 'ar-EG')));
+  return parts.join(' · ');
+}
+
+function renderCouponsList(){
+  const el = document.getElementById('couponsList');
+  const emptyNote = document.getElementById('couponsEmptyNote');
+  if(!el) return;
+  if(!couponsCache.length){
+    el.innerHTML = '';
+    if(emptyNote) emptyNote.style.display = 'block';
+    return;
+  }
+  if(emptyNote) emptyNote.style.display = 'none';
+  el.innerHTML = couponsCache.map(c => `
+    <div class="coupon-row${c.active ? '' : ' coupon-inactive'}">
+      <span class="coupon-code">${escapeHtml(c.code)}</span>
+      <span class="coupon-meta">${escapeHtml(couponMetaLine(c))}</span>
+      <div class="coupon-actions">
+        <button type="button" data-coupon-toggle="${escapeHtml(c.code)}">${c.active ? t('couponDeactivateBtn') : t('couponActivateBtn')}</button>
+        <button type="button" data-coupon-delete="${escapeHtml(c.code)}">${t('couponDeleteBtn')}</button>
+      </div>
+    </div>`).join('');
+}
+
+async function loadCouponsIntoAdmin(){
+  if(!BACKEND_BASE || !adminSessionToken) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/coupons?token=${encodeURIComponent(adminSessionToken)}`, { cache:'no-store' });
+    const data = await res.json();
+    couponsCache = Array.isArray(data.coupons) ? data.coupons : [];
+    renderCouponsList();
+  }catch(e){ /* leave the list as-is on a network hiccup */ }
+}
+
+elById('addCouponBtn')?.addEventListener('click', async ()=>{
+  const errEl = document.getElementById('couponError');
+  const showErr = (msg)=>{ if(errEl){ errEl.textContent = msg; errEl.style.display = 'block'; } };
+  if(errEl){ errEl.style.display = 'none'; errEl.textContent = ''; }
+  if(!BACKEND_BASE || !adminSessionToken) return;
+
+  const code = (document.getElementById('couponCodeInput')?.value || '').trim().toUpperCase();
+  const type = document.getElementById('couponTypeInput')?.value === 'fixed' ? 'fixed' : 'percent';
+  const value = Number(document.getElementById('couponValueInput')?.value);
+  const appliesTo = document.getElementById('couponAppliesToInput')?.value || 'all';
+  const expiresRaw = document.getElementById('couponExpiresInput')?.value;
+  const maxUsesRaw = document.getElementById('couponMaxUsesInput')?.value;
+
+  if(!/^[A-Z0-9_-]{3,24}$/.test(code)){ showErr(t('couponErrCode')); return; }
+  if(!Number.isFinite(value) || value <= 0){ showErr(t('couponErrValue')); return; }
+
+  const body = { code, type, value, appliesTo };
+  if(expiresRaw) body.expiresAt = new Date(expiresRaw + 'T23:59:59').getTime();
+  if(maxUsesRaw) body.maxUses = parseInt(maxUsesRaw, 10);
+
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/set-coupon?token=${encodeURIComponent(adminSessionToken)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    const data = await res.json().catch(()=>({}));
+    if(res.ok && data.ok){
+      document.getElementById('couponCodeInput').value = '';
+      document.getElementById('couponValueInput').value = '';
+      document.getElementById('couponExpiresInput').value = '';
+      document.getElementById('couponMaxUsesInput').value = '';
+      await loadCouponsIntoAdmin();
+      showToast(t('toastCouponSaved'));
+    }else{
+      showErr(data.error || t('toastAdminServerError'));
+    }
+  }catch(e){
+    showErr(t('toastAdminServerError'));
+  }
+});
+
+document.getElementById('couponsList')?.addEventListener('click', async (e)=>{
+  const toggleBtn = e.target.closest('[data-coupon-toggle]');
+  const deleteBtn = e.target.closest('[data-coupon-delete]');
+  if(!BACKEND_BASE || !adminSessionToken) return;
+
+  if(toggleBtn){
+    const code = toggleBtn.getAttribute('data-coupon-toggle');
+    const c = couponsCache.find(x => x.code === code);
+    if(!c) return;
+    try{
+      const res = await fetch(`${BACKEND_BASE}/admin/set-coupon?token=${encodeURIComponent(adminSessionToken)}`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ code: c.code, type: c.type, value: c.value, appliesTo: c.appliesTo, expiresAt: c.expiresAt, maxUses: c.maxUses, active: !c.active })
+      });
+      const data = await res.json().catch(()=>({}));
+      if(res.ok && data.ok){ await loadCouponsIntoAdmin(); showToast(t('toastCouponSaved')); }
+      else showToast(t('toastAdminServerError'));
+    }catch(e){ showToast(t('toastAdminServerError')); }
+  }
+
+  if(deleteBtn){
+    const code = deleteBtn.getAttribute('data-coupon-delete');
+    if(!confirm(code)) return;
+    try{
+      const res = await fetch(`${BACKEND_BASE}/admin/delete-coupon`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ token: adminSessionToken, code })
+      });
+      const data = await res.json().catch(()=>({}));
+      if(res.ok && data.ok){ await loadCouponsIntoAdmin(); showToast(t('toastCouponDeleted')); }
+      else showToast(t('toastAdminServerError'));
+    }catch(e){ showToast(t('toastAdminServerError')); }
+  }
+});
+
+// ---------- Price-change history (added 2026-09-17) ----------
+async function loadPriceHistoryIntoAdmin(){
+  if(!BACKEND_BASE || !adminSessionToken) return;
+  const el = document.getElementById('priceHistoryList');
+  const emptyNote = document.getElementById('priceHistoryEmptyNote');
+  if(!el) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/price-history?token=${encodeURIComponent(adminSessionToken)}`, { cache:'no-store' });
+    const data = await res.json();
+    const history = Array.isArray(data.history) ? data.history.slice(0, 20) : [];
+    if(!history.length){
+      el.innerHTML = '';
+      if(emptyNote) emptyNote.style.display = 'block';
+      return;
+    }
+    if(emptyNote) emptyNote.style.display = 'none';
+    const lang = document.documentElement.lang === 'en' ? 'en-GB' : 'ar-EG';
+    el.innerHTML = history.map(h => `
+      <div class="price-history-row">
+        <span class="price-history-date">${new Date(h.at).toLocaleString(lang)}</span>
+        <span>${escapeHtml(h.summary || h.type || '')}</span>
+      </div>`).join('');
+  }catch(e){ /* leave the list as-is on a network hiccup */ }
+}
+
+// ---------- Full config backup/export (added 2026-09-17) ----------
+elById('exportConfigBtn')?.addEventListener('click', async ()=>{
+  if(!BACKEND_BASE || !adminSessionToken) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/export-config?token=${encodeURIComponent(adminSessionToken)}`, { cache:'no-store' });
+    const data = await res.json();
+    if(!res.ok){ showToast(t('toastAdminServerError')); return; }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `miga-photobook-backup-${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast(t('toastExportDone'));
+  }catch(e){
+    showToast(t('toastAdminServerError'));
+  }
+});
+
+// ---------- GA4 / Meta Pixel analytics config (added 2026-09-17) ----------
+elById('saveAnalyticsBtn')?.addEventListener('click', async ()=>{
+  const errEl = document.getElementById('analyticsError');
+  const showErr = (msg)=>{ if(errEl){ errEl.textContent = msg; errEl.style.display = 'block'; } };
+  if(errEl){ errEl.style.display = 'none'; errEl.textContent = ''; }
+  if(!BACKEND_BASE || !adminSessionToken) return;
+  const ga4Id = (document.getElementById('ga4IdInput')?.value || '').trim();
+  const metaPixelId = (document.getElementById('metaPixelIdInput')?.value || '').trim();
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/set-analytics?token=${encodeURIComponent(adminSessionToken)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ ga4Id, metaPixelId })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(res.ok && data.ok){
+      // Deliberately NOT calling loadSiteAnalytics() here — that would inject
+      // customer-tracking scripts into the ADMIN's own page. The saved config
+      // takes effect for real visitors on their next page load; the toast
+      // below is the confirmation, not a live preview.
+      showToast(t('toastAnalyticsSaved'));
+    }else{
+      showErr(data.error || t('toastAdminServerError'));
+    }
+  }catch(e){
+    showErr(t('toastAdminServerError'));
+  }
+});
 
 // ---------- Before/After circle showcase (homepage hero section) ----------
 // The 9 slots (center + 8 satellites) are stored server-side as plain image
@@ -8048,6 +8513,10 @@ async function activateAdminSession(token, persist){
   applyChildrenVisibility();
   renderAdminProductsList();
   showAdminQuickAccess();
+  // Land on the dashboard first (added 2026-09-17) — see what needs
+  // attention before digging into any specific tab.
+  setAdminTab('dashboard');
+  loadDashboard(); // best-effort, not awaited — never blocks login on this
   if(persist){
     // Kept in localStorage so the admin stays logged in across page refreshes,
     // the same way a customer account does — but this is a revocable session
@@ -8777,10 +9246,10 @@ function renderAdminProductsList(){
     html += `<div class="admin-cat-group"><h4>${catLabel(cat)}</h4>`;
     items.forEach((p, idx)=>{
       html += `
-      <div class="admin-product-row">
+      <div class="admin-product-row${p.hidden ? ' product-hidden' : ''}">
         <img src="${p.image}" alt="${escapeHtml(productTitle(p))}" loading="lazy" decoding="async">
         <div class="admin-product-info">
-          <b>${escapeHtml(p.title)}</b>
+          <b>${escapeHtml(p.title)}${p.hidden ? `<span class="product-hidden-badge">${t('hiddenBadgeLabel')}</span>` : ''}</b>
           <span>${p.price} ${CURRENCY}</span>
           <select class="admin-move-cat" onchange="moveProductCategory('${p.id}', this.value)" title="${t('moveCategoryTitle')}">
             ${allCats.map(c => `<option value="${c}" ${c===p.category?'selected':''} ${c==='luxury' && PROMPT_LIBRARY_MODE ? 'disabled':''}>${catLabel(c)}</option>`).join('')}
@@ -8793,6 +9262,7 @@ function renderAdminProductsList(){
           <button onclick="setCategoryCover('${p.id}')" title="${t('setCoverTitle')}">${p.isCover ? '⭐' : '☆'}</button>
           <button onclick="copyProductLink('${p.id}')" title="${t('copyLinkTitle')}">🔗</button>
           <button onclick="copyProductImageUrl('${p.id}')" title="${t('copyImageLinkTitle')}">📷</button>
+          <button onclick="toggleProductHidden('${p.id}')" title="${p.hidden ? t('showProductTitle') : t('hideProductTitle')}">${p.hidden ? '🙈' : '👁️'}</button>
           <button onclick="editProduct('${p.id}')" title="تعديل">✏️</button>
           <button onclick="triggerReplaceImage('${p.id}')" title="${t('replaceImageTitle')}">🖼️</button>
           <button onclick="removeProductImage('${p.id}')" title="${t('removeImageTitle')}">🚫</button>
@@ -8806,6 +9276,24 @@ function renderAdminProductsList(){
     </div>`;
   });
   el.innerHTML = html || `<div class="empty-note">${t('emptyNoteCategory')}</div>`;
+}
+
+/** Toggles a product's storefront visibility without deleting it (added
+ * 2026-09-17) — keeps the prompt/image/price intact for a seasonal style or
+ * a paused experiment, unlike deleteProduct() which is permanent. Reuses the
+ * existing upsertProductRemote()/products-upsert endpoint (it already
+ * accepts and stores whatever fields a product object has), so no new
+ * backend endpoint was needed — only getProducts() filtering `hidden:true`
+ * out of the PUBLIC list is new. */
+async function toggleProductHidden(id){
+  const p = products.find(x=>x.id===id);
+  if(!p) return;
+  const next = !p.hidden;
+  p.hidden = next;
+  const ok = await upsertProductRemote(p);
+  if(!ok){ p.hidden = !next; showToast(t('toastAdminServerError')); return; }
+  renderGrids(); renderHeroStrip(); renderAdminProductsList();
+  showToast(next ? t('toastProductHidden') : t('toastProductShown'));
 }
 
 async function moveProductOrder(id, direction){

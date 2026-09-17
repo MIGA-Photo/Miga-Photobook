@@ -993,6 +993,63 @@
   #orderStatsTable th, #orderStatsTable td{padding:8px 10px; text-align:inherit; border-bottom:1px solid var(--line);}
   #orderStatsTable th{color:var(--paper-dim); font-weight:600; font-size:var(--text-sm);}
 
+  /* Admin dashboard landing tab (added 2026-09-17) */
+  .dash-attention-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;}
+  .dash-attn-tile{
+    display:flex; flex-direction:column; align-items:flex-start; gap:4px;
+    background:var(--ink-2); border:1px solid var(--line); border-radius:12px;
+    padding:14px 16px; cursor:pointer; text-align:start; font-family:inherit;
+    transition:border-color .15s, transform .1s;
+  }
+  .dash-attn-tile:hover{border-color:var(--brass-dim);}
+  .dash-attn-tile:active{transform:scale(0.98);}
+  .dash-attn-num{font-size:28px; font-weight:700; color:var(--brass); line-height:1;}
+  .dash-attn-num.dash-attn-alert{color:#e08a2b;}
+  .dash-attn-label{font-size:var(--text-sm); color:var(--paper-dim);}
+  .dash-stats-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:14px;}
+  .dash-stat{display:flex; flex-direction:column; gap:2px;}
+  .dash-stat-num{font-size:22px; font-weight:700; color:var(--brass); line-height:1; font-variant-numeric:tabular-nums;}
+  .dash-stat-label{font-size:12.5px; color:var(--paper-dim);}
+  @media (max-width:640px){
+    .dash-attention-grid{grid-template-columns:1fr;}
+    .dash-stats-grid{grid-template-columns:repeat(2, 1fr);}
+  }
+
+  /* Category pricing + coupons + price history (added 2026-09-17) */
+  .category-pricing-grid{display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;}
+  .category-pricing-grid .field{margin:0;}
+  @media (max-width:640px){ .category-pricing-grid{grid-template-columns:1fr;} }
+
+  .coupon-row{
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+    background:var(--ink-2); border:1px solid var(--line); border-radius:10px;
+    padding:10px 14px; margin-bottom:8px;
+  }
+  .coupon-row.coupon-inactive{opacity:0.55;}
+  .coupon-code{font-family:'DejaVu Sans Mono', monospace; font-weight:700; color:var(--brass); letter-spacing:0.5px;}
+  .coupon-meta{font-size:12.5px; color:var(--paper-dim); flex:1 1 auto; min-width:160px;}
+  .coupon-actions{display:flex; gap:6px; margin-inline-start:auto;}
+  .coupon-actions button{
+    background:none; border:1px solid var(--line); border-radius:8px; color:var(--paper);
+    padding:5px 10px; font-size:12.5px; cursor:pointer;
+  }
+  .coupon-actions button:hover{border-color:var(--brass-dim);}
+  .coupon-form-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:10px; margin-bottom:12px;}
+  .coupon-form-grid .field{margin:0;}
+
+  .price-history-row{
+    display:flex; gap:10px; padding:8px 0; border-bottom:1px solid var(--line); font-size:13px;
+  }
+  .price-history-row:last-child{border-bottom:none;}
+  .price-history-date{color:var(--paper-dim); font-size:12px; white-space:nowrap; font-variant-numeric:tabular-nums;}
+
+  /* Product hide/show toggle (added 2026-09-17) */
+  .admin-product-row.product-hidden{opacity:0.5;}
+  .product-hidden-badge{
+    display:inline-block; font-size:11px; color:#e08a2b; border:1px solid #e08a2b;
+    border-radius:6px; padding:1px 6px; margin-inline-start:6px;
+  }
+
   .order-type-badge{
     display:inline-block; font-size:var(--text-sm); font-weight:700; padding:3px 10px; border-radius:100px;
   }
