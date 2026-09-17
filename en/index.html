@@ -960,35 +960,35 @@
 <span><span aria-hidden="true" class="icon-badge"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-4 3.5V6z"></path></svg></span> <span data-i18n="pricingTrust3">Fast WhatsApp support</span></span>
 </div>
 <div class="pricing-grid">
-<div class="plan">
-<h3 data-i18n="plan1Title">Starter Package</h3>
-<div class="price">59 <span data-i18n="currencyLabel">EGP</span> <span data-i18n="plan1Unit">/ 3 photos</span></div>
+<div class="plan" data-package-id="starter">
+<h3 data-pkg-name>Starter Package</h3>
+<div class="price"><span data-pkg-price>59</span> <span data-i18n="currencyLabel">EGP</span> <span data-pkg-unit>/ 3 photos</span></div>
 <ul>
-<li data-i18n="plan1Li1">About 20 EGP per photo</li>
+<li data-pkg-per-photo>About 20 EGP per photo</li>
 <li data-i18n="plan1Li2">Free choice from any section</li>
 <li data-i18n="plan1Li3">Good for a first try</li>
 </ul>
-<button class="btn-ghost" data-i18n="planBuyBtn" onclick="openPackageBuyModal(3)" type="button">Order this package now</button>
+<button class="btn-ghost" data-i18n="planBuyBtn" onclick="openPackageBuyModal('starter')" type="button">Order this package now</button>
 </div>
-<div class="plan featured plan-most-popular">
-<h3 data-i18n="plan2Title">Pro Package</h3>
-<div class="price">259 <span data-i18n="currencyLabel">EGP</span> <span data-i18n="plan2Unit">/ 15 photos</span></div>
+<div class="plan featured plan-most-popular" data-package-id="pro">
+<h3 data-pkg-name>Pro Package</h3>
+<div class="price"><span data-pkg-price>259</span> <span data-i18n="currencyLabel">EGP</span> <span data-pkg-unit>/ 15 photos</span></div>
 <ul>
-<li data-i18n="plan2Li1">Under 18 EGP per photo</li>
+<li data-pkg-per-photo>Under 18 EGP per photo</li>
 <li data-i18n="plan2Li2">Free choice from any section</li>
 <li data-i18n="plan2Li3">Priority support</li>
 </ul>
-<button class="btn-primary" data-i18n="planBuyBtn" onclick="openPackageBuyModal(15)" type="button">Order this package now</button>
+<button class="btn-primary" data-i18n="planBuyBtn" onclick="openPackageBuyModal('pro')" type="button">Order this package now</button>
 </div>
-<div class="plan">
-<h3 data-i18n="plan3Title">Premium Package</h3>
-<div class="price">419 <span data-i18n="currencyLabel">EGP</span> <span data-i18n="plan3Unit">/ 30 photos</span></div>
+<div class="plan" data-package-id="premium">
+<h3 data-pkg-name>Premium Package</h3>
+<div class="price"><span data-pkg-price>419</span> <span data-i18n="currencyLabel">EGP</span> <span data-pkg-unit>/ 30 photos</span></div>
 <ul>
-<li data-i18n="plan3Li1">Under 14 EGP per photo</li>
+<li data-pkg-per-photo>Under 14 EGP per photo</li>
 <li data-i18n="plan3Li2">Free style library updates</li>
 <li data-i18n="plan3Li3">Great for studios and agencies</li>
 </ul>
-<button class="btn-ghost" data-i18n="planBuyBtn" onclick="openPackageBuyModal(30)" type="button">Order this package now</button>
+<button class="btn-ghost" data-i18n="planBuyBtn" onclick="openPackageBuyModal('premium')" type="button">Order this package now</button>
 </div>
 </div>
 <div class="pricing-guarantee">
@@ -999,25 +999,25 @@
 </div>
 <p data-i18n="subSub" style="color:var(--paper-dim); max-width:560px;">A new style every month, and a credit balance that renews — the subscription renews via the same manual payment steps (not auto-billed), and we'll remind you before it's due.</p>
 <div class="pricing-grid">
-<div class="plan">
-<h3 data-i18n="subPlan1Title">Monthly Subscription — 10 photos</h3>
-<div class="price">149 <span data-i18n="currencyLabel">EGP</span> <span data-i18n="subPlan1Unit">/ month</span></div>
+<div class="plan" data-package-id="sub10">
+<h3 data-pkg-name>Monthly Subscription — 10 photos</h3>
+<div class="price"><span data-pkg-price>149</span> <span data-i18n="currencyLabel">EGP</span> <span data-pkg-unit>/ month</span></div>
 <ul>
 <li data-i18n="subPlan1Li1">10 photos every month</li>
 <li data-i18n="subPlan1Li2">New styles added monthly</li>
 <li data-i18n="subPlan1Li3">Simple manual renewal each month</li>
 </ul>
-<button class="btn-ghost" data-i18n="subPlanBuyBtn" onclick="openPackageBuyModal(10)" type="button">Subscribe now</button>
+<button class="btn-ghost" data-i18n="subPlanBuyBtn" onclick="openPackageBuyModal('sub10')" type="button">Subscribe now</button>
 </div>
-<div class="plan featured">
-<h3 data-i18n="subPlan2Title">Monthly Subscription — 20 photos</h3>
-<div class="price">299 <span data-i18n="currencyLabel">EGP</span> <span data-i18n="subPlan2Unit">/ month</span></div>
+<div class="plan featured" data-package-id="sub20">
+<h3 data-pkg-name>Monthly Subscription — 20 photos</h3>
+<div class="price"><span data-pkg-price>299</span> <span data-i18n="currencyLabel">EGP</span> <span data-pkg-unit>/ month</span></div>
 <ul>
 <li data-i18n="subPlan2Li1">20 photos every month</li>
 <li data-i18n="subPlan2Li2">New styles added monthly</li>
 <li data-i18n="subPlan2Li3">Best value for ongoing use</li>
 </ul>
-<button class="btn-primary" data-i18n="subPlanBuyBtn" onclick="openPackageBuyModal(20)" type="button">Subscribe now</button>
+<button class="btn-primary" data-i18n="subPlanBuyBtn" onclick="openPackageBuyModal('sub20')" type="button">Subscribe now</button>
 </div>
 </div>
 </section>
