@@ -159,7 +159,14 @@
 // miga-photobook.com is ever offered to search engines for indexing.
 (function(){
   var host = location.hostname;
-  if(host !== 'miga-photobook.com' && host !== 'www.miga-photobook.com'){
+  var isMirrorHost = (host !== 'miga-photobook.com' && host !== 'www.miga-photobook.com');
+  // 2026-09-17: the admin panel opens at this same URL via ?admin=9k2x —
+  // Google crawled it as a separate, content-identical URL and flagged it
+  // "Duplicate without user-selected canonical" in Search Console. Same
+  // fix as the mirror-host case above: tell search engines not to index
+  // this specific variant.
+  var isAdminUrl = /[?&]admin=/.test(location.search);
+  if (isMirrorHost || isAdminUrl) {
     document.getElementById('__robotsMeta').setAttribute('content', 'noindex, nofollow');
   }
 })();
