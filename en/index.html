@@ -1656,8 +1656,40 @@
 <label data-i18n="passwordLabel">Password</label>
 <input id="loginPassword" type="password"/>
 </div>
+<div style="text-align:end; margin-top:-8px; margin-bottom:14px;">
+<button type="button" id="forgotPasswordLinkBtn" data-i18n="forgotPasswordLink" style="background:none; border:none; padding:0; color:var(--brass); font-size:13px; cursor:pointer; text-decoration:underline;">Forgot password?</button>
+</div>
 <div class="modal-actions">
 <button class="btn-primary" data-i18n="loginBtn" id="loginSubmitBtn">Log In</button>
+</div>
+</div>
+
+<div id="forgotPasswordView" style="display:none;">
+<h3 data-i18n="forgotPasswordTitle" style="margin-top:0;">Reset your password</h3>
+<p class="sub" data-i18n="forgotPasswordDesc">Enter your email and we'll send you a link to reset your password.</p>
+<div class="field">
+<label data-i18n="emailLabel">Email</label>
+<input type="email" id="forgotPasswordEmail" placeholder="you@example.com">
+</div>
+<div class="modal-actions" style="flex-direction:column; gap:10px;">
+<button class="btn-primary" id="sendResetLinkBtn" data-i18n="sendResetLinkBtn" style="width:100%;">Send reset link</button>
+<button type="button" class="btn-ghost" id="backToLoginFromForgotBtn" data-i18n="backToLoginBtn" style="width:100%;">Back to login</button>
+</div>
+</div>
+
+<div id="resetPasswordView" style="display:none;">
+<h3 data-i18n="resetPasswordTitle" style="margin-top:0;">New password</h3>
+<p class="sub" data-i18n="resetPasswordDesc">Enter a new password for your account.</p>
+<div class="field">
+<label data-i18n="newPasswordLabel">New password</label>
+<input type="password" id="newPassword" placeholder="At least 6 characters">
+</div>
+<div class="field">
+<label data-i18n="confirmNewPasswordLabel">Confirm new password</label>
+<input type="password" id="confirmNewPassword">
+</div>
+<div class="modal-actions">
+<button class="btn-primary" id="resetPasswordSubmitBtn" data-i18n="resetPasswordBtn" style="width:100%;">Update password</button>
 </div>
 </div>
 <div id="registerFormView" style="display:none;">
@@ -2241,7 +2273,7 @@
 </div>
 </div>
 <div class="toast" id="toast"></div>
-<script src="/app.js?v=6e21a328"></script>
+<script src="/app.js?v=dfe9c57a"></script>
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
