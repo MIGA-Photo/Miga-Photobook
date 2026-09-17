@@ -81,33 +81,74 @@ let purchases = [];
 let orders = [];
 let currentBuyId = null;
 let currentBuyType = 'transform'; // 'transform' | 'prompt' | 'package' — which of the three the open buy modal is for
-let currentPackageSize = null; // 10 | 25 — only set when currentBuyType === 'package'
+let currentPackageId = null; // e.g. 'starter' — only set when currentBuyType === 'package'
 
-/** Fixed package pricing, mirrored server-side (the server never trusts a
- * client-sent package price — see createOrder). Kept here just so the
- * checkout UI has a title/price to show without waiting on a network call. */
-const PACKAGE_CATALOG = {
-  3:  { price: 59,  title: 'باقة Starter — 3 صور',  titleEn: 'Starter Package — 3 photos' },
-  15: { price: 259, title: 'باقة Pro — 15 صورة',    titleEn: 'Pro Package — 15 photos' },
-  30: { price: 419, title: 'باقة Premium — 30 صورة', titleEn: 'Premium Package — 30 photos' },
-  // "Monthly" subscription-style packages — same underlying credits
-  // mechanism as the packages above (no auto-recurring billing exists),
-  // just marketed with a monthly framing to encourage repeat purchases.
-  10: { price: 149, title: 'اشتراك شهري — 10 صور/شهريًا', titleEn: 'Monthly Subscription — 10 photos/month' },
-  20: { price: 299, title: 'اشتراك شهري — 20 صورة/شهريًا', titleEn: 'Monthly Subscription — 20 photos/month' },
-};
+/** Fallback package data — mirrors the Worker's PACKAGE_REGISTRY_DEFAULT
+ * exactly (added 2026-09-17, replacing the old size-keyed PACKAGE_CATALOG).
+ * The server never trusts a client-sent package price or photo count — see
+ * createOrder() — so this is purely so the checkout UI has something to show
+ * before loadPromptLibraryMode()'s /site-config fetch resolves, or if it
+ * fails outright. packagesRegistry below is what actually drives the UI once
+ * that fetch completes; admin edits (see admin-9k2x.html's "الباقات
+ * والاشتراكات" panel) only ever change what the server returns, never this
+ * hardcoded fallback array. */
+const PACKAGE_CATALOG_FALLBACK = [
+  { id: 'starter', type: 'package',      photoCount: 3,  price: 59,  nameAr: 'باقة Starter',          nameEn: 'Starter Package' },
+  { id: 'pro',      type: 'package',      photoCount: 15, price: 259, nameAr: 'باقة Pro',              nameEn: 'Pro Package' },
+  { id: 'premium',  type: 'package',      photoCount: 30, price: 419, nameAr: 'باقة Premium',          nameEn: 'Premium Package' },
+  { id: 'sub10',    type: 'subscription', photoCount: 10, price: 149, nameAr: 'اشتراك شهري — 10 صور',  nameEn: 'Monthly Subscription — 10 photos' },
+  { id: 'sub20',    type: 'subscription', photoCount: 20, price: 299, nameAr: 'اشتراك شهري — 20 صورة', nameEn: 'Monthly Subscription — 20 photos' },
+];
+let packagesRegistry = PACKAGE_CATALOG_FALLBACK; // replaced by the live list once /site-config responds
+let livePromptPrice = PROMPT_PRICE; // replaced by the admin-set value once /site-config responds
 
 /** Returns whatever is currently being purchased — a real product, or (for
- * package purchases) a synthetic pseudo-product built from the fixed
- * package pricing above — so every existing "p.title / p.price" call site
- * in the checkout flow works unchanged for both individual photos and
- * packages, instead of needing a parallel code path for each. */
+ * package purchases) a synthetic pseudo-product built from the live package
+ * registry — so every existing "p.title / p.price" call site in the checkout
+ * flow works unchanged for both individual photos and packages, instead of
+ * needing a parallel code path for each. */
 function getBuyItem(){
-  if(currentBuyType === 'package' && currentPackageSize && PACKAGE_CATALOG[currentPackageSize]){
-    const pkg = PACKAGE_CATALOG[currentPackageSize];
-    return { id: currentBuyId, title: pkg.title, titleEn: pkg.titleEn, price: pkg.price, category: null };
+  if(currentBuyType === 'package' && currentPackageId){
+    const pkg = packagesRegistry.find(x=>x.id===currentPackageId);
+    if(pkg) return { id: currentBuyId, title: pkg.nameAr, titleEn: pkg.nameEn, price: pkg.price, category: null };
   }
   return products.find(x=>x.id===currentBuyId);
+}
+
+/** Rewrites the "#pricing" section's package/subscription cards from the
+ * live packagesRegistry (added 2026-09-17) — name, price, and photo count
+ * are ALL admin-editable now (see admin-9k2x.html's "الباقات والاشتراكات"
+ * panel), so nothing about a package's displayed text can be hardcoded here
+ * anymore. Each card is matched to its data purely by data-package-id — the
+ * card's PHYSICAL position/highlight styling ("featured" etc.) is left
+ * exactly as authored in the HTML; only its text content is data-driven.
+ *
+ * Called (a) once packagesRegistry first loads from /site-config, and
+ * (b) every time applyLanguage() runs — that function's own blanket
+ * `[data-i18n]` pass has no per-package data to work from and would only
+ * ever show the STATIC fallback name/price baked into the HTML, so this
+ * must re-apply the live values on top of it every time, same reasoning as
+ * the existing applyPromptLibraryLabels() call right after that same pass. */
+function syncPackagePricingUI(){
+  document.querySelectorAll('[data-package-id]').forEach(card=>{
+    const pkg = packagesRegistry.find(p=>p.id===card.getAttribute('data-package-id'));
+    if(!pkg) return; // admin retired this id — leave the card's last-known text alone rather than blanking it
+    const nameEl = card.querySelector('[data-pkg-name]');
+    if(nameEl) nameEl.textContent = currentLang === 'en' ? pkg.nameEn : pkg.nameAr;
+    const priceEl = card.querySelector('[data-pkg-price]');
+    if(priceEl) priceEl.textContent = pkg.price;
+    const unitEl = card.querySelector('[data-pkg-unit]');
+    if(unitEl){
+      unitEl.textContent = pkg.type === 'subscription'
+        ? (currentLang === 'en' ? '/ month' : '/ شهريًا')
+        : (currentLang === 'en' ? `/ ${pkg.photoCount} photos` : `/ ${pkg.photoCount} صور`);
+    }
+    const perPhotoEl = card.querySelector('[data-pkg-per-photo]');
+    if(perPhotoEl && pkg.photoCount > 0){
+      const perPhoto = Math.round(pkg.price / pkg.photoCount);
+      perPhotoEl.textContent = currentLang === 'en' ? `About ${perPhoto} EGP per photo` : `تقريبًا ${perPhoto} جنيه للصورة`;
+    }
+  });
 }
 
 // ---------- i18n ----------
@@ -419,6 +460,12 @@ const translations = {
     tabSiteDesign:'تصميم الموقع', siteDesignIntro:'اختار الشكل اللي هيشوفه العميل لما يفتح الموقع. لوحة الإدارة نفسها بتفضل زي ما هي دايمًا مهما كان اختيارك هنا.', siteDesignLabel:'التصميم الفعّال', siteDesignV1Option:'التصميم الأول (الحالي)', siteDesignV2Option:'التصميم الثاني (الجديد)', siteDesignSaveBtn:'حفظ الاختيار', toastSiteDesignSaved:'تم حفظ التصميم — هيظهر للعملاء من زيارتهم الجاية',
     heroModeIntro:'لكل تصميم، اختار شكل عرض "قبل/بعد" في الصفحة الرئيسية — الدائرة الدوّارة الأصلية، أو السلايدر التفاعلي بالسحب. الاختيار هنا مستقل عن السلايدر الثابت الجديد في التصميم الثاني (ده فاضل سلايدر دايمًا مهما اخترت).', heroModeSaveBtn:'حفظ أوضاع الهيرو', heroModeCircle:'دائرة دوّارة', heroModeSlider:'سلايدر تفاعلي', toastHeroModesSaved:'تم حفظ أوضاع الهيرو لكل التصاميم',
     resolutionTitle:'دقة الصور الناتجة', resolutionIntro:'اختار دقة الصورة اللي الذكاء الاصطناعي بينتجها. 4K أعلى دقة وأغلى في التكلفة، و2K أرخص والفرق بينهم تقريبًا مش محسوس على شاشة الموبايل. جرّب الاتنين وقارن بنفسك.', resolutionSaveBtn:'حفظ الدقة', resolution2K:'2K — أرخص (موصى به)', resolution4K:'4K — أعلى دقة (أغلى)', toastResolutionSaved:'تم حفظ دقة الصور',
+    tabPricing:'الأسعار والباقات', pricingPkgTitle:'الباقات والاشتراكات', pricingPkgIntro:'عدّل اسم أي باقة أو سعرها أو عدد الصور اللي بتوفّرها، واحفظ — التعديل بيظهر فورًا في كل مكان بالموقع (العربي والإنجليزي) من غير أي حاجة تانية تتعمل. تغيير باقة موجودة بيأثر بس على المشتريات الجديدة — أي عميل عنده رصيد صور من شراء سابق يفضل رصيده زي ما هو بالظبط. ملحوظة: إضافة باقة جديدة تماما هتتحفظ في السعر، لكن محتاجة كمان إضافة كارت ليها في تصميم الصفحة الرئيسية — كلمني لو ضفت باقة جديدة عشان أظبطها في الصفحة.',
+    pricingColId:'المعرف', pricingColNameAr:'الاسم (عربي)', pricingColNameEn:'الاسم (إنجليزي)', pricingColType:'النوع', pricingColPhotos:'عدد الصور', pricingColPrice:'السعر (جنيه)',
+    pricingTypePackage:'باقة', pricingTypeSubscription:'اشتراك', pricingAddBtn:'+ إضافة باقة جديدة', pricingSaveBtn:'حفظ الباقات',
+    pricingPromptTitle:'سعر شراء البرومبت لوحده', pricingPromptIntro:'السعر اللي بيدفعه العميل عشان ياخد نص البرومبت بدل الصورة المحوّلة نفسها — سعر ثابت وواحد لكل المنتجات.', pricingPromptLabel:'السعر (جنيه)', pricingPromptSaveBtn:'حفظ سعر البرومبت',
+    toastPricingSaved:'تم حفظ الباقات — التعديل ظاهر فورًا على الموقع', toastPricingPromptSaved:'تم حفظ سعر البرومبت',
+    pricingErrEmpty:'لازم توجد باقة واحدة على الأقل', pricingErrDupId:'في معرّفين باقة متكررين — كل معرّف لازم يكون فريد', pricingErrInvalidId:'المعرف لازم يكون حروف إنجليزية وأرقام و- و_ بس (بدون مسافات)', pricingErrInvalidRow:'راجع بيانات الباقة رقم', pricingErrFields:'كل الحقول مطلوبة والسعر وعدد الصور لازم يكونوا أرقام أكبر من صفر', pricingErrPromptPrice:'سعر البرومبت لازم يكون رقم أكبر من صفر',
     aiModelTitle:'موديل الذكاء الاصطناعي', aiModelIntro:'اختار موديل توليد الصور اللي هيستخدمه الموقع. كل موديل بيفرق في السعر وجودة النتيجة — جرّب صورة تجريبية بكل موديل قبل ما تعتمده بشكل نهائي. ملحوظة: اختيار "دقة الصورة" فوق مالوش تأثير على Flux 2 Pro (بياخد دايمًا أفضل دقة متاحة أوتوماتيك).', aiModelSaveBtn:'حفظ الموديل', toastAiModelSaved:'تم حفظ موديل الذكاء الاصطناعي',
     colorThemeTitle:'لون الهيدر والخلفية تحت الصور', colorThemeIntro:'اختار درجة اللون الغامق اللي تظهر في شريط الهيدر والمساحة خلف صور المنتجات. باقي ألوان الموقع (الدهبي، الخط) بتفضل زي ما هي في كل الاختيارات.', colorThemeLabel:'لون الهيدر', colorThemeBlack:'أسود (الحالي)', colorThemeBrown:'بني قهوة فخم', colorThemeEmerald:'أخضر زمردي غامق', colorThemeWine:'نبيتي غامق', colorThemeNavy:'كحلي ملكي', colorThemeRed:'أحمر / وردي غامق', colorThemeSaveBtn:'حفظ اللون', toastColorThemeSaved:'تم حفظ اللون — هيظهر للعملاء من زيارتهم الجاية',
     headerModeTitle:'شكل الهيدر', headerModeIntro:'"الشكل الحالي" يعرض كل أزرار الهيدر (اللغة، الوضع الليلي، عرض الموبايل/الكمبيوتر، تتبع الطلب) في شريط دايمًا ظاهر. "قائمة مطوية" بينقلهم جوه قائمة (☰) بتتفتح عند الضغط، وده بيقلل ارتفاع الهيدر.', headerModeLabel:'وضع الهيدر', headerModeClassicOption:'الشكل الحالي', headerModeCompactOption:'قائمة مطوية (☰)', headerModeSaveBtn:'حفظ شكل الهيدر', toastHeaderModeSaved:'تم حفظ شكل الهيدر — هيظهر للعملاء من زيارتهم الجاية',
@@ -801,6 +848,12 @@ const translations = {
     tabSiteDesign:'Site Design', siteDesignIntro:'Choose which look customers see when they open the site. The admin panel itself always stays the same regardless of your choice here.', siteDesignLabel:'Active design', siteDesignV1Option:'Design 1 (current)', siteDesignV2Option:'Design 2 (new)', siteDesignSaveBtn:'Save choice', toastSiteDesignSaved:'Design saved — customers will see it on their next visit',
     heroModeIntro:'For each design, choose the "before/after" showcase style on the homepage — the original orbiting circle, or the interactive drag slider. This choice is independent of Design 2\'s new fixed slider (that one always stays a slider regardless).', heroModeSaveBtn:'Save hero modes', heroModeCircle:'Orbiting circle', heroModeSlider:'Interactive slider', toastHeroModesSaved:'Hero modes saved for every design',
     resolutionTitle:'Output image resolution', resolutionIntro:'Choose the resolution the AI generates. 4K is higher detail and costs more per image; 2K is cheaper and the difference is essentially invisible on a phone screen. Try both and compare.', resolutionSaveBtn:'Save resolution', resolution2K:'2K — cheaper (recommended)', resolution4K:'4K — highest detail (pricier)', toastResolutionSaved:'Output resolution saved',
+    tabPricing:'Pricing & Packages', pricingPkgTitle:'Packages & subscriptions', pricingPkgIntro:'Edit any package\'s name, price, or photo count, then save — the change appears everywhere on the site (Arabic and English) instantly, nothing else needs to be done. Changing an existing package only affects new purchases — any customer with credits from a previous purchase keeps their balance exactly as it was. Note: a brand-new package is saved with its price, but also needs a matching card added to the homepage layout — let me know if you add one so I can wire up its card.',
+    pricingColId:'ID', pricingColNameAr:'Name (Arabic)', pricingColNameEn:'Name (English)', pricingColType:'Type', pricingColPhotos:'Photo count', pricingColPrice:'Price (EGP)',
+    pricingTypePackage:'Package', pricingTypeSubscription:'Subscription', pricingAddBtn:'+ Add new package', pricingSaveBtn:'Save packages',
+    pricingPromptTitle:'Prompt-only purchase price', pricingPromptIntro:'The price a customer pays to get the prompt text instead of the transformed photo itself — one fixed price across all products.', pricingPromptLabel:'Price (EGP)', pricingPromptSaveBtn:'Save prompt price',
+    toastPricingSaved:'Packages saved — the change is live on the site immediately', toastPricingPromptSaved:'Prompt price saved',
+    pricingErrEmpty:'At least one package is required', pricingErrDupId:'Duplicate package IDs found — every ID must be unique', pricingErrInvalidId:'ID must be English letters, numbers, - and _ only (no spaces)', pricingErrInvalidRow:'Check the data for package #', pricingErrFields:'All fields are required, and price/photo count must be numbers greater than zero', pricingErrPromptPrice:'Prompt price must be a number greater than zero',
     aiModelTitle:'AI model', aiModelIntro:'Choose which image-generation model the site uses. Each model differs in price and result quality — try a test image with each before committing to it. Note: the resolution choice above has no effect on Flux 2 Pro (it always uses the best resolution automatically).', aiModelSaveBtn:'Save model', toastAiModelSaved:'AI model saved',
     colorThemeTitle:'Header and image-background color', colorThemeIntro:'Choose the dark shade used for the header bar and the space behind product images. The rest of the site colors (gold, text) stay the same across every option.', colorThemeLabel:'Header color', colorThemeBlack:'Black (current)', colorThemeBrown:'Warm coffee brown', colorThemeEmerald:'Deep emerald green', colorThemeWine:'Deep wine', colorThemeNavy:'Royal navy', colorThemeRed:'Deep red / rose', colorThemeSaveBtn:'Save color', toastColorThemeSaved:'Color saved — customers will see it on their next visit',
     headerModeTitle:'Header layout', headerModeIntro:'"Current layout" shows every header button (language, dark mode, mobile/desktop preview, track order) in an always-visible strip. "Collapsed menu" moves them into a (☰) menu that opens on tap, which shortens the header.', headerModeLabel:'Header layout', headerModeClassicOption:'Current layout', headerModeCompactOption:'Collapsed menu (☰)', headerModeSaveBtn:'Save header layout', toastHeaderModeSaved:'Header layout saved — customers will see it on their next visit',
@@ -1295,6 +1348,13 @@ function applyLanguage(lang){
     el.setAttribute('alt', t(el.getAttribute('data-i18n-alt')) + (n ? ' ' + n : ''));
   });
 
+  // The blanket [data-i18n] pass above has no per-package data to draw from,
+  // so it only ever shows the STATIC fallback name/price/unit baked into the
+  // HTML — this re-applies the live packagesRegistry values on top, same
+  // reasoning as applyPromptLibraryLabels() right below needing to run after
+  // that same pass.
+  syncPackagePricingUI();
+
   // Must run BEFORE the active-category dropdown-label sync just below —
   // that sync copies the nav button's CURRENT text into the dropdown
   // toggle, so if 'luxury' is the active filter while PROMPT_LIBRARY_MODE
@@ -1537,14 +1597,26 @@ async function loadProducts(){
  * admin flips from the "تصميم الموقع" tab, stored server-side (config:
  * promptLibraryMode) via the same pattern as colorTheme/headerMode, so every
  * visitor (not just this browser) sees the same mode. Read alongside the
- * product catalog on every page load, before anything renders it. */
+ * product catalog on every page load, before anything renders it.
+ *
+ * 2026-09-17: also piggybacks the live packages/subscriptions registry and
+ * the live prompt price off this SAME /site-config fetch (rather than a
+ * second network round-trip) — see the "الباقات والاشتراكات" admin panel.
+ * Both replace their hardcoded fallbacks (PACKAGE_CATALOG_FALLBACK /
+ * PROMPT_PRICE) the moment this resolves, and everything already rendered
+ * with the fallback values gets refreshed via renderGrids()/
+ * syncPackagePricingUI() so a stale first paint never lingers. */
 async function loadPromptLibraryMode(){
   if(!BACKEND_BASE) return;
   try{
     const res = await fetch(`${BACKEND_BASE}/site-config`, { cache: 'no-store' });
     const data = await res.json();
     PROMPT_LIBRARY_MODE = !!(data && data.promptLibraryMode);
-  }catch(e){ /* network hiccup — keep default (off) */ }
+    if(Array.isArray(data?.packages) && data.packages.length) packagesRegistry = data.packages;
+    if(Number.isFinite(Number(data?.promptPrice)) && Number(data.promptPrice) > 0) livePromptPrice = Number(data.promptPrice);
+    renderGrids(); // re-render product grids so the prompt-price bullets pick up livePromptPrice
+    syncPackagePricingUI(); // re-render the pricing section so it picks up packagesRegistry
+  }catch(e){ /* network hiccup — keep fallback defaults (already set above) */ }
 }
 
 async function upsertProductRemote(product){
@@ -2464,7 +2536,7 @@ function renderProductCard(p, opts){
           ? `<button class="buy-btn" onclick="copyPurchasedPrompt('${p.id}')">${t('copyPromptBtn')}</button>`
           : `<button class="buy-btn" onclick="openTrackForPrompt('${p.id}')">${t('promptPendingBtn')}</button>`)
       : `<button class="buy-btn" onclick="openBuyModal('${p.id}', 'prompt')">
-           ${t('buyPromptBtnPrefix')} — <span class="price-old">${PROMPT_ORIGINAL_PRICE} ${CURRENCY}</span> <span class="price-new">${PROMPT_PRICE} ${CURRENCY}</span>
+           ${t('buyPromptBtnPrefix')} — <span class="price-old">${PROMPT_ORIGINAL_PRICE} ${CURRENCY}</span> <span class="price-new">${livePromptPrice} ${CURRENCY}</span>
          </button>`;
     // نفس صف الشراء الموحّد اللي بقى في الكارت العادي (16 سبتمبر 2026) — هنا
     // بس المفضلة (مفيش سلة أصلاً، منتجات البرومبت-لوحده مش قابلة للإضافة
@@ -2531,7 +2603,7 @@ function renderProductCard(p, opts){
                 ? `<button class="buy-btn prompt-btn" onclick="copyPurchasedPrompt('${p.id}')">${t('copyPromptBtn')}</button>`
                 : `<button class="buy-btn prompt-btn" onclick="openTrackForPrompt('${p.id}')">${t('promptPendingBtn')}</button>`)
             : `<button class="buy-btn prompt-btn" onclick="openBuyModal('${p.id}', 'prompt')">
-                 ${t('buyPromptBtnPrefix')} — <span class="price-old">${PROMPT_ORIGINAL_PRICE} ${CURRENCY}</span> <span class="price-new">${PROMPT_PRICE} ${CURRENCY}</span>
+                 ${t('buyPromptBtnPrefix')} — <span class="price-old">${PROMPT_ORIGINAL_PRICE} ${CURRENCY}</span> <span class="price-new">${livePromptPrice} ${CURRENCY}</span>
                </button>`
         )}
       </div>
@@ -3130,9 +3202,9 @@ function trackPackageHintClick(){
 function openBuyModal(id, type){
   currentBuyId = id;
   currentBuyType = type === 'prompt' ? 'prompt' : type === 'package' ? 'package' : 'transform';
-  if(currentBuyType !== 'package') currentPackageSize = null;
+  if(currentBuyType !== 'package') currentPackageId = null;
   const p = getBuyItem();
-  const displayPrice = currentBuyType === 'prompt' ? PROMPT_PRICE : p.price;
+  const displayPrice = currentBuyType === 'prompt' ? livePromptPrice : p.price;
   trackFunnelEvent(
     'begin_checkout', { currency:'EGP', value: displayPrice, items:[{ item_id:id, item_name: p?.title || '', price: displayPrice }] },
     'InitiateCheckout', { currency:'EGP', value: displayPrice, content_ids:[id], content_name: p?.title || '' }
@@ -3164,11 +3236,14 @@ function openBuyModal(id, type){
 
 /** Package purchases now go through the exact same in-site checkout as a
  * single photo — InstaPay/Vodafone/card/Fawry, no WhatsApp detour. This is
- * the single entry point the pricing cards call. */
-function openPackageBuyModal(size){
-  if(!PACKAGE_CATALOG[size]) return;
-  currentPackageSize = size;
-  openBuyModal('package-' + size, 'package');
+ * the single entry point the pricing cards call. `id` is the package's
+ * stable id (e.g. 'starter'), added 2026-09-17 — the pricing section's
+ * buttons pass this directly (see index.html/en/index.html), and it is
+ * looked up in the live packagesRegistry, never a hardcoded number. */
+function openPackageBuyModal(id){
+  if(!packagesRegistry.find(p=>p.id===id)) return;
+  currentPackageId = id;
+  openBuyModal('package-' + id, 'package');
 }
 
 /** The order button stays inert until the customer has actively ticked the
@@ -3221,14 +3296,14 @@ elById('payCardFawryBtn').onclick = async ()=>{
   const email = document.getElementById('payerEmail').value.trim();
   if(!name || !phone){ showToast(t('toastFillFields')); return; }
   const p = getBuyItem();
-  const amount = currentBuyType === 'prompt' ? PROMPT_PRICE : p.price;
+  const amount = currentBuyType === 'prompt' ? livePromptPrice : p.price;
   if(!BACKEND_BASE){ showToast(t('toastOrderFailed')); return; }
 
   try{
     // Create the underlying order first (same order system as InstaPay), then hand off to the gateway.
     const orderRes = await fetch(`${BACKEND_BASE}/orders/create`, {
       method:'POST', headers:{'Content-Type':'application/json', ...authHeader()},
-      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: amount, phone, appUsed: method==='card' ? 'Fawaterk' : 'Fawry', ref:'', buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '', orderType: currentBuyType, packageSize: currentBuyType==='package' ? currentPackageSize : undefined })
+      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: amount, phone, appUsed: method==='card' ? 'Fawaterk' : 'Fawry', ref:'', buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '', orderType: currentBuyType, packageId: currentBuyType==='package' ? currentPackageId : undefined })
     });
     const orderData = await orderRes.json();
     if(!orderRes.ok || !orderData.code){ showToast(t('toastOrderFailed')); return; }
@@ -3299,12 +3374,12 @@ elById('buyConfirmBtn').onclick = async ()=>{
     return;
   }
   const p = getBuyItem();
-  const amount = currentBuyType === 'prompt' ? PROMPT_PRICE : p.price;
+  const amount = currentBuyType === 'prompt' ? livePromptPrice : p.price;
   if(!BACKEND_BASE){ showToast(t('toastOrderFailed')); return; }
   try{
     const res = await fetch(`${BACKEND_BASE}/orders/create`, {
       method:'POST', headers:{'Content-Type':'application/json', ...authHeader()},
-      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: amount, phone, appUsed: manualMethod, ref, buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '', orderType: currentBuyType, packageSize: currentBuyType==='package' ? currentPackageSize : undefined })
+      body: JSON.stringify({ productId: currentBuyId, productTitle: p.title, price: amount, phone, appUsed: manualMethod, ref, buyerName: currentUser?.name || '', buyerEmail: currentUser?.email || '', orderType: currentBuyType, packageId: currentBuyType==='package' ? currentPackageId : undefined })
     });
     const data = await res.json();
     if(!res.ok || !data.code){
@@ -6556,6 +6631,7 @@ function setAdminTab(tab){
   document.getElementById('tabBtnPromoImages').classList.toggle('active', tab==='promoimages');
   document.getElementById('tabBtnChangePassword').classList.toggle('active', tab==='changepassword');
   document.getElementById('tabBtnSiteDesign').classList.toggle('active', tab==='sitedesign');
+  document.getElementById('tabBtnPricing').classList.toggle('active', tab==='pricing');
   document.getElementById('adminTabProducts').style.display = tab==='products' ? 'block' : 'none';
   document.getElementById('adminTabOrders').style.display = tab==='orders' ? 'block' : 'none';
   document.getElementById('adminTabReviews').style.display = tab==='reviews' ? 'block' : 'none';
@@ -6564,6 +6640,7 @@ function setAdminTab(tab){
   document.getElementById('adminTabPromoImages').style.display = tab==='promoimages' ? 'block' : 'none';
   document.getElementById('adminTabChangePassword').style.display = tab==='changepassword' ? 'block' : 'none';
   document.getElementById('adminTabSiteDesign').style.display = tab==='sitedesign' ? 'block' : 'none';
+  document.getElementById('adminTabPricing').style.display = tab==='pricing' ? 'block' : 'none';
 }
 elById('tabBtnProducts').onclick = ()=> setAdminTab('products');
 elById('tabBtnOrders').onclick = async ()=>{
@@ -6591,6 +6668,10 @@ elById('tabBtnChangePassword').onclick = ()=> setAdminTab('changepassword');
 elById('tabBtnSiteDesign').onclick = async ()=>{
   setAdminTab('sitedesign');
   await loadSiteDesignIntoAdmin();
+};
+elById('tabBtnPricing').onclick = async ()=>{
+  setAdminTab('pricing');
+  await loadPricingIntoAdmin();
 };
 
 /** Loads the list of available designs AND which one is currently live,
@@ -6779,6 +6860,155 @@ elById('saveAiModelBtn').onclick = async ()=>{
     });
     const data = await res.json().catch(()=>({}));
     showToast((res.ok && data.ok) ? t('toastAiModelSaved') : t('toastAdminServerError'));
+  }catch(e){
+    showToast(t('toastAdminServerError'));
+  }
+};
+
+// ---------- Pricing & Packages (admin-editable package/subscription registry) ----------
+// The table edits the same KV-backed registry the Worker uses for both the
+// public /site-config feed AND server-side price validation in createOrder()
+// — so a saved edit here is instantly the real price everywhere, and a
+// customer's browser can never talk the server into a different one.
+// Existing packages' `id` field is locked (readonly): the storefront cards in
+// index.html/en-index.html are wired to specific ids via data-package-id, so
+// renaming one here would silently disconnect that card from its live price.
+let pricingPackagesCache = []; // last-loaded-from-server list; used only to know which rows are pre-existing
+
+function pricingPackageRowHtml(pkg, isExisting){
+  const idAttr = isExisting
+    ? `value="${escapeHtml(pkg.id || '')}" readonly`
+    : `value="${escapeHtml(pkg.id || '')}" placeholder="my-new-package"`;
+  return `
+    <tr data-pkg-row${isExisting ? ' data-pkg-existing="1"' : ''}>
+      <td><input type="text" data-pkg-field="id" ${idAttr}></td>
+      <td><input type="text" data-pkg-field="nameAr" value="${escapeHtml(pkg.nameAr || '')}"></td>
+      <td><input type="text" data-pkg-field="nameEn" value="${escapeHtml(pkg.nameEn || '')}"></td>
+      <td>
+        <select data-pkg-field="type">
+          <option value="package" ${pkg.type === 'subscription' ? '' : 'selected'}>${t('pricingTypePackage')}</option>
+          <option value="subscription" ${pkg.type === 'subscription' ? 'selected' : ''}>${t('pricingTypeSubscription')}</option>
+        </select>
+      </td>
+      <td><input type="number" min="1" step="1" data-pkg-field="photoCount" value="${Number.isFinite(pkg.photoCount) ? pkg.photoCount : ''}"></td>
+      <td><input type="number" min="1" step="1" data-pkg-field="price" value="${Number.isFinite(pkg.price) ? pkg.price : ''}"></td>
+      <td><button type="button" class="pkg-remove-btn" aria-label="remove">✕</button></td>
+    </tr>`;
+}
+
+function renderPricingPackagesTable(list){
+  const body = document.getElementById('pricingPackagesBody');
+  if(!body) return;
+  const existingIds = new Set(pricingPackagesCache.map(p => p.id));
+  body.innerHTML = list.map(pkg => pricingPackageRowHtml(pkg, existingIds.has(pkg.id))).join('');
+}
+
+async function loadPricingIntoAdmin(){
+  if(!BACKEND_BASE) return;
+  const errEl = document.getElementById('pricingPackagesError');
+  if(errEl){ errEl.style.display = 'none'; errEl.textContent = ''; }
+  try{
+    const res = await fetch(`${BACKEND_BASE}/site-config`, { cache: 'no-store' });
+    const data = await res.json();
+    const packages = Array.isArray(data.packages) ? data.packages : [];
+    pricingPackagesCache = packages.map(p => ({ ...p }));
+    renderPricingPackagesTable(packages);
+    const promptInput = document.getElementById('pricingPromptPriceInput');
+    if(promptInput && Number.isFinite(Number(data.promptPrice))) promptInput.value = data.promptPrice;
+  }catch(e){ /* leave the table as-is on a network hiccup */ }
+}
+
+document.getElementById('addPricingPackageBtn')?.addEventListener('click', ()=>{
+  const body = document.getElementById('pricingPackagesBody');
+  if(!body) return;
+  body.insertAdjacentHTML('beforeend', pricingPackageRowHtml({ id:'', nameAr:'', nameEn:'', type:'package', photoCount:'', price:'' }, false));
+});
+
+document.getElementById('pricingPackagesBody')?.addEventListener('click', (e)=>{
+  const btn = e.target.closest('.pkg-remove-btn');
+  if(!btn) return;
+  const row = btn.closest('tr[data-pkg-row]');
+  if(row) row.remove();
+});
+
+elById('savePricingPackagesBtn').onclick = async ()=>{
+  const errEl = document.getElementById('pricingPackagesError');
+  const showErr = (msg)=>{ if(errEl){ errEl.textContent = msg; errEl.style.display = 'block'; } };
+  if(errEl){ errEl.style.display = 'none'; errEl.textContent = ''; }
+  if(!BACKEND_BASE || !adminSessionToken) return;
+
+  const rows = [...document.querySelectorAll('#pricingPackagesBody tr[data-pkg-row]')];
+  if(!rows.length){ showErr(t('pricingErrEmpty')); return; }
+
+  const packages = [];
+  const seenIds = new Set();
+  for(let i = 0; i < rows.length; i++){
+    const row = rows[i];
+    const get = (field) => row.querySelector(`[data-pkg-field="${field}"]`)?.value;
+    const id = (get('id') || '').trim();
+    const nameAr = (get('nameAr') || '').trim();
+    const nameEn = (get('nameEn') || '').trim();
+    const type = get('type') === 'subscription' ? 'subscription' : 'package';
+    const photoCount = parseInt(get('photoCount'), 10);
+    const price = Number(get('price'));
+
+    if(!id || !nameAr || !nameEn || !Number.isInteger(photoCount) || photoCount <= 0 || !Number.isFinite(price) || price <= 0){
+      showErr(`${t('pricingErrInvalidRow')} ${i + 1}: ${t('pricingErrFields')}`);
+      return;
+    }
+    if(!/^[a-z0-9_-]{1,40}$/i.test(id)){
+      showErr(`${t('pricingErrInvalidRow')} ${i + 1}: ${t('pricingErrInvalidId')}`);
+      return;
+    }
+    if(seenIds.has(id.toLowerCase())){
+      showErr(t('pricingErrDupId'));
+      return;
+    }
+    seenIds.add(id.toLowerCase());
+    packages.push({ id, type, photoCount, price, nameAr, nameEn });
+  }
+
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/set-packages?token=${encodeURIComponent(adminSessionToken)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ packages })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(res.ok && data.ok){
+      packagesRegistry = Array.isArray(data.packages) ? data.packages : packages;
+      syncPackagePricingUI();
+      pricingPackagesCache = packagesRegistry.map(p => ({ ...p }));
+      renderPricingPackagesTable(packagesRegistry);
+      showToast(t('toastPricingSaved'));
+    }else{
+      showErr(data.error || t('toastAdminServerError'));
+    }
+  }catch(e){
+    showErr(t('toastAdminServerError'));
+  }
+};
+
+elById('savePricingPromptBtn').onclick = async ()=>{
+  if(!BACKEND_BASE || !adminSessionToken) return;
+  const input = document.getElementById('pricingPromptPriceInput');
+  const price = Number(input?.value);
+  if(!Number.isFinite(price) || price <= 0){
+    showToast(t('pricingErrPromptPrice'));
+    return;
+  }
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/set-prompt-price?token=${encodeURIComponent(adminSessionToken)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ price })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(res.ok && data.ok){
+      livePromptPrice = Number.isFinite(Number(data.promptPrice)) ? data.promptPrice : price;
+      if(typeof renderGrids === 'function') renderGrids();
+      showToast(t('toastPricingPromptSaved'));
+    }else{
+      showToast(t('toastAdminServerError'));
+    }
   }catch(e){
     showToast(t('toastAdminServerError'));
   }

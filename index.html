@@ -1009,35 +1009,35 @@
     <span><span class="icon-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-4 3.5V6z"/></svg></span> <span data-i18n="pricingTrust3">دعم واتساب سريع</span></span>
   </div>
   <div class="pricing-grid">
-    <div class="plan">
-      <h3 data-i18n="plan1Title">باقة Starter</h3>
-      <div class="price">59 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="plan1Unit">/ 3 صور</span></div>
+    <div class="plan" data-package-id="starter">
+      <h3 data-pkg-name>باقة Starter</h3>
+      <div class="price"><span data-pkg-price>59</span> <span data-i18n="currencyLabel">جنيه</span> <span data-pkg-unit>/ 3 صور</span></div>
       <ul>
-        <li data-i18n="plan1Li1">تقريبًا 20 جنيه للصورة</li>
+        <li data-pkg-per-photo>تقريبًا 20 جنيه للصورة</li>
         <li data-i18n="plan1Li2">اختيار حر من أي قسم</li>
         <li data-i18n="plan1Li3">مناسبة للتجربة الأولى</li>
       </ul>
-      <button type="button" class="btn-ghost" onclick="openPackageBuyModal(3)" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
+      <button type="button" class="btn-ghost" onclick="openPackageBuyModal('starter')" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
     </div>
-    <div class="plan featured plan-most-popular">
-      <h3 data-i18n="plan2Title">باقة Pro</h3>
-      <div class="price">259 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="plan2Unit">/ 15 صورة</span></div>
+    <div class="plan featured plan-most-popular" data-package-id="pro">
+      <h3 data-pkg-name>باقة Pro</h3>
+      <div class="price"><span data-pkg-price>259</span> <span data-i18n="currencyLabel">جنيه</span> <span data-pkg-unit>/ 15 صورة</span></div>
       <ul>
-        <li data-i18n="plan2Li1">أقل من 18 جنيه للصورة</li>
+        <li data-pkg-per-photo>أقل من 18 جنيه للصورة</li>
         <li data-i18n="plan2Li2">اختيار حر من أي قسم</li>
         <li data-i18n="plan2Li3">دعم فني بالأولوية</li>
       </ul>
-      <button type="button" class="btn-primary" onclick="openPackageBuyModal(15)" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
+      <button type="button" class="btn-primary" onclick="openPackageBuyModal('pro')" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
     </div>
-    <div class="plan">
-      <h3 data-i18n="plan3Title">باقة Premium</h3>
-      <div class="price">419 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="plan3Unit">/ 30 صورة</span></div>
+    <div class="plan" data-package-id="premium">
+      <h3 data-pkg-name>باقة Premium</h3>
+      <div class="price"><span data-pkg-price>419</span> <span data-i18n="currencyLabel">جنيه</span> <span data-pkg-unit>/ 30 صورة</span></div>
       <ul>
-        <li data-i18n="plan3Li1">أقل من 14 جنيه للصورة</li>
+        <li data-pkg-per-photo>أقل من 14 جنيه للصورة</li>
         <li data-i18n="plan3Li2">تحديثات مجانية للأساليب المتاحة</li>
         <li data-i18n="plan3Li3">مناسبة للاستوديوهات والوكالات</li>
       </ul>
-      <button type="button" class="btn-ghost" onclick="openPackageBuyModal(30)" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
+      <button type="button" class="btn-ghost" onclick="openPackageBuyModal('premium')" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
     </div>
   </div>
   <div class="pricing-guarantee">
@@ -1049,25 +1049,25 @@
   </div>
   <p style="color:var(--paper-dim); max-width:560px;" data-i18n="subSub">أسلوب جديد كل شهر، ورصيد صور يتجدد — الاشتراك بيتجدد بنفس خطوات الدفع اليدوي (مش خصم تلقائي)، وبنفكّرك قبل الموعد.</p>
   <div class="pricing-grid">
-    <div class="plan">
-      <h3 data-i18n="subPlan1Title">اشتراك شهري — 10 صور</h3>
-      <div class="price">149 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="subPlan1Unit">/ شهريًا</span></div>
+    <div class="plan" data-package-id="sub10">
+      <h3 data-pkg-name>اشتراك شهري — 10 صور</h3>
+      <div class="price"><span data-pkg-price>149</span> <span data-i18n="currencyLabel">جنيه</span> <span data-pkg-unit>/ شهريًا</span></div>
       <ul>
         <li data-i18n="subPlan1Li1">10 صور كل شهر</li>
         <li data-i18n="subPlan1Li2">أساليب جديدة تُضاف شهريًا</li>
         <li data-i18n="subPlan1Li3">تجديد يدوي بسيط كل شهر</li>
       </ul>
-      <button type="button" class="btn-ghost" onclick="openPackageBuyModal(10)" data-i18n="subPlanBuyBtn">اشترك دلوقتي</button>
+      <button type="button" class="btn-ghost" onclick="openPackageBuyModal('sub10')" data-i18n="subPlanBuyBtn">اشترك دلوقتي</button>
     </div>
-    <div class="plan featured">
-      <h3 data-i18n="subPlan2Title">اشتراك شهري — 20 صورة</h3>
-      <div class="price">299 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="subPlan2Unit">/ شهريًا</span></div>
+    <div class="plan featured" data-package-id="sub20">
+      <h3 data-pkg-name>اشتراك شهري — 20 صورة</h3>
+      <div class="price"><span data-pkg-price>299</span> <span data-i18n="currencyLabel">جنيه</span> <span data-pkg-unit>/ شهريًا</span></div>
       <ul>
         <li data-i18n="subPlan2Li1">20 صورة كل شهر</li>
         <li data-i18n="subPlan2Li2">أساليب جديدة تُضاف شهريًا</li>
         <li data-i18n="subPlan2Li3">أفضل قيمة للاستخدام المستمر</li>
       </ul>
-      <button type="button" class="btn-primary" onclick="openPackageBuyModal(20)" data-i18n="subPlanBuyBtn">اشترك دلوقتي</button>
+      <button type="button" class="btn-primary" onclick="openPackageBuyModal('sub20')" data-i18n="subPlanBuyBtn">اشترك دلوقتي</button>
     </div>
   </div>
 </section>

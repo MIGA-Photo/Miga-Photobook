@@ -630,6 +630,15 @@
     .hero-with-slider{ gap:8px !important; }
   }
   .hero-showcase-variant[hidden]{ display:none !important; }
+
+  /* ---------- Admin pricing table ("الأسعار والباقات" tab, added 2026-09-17) ---------- */
+  .admin-table{ width:100%; border-collapse:collapse; min-width:640px; }
+  .admin-table th{ text-align:right; font-size:12.5px; color:var(--paper-dim); font-weight:600; padding:6px 8px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  .admin-table td{ padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  .admin-table input, .admin-table select{ width:100%; min-width:70px; box-sizing:border-box; }
+  .admin-table input[data-pkg-field="nameAr"], .admin-table input[data-pkg-field="nameEn"]{ min-width:150px; }
+  .admin-table .pkg-remove-btn{ background:none; border:none; color:#e05a5a; cursor:pointer; font-size:16px; padding:2px 8px; }
+  html[dir="ltr"] .admin-table th{ text-align:left; }
 </style>
 
 <section class="baf-section js-nudge-avoid" id="beforeAfterShowcase">
@@ -856,35 +865,35 @@
     <span>💬 <span data-i18n="pricingTrust3">دعم واتساب سريع</span></span>
   </div>
   <div class="pricing-grid">
-    <div class="plan">
-      <h3 data-i18n="plan1Title">باقة Starter</h3>
-      <div class="price">59 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="plan1Unit">/ 3 صور</span></div>
+    <div class="plan" data-package-id="starter">
+      <h3 data-pkg-name>باقة Starter</h3>
+      <div class="price"><span data-pkg-price>59</span> <span data-i18n="currencyLabel">جنيه</span> <span data-pkg-unit>/ 3 صور</span></div>
       <ul>
-        <li data-i18n="plan1Li1">تقريبًا 20 جنيه للصورة</li>
+        <li data-pkg-per-photo>تقريبًا 20 جنيه للصورة</li>
         <li data-i18n="plan1Li2">اختيار حر من أي قسم</li>
         <li data-i18n="plan1Li3">مناسبة للتجربة الأولى</li>
       </ul>
-      <button type="button" class="btn-ghost" onclick="openPackageBuyModal(3)" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
+      <button type="button" class="btn-ghost" onclick="openPackageBuyModal('starter')" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
     </div>
-    <div class="plan featured plan-most-popular">
-      <h3 data-i18n="plan2Title">باقة Pro</h3>
-      <div class="price">259 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="plan2Unit">/ 15 صورة</span></div>
+    <div class="plan featured plan-most-popular" data-package-id="pro">
+      <h3 data-pkg-name>باقة Pro</h3>
+      <div class="price"><span data-pkg-price>259</span> <span data-i18n="currencyLabel">جنيه</span> <span data-pkg-unit>/ 15 صورة</span></div>
       <ul>
-        <li data-i18n="plan2Li1">أقل من 18 جنيه للصورة</li>
+        <li data-pkg-per-photo>أقل من 18 جنيه للصورة</li>
         <li data-i18n="plan2Li2">اختيار حر من أي قسم</li>
         <li data-i18n="plan2Li3">دعم فني بالأولوية</li>
       </ul>
-      <button type="button" class="btn-primary" onclick="openPackageBuyModal(15)" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
+      <button type="button" class="btn-primary" onclick="openPackageBuyModal('pro')" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
     </div>
-    <div class="plan">
-      <h3 data-i18n="plan3Title">باقة Premium</h3>
-      <div class="price">419 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="plan3Unit">/ 30 صورة</span></div>
+    <div class="plan" data-package-id="premium">
+      <h3 data-pkg-name>باقة Premium</h3>
+      <div class="price"><span data-pkg-price>419</span> <span data-i18n="currencyLabel">جنيه</span> <span data-pkg-unit>/ 30 صورة</span></div>
       <ul>
-        <li data-i18n="plan3Li1">أقل من 14 جنيه للصورة</li>
+        <li data-pkg-per-photo>أقل من 14 جنيه للصورة</li>
         <li data-i18n="plan3Li2">تحديثات مجانية للأساليب المتاحة</li>
         <li data-i18n="plan3Li3">مناسبة للاستوديوهات والوكالات</li>
       </ul>
-      <button type="button" class="btn-ghost" onclick="openPackageBuyModal(30)" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
+      <button type="button" class="btn-ghost" onclick="openPackageBuyModal('premium')" data-i18n="planBuyBtn">اطلب الباقة دلوقتي</button>
     </div>
   </div>
   <div class="pricing-guarantee">
@@ -896,25 +905,25 @@
   </div>
   <p style="color:var(--paper-dim); max-width:560px;" data-i18n="subSub">أسلوب جديد كل شهر، ورصيد صور يتجدد — الاشتراك بيتجدد بنفس خطوات الدفع اليدوي (مش خصم تلقائي)، وبنفكّرك قبل الموعد.</p>
   <div class="pricing-grid">
-    <div class="plan">
-      <h3 data-i18n="subPlan1Title">اشتراك شهري — 10 صور</h3>
-      <div class="price">149 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="subPlan1Unit">/ شهريًا</span></div>
+    <div class="plan" data-package-id="sub10">
+      <h3 data-pkg-name>اشتراك شهري — 10 صور</h3>
+      <div class="price"><span data-pkg-price>149</span> <span data-i18n="currencyLabel">جنيه</span> <span data-pkg-unit>/ شهريًا</span></div>
       <ul>
         <li data-i18n="subPlan1Li1">10 صور كل شهر</li>
         <li data-i18n="subPlan1Li2">أساليب جديدة تُضاف شهريًا</li>
         <li data-i18n="subPlan1Li3">تجديد يدوي بسيط كل شهر</li>
       </ul>
-      <button type="button" class="btn-ghost" onclick="openPackageBuyModal(10)" data-i18n="subPlanBuyBtn">اشترك دلوقتي</button>
+      <button type="button" class="btn-ghost" onclick="openPackageBuyModal('sub10')" data-i18n="subPlanBuyBtn">اشترك دلوقتي</button>
     </div>
-    <div class="plan featured">
-      <h3 data-i18n="subPlan2Title">اشتراك شهري — 20 صورة</h3>
-      <div class="price">299 <span data-i18n="currencyLabel">جنيه</span> <span data-i18n="subPlan2Unit">/ شهريًا</span></div>
+    <div class="plan featured" data-package-id="sub20">
+      <h3 data-pkg-name>اشتراك شهري — 20 صورة</h3>
+      <div class="price"><span data-pkg-price>299</span> <span data-i18n="currencyLabel">جنيه</span> <span data-pkg-unit>/ شهريًا</span></div>
       <ul>
         <li data-i18n="subPlan2Li1">20 صورة كل شهر</li>
         <li data-i18n="subPlan2Li2">أساليب جديدة تُضاف شهريًا</li>
         <li data-i18n="subPlan2Li3">أفضل قيمة للاستخدام المستمر</li>
       </ul>
-      <button type="button" class="btn-primary" onclick="openPackageBuyModal(20)" data-i18n="subPlanBuyBtn">اشترك دلوقتي</button>
+      <button type="button" class="btn-primary" onclick="openPackageBuyModal('sub20')" data-i18n="subPlanBuyBtn">اشترك دلوقتي</button>
     </div>
   </div>
 </section>
@@ -1732,6 +1741,7 @@
         <button data-tab="promoimages" id="tabBtnPromoImages" data-i18n="tabPromoImages">صور العرض</button>
         <button data-tab="changepassword" id="tabBtnChangePassword" data-i18n="tabChangePassword">تغيير كلمة المرور</button>
         <button data-tab="sitedesign" id="tabBtnSiteDesign" data-i18n="tabSiteDesign">تصميم الموقع</button>
+        <button data-tab="pricing" id="tabBtnPricing" data-i18n="tabPricing">الأسعار والباقات</button>
       </div>
 
       <div id="adminTabProducts">
@@ -2175,6 +2185,46 @@
         </div>
         <div class="modal-actions">
           <button class="btn-primary" id="savePromptLibraryModeBtn" data-i18n="promptLibraryModeSaveBtn">حفظ الوضع</button>
+        </div>
+        </div>
+      </div>
+
+      <div id="adminTabPricing" style="display:none;">
+        <div class="admin-card">
+        <h4 style="margin:0 0 8px;" data-i18n="pricingPkgTitle">الباقات والاشتراكات</h4>
+        <p class="sub" style="margin-bottom:14px;" data-i18n="pricingPkgIntro">عدّل اسم أي باقة أو سعرها أو عدد الصور اللي بتوفّرها، واحفظ — التعديل بيظهر فورًا في كل مكان بالموقع (العربي والإنجليزي) من غير أي حاجة تانية تتعمل. تغيير باقة موجودة بيأثر بس على المشتريات الجديدة — أي عميل عنده رصيد صور من شراء سابق يفضل رصيده زي ما هو بالظبط.</p>
+        <div style="overflow-x:auto;">
+        <table class="admin-table" id="pricingPackagesTable">
+          <thead>
+            <tr>
+              <th data-i18n="pricingColId">المعرف</th>
+              <th data-i18n="pricingColNameAr">الاسم (عربي)</th>
+              <th data-i18n="pricingColNameEn">الاسم (إنجليزي)</th>
+              <th data-i18n="pricingColType">النوع</th>
+              <th data-i18n="pricingColPhotos">عدد الصور</th>
+              <th data-i18n="pricingColPrice">السعر (جنيه)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="pricingPackagesBody"><!-- populated dynamically from /site-config --></tbody>
+        </table>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-ghost" id="addPricingPackageBtn" data-i18n="pricingAddBtn">+ إضافة باقة جديدة</button>
+          <button class="btn-primary" id="savePricingPackagesBtn" data-i18n="pricingSaveBtn">حفظ الباقات</button>
+        </div>
+        <p class="sub" id="pricingPackagesError" style="color:#e05a5a; display:none;"></p>
+        </div>
+
+        <div class="admin-card">
+        <h4 style="margin:0 0 8px;" data-i18n="pricingPromptTitle">سعر شراء البرومبت لوحده</h4>
+        <p class="sub" style="margin-bottom:14px;" data-i18n="pricingPromptIntro">السعر اللي بيدفعه العميل عشان ياخد نص البرومبت بدل الصورة المحوّلة نفسها — سعر ثابت وواحد لكل المنتجات.</p>
+        <div class="field">
+          <label data-i18n="pricingPromptLabel">السعر (جنيه)</label>
+          <input type="number" id="pricingPromptPriceInput" min="1" step="1">
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="savePricingPromptBtn" data-i18n="pricingPromptSaveBtn">حفظ سعر البرومبت</button>
         </div>
         </div>
       </div>
