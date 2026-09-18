@@ -1020,6 +1020,26 @@
   .category-pricing-grid .field{margin:0;}
   @media (max-width:640px){ .category-pricing-grid{grid-template-columns:1fr;} }
 
+  /* Category management: edit/hide/delete/add (added 2026-09-18) */
+  .admin-cat-manage-row{
+    display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+    padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .admin-cat-manage-row:last-child{border-bottom:none;}
+  .admin-cat-manage-row .cat-manage-id{
+    min-width:70px; font-size:11.5px; opacity:0.55; font-family:monospace;
+  }
+  .admin-cat-manage-row input[type="text"]{
+    max-width:150px; flex:1 1 120px;
+  }
+  .cat-manage-hidden-badge{
+    font-size:11px; color:var(--brass); margin-inline-start:4px;
+  }
+  @media (max-width:640px){
+    .admin-cat-manage-row{gap:6px;}
+    .admin-cat-manage-row input[type="text"]{max-width:none; flex-basis:100%;}
+  }
+
   .coupon-row{
     display:flex; flex-wrap:wrap; gap:10px; align-items:center;
     background:var(--ink-2); border:1px solid var(--line); border-radius:10px;
@@ -1509,6 +1529,10 @@
   .tag-luxury{background:rgba(255,201,77,0.26); color:var(--brass);}
   .tag-artistic{background:rgba(79,240,192,0.32); color:var(--sage);}
   .tag-magazine{background:rgba(227,164,41,0.26); color:var(--brass-dim);}
+  /* 2026-09-18: shared neutral tint for any category added from the admin
+     panel, beyond the original 8 hand-tinted ones above — see catColorKey()
+     in app.js. */
+  .tag-default{background:rgba(150,150,168,0.28); color:var(--paper);}
 
   /* ===== Category tiles: one icon per section, built from that section's own
      photos, arranged in neat aligned rows on desktop and mobile. Clicking a
@@ -1677,6 +1701,7 @@
   .icon-luxury{color:var(--brass);}
   .icon-artistic{color:var(--sage);}
   .icon-magazine{color:var(--brass-dim);}
+  .icon-default{color:var(--paper-dim);}
 
   /* Product row: one horizontal, snap-scrolling line instead of a wrapped
      grid. The arrows under the row scroll by exactly one container width, so

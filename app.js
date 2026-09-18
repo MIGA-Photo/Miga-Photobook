@@ -101,6 +101,7 @@ const PACKAGE_CATALOG_FALLBACK = [
 ];
 let packagesRegistry = PACKAGE_CATALOG_FALLBACK; // replaced by the live list once /site-config responds
 let livePromptPrice = PROMPT_PRICE; // replaced by the admin-set value once /site-config responds
+let livePromptOriginalPrice = PROMPT_ORIGINAL_PRICE; // replaced by the admin-set value once /site-config responds
 const LAUNCH_ORIGINAL_PRICE_FALLBACK = 50; // matches the Worker's own LAUNCH_ORIGINAL_PRICE_DEFAULT
 let liveLaunchOriginalPrice = LAUNCH_ORIGINAL_PRICE_FALLBACK; // replaced by the admin-set value once /site-config responds
 
@@ -465,9 +466,9 @@ const translations = {
     tabPricing:'الأسعار والباقات', pricingPkgTitle:'الباقات والاشتراكات', pricingPkgIntro:'عدّل اسم أي باقة أو سعرها أو عدد الصور اللي بتوفّرها، واحفظ — التعديل بيظهر فورًا في كل مكان بالموقع (العربي والإنجليزي) من غير أي حاجة تانية تتعمل. تغيير باقة موجودة بيأثر بس على المشتريات الجديدة — أي عميل عنده رصيد صور من شراء سابق يفضل رصيده زي ما هو بالظبط. ملحوظة: إضافة باقة جديدة تماما هتتحفظ في السعر، لكن محتاجة كمان إضافة كارت ليها في تصميم الصفحة الرئيسية — كلمني لو ضفت باقة جديدة عشان أظبطها في الصفحة.',
     pricingColId:'المعرف', pricingColNameAr:'الاسم (عربي)', pricingColNameEn:'الاسم (إنجليزي)', pricingColType:'النوع', pricingColPhotos:'عدد الصور', pricingColPrice:'السعر (جنيه)',
     pricingTypePackage:'باقة', pricingTypeSubscription:'اشتراك', pricingAddBtn:'+ إضافة باقة جديدة', pricingSaveBtn:'حفظ الباقات',
-    pricingPromptTitle:'سعر شراء البرومبت لوحده', pricingPromptIntro:'السعر اللي بيدفعه العميل عشان ياخد نص البرومبت بدل الصورة المحوّلة نفسها — سعر ثابت وواحد لكل المنتجات.', pricingPromptLabel:'السعر (جنيه)', pricingPromptSaveBtn:'حفظ سعر البرومبت',
+    pricingPromptTitle:'سعر شراء البرومبت لوحده', pricingPromptIntro:'السعر اللي بيدفعه العميل عشان ياخد نص البرومبت بدل الصورة المحوّلة نفسها — سعر ثابت وواحد لكل المنتجات.', pricingPromptLabel:'السعر الحالي (جنيه)', pricingPromptOriginalLabel:'السعر قبل الخصم (جنيه)', pricingPromptSaveBtn:'حفظ سعر البرومبت',
     toastPricingSaved:'تم حفظ الباقات — التعديل ظاهر فورًا على الموقع', toastPricingPromptSaved:'تم حفظ سعر البرومبت',
-    pricingErrEmpty:'لازم توجد باقة واحدة على الأقل', pricingErrDupId:'في معرّفين باقة متكررين — كل معرّف لازم يكون فريد', pricingErrInvalidId:'المعرف لازم يكون حروف إنجليزية وأرقام و- و_ بس (بدون مسافات)', pricingErrInvalidRow:'راجع بيانات الباقة رقم', pricingErrFields:'كل الحقول مطلوبة والسعر وعدد الصور لازم يكونوا أرقام أكبر من صفر', pricingErrPromptPrice:'سعر البرومبت لازم يكون رقم أكبر من صفر',
+    pricingErrEmpty:'لازم توجد باقة واحدة على الأقل', pricingErrDupId:'في معرّفين باقة متكررين — كل معرّف لازم يكون فريد', pricingErrInvalidId:'المعرف لازم يكون حروف إنجليزية وأرقام و- و_ بس (بدون مسافات)', pricingErrInvalidRow:'راجع بيانات الباقة رقم', pricingErrFields:'كل الحقول مطلوبة والسعر وعدد الصور لازم يكونوا أرقام أكبر من صفر', pricingErrPromptPrice:'سعر البرومبت لازم يكون رقم أكبر من صفر', pricingErrPromptOriginal:'السعر قبل الخصم لازم يكون رقم أكبر من صفر', pricingErrPromptOriginalTooLow:'السعر قبل الخصم لازم يكون أعلى من السعر الحالي (عشان يفضل خصم حقيقي)',
     pricingScrollHint:'◀ مرّر يمين/شمال لعرض كل الأعمدة ▶',
     launchPromoTitle:'سعر الصورة الفردية والعرض الترويجي', launchPromoIntro:'بيغيّر سعر كل المنتجات (الأساليب) الفردية في الموقع دفعة واحدة، وكمان الشريط الإعلاني أعلى الصفحة وكل نص "X جنيه بدل Y" في الموقع — كل حاجة بتتحدّث تلقائيًا لنفس الرقمين اللي تحفظهم هنا. الباقات والاشتراكات مش بتتأثر (ليها الجدول الخاص بيها فوق).', launchOfferPriceLabel:'السعر الحالي (العرض)', launchOriginalPriceLabel:'السعر قبل العرض (يظهر كخصم)', launchPromoSaveBtn:'حفظ السعر في كل الموقع',
     launchPromoErrFields:'محتاج تدخل السعرين كأرقام أكبر من صفر', launchPromoErrOrder:'السعر الحالي لازم يكون أقل من السعر قبل العرض (عشان يبقى في خصم فعلي)',
@@ -484,6 +485,17 @@ const translations = {
     categoryPricingTitle:'تسعير حسب القسم', categoryPricingIntro:'أداة منفصلة عن أداة "سعر الصورة الفردية" فوق — دي بتخليك تحدد سعر مختلف لكل قسم (بسيط/بيزنس/فاخر...) بدل سعر واحد موحّد للكل. سيب أي خانة فاضية عشان قسمها ما يتغيّرش. تنبيه: تشغيل أداة "سعر الصورة الفردية" فوق بعد كده هيرجّع كل الأقسام لسعر واحد تاني.',
     categoryPricingSaveBtn:'حفظ أسعار الأقسام', categoryPricingErrFields:'محتاج تدخل سعر واحد صحيح على الأقل', toastCategoryPricingSaved:'تم حفظ أسعار الأقسام',
     categoryPricingSummaryTpl:'تم تحديث {count} منتج حسب القسم.',
+    categoriesManageTitle:'إدارة الأقسام',
+    categoriesManageIntro:'عدّل اسم أي قسم، أخفه عن الزوار، احذفه بعد نقل منتجاته لقسم تاني، أو أضف قسمًا جديدًا بنفس خواص الأقسام الحالية. الإخفاء بيخفي التبويب وكل منتجات القسم من كل مكان في الموقع للزوار العاديين، وبيفضل ظاهر ليك عشان تقدر تديره.',
+    categoriesAddTitle:'إضافة قسم جديد', categoriesAddNameArLabel:'الاسم بالعربي', categoriesAddNameEnLabel:'الاسم بالإنجليزي',
+    categoriesAddBtn:'+ إضافة قسم', categoriesRenameBtn:'حفظ الاسم', categoriesHideBtn:'إخفاء', categoriesShowBtn:'إظهار',
+    categoriesDeleteBtn:'حذف', categoriesHiddenBadge:'مخفي',
+    categoriesHideLuxuryBlocked:'اسم "فاخر" هو مكتبة البرومبتات دلوقتي — أوقف وضع مكتبة البرومبتات الأول عشان تقدر تخفيه',
+    categoriesDeleteLuxuryBlocked:'قسم "فاخر" أساسي في الموقع (مكتبة البرومبتات) ومينفعش يتحذف',
+    categoriesErrNames:'محتاج تكتب الاسم بالعربي والإنجليزي', categoriesErrGeneric:'حصل خطأ، جرب تاني',
+    categoriesDeleteConfirmTpl:'متأكد إنك عايز تحذف قسم "{name}"؟ الإجراء ده لا يمكن التراجع عنه.',
+    toastCategoryRenamed:'تم تعديل اسم القسم', toastCategoryHidden:'تم إخفاء القسم عن الزوار', toastCategoryShown:'تم إظهار القسم للزوار',
+    toastCategoryDeleted:'تم حذف القسم', toastCategoryAdded:'تم إضافة القسم الجديد',
     couponsTitle:'أكواد الخصم', couponsIntro:'كود يكتبه العميل وقت الدفع فيخصم من السعر تلقائيًا — مفيد لمتابعة أداء إعلان أو مؤثر بعينه، أو عرض لمناسبة. الخصم بيتحسب ويتّحقق منه من عندنا في السيرفر دايمًا، مش من المتصفح.',
     couponsEmptyNote:'لا يوجد أكواد خصم حاليًا.', couponCodeLabel:'الكود', couponTypeLabel:'نوع الخصم', couponTypePercent:'نسبة %', couponTypeFixed:'مبلغ ثابت',
     couponValueLabel:'القيمة', couponAppliesToLabel:'يسري على', couponAppliesAll:'كل الطلبات', couponAppliesTransform:'الصورة الفردية بس', couponAppliesPackage:'الباقات بس', couponAppliesPrompt:'البرومبت بس',
@@ -881,9 +893,9 @@ const translations = {
     tabPricing:'Pricing & Packages', pricingPkgTitle:'Packages & subscriptions', pricingPkgIntro:'Edit any package\'s name, price, or photo count, then save — the change appears everywhere on the site (Arabic and English) instantly, nothing else needs to be done. Changing an existing package only affects new purchases — any customer with credits from a previous purchase keeps their balance exactly as it was. Note: a brand-new package is saved with its price, but also needs a matching card added to the homepage layout — let me know if you add one so I can wire up its card.',
     pricingColId:'ID', pricingColNameAr:'Name (Arabic)', pricingColNameEn:'Name (English)', pricingColType:'Type', pricingColPhotos:'Photo count', pricingColPrice:'Price (EGP)',
     pricingTypePackage:'Package', pricingTypeSubscription:'Subscription', pricingAddBtn:'+ Add new package', pricingSaveBtn:'Save packages',
-    pricingPromptTitle:'Prompt-only purchase price', pricingPromptIntro:'The price a customer pays to get the prompt text instead of the transformed photo itself — one fixed price across all products.', pricingPromptLabel:'Price (EGP)', pricingPromptSaveBtn:'Save prompt price',
+    pricingPromptTitle:'Prompt-only purchase price', pricingPromptIntro:'The price a customer pays to get the prompt text instead of the transformed photo itself — one fixed price across all products.', pricingPromptLabel:'Current price (EGP)', pricingPromptOriginalLabel:'Price before discount (EGP)', pricingPromptSaveBtn:'Save prompt price',
     toastPricingSaved:'Packages saved — the change is live on the site immediately', toastPricingPromptSaved:'Prompt price saved',
-    pricingErrEmpty:'At least one package is required', pricingErrDupId:'Duplicate package IDs found — every ID must be unique', pricingErrInvalidId:'ID must be English letters, numbers, - and _ only (no spaces)', pricingErrInvalidRow:'Check the data for package #', pricingErrFields:'All fields are required, and price/photo count must be numbers greater than zero', pricingErrPromptPrice:'Prompt price must be a number greater than zero',
+    pricingErrEmpty:'At least one package is required', pricingErrDupId:'Duplicate package IDs found — every ID must be unique', pricingErrInvalidId:'ID must be English letters, numbers, - and _ only (no spaces)', pricingErrInvalidRow:'Check the data for package #', pricingErrFields:'All fields are required, and price/photo count must be numbers greater than zero', pricingErrPromptPrice:'Prompt price must be a number greater than zero', pricingErrPromptOriginal:'The price before discount must be a number greater than zero', pricingErrPromptOriginalTooLow:'The price before discount must be higher than the current price (so it stays a real discount)',
     pricingScrollHint:'◀ Swipe left/right to see every column ▶',
     launchPromoTitle:'Individual photo price & promo offer', launchPromoIntro:'Changes every individual (non-package) product\'s price on the site at once, plus the top announcement banner and every "X instead of Y" string on the site — everything updates automatically to the two numbers you save here. Packages/subscriptions are unaffected (they have their own table above).', launchOfferPriceLabel:'Current price (offer)', launchOriginalPriceLabel:'Price before the offer (shown as a discount)', launchPromoSaveBtn:'Save site-wide',
     launchPromoErrFields:'Enter both prices as numbers greater than zero', launchPromoErrOrder:'The current price must be lower than the price before the offer (so it\'s a real discount)',
@@ -900,6 +912,17 @@ const translations = {
     categoryPricingTitle:'Pricing by category', categoryPricingIntro:'A separate tool from the "individual photo price" one above — this lets you set a different price per category (simple/business/luxury...) instead of one flat price for everyone. Leave a field empty to leave that category untouched. Note: running the flat-price tool above afterwards will overwrite every category back to one price.',
     categoryPricingSaveBtn:'Save category prices', categoryPricingErrFields:'Enter at least one valid price', toastCategoryPricingSaved:'Category prices saved',
     categoryPricingSummaryTpl:'Updated {count} product(s) by category.',
+    categoriesManageTitle:'Manage categories',
+    categoriesManageIntro:'Edit any category\'s name, hide it from visitors, delete it once its products have been moved elsewhere, or add a new category with the same properties as any existing one. Hiding a category hides its tab AND all its products everywhere on the site for regular visitors, while staying visible to you so you can still manage it.',
+    categoriesAddTitle:'Add a new category', categoriesAddNameArLabel:'Arabic name', categoriesAddNameEnLabel:'English name',
+    categoriesAddBtn:'+ Add category', categoriesRenameBtn:'Save name', categoriesHideBtn:'Hide', categoriesShowBtn:'Show',
+    categoriesDeleteBtn:'Delete', categoriesHiddenBadge:'hidden',
+    categoriesHideLuxuryBlocked:'"Luxury" is currently the Prompt Library slot — turn off Prompt Library mode first to hide it',
+    categoriesDeleteLuxuryBlocked:'The "Luxury" category is a permanent part of the site (Prompt Library) and can\'t be deleted',
+    categoriesErrNames:'Enter both the Arabic and English name', categoriesErrGeneric:'Something went wrong, try again',
+    categoriesDeleteConfirmTpl:'Delete the "{name}" category? This cannot be undone.',
+    toastCategoryRenamed:'Category name updated', toastCategoryHidden:'Category hidden from visitors', toastCategoryShown:'Category shown to visitors',
+    toastCategoryDeleted:'Category deleted', toastCategoryAdded:'New category added',
     couponsTitle:'Discount coupons', couponsIntro:'A code a customer types at checkout to get an automatic discount — useful for tracking a specific ad or influencer, or a one-off occasion offer. The discount is always calculated and verified server-side, never trusted from the browser.',
     couponsEmptyNote:'No discount coupons yet.', couponCodeLabel:'Code', couponTypeLabel:'Discount type', couponTypePercent:'Percent %', couponTypeFixed:'Fixed amount',
     couponValueLabel:'Value', couponAppliesToLabel:'Applies to', couponAppliesAll:'All orders', couponAppliesTransform:'Individual photo only', couponAppliesPackage:'Packages only', couponAppliesPrompt:'Prompt only',
@@ -1420,6 +1443,7 @@ function applyLanguage(lang){
   // before this text gets copied, or the toggle would show the stale
   // "فاخر"/"Luxury" name until the next unrelated re-render.
   applyPromptLibraryLabels();
+  applyCategoryNameOverrides();
 
   // If a specific category (not "All") is selected, the dropdown button shows
   // that category's name — the blanket data-i18n pass above just reset it to
@@ -1733,15 +1757,24 @@ async function loadPromptLibraryMode(){
     PROMPT_LIBRARY_MODE = !!(data && data.promptLibraryMode);
     if(Array.isArray(data?.packages) && data.packages.length) packagesRegistry = data.packages;
     if(Number.isFinite(Number(data?.promptPrice)) && Number(data.promptPrice) > 0) livePromptPrice = Number(data.promptPrice);
+    if(Number.isFinite(Number(data?.promptOriginalPrice)) && Number(data.promptOriginalPrice) > 0) livePromptOriginalPrice = Number(data.promptOriginalPrice);
     if(Number.isFinite(Number(data?.launchOriginalPrice)) && Number(data.launchOriginalPrice) > 0) liveLaunchOriginalPrice = Number(data.launchOriginalPrice);
+    applyCategoriesConfig(data?.categories); // sync CAT_IDS/CATEGORY_META + scaffold DOM for any admin-added category, before renderGrids() below iterates CAT_IDS
     renderGrids(); // re-render product grids so the prompt-price bullets pick up livePromptPrice
     syncPackagePricingUI(); // re-render the pricing section so it picks up packagesRegistry
     syncLaunchPromoTexts(); // re-apply the "X جنيه بدل Y" copy everywhere with the live numbers
-    // Never on the admin panel itself (added 2026-09-17) — GA4/Meta Pixel are
-    // for measuring CUSTOMER traffic; injecting them here would count every
-    // one of Magdy's own admin logins/price changes as a site visit and
-    // quietly skew the real numbers.
-    if(typeof loadSiteAnalytics === 'function' && !IS_DEDICATED_ADMIN_PAGE) loadSiteAnalytics(data.analytics);
+    // Intentionally NOT calling loadSiteAnalytics() here (decided 2026-09-18).
+    // index.html/en/index.html already have real, verified, working GA4
+    // (G-98HS77F9E9) and Meta Pixel (317880457219719) snippets hardcoded
+    // directly in <head> from an earlier session — that's the one live
+    // tracking source, tested end-to-end. Calling loadSiteAnalytics() here
+    // too would inject a SECOND gtag.js/fbevents.js and fire a second
+    // pageview/PageView on every load, double-counting every visit and sale
+    // in GA4/Meta without any obvious symptom on the site itself. Magdy chose
+    // to keep the hardcoded tags as the single source of truth rather than
+    // migrate to this KV-driven path, so this stays disabled. The Analytics
+    // card in the admin panel still saves ga4Id/metaPixelId to KV (harmless),
+    // but nothing on the storefront reads or injects that config right now.
   }catch(e){ /* network hiccup — keep fallback defaults (already set above) */ }
 }
 
@@ -2260,8 +2293,9 @@ function applyChildrenVisibility(){
   // manual "unhide" step needed. (renderCatTiles() also bakes this same
   // check in directly, so a tile stays correctly hidden/shown even when it
   // gets rebuilt from scratch without this function running again first.)
-  const allCats = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
-  allCats.forEach(cat=>{
+  // CAT_IDS (not a fixed list) so this also covers any category added from
+  // the admin panel — see applyCategoriesConfig().
+  CAT_IDS.forEach(cat=>{
     if(cat === 'children') return; // handled by HIDE_CHILDREN_FROM_CUSTOMERS above
     // 'luxury' under PROMPT_LIBRARY_MODE is a derived aggregate of every
     // OTHER category (see itemsForCategoryTile()) — "has products" for it
@@ -2519,7 +2553,7 @@ function renderPromptLibraryGrid(container, outerDotsEl){
     return `
       <div class="prompt-lib-group" style="margin-bottom:28px;">
         <div class="prompt-lib-group-title" style="display:flex; align-items:center; gap:8px; font-size:16px; font-weight:700; color:var(--paper); margin:0 0 12px; padding-top:6px;">
-          <span class="cicon ${ICON_COLOR_CLASS[cat]}" aria-hidden="true" style="display:inline-flex; font-size:18px;">${CAT_ICON[cat]}</span>
+          <span class="cicon ${ICON_COLOR_CLASS[catColorKey(cat)]}" aria-hidden="true" style="display:inline-flex; font-size:18px;">${catIcon(cat)}</span>
           <span>${escapeHtml(catLabel(cat))}</span>
         </div>
         <div class="grid-nav-wrap">
@@ -2709,7 +2743,7 @@ function renderProductCard(p, opts){
           ? `<button class="buy-btn" onclick="copyPurchasedPrompt('${p.id}')">${t('copyPromptBtn')}</button>`
           : `<button class="buy-btn" onclick="openTrackForPrompt('${p.id}')">${t('promptPendingBtn')}</button>`)
       : `<button class="buy-btn" onclick="openBuyModal('${p.id}', 'prompt')">
-           ${t('buyPromptBtnPrefix')} — <span class="price-old">${PROMPT_ORIGINAL_PRICE} ${CURRENCY}</span> <span class="price-new">${livePromptPrice} ${CURRENCY}</span>
+           ${t('buyPromptBtnPrefix')} — <span class="price-old">${livePromptOriginalPrice} ${CURRENCY}</span> <span class="price-new">${livePromptPrice} ${CURRENCY}</span>
          </button>`;
     // نفس صف الشراء الموحّد اللي بقى في الكارت العادي (16 سبتمبر 2026) — هنا
     // بس المفضلة (مفيش سلة أصلاً، منتجات البرومبت-لوحده مش قابلة للإضافة
@@ -2776,7 +2810,7 @@ function renderProductCard(p, opts){
                 ? `<button class="buy-btn prompt-btn" onclick="copyPurchasedPrompt('${p.id}')">${t('copyPromptBtn')}</button>`
                 : `<button class="buy-btn prompt-btn" onclick="openTrackForPrompt('${p.id}')">${t('promptPendingBtn')}</button>`)
             : `<button class="buy-btn prompt-btn" onclick="openBuyModal('${p.id}', 'prompt')">
-                 ${t('buyPromptBtnPrefix')} — <span class="price-old">${PROMPT_ORIGINAL_PRICE} ${CURRENCY}</span> <span class="price-new">${livePromptPrice} ${CURRENCY}</span>
+                 ${t('buyPromptBtnPrefix')} — <span class="price-old">${livePromptOriginalPrice} ${CURRENCY}</span> <span class="price-new">${livePromptPrice} ${CURRENCY}</span>
                </button>`
         )}
       </div>
@@ -2787,14 +2821,43 @@ function renderProductCard(p, opts){
   </div>`;
 }
 
-const CAT_IDS = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
+// 2026-09-18: CAT_IDS was a fixed const listing exactly the 8 original
+// categories. It's now `let`, kept in sync with the live, admin-editable
+// category list (add/rename/hide/delete from the panel) by
+// applyCategoriesConfig() below, itself fed from /site-config's
+// `categories` field. Seeded here with the original 8 so the page still
+// renders correctly for the one paint before that first response comes back.
+let CAT_IDS = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
+
+/** Bilingual name + hidden/order metadata for every category, keyed by id —
+ * the live source catLabel() reads from. Populated from /site-config's
+ * `categories` by applyCategoriesConfig() (called once on load and again
+ * after every admin add/rename/hide/delete), so a rename shows up everywhere
+ * the name appears without a page reload. Seeded with the original 8
+ * categories' current Arabic/English names so nothing depends on that first
+ * network round-trip having completed yet. */
+let CATEGORY_META = {
+  children:{ nameAr:'أطفال', nameEn:'Children', hidden:false, order:0 },
+  male:{ nameAr:'رجالي', nameEn:'Men', hidden:false, order:1 },
+  female:{ nameAr:'نسائي', nameEn:'Women', hidden:false, order:2 },
+  business:{ nameAr:'أعمال', nameEn:'Business', hidden:false, order:3 },
+  cinematic:{ nameAr:'سينمائي', nameEn:'Cinematic', hidden:false, order:4 },
+  luxury:{ nameAr:'فاخر', nameEn:'Luxury', hidden:false, order:5 },
+  artistic:{ nameAr:'فني', nameEn:'Artistic', hidden:false, order:6 },
+  magazine:{ nameAr:'مجلات', nameEn:'Magazine', hidden:false, order:7 },
+};
+
 /** One small line-icon per category, shared everywhere a category shows its
  * identity (overview tile, opened section header, search results) so the
  * icon+name pairing reads as a single deliberate mark instead of the old
  * name-plus-separate-colour-tag duplication. No width/height baked in — each
  * context sizes it with CSS (font-size + 1em svg) so the same markup works
  * small in a chip and larger in a section header. Colour comes from
- * currentColor, inherited from whichever tag-<cat>/icon-<cat> class wraps it. */
+ * currentColor, inherited from whichever tag-<cat>/icon-<cat> class wraps it.
+ * `default` is what a category added from the admin panel gets — there's no
+ * bespoke artwork for a category nobody anticipated, so every id outside the
+ * original 8 shares one neutral generic mark instead (see catIcon()/
+ * catColorKey() below) rather than the lookup coming back `undefined`. */
 const CAT_ICON = {
   children: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l2.2 4.9 5.3.5-4 3.6 1.3 5.3L12 15.1l-4.8 2.7 1.3-5.3-4-3.6 5.3-.5L12 3.5z"/></svg>',
   male: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5h6l.9 2.6-1.9 1.7 1.6 9-3.6 3.7-3.6-3.7 1.6-9-1.9-1.7L9 3.5z"/></svg>',
@@ -2804,8 +2867,16 @@ const CAT_ICON = {
   luxury: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.3 3.5h11.4l3 5-8.7 12-8.7-12 3-5z"/><path d="M2.6 8.5h18.8M9 3.5l-1.8 5 4.8 12 4.8-12-1.8-5"/></svg>',
   artistic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2a8.8 8.8 0 1 0 0 17.6c1.3 0 1.9-.9 1.9-1.8 0-.5-.2-1-.5-1.4-.3-.4-.5-.9-.5-1.4 0-1.1.9-2 2-2h2a4 4 0 0 0 4-4c0-3.9-4-7-8.9-7z"/><circle cx="7.6" cy="10.8" r="1"/><circle cx="9.6" cy="7.2" r="1"/><circle cx="14.2" cy="6.6" r="1"/><circle cx="17" cy="9.8" r="1"/></svg>',
   magazine: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6c3.3-1.4 6.5-1.4 9.5.3 3-1.7 6.2-1.7 9.5-.3v12.4c-3.3-1.4-6.5-1.4-9.5.3-3-1.7-6.2-1.7-9.5-.3V6z"/><path d="M12 6.3v12.4"/></svg>',
+  default: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3.5H5.5A1.5 1.5 0 0 0 4 5v5.5c0 .4.16.78.44 1.06l8 8a1.5 1.5 0 0 0 2.12 0l5.5-5.5a1.5 1.5 0 0 0 0-2.12l-8-8A1.5 1.5 0 0 0 11 3.5z"/><circle cx="8" cy="8" r="1.3"/></svg>',
 };
-const ICON_COLOR_CLASS = { children:'icon-children', male:'icon-male', female:'icon-female', business:'icon-business', cinematic:'icon-cinematic', luxury:'icon-luxury', artistic:'icon-artistic', magazine:'icon-magazine' };
+const ICON_COLOR_CLASS = { children:'icon-children', male:'icon-male', female:'icon-female', business:'icon-business', cinematic:'icon-cinematic', luxury:'icon-luxury', artistic:'icon-artistic', magazine:'icon-magazine', default:'icon-default' };
+
+/** The original 8 categories each have their own hand-picked colour/icon —
+ * anything else (added later from the admin panel) falls back to the shared
+ * neutral `default` mark rather than an undefined/blank one. */
+const CAT_COLOR_KEYS = new Set(Object.keys(ICON_COLOR_CLASS).filter(k => k !== 'default'));
+function catColorKey(cat){ return CAT_COLOR_KEYS.has(cat) ? cat : 'default'; }
+function catIcon(cat){ return CAT_ICON[cat] || CAT_ICON.default; }
 
 /** One tile per category: its "icon" is a 2x2 collage built from that
  * category's own real product photos (falls back to the placeholder art
@@ -2927,8 +2998,8 @@ function catTileHtml(cat){
         ${items.length ? `<span class="ct-count">${items.length}</span>` : ''}
         ${catFavBtnHtml(cat)}
         <div class="cat-tile-label">
-          <span class="cat-chip tag-${cat}">
-            <span class="cicon" aria-hidden="true">${CAT_ICON[cat]}</span>
+          <span class="cat-chip tag-${catColorKey(cat)}">
+            <span class="cicon" aria-hidden="true">${catIcon(cat)}</span>
             <span class="cc-name">${escapeHtml(catLabel(cat))}</span>
           </span>
         </div>
@@ -3081,8 +3152,17 @@ function firstCardOrSelf(sec){
   return sec.querySelector('.grid > .card') || sec.querySelector('.grid') || sec;
 }
 
+/** The category's display name in the current language — 'luxury' keeps its
+ * existing Prompt Library special case (a derived view, not a real name), and
+ * every other id (the original 8, or one added later from the admin panel)
+ * reads its live, admin-editable name straight from CATEGORY_META. Falls
+ * back to the old static translation-key map only in the — normally
+ * unreachable — case that CATEGORY_META has no entry for a given id yet. */
 function catLabel(c){
-  const map = { children:'optChildren', male:'optMale', female:'optFemale', business:'optBusiness', cinematic:'optCinematic', luxury: PROMPT_LIBRARY_MODE ? 'optPromptLibrary' : 'optLuxury', artistic:'optArtistic', magazine:'optMagazine' };
+  if(c === 'luxury' && PROMPT_LIBRARY_MODE) return t('optPromptLibrary');
+  const meta = CATEGORY_META[c];
+  if(meta) return (currentLang === 'en' ? meta.nameEn : meta.nameAr) || meta.nameAr || meta.nameEn || c;
+  const map = { children:'optChildren', male:'optMale', female:'optFemale', business:'optBusiness', cinematic:'optCinematic', luxury:'optLuxury', artistic:'optArtistic', magazine:'optMagazine' };
   return t(map[c] || 'optChildren');
 }
 
@@ -3108,6 +3188,135 @@ function applyPromptLibraryLabels(){
       ? `${t('optPromptLibrary')} — ${t('optPromptLibraryDisabledHint')}`
       : t('optLuxury');
   });
+}
+
+/** Keeps every place a category's name is baked directly into an element's
+ * text (rather than read live via catLabel() on each render, like a tile's
+ * chip) in sync with CATEGORY_META: the #catNav button and the admin's
+ * #pCat option for every category. Two different kinds of element rely on
+ * this for two different reasons — the original 8 each carry a
+ * data-i18n="navX"/"optX" attribute that applyLanguage()'s blanket pass
+ * would otherwise stamp back to this file's baked-in default name on every
+ * language switch or re-render (the exact trap applyPromptLibraryLabels()
+ * exists for, right above, which is why this runs immediately after it and
+ * deliberately skips 'luxury' — that function already owns it); a category
+ * added later from the admin panel has no data-i18n at all, so nothing else
+ * would ever give its button/option a name in the first place. Called from
+ * applyLanguage() and again after every add/rename/hide/delete that touches
+ * the live list (see applyCategoriesConfig()). */
+function applyCategoryNameOverrides(){
+  CAT_IDS.forEach(cat=>{
+    if(cat === 'luxury') return; // applyPromptLibraryLabels() owns this one
+    const label = catLabel(cat);
+    const navBtn = document.querySelector('#catNav button[data-cat="'+cat+'"]');
+    if(navBtn) navBtn.textContent = label;
+    const opt = document.querySelector('#pCat option[value="'+cat+'"]');
+    if(opt) opt.textContent = label;
+  });
+}
+
+/** One collapsible category section, in the exact markup every one of the
+ * original 8 already has baked into index.html/en/index.html/admin-9k2x.html
+ * — used by ensureCategoryDom() to scaffold a matching section for a
+ * category added later from the admin panel, so it gets the identical
+ * grid/arrows/page-dots behaviour with zero extra CSS or JS. */
+function categorySectionTemplate(id){
+  return `
+<section class="cat-section collapsible" id="${id}">
+  <div class="cs-body">
+  <div class="grid-nav-wrap">
+    <div class="grid" id="grid-${id}"></div>
+  </div>
+  <div class="grid-page-dots" id="gridDots-${id}"></div>
+  </div>
+</section>`;
+}
+
+/** Builds whatever DOM a brand-new admin-added category needs but doesn't
+ * already have — the original 8 categories have all of this baked
+ * statically into every HTML page; a category created later from the admin
+ * panel has none of it, so this recreates the same three pieces at runtime:
+ * a button in the #catNav dropdown, an <option> in the admin's #pCat select
+ * (only present on the admin page — a no-op elsewhere), and its own
+ * collapsible <section> (grid + page-dots) inserted right before the
+ * pricing section, alongside every other category section. Safe to call
+ * more than once for the same id — each piece is only created if missing —
+ * so applyCategoriesConfig() doesn't need to track what it already built. */
+function ensureCategoryDom(id){
+  const navList = document.getElementById('catNav');
+  if(navList && !navList.querySelector('button[data-cat="'+id+'"]')){
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.setAttribute('data-cat', id);
+    btn.setAttribute('role', 'menuitem');
+    btn.textContent = catLabel(id);
+    navList.appendChild(btn);
+  }
+  const pCat = document.getElementById('pCat');
+  if(pCat && !pCat.querySelector('option[value="'+id+'"]')){
+    const opt = document.createElement('option');
+    opt.value = id;
+    opt.textContent = catLabel(id);
+    pCat.appendChild(opt);
+  }
+  if(!document.getElementById(id)){
+    const pricingSection = document.getElementById('pricing');
+    if(pricingSection){
+      pricingSection.insertAdjacentHTML('beforebegin', categorySectionTemplate(id));
+    }else{
+      // Extremely defensive fallback — 'pricing' is a fixture of every page
+      // that has categories at all, but a missing anchor should never
+      // silently drop a whole category's storefront presence.
+      document.body.insertAdjacentHTML('beforeend', categorySectionTemplate(id));
+    }
+  }
+}
+
+/** Undoes ensureCategoryDom() for a category the admin deleted server-side.
+ * deleteCategory() on the Worker already refuses to delete one that still
+ * has products in it, so this only ever removes an empty section/button/
+ * option/tile — never a product's own card. */
+function removeCategoryDom(id){
+  document.querySelector('#catNav button[data-cat="'+id+'"]')?.remove();
+  document.querySelector('#pCat option[value="'+id+'"]')?.remove();
+  document.getElementById(id)?.remove();
+  document.querySelector('.cat-tile[data-cat="'+id+'"]')?.remove();
+}
+
+/** Reconciles the live category list (from /site-config's `categories`,
+ * backed by /admin/add-category, /admin/rename-category,
+ * /admin/set-category-hidden and /admin/delete-category) against what's
+ * currently in CAT_IDS/CATEGORY_META and the DOM. Called once right after
+ * every /site-config load (see loadPromptLibraryMode()) and again the
+ * moment any add/rename/hide/delete succeeds in the admin panel, so every
+ * surface — nav dropdown, #pCat select, section list, tiles — stays in sync
+ * with the database without a page reload.
+ *
+ * "Hide" itself needs no dedicated visibility logic here: getProducts() on
+ * the Worker already excludes a hidden category's products from the public
+ * catalog, so the existing "auto-hide an empty category from visitors, but
+ * keep showing it to a logged-in admin" logic already in
+ * applyChildrenVisibility()/itemsForCategoryTile()/catTileHtml() does the
+ * rest for free — a hidden category with real products looks exactly like
+ * an empty one to a regular visitor's copy of `products` (fetched from the
+ * public endpoint), while the admin's own unfiltered copy (see
+ * loadAdminProducts()) still shows everything so they can manage it. */
+function applyCategoriesConfig(categories){
+  if(!Array.isArray(categories) || !categories.length) return;
+  const sorted = [...categories].sort((a,b)=>(a.order ?? 0) - (b.order ?? 0));
+  const newIds = sorted.map(c=>c.id);
+
+  // Metadata first — everything below (catLabel() included) must already see
+  // the final names/hidden flags while it reconciles the DOM.
+  CATEGORY_META = {};
+  sorted.forEach(c=>{ CATEGORY_META[c.id] = { nameAr:c.nameAr, nameEn:c.nameEn, hidden:!!c.hidden, order:c.order }; });
+
+  CAT_IDS.filter(id => !newIds.includes(id)).forEach(removeCategoryDom);
+  newIds.filter(id => !CAT_IDS.includes(id)).forEach(ensureCategoryDom);
+
+  CAT_IDS = newIds;
+  CAT_TILE_ORDER = null; // membership/order may have changed — rebuild on next render
+  applyCategoryNameOverrides();
 }
 
 /** Products backing the "luxury" tile/section: under normal operation, just
@@ -4852,8 +5061,7 @@ function scrollToProductCard(p){
  * so a query matches if the words exist ANYWHERE in that section's real
  * content, not just in whichever few lines were originally picked. */
 function getStaticSearchIndex(){
-  const cats = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
-  const items = cats.map(c => ({ id:c, label: catLabel(c), keywords:[catLabel(c)], icon:`<span class="cicon ${ICON_COLOR_CLASS[c]}" style="display:inline-flex;font-size:15px;vertical-align:-2px;">${CAT_ICON[c]}</span>` }));
+  const items = CAT_IDS.map(c => ({ id:c, label: catLabel(c), keywords:[catLabel(c)], icon:`<span class="cicon ${ICON_COLOR_CLASS[catColorKey(c)]}" style="display:inline-flex;font-size:15px;vertical-align:-2px;">${catIcon(c)}</span>` }));
   items.push(
     { id:'howItWorks', label:t('howItWorksTitle'), keywords:[t('how1Title'), t('how1Desc'), t('how2Title'), t('how2Desc'), t('how3Title'), t('how3Desc')], icon:'❔' },
     { id:'testimonials', label:t('testimonialsTitle'), keywords:['تقييم', 'تقييمات', 'review', 'reviews', 'rating'], icon:'⭐' },
@@ -6852,6 +7060,7 @@ elById('tabBtnPricing').onclick = async ()=>{
   setAdminTab('pricing');
   await loadPricingIntoAdmin();
   await loadCategoryPricingIntoAdmin();
+  renderCategoriesManageList();
   await loadCouponsIntoAdmin();
   await loadPriceHistoryIntoAdmin();
 };
@@ -7136,6 +7345,8 @@ async function loadPricingIntoAdmin(){
     renderPricingPackagesTable(packages);
     const promptInput = document.getElementById('pricingPromptPriceInput');
     if(promptInput && Number.isFinite(Number(data.promptPrice))) promptInput.value = data.promptPrice;
+    const promptOriginalInput = document.getElementById('pricingPromptOriginalPriceInput');
+    if(promptOriginalInput && Number.isFinite(Number(data.promptOriginalPrice))) promptOriginalInput.value = data.promptOriginalPrice;
 
     // Offer price shown here is the REAL current cheapest individual-product
     // price (same source syncHeroPriceCta/syncLaunchPromoTexts trust) — never
@@ -7253,19 +7464,30 @@ elById('savePricingPackagesBtn').onclick = async ()=>{
 elById('savePricingPromptBtn').onclick = async ()=>{
   if(!BACKEND_BASE || !adminSessionToken) return;
   const input = document.getElementById('pricingPromptPriceInput');
+  const originalInput = document.getElementById('pricingPromptOriginalPriceInput');
   const price = Number(input?.value);
+  const originalPrice = Number(originalInput?.value);
   if(!Number.isFinite(price) || price <= 0){
     showToast(t('pricingErrPromptPrice'));
+    return;
+  }
+  if(!Number.isFinite(originalPrice) || originalPrice <= 0){
+    showToast(t('pricingErrPromptOriginal'));
+    return;
+  }
+  if(originalPrice <= price){
+    showToast(t('pricingErrPromptOriginalTooLow'));
     return;
   }
   try{
     const res = await fetch(`${BACKEND_BASE}/admin/set-prompt-price?token=${encodeURIComponent(adminSessionToken)}`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ price })
+      body: JSON.stringify({ price, originalPrice })
     });
     const data = await res.json().catch(()=>({}));
     if(res.ok && data.ok){
       livePromptPrice = Number.isFinite(Number(data.promptPrice)) ? data.promptPrice : price;
+      livePromptOriginalPrice = Number.isFinite(Number(data.promptOriginalPrice)) ? data.promptOriginalPrice : originalPrice;
       if(typeof renderGrids === 'function') renderGrids();
       showToast(t('toastPricingPromptSaved'));
     }else{
@@ -7368,12 +7590,12 @@ elById('saveLaunchPromoBtn').onclick = async ()=>{
 // ---------- Per-category bulk pricing (added 2026-09-17) ----------
 // A separate control from the launch-promo one above: that sets ONE price
 // for every individual product; this sets a price PER CATEGORY. Renders one
-// input per category the site actually uses (PRODUCT_CATEGORIES on the
-// Worker), pre-filled from /site-config's categoryPricing (only categories
-// that have ever been explicitly set here show a value — an empty field
-// means "leave this category as-is" both on load and on save).
-const PRODUCT_CATEGORIES_LIST = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
-
+// input per category the site actually uses — CAT_IDS, the live list kept in
+// sync with the admin's add/rename/hide/delete tools by
+// applyCategoriesConfig(), not a fixed list — pre-filled from /site-config's
+// categoryPricing (only categories that have ever been explicitly set here
+// show a value — an empty field means "leave this category as-is" both on
+// load and on save).
 async function loadCategoryPricingIntoAdmin(){
   if(!BACKEND_BASE) return;
   const grid = document.getElementById('categoryPricingGrid');
@@ -7386,7 +7608,7 @@ async function loadCategoryPricingIntoAdmin(){
     const res = await fetch(`${BACKEND_BASE}/site-config`, { cache:'no-store' });
     const data = await res.json();
     const saved = data.categoryPricing || {};
-    grid.innerHTML = PRODUCT_CATEGORIES_LIST.map(cat => `
+    grid.innerHTML = CAT_IDS.map(cat => `
       <div class="field">
         <label>${catLabel(cat)}</label>
         <input type="number" min="1" step="1" data-cat-price="${cat}" value="${Number.isFinite(saved[cat]) ? saved[cat] : ''}" placeholder="—">
@@ -7439,6 +7661,148 @@ elById('saveCategoryPricingBtn')?.addEventListener('click', async ()=>{
     showErr(t('toastAdminServerError'));
   }
 });
+
+// ---------- Category management: edit / hide / delete / add (added 2026-09-18) ----------
+// From the admin panel: rename any category (Arabic + English name), hide
+// one from regular visitors (its tab AND every one of its products
+// disappears everywhere on the site — see applyCategoriesConfig()'s comment
+// for how that's achieved with no extra visibility code), delete an empty
+// one after a confirm dialog, or add a brand-new one with the exact same
+// properties as any existing category. 'luxury' is permanently protected
+// from deletion (it's the Prompt Library's derived slot, not an ordinary
+// bucket of products) and from being hidden while Prompt Library mode is on
+// — both guards are enforced server-side (see the Worker's
+// setCategoryHidden()/deleteCategory()); the buttons here are just disabled
+// to match, so the admin sees why before ever sending the request.
+function renderCategoriesManageList(){
+  const wrap = document.getElementById('categoriesManageList');
+  if(!wrap) return;
+  const rows = [...CAT_IDS].sort((a,b)=>(CATEGORY_META[a]?.order ?? 0) - (CATEGORY_META[b]?.order ?? 0));
+  wrap.innerHTML = rows.map(id=>{
+    const meta = CATEGORY_META[id] || {};
+    const isLuxury = id === 'luxury';
+    const hideDisabled = isLuxury && PROMPT_LIBRARY_MODE;
+    const deleteDisabled = isLuxury;
+    return `
+    <div class="admin-cat-manage-row" data-cat-id="${escapeHtml(id)}">
+      <span class="cat-manage-id">${escapeHtml(id)}</span>
+      <input type="text" class="cat-manage-name-ar" data-cat-name-ar="${escapeHtml(id)}" value="${escapeHtml(meta.nameAr || '')}" placeholder="${escapeHtml(t('categoriesAddNameArLabel'))}">
+      <input type="text" class="cat-manage-name-en" data-cat-name-en="${escapeHtml(id)}" value="${escapeHtml(meta.nameEn || '')}" placeholder="${escapeHtml(t('categoriesAddNameEnLabel'))}">
+      <button type="button" class="btn-ghost" onclick="renameCategoryFromAdmin('${id}')">${escapeHtml(t('categoriesRenameBtn'))}</button>
+      <button type="button" class="btn-ghost" onclick="toggleCategoryHiddenFromAdmin('${id}')" ${hideDisabled ? `disabled title="${escapeHtml(t('categoriesHideLuxuryBlocked'))}"` : ''}>${escapeHtml(meta.hidden ? t('categoriesShowBtn') : t('categoriesHideBtn'))}${meta.hidden ? ` <span class="cat-manage-hidden-badge">${escapeHtml(t('categoriesHiddenBadge'))}</span>` : ''}</button>
+      <button type="button" class="btn-ghost cat-manage-delete-btn" onclick="deleteCategoryFromAdmin('${id}')" ${deleteDisabled ? `disabled title="${escapeHtml(t('categoriesDeleteLuxuryBlocked'))}"` : ''}>${escapeHtml(t('categoriesDeleteBtn'))}</button>
+    </div>`;
+  }).join('');
+}
+
+function showCategoriesManageError(msg){
+  const errEl = document.getElementById('categoriesManageError');
+  if(errEl){ errEl.textContent = msg; errEl.style.display = 'block'; }
+}
+function clearCategoriesManageError(){
+  const errEl = document.getElementById('categoriesManageError');
+  if(errEl){ errEl.style.display = 'none'; errEl.textContent = ''; }
+}
+
+/** Shared tail for every category-management call below: apply whatever
+ * fresh `categories` list the Worker handed back (every add/rename/hide/
+ * delete endpoint returns the full updated list, same as addCategory() /
+ * renameCategory() / setCategoryHidden() / deleteCategory() on the Worker),
+ * then refresh every admin surface that shows category names or the
+ * per-category price grid so nothing lags behind the change just made. */
+function refreshAfterCategoriesChange(categories){
+  applyCategoriesConfig(categories);
+  renderCategoriesManageList();
+  renderGrids();
+  loadCategoryPricingIntoAdmin();
+}
+
+async function renameCategoryFromAdmin(id){
+  clearCategoriesManageError();
+  if(!BACKEND_BASE || !adminSessionToken) return;
+  const nameAr = document.querySelector(`[data-cat-name-ar="${id}"]`)?.value.trim();
+  const nameEn = document.querySelector(`[data-cat-name-en="${id}"]`)?.value.trim();
+  if(!nameAr || !nameEn){ showCategoriesManageError(t('categoriesErrNames')); return; }
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/rename-category?token=${encodeURIComponent(adminSessionToken)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id, nameAr, nameEn })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(res.ok && data.ok){
+      refreshAfterCategoriesChange(data.categories);
+      showToast(t('toastCategoryRenamed'));
+    }else{
+      showCategoriesManageError(data.error || t('categoriesErrGeneric'));
+    }
+  }catch(e){ showCategoriesManageError(t('categoriesErrGeneric')); }
+}
+
+async function toggleCategoryHiddenFromAdmin(id){
+  clearCategoriesManageError();
+  if(!BACKEND_BASE || !adminSessionToken) return;
+  const wasHidden = !!CATEGORY_META[id]?.hidden;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/set-category-hidden?token=${encodeURIComponent(adminSessionToken)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id, hidden: !wasHidden })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(res.ok && data.ok){
+      refreshAfterCategoriesChange(data.categories);
+      showToast(t(wasHidden ? 'toastCategoryShown' : 'toastCategoryHidden'));
+    }else{
+      showCategoriesManageError(data.error || t('categoriesErrGeneric'));
+    }
+  }catch(e){ showCategoriesManageError(t('categoriesErrGeneric')); }
+}
+
+async function deleteCategoryFromAdmin(id){
+  clearCategoriesManageError();
+  if(!BACKEND_BASE || !adminSessionToken) return;
+  if(!window.confirm(t('categoriesDeleteConfirmTpl').replace('{name}', catLabel(id)))) return;
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/delete-category?token=${encodeURIComponent(adminSessionToken)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(res.ok && data.ok){
+      refreshAfterCategoriesChange(data.categories);
+      showToast(t('toastCategoryDeleted'));
+    }else{
+      showCategoriesManageError(data.error || t('categoriesErrGeneric'));
+    }
+  }catch(e){ showCategoriesManageError(t('categoriesErrGeneric')); }
+}
+
+async function addCategoryFromAdmin(){
+  const addErrEl = document.getElementById('categoriesAddError');
+  if(addErrEl){ addErrEl.style.display = 'none'; addErrEl.textContent = ''; }
+  if(!BACKEND_BASE || !adminSessionToken) return;
+  const nameArEl = document.getElementById('newCategoryNameAr');
+  const nameEnEl = document.getElementById('newCategoryNameEn');
+  const nameAr = nameArEl?.value.trim();
+  const nameEn = nameEnEl?.value.trim();
+  const showAddErr = (msg)=>{ if(addErrEl){ addErrEl.textContent = msg; addErrEl.style.display = 'block'; } };
+  if(!nameAr || !nameEn){ showAddErr(t('categoriesErrNames')); return; }
+  try{
+    const res = await fetch(`${BACKEND_BASE}/admin/add-category?token=${encodeURIComponent(adminSessionToken)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ nameAr, nameEn })
+    });
+    const data = await res.json().catch(()=>({}));
+    if(res.ok && data.ok){
+      refreshAfterCategoriesChange(data.categories);
+      if(nameArEl) nameArEl.value = '';
+      if(nameEnEl) nameEnEl.value = '';
+      showToast(t('toastCategoryAdded'));
+    }else{
+      showAddErr(data.error || t('categoriesErrGeneric'));
+    }
+  }catch(e){ showAddErr(t('categoriesErrGeneric')); }
+}
+elById('addCategoryBtn')?.addEventListener('click', addCategoryFromAdmin);
 
 // ---------- Discount coupons (added 2026-09-17) ----------
 // The full list — codes, values, usage — is only ever fetched with an
@@ -8866,7 +9230,7 @@ async function downloadAllArchive(){
   catch(e){ showToast(t('toastArchiveFailed')); return; }
   if(typeof JSZip === 'undefined'){ showToast(t('toastArchiveFailed')); return; }
   const btn = document.getElementById('archiveAllBtn');
-  const cats = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
+  const cats = CAT_IDS;
   const relevant = products.filter(p => p.image && p.image !== PLACEHOLDER_IMG);
   if(!relevant.length){ showToast(t('toastNoImageYet')); return; }
   const originalLabel = btn ? btn.textContent : '';
@@ -9236,9 +9600,8 @@ elById('dailyReportCloseBtn').onclick = ()=> document.getElementById('dailyRepor
 function renderAdminProductsList(){
   const el = document.getElementById('adminProductsList');
   if(!el) return;
-  const allCats = ['children','male','female','business','cinematic','luxury','artistic','magazine'];
   const selectedCat = document.getElementById('pCat')?.value;
-  const cats = allCats.includes(selectedCat) ? [selectedCat] : allCats;
+  const cats = CAT_IDS.includes(selectedCat) ? [selectedCat] : CAT_IDS;
   let html = '';
   cats.forEach(cat=>{
     const items = products.filter(p=>p.category===cat).sort((a,b)=>(b.order??9999)-(a.order??9999));
@@ -9252,7 +9615,7 @@ function renderAdminProductsList(){
           <b>${escapeHtml(p.title)}${p.hidden ? `<span class="product-hidden-badge">${t('hiddenBadgeLabel')}</span>` : ''}</b>
           <span>${p.price} ${CURRENCY}</span>
           <select class="admin-move-cat" onchange="moveProductCategory('${p.id}', this.value)" title="${t('moveCategoryTitle')}">
-            ${allCats.map(c => `<option value="${c}" ${c===p.category?'selected':''} ${c==='luxury' && PROMPT_LIBRARY_MODE ? 'disabled':''}>${catLabel(c)}</option>`).join('')}
+            ${CAT_IDS.map(c => `<option value="${c}" ${c===p.category?'selected':''} ${c==='luxury' && PROMPT_LIBRARY_MODE ? 'disabled':''}>${catLabel(c)}</option>`).join('')}
           </select>
         </div>
         <span class="popularity-badge" title="${t('popularityCountTitle')}">🔥 ${productPopularity[p.id] || 0}</span>
